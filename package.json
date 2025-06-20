@@ -1,0 +1,24 @@
+{
+  "name": "asparsh",
+  "version": "1.0.0",
+  "description": "This is a journey of new begining",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "asparsh"
+  ],
+  "author": "R__",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.7",
+    "connect-mongo": "^5.1.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "hbs": "^4.2.0",
+    "mongoose": "^8.16.0"
+  }
+}
