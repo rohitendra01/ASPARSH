@@ -1,0 +1,229 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden;
+    background-image: url(/assets/desktop-background.jpg);
+    background-size: cover;
+    min-height: 100vh;
+}
+
+.navbar {
+    width: 100%;
+    background: transparent;
+}
+
+.container-fluid {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100vw;
+    padding: 0 40px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.brand-name {
+    flex: 0 0 auto;
+}
+
+.brand-name a {
+    color: black;
+    text-decoration: none;
+    font-size: 24px;
+}
+
+.navbar-nav {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    border: 2px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+
+.nav-link {
+    color: black;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: text-shadow 0.2s ease;
+    position: relative;
+    overflow: visible;
+    padding-bottom: 4px; 
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    filter: blur(2px);
+}
+
+.nav-link:hover::after {
+  width: 80%;
+}
+
+
+
+.user-dropdown {
+    position: relative;
+    overflow: visible;
+    z-index: 1000; 
+    flex: 0 0 auto;
+}
+
+.user-profile-trigger {
+    cursor: pointer;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+
+.user-dropdown-content {
+    display: none; 
+    position: absolute; 
+    top: 110%; 
+    right: 0;  
+    background: #fff;
+    min-width: 250px;
+    padding: 20px 16px 12px 16px;
+    box-shadow: 1px 4px 16px rgba(0,0,0,0.15);
+    border-radius: 10px; /* Corrected syntax */
+    z-index: 1000; 
+}
+
+.user-dropdown:hover .user-dropdown-content,
+.user-dropdown:focus-within .user-dropdown-content {
+    display: block;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    background-color: #ffffff;
+    padding: 10px;
+    width: 400px;
+    border-radius: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+::placeholder {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.form button {
+    align-self: flex-end;
+}
+
+.flex-column > label {
+    color: #151717;
+    font-weight: 600;
+}
+
+.inputForm {
+    border: 1.5px solid #ecedec;
+    border-radius: 10px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    transition: 0.2s ease-in-out;
+}
+
+.input {
+    margin-left: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 85%;
+    height: 100%;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.inputForm:focus-within {
+    border: 1.5px solid #2d79f3;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.flex-row > div > label {
+    font-size: 14px;
+    color: black;
+    font-weight: 400;
+}
+
+.span {
+    font-size: 14px;
+    margin-left: 5px;
+    color: #2d79f3;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.button-submit {
+    margin: 20px 0 10px 0;
+    background-color: #151717;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 10px;
+    height: 50px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.button-submit:hover {
+    background-color: #252727;
+}
+
+.p {
+    text-align: center;
+    color: black;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.btn {
+    margin-top: 10px;
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    gap: 10px;
+    border: 1px solid #ededef;
+    background-color: white;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.btn:hover {
+    border: 1px solid #2d79f3;
+}

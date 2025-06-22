@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navbar Example</title>
+    <style>
+        /* Basic CSS for demonstration */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: #333;
+            padding: 10px 20px;
+            display: flex; /* Enables Flexbox */
+            justify-content: space-between; /* Distributes items along the main axis */
+            align-items: center; /* Aligns items vertically in the center */
+            color: white;
+        }
+
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            margin-right: auto; /* Pushes the next items to the right */
+        }
+
+        .navbar-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 20px; /* Space between links */
+            flex-grow: 1; /* Allows the links section to grow and take available space */
+            justify-content: center; /* Centers the links within their available space */
+        }
+
+        .navbar-links li a {
+            text-decoration: none;
+            color: white;
+            padding: 5px 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-links li a:hover {
+            background-color: #555;
+            border-radius: 4px;
+        }
+
+        .navbar-user-login {
+            display: flex;
+            gap: 15px; /* Space between login elements */
+            margin-left: auto; /* Pushes login elements to the far right */
+        }
+
+        .navbar-user-login a {
+            text-decoration: none;
+            color: white;
+            padding: 5px 10px;
+            border: 1px solid white;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar-user-login a:hover {
+            background-color: white;
+            color: #333;
+        }
+
+        /* Responsive adjustments (basic) */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap; /* Allows items to wrap to the next line */
+                justify-content: center;
+            }
+
+            .navbar-brand,
+            .navbar-links,
+            .navbar-user-login {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            .navbar-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">YourCompany</a>
+
+        <ul class="navbar-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+
+        <div class="navbar-user-login">
+            <a href="#">Login</a>
+            <a href="#">Sign Up</a>
+        </div>
+    </nav>
+
+    <div style="padding: 20px;">
+        <h1>Welcome to Our Website!</h1>
+        <p>This is where your main content will go.</p>
+    </div>
+
+</body>
+</html>
