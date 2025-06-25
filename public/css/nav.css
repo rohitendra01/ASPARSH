@@ -1,3 +1,4 @@
+/* General Resets (keep as is) */
 *{
     margin: 0;
     padding: 0;
@@ -5,16 +6,17 @@
 }
 
 html, body {
-  overflow-x: hidden;   
-  overflow-y: auto;   
-  margin: 0;
-  padding: 0;
-  padding-top: 10px;
-    background-image: url(/assets/desktop-background.jpg);
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    padding-top: 10px; /* Adjust if your navbar is fixed and needs space */
+    background-image: url(/assets/desktop-background.jpg); /* Ensure this path is correct */
     background-size: cover;
     min-height: 100vh;
 }
 
+/* Navbar Styles (keep as is) */
 .navbar {
     width: 100%;
     background: transparent;
@@ -24,8 +26,8 @@ html, body {
     z-index: 1000;
 }
 .navbar.scrolled {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-    background: rgba(255,255,255,0.95); /* Optional: subtle background */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.678);
+    background: rgba(255,255,255,0.95);
     transition: box-shadow 0.2s, background 0.2s;
 }
 
@@ -38,14 +40,15 @@ html, body {
     max-width: 100%;
     padding: 0 40px;
     box-sizing: border-box;
-    overflow: visible;
+    overflow: visible; /* Important for dropdown to not be clipped */
 }
 
+/* Ensure these are for positioning context and z-index */
 .container-fluid,
 .user-dropdown {
-    position: relative;
-    overflow: visible;
-    z-index: 10;
+    position: relative; /* Container for absolute children */
+    overflow: visible; /* Allows children to break out of bounds */
+    z-index: 10; /* Set z-index for stacking context */
 }
 
 .brand-name {
@@ -69,7 +72,6 @@ html, body {
     transition: background 0.2s, border-color 0.2s;
 }
 
-
 .nav-link {
     color: black;
     text-decoration: none;
@@ -77,10 +79,9 @@ html, body {
     padding: 8px 12px;
     border-radius: 6px;
     transition: box-shadow 0.2s ease;
-    /* transition: text-shadow 0.2s ease; */
     position: relative;
     overflow: visible;
-    padding-bottom: 4px; 
+    padding-bottom: 4px;
 }
 
 .nav-link::after {
@@ -98,67 +99,77 @@ html, body {
 }
 
 .nav-link:hover::after {
-  width: 80%;
+    width: 80%;
 }
 
-
-
+/* --- User Dropdown Specific Styles --- */
 .user-dropdown {
-    position: relative;
-    overflow: visible;
-    z-index: 1000; 
+    position: relative; /* Parent for absolute positioning of content */
+    overflow: visible; /* Allow dropdown content to be visible */
+    z-index: 1000; /* Ensure it's above other elements */
     flex: 0 0 auto;
+    /* Removed temporary debugging styles if you had them */
 }
 
 .user-profile-trigger {
     cursor: pointer;
-    display: flex; 
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .user-dropdown-content {
-  /* start hidden */
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;          
+    opacity: 0; /* Hidden initially */
+    visibility: hidden; /* Hidden for accessibility and pointer events */
+    pointer-events: none; /* Prevents interaction when hidden */
 
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+    position: absolute;
+    top: calc(100% + 10px); /* Position 10px below the user-dropdown */
+    right: 0; /* Align to the right of the user-dropdown */
 
-  background: #ffffff;
-  width: auto;
-  padding: 20px 16px 12px;
-  box-shadow: 1px 4px 16px rgba(0,0,0,0.15);
-  border-radius: 10px;
+    background: #ffffff;
+    width: 400px; /* Explicit width for the form (from your partials/login form) */
+    padding: 20px 16px 12px 16px;
+    box-shadow: 1px 4px 16px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    z-index: 1000; /* Ensure dropdown content is above other elements */
+    box-sizing: border-box; /* Include padding/border in width */
 
-  transform: translateY(-5px);   
-  transition:
-    opacity 0.2s ease 1s,        
-    transform 0.2s ease 1s,      
-    visibility 0s linear 1.2s;   
+    transform: translateY(-5px); /* Start slightly above for slide-down effect */
+
+    /* Transition properties for showing and hiding */
+    /* When hiding: fade out and slide up, then become invisible after opacity fades (0.2s delay for visibility) */
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
 }
 
-.user-dropdown:hover .user-dropdown-content,
-.user-dropdown:focus-within .user-dropdown-content {
-    opacity: 1;
-  visibility: visible;
-  pointer-events: auto;          
+.user-dropdown-content.show {
+    opacity: 1; /* Fully visible */
+    visibility: visible; /* Make visible */
+    pointer-events: auto; /* Enable interaction */
+    transform: translateY(0); /* Slide to final position */
 
-  transform: translateY(0);      
-
-  transition-delay: 0s, 0s, 0s;
+    /* When showing: appear immediately (no delay on visibility) and fade/slide in */
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
 }
 
+/* IMPORTANT: Remove any CSS hover rules for .user-dropdown-content if they exist.
+   JavaScript is now fully controlling the 'show' class. */
+/* Example of what to remove if you have it: */
+/*
+.user-dropdown:hover .user-dropdown-content {
+    // ... all visibility/opacity/transform rules
+}
+*/
+
+/* --- Form Styles (keep as is, ensure this is the content of partials/login) --- */
 .form {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    background-color: #ffffff;
-    padding: 10px;
-    width: 400px;
-    border-radius: 20px;
+    background-color: #ffffff; /* This is already set by .user-dropdown-content */
+    padding: 10px; /* This padding applies to the form itself, consider if .user-dropdown-content padding is enough */
+    width: 100%; /* Make form fill the dropdown content width */
+    border-radius: 20px; /* This is already set by .user-dropdown-content */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
