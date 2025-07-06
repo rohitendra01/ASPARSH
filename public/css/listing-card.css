@@ -5,17 +5,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; 
+    box-sizing: border-box;
+    margin-top: 100px;
 }
 .container {
     background-color: #ffffff;
     border-radius: 20px;
+    height: 600px; 
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     width: 900px;
     min-height: 500px;
-    padding: 40px;
     box-sizing: border-box;
     justify-content: space-between;
 }
@@ -23,6 +24,7 @@ body {
     display: flex;
     flex: 1 1 auto;
     gap: 40px;
+    padding: 20px;
 }
 .left-panel {
     flex: 1;
@@ -35,10 +37,12 @@ body {
 }
 .bottom-panel {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
     align-items: center;
     gap: 16px;
-    margin-top: 32px;
+    padding: 0 40px;
 }
 .header {
     display: flex;
@@ -132,10 +136,13 @@ body {
 .click-here-button:hover {
     background-color: #d0d0d0;
 }
+button{
+    margin-bottom: 20px;
+}
 .buy-now-button {
     background-color: #333;
     color: #fff;
-    padding: 15px 40px;
+    padding: 10px 20px;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;

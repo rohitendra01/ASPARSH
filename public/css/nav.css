@@ -10,7 +10,6 @@ html, body {
     overflow-y: auto;
     margin: 0;
     padding: 0;
-    padding-top: 10px; /* Adjust if your navbar is fixed and needs space */
     background-image: url(/assets/desktop-background.jpg); /* Ensure this path is correct */
     background-size: cover;
     min-height: 100vh;
@@ -102,7 +101,8 @@ html, body {
     width: 80%;
 }
 
-/* --- User Dropdown Specific Styles --- */
+
+
 .user-dropdown {
     position: relative; /* Parent for absolute positioning of content */
     overflow: visible; /* Allow dropdown content to be visible */
@@ -276,4 +276,104 @@ html, body {
 
 .btn:hover {
     border: 1px solid #2d79f3;
+}
+
+
+.footer {
+    background-color: #ffffffa6;
+    color: #fff;
+    padding: 2rem 1rem;
+}
+
+.footer_container {
+    display: grid;
+    gap: 2rem;
+    padding: 2rem 1rem;
+    background-color: #f9ffd1b5;
+    color: #111827;
+}
+
+.footer_col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.footer_logo .logo {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.footer_logo .logo span {
+    color: #111827;
+}
+
+.footer_col h4 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #000000;
+}
+
+.footer_links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.footer_links a {
+    color: #111827;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer_links a:hover {
+    color: #ffffff;
+}
+
+.footer_socials {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer_socials a {
+    color: #111827;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+.footer_socials a:hover {
+    color: #000000;
+}
+
+.footer_col h5 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.footer_discover {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer_discover img {
+    max-width: 120px;
+    border-radius: 1rem;
+}
+
+.footer_bar {
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #111827;
+    text-align: center;
+}
+
+
+@media (min-width: 1024px) {
+    .footer_container {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }

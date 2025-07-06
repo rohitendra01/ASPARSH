@@ -7,6 +7,7 @@
   gap: 2rem;
   margin: 2rem 0;
   box-sizing: border-box;
+  margin-top: 100px;
 }
 
 
@@ -153,10 +154,10 @@
 .card__button button {
   background: var(--card-accent);
   width: auto;
-  height: 55px;
+  height: 30px;
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 0.5em 1.5em;
   font-size: 1em;
   font-weight: 600;

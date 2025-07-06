@@ -1,0 +1,136 @@
+<style>
+
+  /* Login Page Styles */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f2f5; /* Light grey background for the page */
+}
+
+.login-container {
+    background-color: #ffffff; /* White background for the form container */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.login-title {
+    font-size: 2em;
+    color: #333333;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.login-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555555;
+    font-weight: 500;
+}
+
+.login-group input[type="email"],
+.login-group input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    color: #333333;
+    transition: border-color 0.3s ease;
+}
+
+.login-group input[type="email"]::placeholder,
+.login-group input[type="password"]::placeholder {
+    color: #aaaaaa;
+}
+
+.login-group input[type="email"]:focus,
+.login-group input[type="password"]:focus {
+    border-color: #007bff; /* Highlight on focus */
+    outline: none;
+}
+
+.login-btn {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    margin-top: 20px;
+    font-weight: 600;
+}
+
+.login-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.login-register-link {
+    margin-top: 25px;
+    color: #666666;
+    font-size: 0.95em;
+}
+
+.login-register-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Styles for alert messages (from your HTML) */
+.alert {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    text-align: left;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+</style>
+
+<div class="login-container">
+  <form class="login-form" method="POST" action="/login">
+    <h2 class="login-title">Sign In</h2>
+    <% if (error && error.length) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <div class="login-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required placeholder="Enter your email">
+    </div>
+    <div class="login-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required placeholder="Enter your password">
+    </div>
+    <button type="submit" class="login-btn">Login</button>
+    <p class="login-register-link">Don't have an account? <a href="/register">Register</a></p>
+  </form>
+</div>
