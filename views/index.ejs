@@ -18,8 +18,11 @@
     background-size: cover;
     background-position: center;">
     <%- include('partials/navbar') %>
-    <%- include('partials/listing-cards') %>
-    <%- include('partials/product-cards') %>
+    <div>
+        <%- include('partials/flash') %>
+    </div>
+        <%- include('partials/listing-cards') %>
+        <%- include('partials/product-cards') %>
     <script src="js/main.js"></script>
 </body>
 </html>

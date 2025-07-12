@@ -1,14 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
-const http = require("http");
 const ejsMate = require('ejs-mate');
-const server = http.createServer(app);
-
-
-
 const path = require("path");
-const mongoose = require("mongoose");
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
@@ -16,18 +11,9 @@ const LocalStrategy = require('passport-local').Strategy;
 const User = require('./models/User');
 
 
-mongoose.connect("mongodb://localhost:27017/asparsh", {
-}).then(() => {
-    console.log("Connected to MongoDB");
-}).catch(err => {
-    console.error("MongoDB connection error:", err);
-});
-
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
-
 app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "assets")));
@@ -35,11 +21,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-// Session middleware
+
 app.use(session({
     secret: 'yourSecretKey',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { 
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }));
 app.use(flash());
 
@@ -47,83 +38,59 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport config
+// Passport config - fixed to use comparePassword method
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
-    const user = await User.findOne({ email });
-    if (!user) return done(null, false, { message: 'Incorrect email.' });
-    const isMatch = await user.isValidPassword(password);
-    if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
-    return done(null, user);
+    try {
+        // Convert email to lowercase for case-insensitive search
+        const emailLower = email.toLowerCase();
+        const user = await User.findOne({ email: emailLower });
+        if (!user) return done(null, false, { message: 'Incorrect email.' });
+        
+        // Fixed to use comparePassword method
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
+        
+        return done(null, user);
+    } catch (err) {
+        return done(err);
+    }
 }));
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id);
-    done(null, user);
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err);
+    }
 });
 
-// Make user and flash available in all templates
+// Enhanced res.locals middleware
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.errors = req.flash('errors');
+    res.locals.fieldErrors = req.flash('fieldErrors')[0] || {};
+    res.locals.fieldWarnings = req.flash('fieldWarnings')[0] || {};
+    res.locals.returnTo = req.session.returnTo || '/';
+    res.locals.name = req.flash('name')[0];
+    res.locals.email = req.flash('email')[0];
     next();
 });
 
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const indexRoutes = require('./routes/indexRoutes');
+const productRoutes = require('./routes/productRoutes');
 
-app.get("/", (req, res) => {
-    res.render("index");
-});
-app.get("/products/index", (req, res) => {
-    res.render("products/index");
-});
+// Use routes
+app.use('/', indexRoutes);
+app.use('/', authRoutes);
+app.use('/products', productRoutes);
 
-// Show register page
-app.get("/register", (req, res) => {
-    res.render("users/register");
-});
-
-// Handle register form submission
-app.post("/register", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        const user = new User({ name, email, password });
-        await user.save();
-        req.login(user, err => {
-            if (err) return next(err);
-            req.flash('success', 'Welcome!');
-            res.redirect('/');
-        });
-    } catch (e) {
-        req.flash('error', 'Email already registered.');
-        res.redirect('/register');
-    }
-});
-
-// Show login page
-app.get("/login", (req, res) => {
-    res.render("users/login"); // Make sure you have users/login.ejs
-});
-
-// Handle login form submission
-app.post("/login", passport.authenticate('local', {
-    failureRedirect: '/login',
-    failureFlash: true
-}), (req, res) => {
-    req.flash('success', 'Welcome back!');
-    res.redirect('/');
-});
-
-app.get('/logout', (req, res, next) => {
-    req.logout(err => {
-        if (err) return next(err);
-        req.flash('success', 'Logged out successfully.');
-        res.redirect('/');
-    });
-});
-
-
-
-server.listen(3000, () => {
-    console.log("Server running on 3000");
-});
+// Export app for server.js
+module.exports = app;
