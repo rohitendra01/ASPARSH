@@ -150,16 +150,9 @@ html, body {
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
 }
 
-/* IMPORTANT: Remove any CSS hover rules for .user-dropdown-content if they exist.
-   JavaScript is now fully controlling the 'show' class. */
-/* Example of what to remove if you have it: */
-/*
-.user-dropdown:hover .user-dropdown-content {
-    // ... all visibility/opacity/transform rules
-}
-*/
 
-/* --- Form Styles (keep as is, ensure this is the content of partials/login) --- */
+
+
 .form {
     display: flex;
     flex-direction: column;
