@@ -311,6 +311,42 @@
                 </div> 
             </div>
         </section>
+        <section class="size container5 snap-section">
+            <div class="container5-head-text">
+                <h2>Happy Customers</h2>
+                <p>Hear from our satisfied customers who have transformed their business connections with Asparsh.
+                    <br>It has always been possible with the help of our innovative solutions. So join the community of happy customers today!
+                </p>
+            </div>
+            <div class="testimonial-carousel">
+                <button class="testimonial-carousel-nav prev">&#10094;</button>
+                <div class="testimonial-carousel-wrapper">
+                  <% testimonials.forEach(function(testimonial, idx) { %>
+                    <div class="testimonial-card">
+                        <img class="testimonial-avatar" src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>">
+                    <div class="testimonial-quote">"<%= testimonial.text %>"</div>
+                    <div class="testimonial-user">
+                        <div class="testimonial-name"><%= testimonial.name %></div>
+                        <div class="testimonial-role"><%= testimonial.role %></div>
+                    </div>
+                </div>
+                  <% }) %>
+            </div>
+                <button class="testimonial-carousel-nav next">&#10095;</button>
+                <div class="testimonial-carousel-dots"></div>
+        </section>
+        <section class="size container6 snap-section">
+            <div class="container6-head-text">
+                <h2>Sharing is Caring</h2>
+            </div>
+            <div class="container6-content">
+                <div class="container6-content-text">
+                    <p>Share your NFC-enabled products with friends and colleagues. Help them discover the convenience of instant connections and interactive experiences.</p>
+                    <p>Join our community of users who are embracing the future of connectivity with Asparsh.</p>
+                    <p>Spread the word about Asparsh and let others experience the future of connectivity.</p>      
+                    
+                </div>
+            </div>
     </main>
     <footer id="snap">
         <div class="footer-tag-line">
