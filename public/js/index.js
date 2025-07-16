@@ -1,39 +1,17 @@
-    (function() {
-        const sliderContainer = document.querySelector('.slider-container');
-        if (!sliderContainer) return;
-
-        const tracker = sliderContainer.querySelector('.slider-tracker');
-        const slides = tracker.querySelectorAll('.slide');
-        const prevBtn = sliderContainer.querySelector('.prev-btn');
-        const nextBtn = sliderContainer.querySelector('.next-btn');
-        if (slides.length === 0) return;
-        const slideCount = slides.length;
-        let currentIndex = 0;
-
-        function goToSlide(index) {
-            if (index < 0) {
-                index = slideCount - 1;
-            } else if (index >= slideCount) {
-                index = 0;
-            }
-            tracker.style.transform = `translateX(-${index * 100}%)`;
-            currentIndex = index;
-        }
-
-        nextBtn.addEventListener('click', function() {
-            goToSlide(currentIndex + 1);
-        });
-
-        prevBtn.addEventListener('click', function() {
-            goToSlide(currentIndex - 1);
-        });
-
-        setInterval(function() {
-            goToSlide(currentIndex + 1);
-        }, 4000);
-    })();
+console.log('Index JS Loaded'  );
 
 
+document.addEventListener('DOMContentLoaded', () => {
+  new Swiper('.swiper', {
+    slidesPerView: 1,
+    spaceBetween: 20,
+    freeMode: true,
+    loop: true,
+    autoplay: { delay: 4000, disableOnInteraction: false },
+    grabCursor: true,
+    centeredSlides: true
+  });
+});
 
 
     document.addEventListener('DOMContentLoaded', () => {

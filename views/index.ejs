@@ -12,6 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
     <link rel="icon" type="image/svg+xml" href="assets/nfctools-svgrepo-com.svg">
     <title>Asparsh</title>
 </head>
@@ -210,56 +211,59 @@
                     <h2>Our Products</h2>
                 </div>
                 <div class="container3-head-text2">
-                    <p>Explore our range of NFC products designed to enhance your business connections.</p>
+                    <p>Explore our NFC‑enabled product line designed to streamline and elevate your professional networking.<br>
+                    From smart cards to customizable digital profiles, share contact details, portfolio links, and promotional content with a single tap.</p>
                 </div>
             </div>
-            <div class="index-product-card">
-                <div class="index-product-image">
-                    <img src="assets/product1.jpg" alt="Product 1">
-                </div>
-                <div class="index-product-content">
-                    <div class="index-product-head">
-                        <div class="flash-message-new">
-                            NEW
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    <% products.forEach(product => { %>
+                    <div class="swiper-slide">
+                        <div class="index-product-card">
+                            <div class="index-product-image">
+                                <img src="<%= product.image %>" alt="<%= product.title %>">
+                            </div>
+                            <div class="index-product-content">
+                                <div class="index-product-head">
+                                    <% if (product.badge) { %>
+                                        <div class="flash-message-new"><%= product.badge %></div>
+                                        <% } %>
+                                        <h2><%= product.title %></h2>
+                                        <h3><%= product.subtitle %></h3>
+                                    </div>
+                                    <div class="index-product-price">
+                                        <h3>Price</h3>
+                                        <span class="index-product-current-price">₹ <%= product.price %></span>
+                                    </div>
+                                    <div class="index-product-description-container">
+                                        <div class="tab-headers">
+                                            <div class="tab-header active" data-tab="description-<%= product.id %>">DESCRIPTION</div>
+                                            <div class="tab-header" data-tab="features-<%= product.id %>">DETAILS</div>
+                                            <div class="tab-underline"></div>
+                                        </div>
+                                        <div class="tab-content-wrapper">
+                                            <div id="description-<%= product.id %>" class="tab-pane active">
+                                                <div class="index-product-description-details"><%= product.description %></div>
+                                            </div>
+                                            <div id="features-<%= product.id %>" class="tab-pane">
+                                                <div class="index-product-description-features">
+                                                    <ul>
+                                                        <% product.features.forEach(feature => { %>
+                                                            <li><%= feature %></li>
+                                                            <% }) %>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="index-product-button">
+                                        <button class="buy-now-btn">Buy Now</button>
+                                        <button class="explore-more-btn">Explore More</button>
+                                </div>
+                            </div>
                         </div>
-                        <h2>NFC Business Card</h2>
-                        <h3>A smart way to connect</h3>
                     </div>
-                    <div class="index-product-price">
-                        <h3>Price</h3>
-                        <span class="index-product-current-price">
-                            ₹ 999
-                        </span>
-                    </div>
-                    <div class="index-product-description-container">
-    <div class="tab-headers">
-        <div class="tab-header active" data-tab="description-content">DESCRIPTION</div>
-        <div class="tab-header" data-tab="features-content">DETAILS</div> <div class="tab-underline"></div>
-    </div>
-
-    <div class="tab-content-wrapper">
-        <div id="description-content" class="tab-pane active">
-            <div class="index-product-description-details">
-                A digital business card that allows you to share your contact details, social media profiles, and website with just a tap. No more paper cards, just instant connections.
-            </div>
-        </div>
-        <div id="features-content" class="tab-pane">
-            <div class="index-product-description-features">
-                <ul>
-                    <li>Customizable</li>
-                    <li>Universal</li>
-                    <li>Durable</li>
-                    <li>Waterproof</li>
-                    <li>Contactless</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-                    <div class="index-product-button">
-                        <button>Buy Now</button>
-                        <button>Explore More</button>
-                    </div>
+                    <% }) %>
                 </div>
             </div>
         </section>
@@ -331,6 +335,7 @@ style="fill:#FFFFFF;">
             <span>© 2025 Asparsh. All rights reserved.</span>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
     <script src="/js/index.js"></script>
     <script src="/js/nav-user.js"></script>
 </body>
