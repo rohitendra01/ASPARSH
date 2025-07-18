@@ -10,7 +10,7 @@ exports.registerUser = async (req, res) => {
     const errors = {};
 
     // Validation
-    if (!name) errors.username = 'Name is required';
+    if (!name) errors.name = 'Name is required';
     if (!email) errors.email = 'Email is required';
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Invalid email address';
     if (!password) errors.password = 'Password is required';
@@ -23,6 +23,18 @@ exports.registerUser = async (req, res) => {
         if (existingUser) errors.email = 'Email already registered';
     }
 
+    // Create username from email if not provided
+    let username = name;
+    if (!username && email) {
+        username = email.split('@')[0];
+    }
+
+    // Check if username already exists
+    if (username) {
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) errors.name = 'Username already taken';
+    }
+
     if (Object.keys(errors).length > 0) {
         req.flash('fieldErrors', errors);
         req.flash('name', name);
@@ -33,8 +45,14 @@ exports.registerUser = async (req, res) => {
     try {
         const user = new User({ username, email: email.toLowerCase(), password });
         await user.save();
-        req.flash('success_msg', 'Registration successful! Please log in');
-        res.redirect('/login');
+        req.flash('success_msg', 'Registration successful! You are now logged in.');
+        req.logIn(user, (err) => {
+            if (err) {
+                req.flash('error_msg', 'Login after registration failed. Please log in manually.');
+                return res.redirect('/login');
+            }
+            return res.redirect('/');
+        });
     } catch (err) {
         req.flash('error_msg', 'Registration failed: ' + err.message);
         req.flash('name', name);

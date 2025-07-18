@@ -1,24 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/index.css" />
-    <link rel="stylesheet" href="/css/product-cards.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
-    <link rel="icon" type="image/svg+xml" href="assets/nfctools-svgrepo-com.svg">
-    <title>Asparsh</title>
-</head>
-<body>
-    <%- include('partials/header') %>
-    <main>
+<% layout('layouts/boilerplate') -%>
+<% block('styles').append(`<link rel="stylesheet" href="/css/index-snap.css" />`) %>
+<main>
         <section class="size container1 snap-section">
             <div class="hero-text">
                 <div class="hero-head-text">
@@ -135,7 +117,7 @@
         </section>
         <section class="size container4 snap-section">
             <div class="container4-head-text">
-                <h2>How Asparsh Works</h2>
+                <h2>How Asparsh Works!</h2>
                 <p>Asparsh leverages cutting-edge NFC technology to create seamless and interactive experiences for users. Our platform allows businesses to connect with their customers in innovative ways, enhancing engagement and driving results.</p>
             </div>
             <div class="container4-how-it-works">
@@ -213,11 +195,6 @@
                     
                 </div>
             </div>
-    </main>
-    <%- include('partials/footer') %>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-    <script src="/js/index.js"></script>
-    <script src="/js/nav-user.js"></script>
-</body>
-
-</html>
+        </section>
+</main>
+    

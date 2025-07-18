@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { isLoggedIn } = require('../middleware/authMiddleware');
 
 const products = [
-  {
+    {
     id: 1,
     image: '/assets/product1.jpg',
     badge: 'NEW',
@@ -27,16 +28,26 @@ const products = [
     image: '/assets/product3.jpg',
     badge: 'BEST SELLER',
     title: 'Google Review Card',
-    subtitle: 'Boost your business visibility',
+    subtitle: 'Boost your business ratings',
     price: 799,
     description: 'A digital card designed to collect and showcase Google reviews. Perfect for businesses looking to enhance their online reputation.',
     features: ['NFC enabled', 'Customizable design', 'Instant review collection', 'Analytics dashboard', 'Easy sharing']
+  },
+  {
+    id: 4,
+    image: '/assets/product3.jpg',
+    badge: 'LIMITED EDITION',
+    title: 'Event Pass Card',
+    subtitle: 'Your ticket to exclusive events',
+    price: 1299,
+    description: 'An NFC-enabled event pass that allows you to access exclusive events and offers. Share your event details with others easily.',
+    features: ['NFC enabled', 'Customizable design', 'Instant access', 'Event reminders', 'Easy sharing']
   }
 ];
 
-    const testimonials = [
-        {
-            text: "Asparsh made networking at events effortless. I love how easy it is to update my info!",
+const testimonials = [
+    {
+        text: "Asparsh made networking at events effortless. I love how easy it is to update my info!",
             name: "Amit Sharma",
             role: "Marketing Lead, TechNova",
             avatar: "/assets/testimonial1.jpg"
@@ -79,14 +90,40 @@ const products = [
         }
     ];
 
+    
+    
+    
+    
+    // Index route
+    router.get("/", (req, res) => {
+        res.render("index", { products, testimonials, layout: "layouts/boilerplate" });
+    });
+    
+    
+    // Home route
+    router.get("/home", (req, res) => {
+        res.render("home", { layout: "layouts/boilerplate" });
+    });
+    
+    // Contact Us page
+    router.get("/contact", (req, res) => {
+        res.render("contact", { layout: "layouts/boilerplate" });
+    });
+    
+    // Pricing page
+    router.get("/pricing", (req, res) => {
+        res.render("pricing", { layout: "layouts/boilerplate" });
+    });
+    
+    // Dashboard route (protected)
+    router.get("/dashboard", isLoggedIn, (req, res) => {
+        res.render("dashboard", { layout: "layouts/boilerplate" });
+    });
 
-
-
-
-
-router.get("/", (req, res) => {
-    res.render("index", { products, testimonials });
-});
+    // About Us page
+    router.get("/about", (req, res) => {
+        res.render("about", { layout: "layouts/boilerplate" });
+    });
 
 
 

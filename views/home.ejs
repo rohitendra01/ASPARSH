@@ -1,0 +1,102 @@
+<% layout('layouts/boilerplate') %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/home.css" />`) %>
+<main>
+    <section class="home-container1">
+        <h1>Build NFC Experiences That Work For You</h1>
+        <p>From custom tag design to real-time analytics, we handle every step so you can focus on growth.
+            Start your journey with us today and unlock the full potential of NFC technology.</p>
+        </p>
+        <div class="home-contact-me">
+            <p>Enter your details and we will reach to you shortly.</p>
+            <form action="/contact" method="POST" class="contact-form">
+                <div class="wave-group">
+                  <input required type="text" name="name" class="input" />
+                  <span class="bar"></span>
+                  <label class="label">
+                    <span class="label-char" style="--index: 0">N</span>
+                    <span class="label-char" style="--index: 1">a</span>
+                    <span class="label-char" style="--index: 2">m</span>
+                    <span class="label-char" style="--index: 3">e</span>
+                  </label>
+                </div>
+                <div class="wave-group">
+                  <input required type="email" name="email" class="input" />
+                  <span class="bar"></span>
+                  <label class="label">
+                    <span class="label-char" style="--index: 0">E</span>
+                    <span class="label-char" style="--index: 1">m</span>
+                    <span class="label-char" style="--index: 2">a</span>
+                    <span class="label-char" style="--index: 3">i</span>
+                    <span class="label-char" style="--index: 4">l</span>
+                  </label>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+            <p id="or-text">OR</p>
+            <p id="secondary-text">Get your own choice of NFC product tailored to your needs.</p>
+            <a href="/contact" class="button">Contact Us</a>
+        </div>
+    </section>
+    <section class="home-container2">
+        <h1>Our Features</h1>
+        <p>Discover the unique advantages of our NFC solutions:</p>
+        <div class="container2-feature-cards">
+            <div class="feature-card">
+                <img src="/images/feature1.jpg" alt="Person holding an NFC-enabled card and tapping it on a smartphone in a modern office setting, demonstrating seamless contactless technology with a positive and innovative atmosphere" srcset="">
+                <h3>Seamless Integration</h3>
+                <p>Effortlessly integrate NFC technology into your existing systems for a smooth user experience.</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/feature2.jpg" alt="A close-up of an NFC-enabled device being used in a retail environment, showcasing its convenience and efficiency" srcset="">
+                <h3>Enhanced Security</h3>
+                <p>Utilize advanced encryption and authentication methods to protect sensitive data during transactions.</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/feature3.jpg" alt="A diverse group of people using NFC technology in various settings, highlighting its versatility and ease of use" srcset="">
+                <h3>Versatile Applications</h3>
+                <p>Implement NFC solutions across various industries, from retail to hospitality, for maximum impact.</p>
+            </div>
+        </div>
+    </section>
+    <section class="home-container3">
+        <h3>We believe in</h3>
+        <h2>Your Connection, Our Commitment</h2>
+    <p>At Asparsh, we are dedicated to revolutionizing the way businesses connect with their customers through NFC technology. Our mission is to provide innovative solutions that enhance user experiences and drive growth.</p>
+    <div class="container3-mission">
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/pencil-square.svg" alt="Tailored Solutions icon" />
+            <h4>Tailored Solutions</h4>
+            <p>We work closely with each client to design NFC products (business cards, wristbands, menus) that reflect their unique brand identity.Our design team ensures every product is customized to your specifications for maximum impact.</p>
+        </div>
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/shield-check.svg" alt="High‑Quality Components icon" />
+            <h4>High‑Quality Components</h4>
+            <p>We source premium NTAG chips and durable card materials to ensure reliable performance and long‑term use.Each component is rigorously tested to meet industry standards for quality and durability.</p>
+        </div>
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/rocket-launch.svg" alt="Seamless Onboarding icon" />
+            <h4>Seamless Onboarding</h4>
+            <p>Our streamlined onboarding process ensures you can start leveraging NFC technology quickly and efficiently.We provide step-by-step guidance and support throughout your integration journey.</p>
+        </div>
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/clock.svg" alt="Time is Money icon" />
+            <h4>Time is Money</h4>
+            <p>We value your time by delivering fast turnaround and responsive support at every stage of your project.Our team is committed to meeting deadlines and resolving queries promptly.</p>
+        </div>
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/server-stack.svg" alt="Scalable Infrastructure icon" />
+            <h4>Scalable Infrastructure</h4>
+            <p>Our solutions are built to grow with your business, supporting increased demand and new use cases effortlessly.Flexible architecture allows easy expansion as your requirements evolve.</p>
+        </div>
+        <div class="mission-card">
+            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/globe-alt.svg" alt="Global Business icon" />
+            <h4>Global Business</h4>
+            <p>We empower clients worldwide with NFC products and services tailored to diverse markets and regulations.Our global network ensures reliable delivery and compliance wherever you operate.</p>
+        </div>
+    </div>
+    </section>
+    <section class="home-container4">
+        <h1>Come Join Us</h1>
+        <p>Be a part of our journey to transform the way businesses connect with their customers. Together, we can create innovative NFC solutions that drive engagement and growth.</p>
+        <img src="/images/join-us.jpg" alt="Join Us">
+</main>

@@ -1,0 +1,140 @@
+.contact-main {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 7rem;
+}
+
+.contact-hero {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.contact-tagline {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.contact-intro {
+    color: var(--heading-color);
+    font-size: 1.2rem;
+}
+
+.contact-form-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.contact-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-form label {
+    font-weight: 600;
+    color: var(--heading-color);
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 10px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: var(--secondary-color);
+    transition: border-color 0.2s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.contact-submit-btn {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 12px 0;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.contact-submit-btn:hover {
+    background: var(--accent-color);
+    color: var(--heading-color);
+}
+
+.contact-form-section img {
+    max-width: 220px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(42, 122, 228, 0.07);
+}
+
+.contact-info {
+    margin-bottom: 32px;
+}
+
+.contact-info h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.contact-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.contact-info li {
+    margin-bottom: 6px;
+}
+
+.contact-info a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-info a:hover {
+    text-decoration: underline;
+}
+
+.contact-follow h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.social-links {
+    display: flex;
+    gap: 18px;
+    list-style: none;
+    padding: 0;
+}
+
+.social-links a {
+    color: var(--primary-color);
+    background: var(--secondary-color);
+    padding: 6px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+
+.social-links a:hover {
+    background: var(--accent-color);
+    color: var(--heading-color);
+}

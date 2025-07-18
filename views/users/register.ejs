@@ -136,13 +136,14 @@
           name="name"
           value="<%= typeof name !== 'undefined' ? name : '' %>"
           required
-          placeholder="Enter your name"
+          placeholder="Enter your name (username will be auto-created from email if left blank)"
           class="<%= fieldErrors.name
             ? 'input-error'
             : fieldWarnings?.name
             ? 'input-warning'
             : '' %>"
         >
+        <small style="color:#888;">If left blank, your username will be auto-created from your email address.</small>
         <% if (fieldErrors.name) { %>
           <div class="alert alert-danger"><%= fieldErrors.name %></div>
         <% } else if (fieldWarnings?.name) { %>

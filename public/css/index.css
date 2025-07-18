@@ -13,10 +13,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
-  scroll-padding-top: 3rem;
-  background: linear-gradient(135deg, #e1f6e0, #083235);
+  background: linear-gradient(135deg, #083235, #e1f6e0);
   height: 100%;
 }
 
@@ -35,23 +32,6 @@ body::before {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   z-index: -1;
-}
-
-main {
-  height: 100%;
-  padding-top: 6.5rem;
-}
-
-main > div {
-  height: 100%;
-}
-
-.snap-section {
-  scroll-snap-align: start;   
-  height: 100%;              
-}
-#snap{
-    scroll-snap-align: start;   
 }
 
 /* header styles */
@@ -299,12 +279,14 @@ footer {
 .hero-head-text h1{
     color: var(--text-light);
     font-family: var(--head-text);
-    font-size: 3.8rem;
+    font-size: 3.9rem;
+    font-weight: 900;
     text-align: left;
 }
 
-.hero-sub-text{
-    font-size: 1.4rem;
+.hero-sub-text h3{
+    font-size: 1.6rem;
+    font-weight: 400;
     color: var(--text-light);
     font-family: var(--subhead-text);
 }   
@@ -490,7 +472,7 @@ span{
 }
 
 .container3-head-text1 h2 {
-    color: var(--text-light); 
+    color: var(--text-dark); 
     font-family: var(--subhead-text);
     font-size: 2.8rem;
     font-weight: 700;
@@ -831,7 +813,7 @@ span{
     font-family: var(--head-text);
     font-size: 2.8rem;
     font-weight: 700;
-    color: var(--text-light);
+    color: var(--text-dark);
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
 }
@@ -1363,4 +1345,46 @@ span{
     display: flex;
     justify-content: center;
     align-items: stretch;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a.dashboard-btn {
+    text-decoration: none;
+    background: var(--hea-foo);
+    color: white;
+    padding: 12px 26px;
+    border: 2px solid white;
+    border-radius: 16px;
+    cursor: pointer;
+    
+    font-weight: 700;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.dashboard-btn:hover {
+    background: #083235;
+    color: #39ff14;
+    text-shadow: 0 0 8px #39ff14, 0 0 32px #39ff14;
 }
