@@ -46,8 +46,8 @@ const products = [
 ];
 
 const testimonials = [
-    {
-        text: "Asparsh made networking at events effortless. I love how easy it is to update my info!",
+        {
+            text: "Asparsh made networking at events effortless. I love how easy it is to update my info!",
             name: "Amit Sharma",
             role: "Marketing Lead, TechNova",
             avatar: "/assets/testimonial1.jpg"

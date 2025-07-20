@@ -18,7 +18,9 @@
                     </h3>
                 </div>
                 <div class="started-button">
-                    <button>Get Started</button>
+                    <a href="/home" class="get-started-link">
+                        <button>Get Started</button>
+                    </a>
                 </div>
             </div>
             <div class="hero-image">
@@ -32,7 +34,7 @@
                 </span>
                     Our touchless service replaces outdated paper tools, providing digital business cards and product-linked tags for seamless engagement.
                 <div class="description-highlited-text">
-                    <span id="text1">We create interactive, tap-and-go experiences </span><span id="text1"> that feel both modern and timeless.</span>
+                    <span >We create interactive, tap-and-go experiences </span><span> that feel both modern and timeless.</span>
                 </div>
                 </div>
             <div class="description-box">
@@ -120,42 +122,34 @@
                 <h2>How Asparsh Works!</h2>
                 <p>Asparsh leverages cutting-edge NFC technology to create seamless and interactive experiences for users. Our platform allows businesses to connect with their customers in innovative ways, enhancing engagement and driving results.</p>
             </div>
-            <div class="container4-how-it-works">
+           <div class="container4-how-it-works">
                 <div class="container4-how-it-works-card">
-                    <div class="container4-how-it-works-card-image">
-                        <img src="/assets/how-it-works-1.png" alt="Step 1">
-                    </div>
-                    <div class="container4-how-it-works-card-text">
-                        <h3>Step 1</h3>
-                        <p>Choose your NFC product and customize it to fit your brand.</p>
-                    </div>
+                        <img src="/assets/how-it-works-1.jpg" alt="Step 1">
+                        <div class="container4-how-it-works-card-text">
+                            <h3>Step 1</h3>
+                            <p>Choose your NFC product and customize it to fit your brand with ease and flexibility.</p>
+                        </div>
+               </div>
+                <div class="container4-how-it-works-card">
+                        <img src="/assets/how-it-works-2.jpg" alt="Step 2">
+                        <div class="container4-how-it-works-card-text">
+                            <h3>Step 2</h3>
+                            <p>Share your NFC-enabled product with customers, allowing them to tap and connect instantly.</p>
+                        </div>
                 </div>
                 <div class="container4-how-it-works-card">
-                    <div class="container4-how-it-works-card-image">
-                        <img src="/assets/how-it-works-2.png" alt="Step 2">
-                    </div>
-                    <div class="container4-how-it-works-card-text">
-                        <h3>Step 2</h3>
-                        <p>Share your NFC-enabled product with customers, allowing them to tap and connect instantly.</p>
-                    </div>
-                </div>
+                        <img src="/assets/how-it-works-3.jpg" alt="Step 3">
+                        <div class="container4-how-it-works-card-text">
+                            <h3>Step 3</h3>
+                            <p>Engage with your audience through interactive content and track their interactions for better insights.</p>
+                        </div>
+               </div>
                 <div class="container4-how-it-works-card">
-                    <div class="container4-how-it-works-card-image">
-                        <img src="/assets/how-it-works-3.png" alt="Step 3">
-                    </div>
-                    <div class="container4-how-it-works-card-text">
-                        <h3>Step 3</h3>
-                        <p>Engage with your audience through interactive content and track their interactions for better insights.</p>
-                    </div>
-                </div>
-                <div class="container4-how-it-works-card">
-                    <div class="container4-how-it-works-card-image">
-                        <img src="/assets/how-it-works-4.png" alt="Step 4">
-                    </div>
-                    <div class="container4-how-it-works-card-text">
-                        <h3>Step 4</h3>
-                        <p>Analyze the data collected to refine your marketing strategies and improve customer engagement.</p>
-                    </div>
+                        <img src="/assets/how-it-works-4.jpg" alt="Step 4">
+                        <div class="container4-how-it-works-card-text">
+                            <h3>Step 4</h3>
+                            <p>Analyze the data collected to refine your marketing strategies and improve customer engagement.</p>
+                        </div>
                 </div> 
             </div>
         </section>
@@ -172,10 +166,10 @@
                   <% testimonials.forEach(function(testimonial, idx) { %>
                     <div class="testimonial-card">
                         <img class="testimonial-avatar" src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>">
-                    <div class="testimonial-quote">"<%= testimonial.text %>"</div>
-                    <div class="testimonial-user">
-                        <div class="testimonial-name"><%= testimonial.name %></div>
-                        <div class="testimonial-role"><%= testimonial.role %></div>
+                        <div class="testimonial-quote">"<%= testimonial.text %>"</div>
+                        <div class="testimonial-user">
+                            <div class="testimonial-name"><%= testimonial.name %></div>
+                            <div class="testimonial-role"><%= testimonial.role %></div>
                     </div>
                 </div>
                   <% }) %>
@@ -191,10 +185,13 @@
                 <div class="container6-content-text">
                     <p>Share your NFC-enabled products with friends and colleagues. Help them discover the convenience of instant connections and interactive experiences.</p>
                     <p>Join our community of users who are embracing the future of connectivity with Asparsh.</p>
-                    <p>Spread the word about Asparsh and let others experience the future of connectivity.</p>      
                     
                 </div>
+                <div class="container6-content-image">
+                    <img src="/assets/share-nfc.jpg" alt="Share NFC Products">
+                </div>
             </div>
+            <p>Spread the word about Asparsh and let others experience the future of connectivity.</p>      
         </section>
 </main>
     

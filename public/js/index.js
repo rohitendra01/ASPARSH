@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   window.addEventListener('resize', updateCarousel);
 
-  let autoSlide = setInterval(next, 2000);
+  let autoSlide = setInterval(next, 3000);
   wrapper.addEventListener('mouseenter', () => clearInterval(autoSlide));
   wrapper.addEventListener('mouseleave', () => autoSlide = setInterval(next, 2000));
 

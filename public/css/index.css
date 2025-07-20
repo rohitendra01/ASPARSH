@@ -258,6 +258,19 @@ footer {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* container 1 hero section */
 
 .container1{
@@ -350,6 +363,16 @@ span{
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* container 2 discription section */
 
 .container2{
@@ -367,6 +390,7 @@ span{
 
 .description-highlited-text{
     font-family: var(--head-text);
+    color: var(--text-dark);
     padding-top: 0.8rem;
     font-weight: 600;
     font-size: 1.6em;
@@ -435,6 +459,17 @@ span{
     border-radius: 18px;
     box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 6px 0 rgba(0,0,0,0.07);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -785,6 +820,16 @@ span{
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* container 4 how it works section */
 
 
@@ -810,7 +855,7 @@ span{
 }
 
 .container4-head-text h2 {
-    font-family: var(--head-text);
+    font-family: var(--subhead-text);
     font-size: 2.8rem;
     font-weight: 700;
     color: var(--text-dark);
@@ -839,51 +884,65 @@ span{
 .container4-how-it-works-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-around;
+    align-items: center;
     background: #fff;
     width: 19rem;
     height: 30rem;
     border-radius: 18px;
     box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08), 0 1.5px 6px 0 rgba(0,0,0,0.07);
-    padding: 0.5rem;
+    padding: 1rem 0.5rem;
 }
 
-.container4-how-it-works-card-image{
-    background-color: #000000;
+.container4-how-it-works-card img{
     border-radius: 18px;
     height: 50%;
     width: 100%;
+    padding: 0 10px;
 }
 
-.container4-how-it-works-card-text {
-    height: 50%;
-    width: 100%;
-    border-radius: 18px;
+.container4-how-it-works-card-text{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 1rem;
+    height: 50%;
 }
 
-.container4-how-it-works-card-text h3{
+.container4-how-it-works-card h3{
+    padding: 30px 0;
     font-family: var(--subhead-text);
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--text-dark);
     margin-bottom: 0.5rem;
-}
-
-.container4-how-it-works-card-text p{
-    font-family: var(--content-text);
-    font-size: 1.1rem;
-    color: var(--hea-foo);
     text-align: center;
 }
 
-.container4-how-it-works-card img {
-    border-radius: 10px;
+.container4-how-it-works-card p{
+    padding-left: 10px;
+    font-family: var(--content-text);
+    font-size: 1.1rem;
+    color: var(--hea-foo);
+    text-align: left;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -911,14 +970,13 @@ span{
     justify-content: center;
     width: 100%;
     text-align: center;
-    margin-bottom: 2rem;
 }
 
 .container5-head-text h2 {
-    font-family: var(--head-text);
+    font-family: var(--subhead-text);
     font-size: 2.8rem;
     font-weight: 700;
-    color: var(--text-light);
+    color: var(--text-dark);
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
 }
@@ -950,10 +1008,15 @@ span{
 }
 
 .testimonial-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   flex: 0 0 33.3333%;
   max-width: 33.3333%;
+  height: 30rem;
   box-sizing: border-box;
-  padding: 0 1rem;
+  padding:  1rem;
   opacity: 0.5;
   transform: scale(0.92);
   transition: 
@@ -983,21 +1046,21 @@ span{
 }
 
 .testimonial-avatar {
-  width: 56px;
-  height: 56px;
+  width: 50%;
+  height: auto;
   border-radius: 50%;
+  margin-bottom: 3rem;
   object-fit: cover;
-  margin: 0 auto 1rem auto;
   display: block;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.489);
 }
 
 .testimonial-quote {
   font-size: 1.1rem;
-  color: #222;
+  color: var(--text-dark);
   text-align: center;
   margin-bottom: 1.2rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--content-text);
   min-height: 70px;
 }
 
@@ -1007,12 +1070,14 @@ span{
 
 .testimonial-name {
   font-weight: 700;
-  color: #083235;
+  color: var(--hea-foo);
+    font-family: var(--subhead-text);
   font-size: 1.1rem;
 }
 
 .testimonial-role {
-  color: #666;
+  color: var(--text-dark);
+    font-family: var(--content-text);
   font-size: 0.98rem;
   margin-top: 0.2rem;
 }
@@ -1079,13 +1144,46 @@ span{
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* container 6 contact us section */
+
 .container6{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     margin-bottom: 12rem;
-    padding: 3rem 0; 
+    padding: 4rem 0; 
     overflow: auto;
     box-sizing: border-box;
 }
@@ -1097,39 +1195,78 @@ span{
     justify-content: center;
     width: 100%;
     text-align: center;
-    margin-bottom: 2rem;
 }
 
 .container6-head-text h2 {
-    font-family: var(--head-text);
+    font-family: var(--subhead-text);
     font-size: 2.8rem;
     font-weight: 700;
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
+    color: var(--text-dark);
     letter-spacing: 1px;
 }
+
+.container6-content{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 80rem;
+    padding: 2rem 2rem;
+    gap: 2rem;
+    box-sizing: border-box;
+}
+
 
 .container6-content-text {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     width: 100%;
     text-align: center;
 }
 
-.container6-content-text p {
+.container6-content-text p:nth-child(1) {
+    font-family: var(--subhead-text);
+    font-size: 1.3rem;
+    text-align: center;
+    color: var(--text-light);
+} 
+
+.container6-content-text p:nth-child(2) {
+    font-family: var(--head-text);
+    font-size: 3rem;
+    color: var(--text-dark);
+    text-align: left;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.container6 p {
     font-family: var(--subhead-text);
     font-size: 1.3rem;
     color: var(--text-light);
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-top: 2.5rem;
     max-width: 80rem;
 }
 
 
 
+.container6-content-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
 
+.container6-content-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgb(0, 0, 0);
+}
 
 
 

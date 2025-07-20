@@ -2,7 +2,7 @@
 <% block('styles').append(`<link rel="stylesheet" href="/css/home.css" />`) %>
 <main>
     <section class="home-container1">
-        <h1>Build NFC Experiences That Work For You</h1>
+        <h1>Build NFC Experienc That Works For You</h1>
         <p>From custom tag design to real-time analytics, we handle every step so you can focus on growth.
             Start your journey with us today and unlock the full potential of NFC technology.</p>
         </p>
@@ -20,15 +20,31 @@
                   </label>
                 </div>
                 <div class="wave-group">
-                  <input required type="email" name="email" class="input" />
+                  <input required type="tel" name="number" class="input" pattern="[0-9]{10,}" />
                   <span class="bar"></span>
                   <label class="label">
-                    <span class="label-char" style="--index: 0">E</span>
-                    <span class="label-char" style="--index: 1">m</span>
-                    <span class="label-char" style="--index: 2">a</span>
-                    <span class="label-char" style="--index: 3">i</span>
-                    <span class="label-char" style="--index: 4">l</span>
+                    <span class="label-char" style="--index: 0">N</span>
+                    <span class="label-char" style="--index: 1">u</span>
+                    <span class="label-char" style="--index: 2">m</span>
+                    <span class="label-char" style="--index: 3">b</span>
+                    <span class="label-char" style="--index: 4">e</span>
+                    <span class="label-char" style="--index: 5">r</span>
                   </label>
+                </div>
+                <div class="wave-group" style="position: relative;">
+                    <input required type="email" name="email" class="input" 
+                        oninput="this.nextElementSibling.nextElementSibling.nextElementSibling.style.display = this.value ? 'none' : 'inline';" />
+                    <span class="bar"></span>
+                    <label class="label">
+                        <span class="label-char" style="--index: 0">E</span>
+                        <span class="label-char" style="--index: 1">m</span>
+                        <span class="label-char" style="--index: 2">a</span>
+                        <span class="label-char" style="--index: 3">i</span>
+                        <span class="label-char" style="--index: 4">l</span>
+                    </label>
+                    <span style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 0.9em; pointer-events: none; z-index: 0; opacity: 0.6;">
+                        (optional)
+                    </span>
                 </div>
                 <button type="submit">Submit</button>
             </form>
@@ -41,20 +57,20 @@
         <h1>Our Features</h1>
         <p>Discover the unique advantages of our NFC solutions:</p>
         <div class="container2-feature-cards">
-            <div class="feature-card">
-                <img src="/images/feature1.jpg" alt="Person holding an NFC-enabled card and tapping it on a smartphone in a modern office setting, demonstrating seamless contactless technology with a positive and innovative atmosphere" srcset="">
-                <h3>Seamless Integration</h3>
-                <p>Effortlessly integrate NFC technology into your existing systems for a smooth user experience.</p>
+            <div class="feature-card" >
+                <img src="/assets/feature1.jpg" alt="Person holding an NFC-enabled card and tapping it on a smartphone in a modern office setting, demonstrating seamless contactless technology with a positive and innovative atmosphere" srcset="">
+                    <h3>Seamless Integration</h3>
+                    <p>Effortlessly integrate NFC technology into your existing systems for a smooth user experience.</p>
             </div>
             <div class="feature-card">
-                <img src="/images/feature2.jpg" alt="A close-up of an NFC-enabled device being used in a retail environment, showcasing its convenience and efficiency" srcset="">
-                <h3>Enhanced Security</h3>
-                <p>Utilize advanced encryption and authentication methods to protect sensitive data during transactions.</p>
+                <img src="/assets/feature2.jpg" alt="A close-up of an NFC-enabled device being used in a retail environment, showcasing its convenience and efficiency" srcset="">
+                    <h3>Enhanced Security</h3>
+                    <p>Utilize advanced encryption and authentication methods to protect sensitive data during transactions.</p>
             </div>
             <div class="feature-card">
-                <img src="/images/feature3.jpg" alt="A diverse group of people using NFC technology in various settings, highlighting its versatility and ease of use" srcset="">
-                <h3>Versatile Applications</h3>
-                <p>Implement NFC solutions across various industries, from retail to hospitality, for maximum impact.</p>
+                <img src="/assets/feature3.jpg" alt="A diverse group of people using NFC technology in various settings, highlighting its versatility and ease of use" srcset="">
+                    <h3>Versatile Applications</h3>
+                    <p>Unlock new possibilities with NFC—enable smart access, interactive marketing, and seamless payments in any environment.</p>
             </div>
         </div>
     </section>
@@ -98,5 +114,8 @@
     <section class="home-container4">
         <h1>Come Join Us</h1>
         <p>Be a part of our journey to transform the way businesses connect with their customers. Together, we can create innovative NFC solutions that drive engagement and growth.</p>
-        <img src="/images/join-us.jpg" alt="Join Us">
+        <div class="home-image">
+            <img src="/assets/join-us.png" alt="Join Us">
+        </div>
+        </section>
 </main>
