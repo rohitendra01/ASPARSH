@@ -1,6 +1,6 @@
 .about-hero {
     text-align: center;
-    padding: 6rem 1rem;
+    padding: 7rem 1rem 4rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,8 +15,8 @@
 }
 
 .about-intro {
-    font-size: 2rem;
-    width: 60rem;
+    font-size: 1.5rem;
+    width: 70rem;
     color: var(--text-dark);
     font-family: var(--content-text);
 }
