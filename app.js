@@ -86,11 +86,15 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 const indexRoutes = require('./routes/indexRoutes');
 const productRoutes = require('./routes/productRoutes');
+const resetRoutes = require('./routes/resetRoutes'); // Added resetRoutes
+const otpRoutes = require('./routes/otpRoutes'); // Added otpRoutes
 
 // Use routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/products', productRoutes);
+app.use('/', resetRoutes); // Added resetRoutes to enable password reset endpoints
+app.use('/', otpRoutes); // Added otpRoutes to enable OTP endpoints
 
 // Export app for server.js
 module.exports = app;

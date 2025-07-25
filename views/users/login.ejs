@@ -119,9 +119,9 @@ body {
 <div class="login-container">
   <form class="login-form" method="POST" action="/login">
     <h2 class="login-title">Sign In</h2>
-    <% if (error_msg) { %>
+    <!-- <% if (error_msg) { %>
       <div class="alert alert-danger"><%= error_msg %></div>
-    <% } %>
+    <% } %> -->
     <div class="login-group">
       <label for="email">Email</label>
       <input
@@ -146,6 +146,48 @@ body {
       >
     </div>
     <button type="submit" class="login-btn">Login</button>
+    <p style="margin-top: 10px; text-align: right;">
+      <a href="#" id="forgot-password-link" style="color: #007bff; font-size: 0.95em; text-decoration: none;">Forgot Password?</a>
+    </p>
     <p class="login-register-link">Don't have an account? <a href="/register">Register</a></p>
+</form>
+
+<!-- Modern Password Reset Modal -->
+<div id="reset-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#fff; padding:2.5rem 2rem; border-radius:16px; box-shadow:0 12px 32px rgba(0,0,0,0.18); max-width:370px; width:92%; margin:auto; display:flex; flex-direction:column; align-items:center;">
+    <div style="width:100%; text-align:center;">
+      <img src="/public/assets/user-login.png" alt="Reset" style="width:56px; height:56px; margin-bottom:12px; border-radius:50%; box-shadow:0 2px 8px #007bff22;">
+      <h2 style="margin-bottom:10px; color:#007bff; font-size:1.5rem; font-weight:700;">Forgot Password?</h2>
+      <p style="color:#555; font-size:1rem; margin-bottom:18px;">Enter your registered email to receive a password reset link.</p>
+    </div>
+    <form id="reset-form" method="POST" action="/request-otp" autocomplete="on" style="width:100%;">
+      <label for="reset-email" style="display:block; margin-bottom:8px; color:#333; font-weight:600; text-align:left;">Email Address</label>
+      <input type="email" id="reset-email" name="email" required placeholder="your@email.com" style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #b3e5fc; margin-bottom:18px; font-size:1.08rem; background:#f8fafc; color:#083235;">
+      <button type="submit" style="background:#007bff; color:#fff; border:none; border-radius:8px; padding:12px 0; width:100%; font-weight:700; font-size:1.08rem; box-shadow:0 2px 8px #b3e5fc44; transition:background 0.2s;">Send Reset Link</button>
+    </form>
+    <button id="close-modal" style="margin-top:14px; background:none; border:none; color:#007bff; font-size:1rem; cursor:pointer; font-weight:600;">Cancel</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('forgot-password-link').onclick = function(e) {
+    e.preventDefault();
+    var modal = document.getElementById('reset-modal');
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+  };
+  document.getElementById('close-modal').onclick = function() {
+    document.getElementById('reset-modal').style.display = 'none';
+  };
+  document.getElementById('reset-form').onsubmit = function() {
+    var email = document.getElementById('reset-email').value;
+    if (!email) {
+      document.getElementById('reset-email').focus();
+      return false;
+    }
+    return true;
+  };
+</script>
   </form>
 </div>
