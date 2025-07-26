@@ -2,10 +2,20 @@
 <% layout('layouts/hotel-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/show.css" />`) %>
 
+<!-- Mobile-only category filter buttons -->
+<div class="category-filter-bar" id="categoryFilterBar">
+  <button class="category-btn" data-category="all">All</button>
+  <% if (categories && categories.length) { %>
+    <% categories.forEach(category => { %>
+      <button class="category-btn" data-category="<%= category.name %>"><%= category.name %></button>
+    <% }) %>
+  <% } %>
+</div>
+
 <main>
   <% if (categories && categories.length) { %>
     <% categories.forEach(category => { %>
-    <div class="food-container">
+    <div class="food-container" data-category="<%= category.name %>">
       <div class="food-category">
         <h3><%= category.name %></h3>
         <% if (category.image) { %>
@@ -28,3 +38,34 @@
     <p>No food categories found.</p>
   <% } %>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function isMobile() {
+    return window.innerWidth <= 600;
+  }
+  if (isMobile()) {
+    const buttons = document.querySelectorAll('.category-btn');
+    const containers = document.querySelectorAll('.food-container');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const cat = btn.getAttribute('data-category');
+        if (cat === 'all') {
+          containers.forEach(c => c.style.display = '');
+        } else {
+          containers.forEach(c => {
+            if (c.getAttribute('data-category') === cat) {
+              c.style.display = '';
+            } else {
+              c.style.display = 'none';
+            }
+          });
+        }
+      });
+    });
+  } else {
+    const bar = document.getElementById('categoryFilterBar');
+    if (bar) bar.style.display = 'none';
+  }
+});
+</script>

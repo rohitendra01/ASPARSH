@@ -72,6 +72,26 @@ const foodCategories = [
     ]
   },
   {
+    name: 'Chinese Combos',
+    image: '/assets/chinese.jpg',
+    items: [
+      { name: 'Fried Rice', price: 180 },
+      { name: 'Chow Mein', price: 150 },
+      { name: 'Spring Rolls', price: 120 },
+      { name: 'Manchurian', price: 200 },
+      { name: 'Dumplings', price: 160 },
+      { name: 'Hot and Sour Soup', price: 100 },
+      { name: 'Chili Chicken', price: 220 },
+      { name: 'Paneer Chilli', price: 180 },
+      { name: 'Szechuan Noodles', price: 190 },
+      { name: 'Vegetable Hakka Noodles', price: 170 },
+      { name: 'Kung Pao Chicken', price: 240 },
+      { name: 'Sweet and Sour Vegetables', price: 160 },
+      { name: 'Egg Fried Rice', price: 150 },
+      { name: 'Garlic Noodles', price: 140 }
+    ]
+  },
+  {
     name: 'Dinner',
     image: '/assets/dinner.jpg',
     items: [
@@ -132,26 +152,6 @@ const foodCategories = [
       { name: 'Tiramisu', price: 150 },
       { name: 'Pineapple Upside Down Cake', price: 130 },
       { name: 'Apple Pie', price: 110 }
-    ]
-  },
-  {
-    name: 'Chinese Combos',
-    image: '/assets/chinese.jpg',
-    items: [
-      { name: 'Fried Rice', price: 180 },
-      { name: 'Chow Mein', price: 150 },
-      { name: 'Spring Rolls', price: 120 },
-      { name: 'Manchurian', price: 200 },
-      { name: 'Dumplings', price: 160 },
-      { name: 'Hot and Sour Soup', price: 100 },
-      { name: 'Chili Chicken', price: 220 },
-      { name: 'Paneer Chilli', price: 180 },
-      { name: 'Szechuan Noodles', price: 190 },
-      { name: 'Vegetable Hakka Noodles', price: 170 },
-      { name: 'Kung Pao Chicken', price: 240 },
-      { name: 'Sweet and Sour Vegetables', price: 160 },
-      { name: 'Egg Fried Rice', price: 150 },
-      { name: 'Garlic Noodles', price: 140 }
     ]
   },
   {

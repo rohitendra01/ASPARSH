@@ -26,6 +26,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.18.1",
     "hbs": "^4.2.0",
+    "ipconfig": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
     "nodemailer": "^7.0.5",
