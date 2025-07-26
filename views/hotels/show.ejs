@@ -1,2 +1,30 @@
-<% block('styles').append(`<link rel="stylesheet" href="/css/hotel/hotel-header.css" />`) %>
+<!-- <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/hotel-header.css" />`) %> -->
 <% layout('layouts/hotel-boilerplate') %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/hotel/show.css" />`) %>
+
+<main>
+  <% if (categories && categories.length) { %>
+    <% categories.forEach(category => { %>
+    <div class="food-container">
+      <div class="food-category">
+        <h3><%= category.name %></h3>
+        <% if (category.image) { %>
+          <img src="<%= category.image %>" alt="<%= category.name %>">
+        <% } %>
+      </div>
+      <div class="food-items">
+        <ul>
+          <% category.items.forEach(item => { %>
+            <li>
+              <div class="food-item"><%= item.name %></div>
+              <div class="food-price">₹<%= item.price %></div>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+    <% }) %>
+  <% } else { %>
+    <p>No food categories found.</p>
+  <% } %>
+</main>
