@@ -1,7 +1,9 @@
 <!-- <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/hotel-header.css" />`) %> -->
 <% layout('layouts/hotel-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/show.css" />`) %>
-
+<!-- Mobile-only hero image -->
+<img src="/assets/hotel-banner.jpg" alt="Hero" class="mobile-hero-image">
+<hr>
 <!-- Mobile-only category filter buttons -->
 <div class="category-filter-bar" id="categoryFilterBar">
   <button class="category-btn" data-category="all">All</button>
@@ -47,8 +49,14 @@ document.addEventListener('DOMContentLoaded', function() {
   if (isMobile()) {
     const buttons = document.querySelectorAll('.category-btn');
     const containers = document.querySelectorAll('.food-container');
+    if (buttons.length) {
+      buttons[0].classList.add('selected');
+    }
+
     buttons.forEach(btn => {
       btn.addEventListener('click', function() {
+        buttons.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
         const cat = btn.getAttribute('data-category');
         if (cat === 'all') {
           containers.forEach(c => c.style.display = '');

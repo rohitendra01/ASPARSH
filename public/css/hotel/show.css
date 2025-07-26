@@ -1,11 +1,16 @@
+
 main{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 1rem;
-    margin: 60px;
+    margin: 30px;
     justify-content: space-around;
     align-items: flex-start;
+}
+
+hr{
+    margin-top: 4rem;
 }
 
 .main > * {
@@ -80,6 +85,17 @@ main{
     list-style: none;
 }
 
+.mobile-hero-image {
+  display: none;
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -104,6 +120,11 @@ main {
     padding: 0;
     align-items: center;
 }
+
+hr{
+    margin-top: 0rem;
+}
+
 .food-container {
     width: 100%;
     margin: 0.5rem 0;
@@ -157,6 +178,14 @@ main {
     color: #fff;
     border: 1px solid #083235;
   }
-
+.mobile-hero-image {
+    display: block;
+    width: 100%;
+    max-width: 100vw;
+    height: auto;
+    margin: 0 auto 0.5rem auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
 
 }
