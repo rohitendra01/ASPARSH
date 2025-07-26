@@ -92,7 +92,7 @@ const otpRoutes = require('./routes/otpRoutes'); // Added otpRoutes
 // Use routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
-app.use('/products', productRoutes);
+app.use('/', productRoutes);
 app.use('/', resetRoutes); // Added resetRoutes to enable password reset endpoints
 app.use('/', otpRoutes); // Added otpRoutes to enable OTP endpoints
 
