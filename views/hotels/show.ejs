@@ -1,34 +1,31 @@
-<!-- <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/hotel-header.css" />`) %> -->
 <% layout('layouts/hotel-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/show.css" />`) %>
-<!-- Mobile-only hero image -->
 <img src="/assets/hotel-banner.jpg" alt="Hero" class="mobile-hero-image">
 <hr>
-<!-- Mobile-only category filter buttons -->
 <div class="category-filter-bar" id="categoryFilterBar">
   <button class="category-btn" data-category="all">All</button>
-  <% if (categories && categories.length) { %>
-    <% categories.forEach(category => { %>
-      <button class="category-btn" data-category="<%= category.name %>"><%= category.name %></button>
+  <% if (foodCategories && foodCategories.length) { %>
+    <% foodCategories.forEach(category => { %>
+      <button class="category-btn" data-category="<%= category.categoryName %>"><%= category.categoryName %></button>
     <% }) %>
   <% } %>
 </div>
 
 <main>
-  <% if (categories && categories.length) { %>
-    <% categories.forEach(category => { %>
-    <div class="food-container" data-category="<%= category.name %>">
+  <% if (foodCategories && foodCategories.length) { %>
+    <% foodCategories.forEach(category => { %>
+    <div class="food-container" data-category="<%= category.categoryName %>">
       <div class="food-category">
-        <h3><%= category.name %></h3>
-        <% if (category.image) { %>
-          <img src="<%= category.image %>" alt="<%= category.name %>">
+        <h3><%= category.categoryName %></h3>
+        <% if (category.imageUrl) { %>
+          <img src="<%= category.imageUrl %>" alt="<%= category.categoryName %>">
         <% } %>
       </div>
       <div class="food-items">
         <ul>
-          <% category.items.forEach(item => { %>
+          <% category.foodItems.forEach(item => { %>
             <li>
-              <div class="food-item"><%= item.name %></div>
+              <div class="food-item"><%= item.itemName %></div>
               <div class="food-price">₹<%= item.price %></div>
             </li>
           <% }) %>

@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
+const loginOtpController = require('../controllers/loginOtpController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Apply storeReturnTo middleware globally
 router.use(authMiddleware.storeReturnTo);
 
-router.get('/register', authMiddleware.isGuest, authController.getRegisterPage);
-router.post('/register', authController.registerUser);
-router.get('/login', authController.getLoginPage);
-router.post('/login', authController.loginUser);
-router.get('/logout', authMiddleware.isLoggedIn, authController.logoutUser);
+router.get('/login', loginOtpController.getLoginPage);
+router.post('/login', loginOtpController.loginUser);
+router.get('/logout', authMiddleware.isLoggedIn, loginOtpController.logoutUser);
+router.post('/request-otp', loginOtpController.requestOtp);
+router.post('/resend-otp', loginOtpController.resendOtp);
+router.post('/verify-otp', loginOtpController.verifyOtp);
+router.post('/reset-password-otp', loginOtpController.resetPasswordOtp);
 
 module.exports = router;

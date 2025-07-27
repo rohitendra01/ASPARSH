@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const dashboardController = require('../controllers/dashboardController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
+
+router.get('/hotels/:hotelId', dashboardController.showHotelPage);
 
 const products = [
     {
@@ -118,6 +121,93 @@ const testimonials = [
     // Dashboard route (protected)
     router.get("/dashboard", isLoggedIn, (req, res) => {
         res.render("dashboard", { layout: "layouts/boilerplate" });
+    });
+
+    // Handle hotel show page creation
+    const Hotel = require('../models/Hotel');
+    const multer = require('multer');
+    const upload = multer();
+    const cloudinary = require('cloudinary').v2;
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+
+    router.post("/dashboard/create-hotel", isLoggedIn, upload.fields([
+        { name: 'hotelLogo', maxCount: 1 },
+        { name: 'hotelOfferBanner', maxCount: 1 }
+    ]), async (req, res) => {
+        try {
+            const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
+            const createdBy = req.user._id;
+            // Upload images to Cloudinary
+            const logoFile = req.files['hotelLogo'] ? req.files['hotelLogo'][0] : null;
+            const bannerFile = req.files['hotelOfferBanner'] ? req.files['hotelOfferBanner'][0] : null;
+            let hotelLogoUrl = '';
+            let hotelOfferBannerUrl = '';
+            // Helper to upload to Cloudinary and return URL
+            async function uploadToCloudinary(file, folderName) {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: folderName }, (error, result) => {
+                        if (error) return reject(error);
+                        console.log('Cloudinary upload result:', result);
+                        resolve(result.secure_url);
+                    });
+                    stream.end(file.buffer);
+                });
+            }
+            if (logoFile) {
+                hotelLogoUrl = await uploadToCloudinary(logoFile, 'hotels');
+            }
+            if (bannerFile) {
+                hotelOfferBannerUrl = await uploadToCloudinary(bannerFile, 'hotels');
+            }
+            // Parse foodCategories from form
+            let foodCategories = [];
+            if (req.body.foodCategories) {
+                // If only one category, req.body.foodCategories is an object, else array
+                const categories = Array.isArray(req.body.foodCategories) ? req.body.foodCategories : [req.body.foodCategories];
+                foodCategories = categories.map(cat => {
+                    let foodItems = [];
+                    if (cat.foodItems) {
+                        const items = Array.isArray(cat.foodItems) ? cat.foodItems : [cat.foodItems];
+                        foodItems = items.map(item => ({
+                            itemName: item.itemName,
+                            price: item.price
+                        }));
+                    }
+                    return {
+                        categoryName: cat.categoryName,
+                        imageUrl: cat.imageUrl,
+                        foodItems
+                    };
+                });
+            }
+            // Check required fields
+            if (!hotelId || !hotelName || !hotelDescription || !hotelType || !hotelLogoUrl || !hotelOfferBannerUrl || !street || !city || !state || !country || !zipCode || !createdBy) {
+                console.error('Missing required hotel fields:', { hotelId, hotelName, hotelDescription, hotelType, hotelLogoUrl, hotelOfferBannerUrl, street, city, state, country, zipCode, createdBy });
+                return res.status(400).send('Missing required hotel fields');
+            }
+            // Create hotel document
+            const hotel = new Hotel({
+                hotelId,
+                hotelName,
+                hotelDescription,
+                hotelType,
+                hotelLogo: hotelLogoUrl,
+                hotelOfferBanner: hotelOfferBannerUrl,
+                hotelAddress: { street, city, state, country, zipCode },
+                foodCategories,
+                createdBy,
+                createdByUsername: req.user.username || req.user.email || ''
+            });
+            await hotel.save();
+            res.redirect(`/hotels/${hotelId}`);
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Error saving hotel data');
+        }
     });
 
     // About Us page
