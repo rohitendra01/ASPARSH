@@ -1,0 +1,83 @@
+<% layout('layouts/dashboard-boilerplate') %>
+
+<div class="admin-profile-container">
+  <div class="admin-profile-card">
+    <div class="admin-profile-header">
+      <img src="/assets/user-login.png" alt="Admin Avatar" class="admin-avatar">
+      <h2 class="admin-username"><%= user.username %></h2>
+      <p class="admin-email"><%= user.email %></p>
+    </div>
+    <div class="admin-profile-details">
+      <h3>Profile Details</h3>
+      <ul>
+        <li><strong>Username:</strong> <%= user.username %></li>
+        <li><strong>Email:</strong> <%= user.email %></li>
+        <li><strong>Account Created:</strong> <%= user.createdAt.toLocaleString() %></li>
+        <li><strong>Last Updated:</strong> <%= user.updatedAt.toLocaleString() %></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+.admin-profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 60vh;
+  padding: 2rem 0;
+}
+.admin-profile-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+.admin-profile-header {
+  margin-bottom: 1.5rem;
+}
+.admin-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px #007bff22;
+}
+.admin-username {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.3rem;
+}
+.admin-email {
+  color: #007bff;
+  font-size: 1.08rem;
+  margin-bottom: 0.5rem;
+}
+.admin-profile-details {
+  text-align: left;
+  margin-top: 1.5rem;
+}
+.admin-profile-details h3 {
+  font-size: 1.15rem;
+  color: #444;
+  margin-bottom: 0.7rem;
+}
+.admin-profile-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.admin-profile-details li {
+  font-size: 1.05rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.admin-profile-details strong {
+  color: #007bff;
+}
+</style>

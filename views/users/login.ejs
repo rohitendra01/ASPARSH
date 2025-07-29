@@ -137,7 +137,7 @@ body {
     <div class="login-group">
       <label for="password">Password</label>
       <input
-        type="password"
+        type="password" 
         id="password"
         name="password"
         required
@@ -145,6 +145,7 @@ body {
         class="<%= error_msg ? 'input-error' : '' %>"
       >
     </div>
+    <input type="hidden" name="returnTo" value="<%= typeof returnTo !== 'undefined' ? returnTo : (typeof req !== 'undefined' && req.headers.referer ? req.headers.referer : '/') %>">
     <button type="submit" class="login-btn">Login</button>
     <p style="margin-top: 10px; text-align: right;">
       <a href="#" id="forgot-password-link" style="color: #007bff; font-size: 0.95em; text-decoration: none;">Forgot Password?</a>

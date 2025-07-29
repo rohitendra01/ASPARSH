@@ -1,3 +1,30 @@
+// Dashboard hotels index page
+exports.dashboardHotelsIndex = async (req, res) => {
+  try {
+    const hotels = await Hotel.find({});
+    res.render('hotels/index', {
+      hotels,
+      layout: 'layouts/dashboard-boilerplate'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('hotels/index', {
+      error: 'Error loading hotels',
+      hotels: [],
+      layout: 'layouts/dashboard-boilerplate'
+    });
+  }
+};
+// Dashboard home page
+exports.dashboardHome = (req, res) => {
+  res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });
+};
+
+// Dashboard user profile page
+exports.dashboardUserProfile = (req, res) => {
+  // You should fetch the user from req.user or DB as needed
+  res.render('users/view', { user: req.user, layout: 'layouts/dashboard-boilerplate' });
+};
 // dashboardController.js
 const path = require('path');
 

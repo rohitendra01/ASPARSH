@@ -92,7 +92,7 @@ const testimonials = [
             avatar: "/assets/testimonial7.jpg"
         }
     ];
-
+    
     
     
     
@@ -101,30 +101,28 @@ const testimonials = [
     router.get("/", (req, res) => {
         res.render("index", { products, testimonials, layout: "layouts/boilerplate" });
     });
-    
-    
+
     // Home route
     router.get("/home", (req, res) => {
         res.render("home", { layout: "layouts/boilerplate" });
     });
-    
+
     // Contact Us page
     router.get("/contact", (req, res) => {
         res.render("contact", { layout: "layouts/boilerplate" });
     });
-    
+
     // Pricing page
     router.get("/pricing", (req, res) => {
         res.render("pricing", { layout: "layouts/boilerplate" });
     });
-    
+
     // Dashboard route (protected)
     router.get("/dashboard", isLoggedIn, (req, res) => {
-        res.render("dashboard", { layout: "layouts/boilerplate" });
+        res.render("dashboard", { layout: "layouts/dashboard-boilerplate" });
     });
 
     // Handle hotel show page creation
-    const Hotel = require('../models/Hotel');
     const multer = require('multer');
     const upload = multer();
     const cloudinary = require('cloudinary').v2;
@@ -133,7 +131,7 @@ const testimonials = [
         api_key: process.env.CLOUDINARY_API_KEY,
         api_secret: process.env.CLOUDINARY_API_SECRET
     });
-
+    
     router.post("/dashboard/create-hotel", isLoggedIn, upload.fields([
         { name: 'hotelLogo', maxCount: 1 },
         { name: 'hotelOfferBanner', maxCount: 1 }
@@ -214,8 +212,28 @@ const testimonials = [
     router.get("/about", (req, res) => {
         res.render("about", { layout: "layouts/boilerplate" });
     });
+    
 
+// Hotels index page (public, hotel-boilerplate)
+const Hotel = require('../models/Hotel');
+router.get('/hotels', async (req, res) => {
+  try {
+    const hotels = await Hotel.find({});
+    res.render('hotels/index', { hotels, layout: 'layouts/hotel-boilerplate' }); // Correct: views/hotels/index.ejs
+  } catch (err) {
+    console.error(err);
+    res.render('hotels/index', { hotels: [], layout: 'layouts/hotel-boilerplate', error: 'Could not load hotels.' });
+  }
+});
 
+// Dashboard page (protected, dashboard-boilerplate)
+router.get('/dashboard', isLoggedIn, (req, res) => {
+  res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });
+});
 
-
+    // Public hotel show page
+router.get('/hotel/:hotelId', dashboardController.showHotelPage); // Correct: controller should render views/hotels/show.ejs
+    
+    
+    
 module.exports = router;

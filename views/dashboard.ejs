@@ -1,84 +1,12 @@
-<% layout('layouts/boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/dashboard.css" />`) %>
-<main class="dashboard-main">
-    <div class="dashboard-container">
-        <h2>Hotel Dashboard</h2>
-        <div class="dashboard-options">
-            <div class="option-card">
-                <h3>Create Hotel Show Page</h3>
-                <form action="/dashboard/create-hotel" method="POST" enctype="multipart/form-data">
-                    <label for="hotelId">Hotel ID:</label>
-                    <input type="text" id="hotelId" name="hotelId" required>
-                    <label for="hotelName">Hotel Name:</label>
-                    <input type="text" id="hotelName" name="hotelName" required>
-                    <label for="hotelDescription">Description:</label>
-                    <textarea id="hotelDescription" name="hotelDescription" required></textarea>
-                    <label for="hotelType">Type:</label>
-                    <input type="text" id="hotelType" name="hotelType" required>
-                    <label for="hotelLogo">Hotel Logo:</label>
-                    <input type="file" id="hotelLogo" name="hotelLogo" accept="image/*" required>
-                    <label for="hotelOfferBanner">Offer Banner:</label>
-                    <input type="file" id="hotelOfferBanner" name="hotelOfferBanner" accept="image/*" required>
-                    <fieldset>
-                        <legend>Hotel Address</legend>
-                        <input type="text" name="street" placeholder="Street" required>
-                        <input type="text" name="city" placeholder="City" required>
-                        <input type="text" name="state" placeholder="State" required>
-                        <input type="text" name="country" placeholder="Country" required>
-                        <input type="text" name="zipCode" placeholder="Zip Code" required>
-                    </fieldset>
-                    <fieldset id="foodCategories">
-                        <legend>Food Categories & Items</legend>
-                    </fieldset>
-                    <button type="button" onclick="addCategory()">Add Category</button>
-                    <button type="submit">Create Show Page</button>
-                    <script>
-                    let categoryCount = 0;
-                    let itemCounts = [];
-                    function addCategory() {
-                        const container = document.getElementById('foodCategories');
-                        const group = document.createElement('div');
-                        group.className = 'food-category-group';
-                        group.setAttribute('data-category', categoryCount);
-                        itemCounts[categoryCount] = 0;
-                        group.innerHTML = `
-                            <hr>
-                            <label>Category Name:</label>
-                            <input type="text" name="foodCategories[${categoryCount}][categoryName]">
-                            <div class="food-items-list" id="foodItemsList${categoryCount}"></div>
-                            <button type="button" onclick="addItem(${categoryCount})">Add Item</button>
-                            <button type="button" onclick="removeCategory(this)">Remove Category</button>
-                        `;
-                        container.appendChild(group);
-                        addItem(categoryCount); // Add first item by default
-                        categoryCount++;
-                    }
-                    function addItem(catIdx) {
-                        const itemsList = document.getElementById(`foodItemsList${catIdx}`);
-                        if (!itemsList) return;
-                        const itemIdx = itemCounts[catIdx] || 0;
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'food-items-group';
-                        itemDiv.innerHTML = `
-                            <label>Item Name:</label>
-                            <input type="text" name="foodCategories[${catIdx}][foodItems][${itemIdx}][itemName]">
-                            <label>Price:</label>
-                            <input type="number" name="foodCategories[${catIdx}][foodItems][${itemIdx}][price]" min="0">
-                            <button type="button" onclick="removeItem(this)">Remove Item</button>
-                        `;
-                        itemsList.appendChild(itemDiv);
-                        itemCounts[catIdx] = itemIdx + 1;
-                    }
-                    function removeCategory(btn) {
-                        btn.parentElement.remove();
-                    }
-                    function removeItem(btn) {
-                        btn.parentElement.remove();
-                    }
-                    window.onload = function() { addCategory(); };
-                    </script>
-                </form>
-            </div>
-        </div>
+<% layout('layouts/dashboard-boilerplate') %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/dashboard/dashboard.css" />`) %>
+<section class="dashboard-intro">
+    <h1>Welcome to Your Dashboard</h1>
+    <p>
+        This dashboard provides a quick overview of your activities, statistics, and recent updates. Use the tools and features below to manage your account and stay informed.
+    </p>
+    <div class="dashboard-illustrations">
+        <img src="/images/overview.svg" alt="Overview Illustration" style="width:80px; margin-right:20px;">
+        <img src="/images/updates.svg" alt="Updates Illustration" style="width:80px;">
     </div>
-</main>
+</section>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asparsh | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Poppins:wght@400;500;600&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard/dashboard-header.css">
+    <link rel="stylesheet" href="/css/dashboard/dashboard-footer.css">
+    <%- block('styles') %>
+</head>
+<body>
+    <%- include('../partials/dashboard/dashboard-header') %>
+    <div class="dashboard-layout">
+        <%- include('../partials/dashboard/dashboard-sidebar') %>
+        <main class="dashboard-main">
+            <%- body %>
+        </main>
+    </div>
+    <%- include('../partials/dashboard/dashboard-footer') %>
+</body>
+</html>

@@ -172,13 +172,13 @@ router.get('/hotels/:id', async (req, res) => {
     // Fetch hotel by id from DB (replace with your model logic)
     // const hotel = await Hotel.findById(req.params.id);
     // if (!hotel) throw new Error('Hotel not found');
-    res.render('hotels/show', { categories: foodCategories }); // Placeholder, add hotel data as needed
+    res.render('hotels/show', { categories: foodCategories }); // Correct: views/hotels/show.ejs
   } catch (err) {
     res.status(500).send('Error loading hotel page: ' + err.message);
   }
 });
 
-router.get('hotels/show', (req, res) => {
+router.get('/hotels/show', (req, res) => {
   res.render('hotels/show', { categories: foodCategories });
 });
 

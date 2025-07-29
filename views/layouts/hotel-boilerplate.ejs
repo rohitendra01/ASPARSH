@@ -12,11 +12,11 @@
     <title>Hotel Menu</title>
 </head>
 <body>
-<%- include('../partials/hotel-header', {
+<%- include('../partials/hotel/hotel-header', {
   hotelName: typeof hotelName !== 'undefined' ? hotelName : '',
   hotelDescription: typeof hotelDescription !== 'undefined' ? hotelDescription : '',
   hotelLogo: typeof hotelLogo !== 'undefined' ? hotelLogo : '',
   hotelType: typeof hotelType !== 'undefined' ? hotelType : ''
 }) %>
     <%- body %>
-<%- include('../partials/hotel-footer') %>
+<%- include('../partials/hotel/hotel-footer') %>

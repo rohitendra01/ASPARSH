@@ -1,5 +1,7 @@
+.dashboard-main{
+    padding-top: 4rem;
+}
 
-/* dashboard hotel form styles */
 .dashboard-container {
     background: #fff;
     border-radius: 18px;
@@ -43,14 +45,14 @@
     padding: 4px;
 }
 fieldset {
-    border: 1px solid #00eaff;
+    border: 1px solid #11482e;
     border-radius: 6px;
     margin-top: 16px;
     padding: 12px;
 }
 legend {
     font-weight: 700;
-    color: #00eaff;
+    color: #000000;
 }
 .option-card form button {
     margin-top: 18px;
