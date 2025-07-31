@@ -2,9 +2,9 @@
   <nav class="sidebar-nav">
     <div class="sidebar-title">Dashboard</div>
     <ul class="sidebar-links">
-      <li><a href="/dashboard/user/view" class="sidebar-link-user"><span class="sidebar-icon">👤</span> User</a></li>
-      <li><a href="/dashboard/hotels/index"><span class="sidebar-icon">🏨</span> Hotels</a></li>
-      <li><a href="/dashboard/portfolio"><span class="sidebar-icon">🗂️</span> Portfolio</a></li>
+      <li><a href="/dashboard/<%= currentUser.slug %>/user/view/<%= currentUser.slug %>" class="sidebar-link-user"><span class="sidebar-icon">👤</span> User</a></li>
+      <li><a href="/dashboard/<%= currentUser.slug %>/hotels/index"><span class="sidebar-icon">🏨</span> Hotels</a></li>
+      <li><a href="/dashboard/<%= currentUser.slug %>/portfolios"><span class="sidebar-icon">🗂️</span> Portfolio</a></li>
     </ul>
   </nav>
 </aside>

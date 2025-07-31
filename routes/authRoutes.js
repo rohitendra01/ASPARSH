@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const loginOtpController = require('../controllers/loginOtpController');
+const authController = require('../controllers/authController');
+// Registration routes
+router.get('/register', authController.getRegisterPage);
+router.post('/register', authController.registerUser);
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Apply storeReturnTo middleware globally

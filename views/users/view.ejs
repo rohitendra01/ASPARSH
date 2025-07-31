@@ -3,18 +3,13 @@
 <div class="admin-profile-container">
   <div class="admin-profile-card">
     <div class="admin-profile-header">
-      <img src="/assets/user-login.png" alt="Admin Avatar" class="admin-avatar">
+      <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar">
       <h2 class="admin-username"><%= user.username %></h2>
       <p class="admin-email"><%= user.email %></p>
     </div>
-    <div class="admin-profile-details">
-      <h3>Profile Details</h3>
-      <ul>
-        <li><strong>Username:</strong> <%= user.username %></li>
-        <li><strong>Email:</strong> <%= user.email %></li>
-        <li><strong>Account Created:</strong> <%= user.createdAt.toLocaleString() %></li>
-        <li><strong>Last Updated:</strong> <%= user.updatedAt.toLocaleString() %></li>
-      </ul>
+    <div class="admin-profile-actions">
+      <a href="/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>" class="btn btn-primary admin-edit-btn">Edit Profile</a>
+    </div>
     </div>
   </div>
 </div>
@@ -24,8 +19,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 60vh;
-  padding: 2rem 0;
+  min-height: 80vh;
+  padding: 2rem 1rem;
 }
 .admin-profile-card {
   background: #fff;
@@ -58,26 +53,33 @@
   font-size: 1.08rem;
   margin-bottom: 0.5rem;
 }
-.admin-profile-details {
-  text-align: left;
+
+.admin-profile-actions {
   margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.admin-profile-details h3 {
-  font-size: 1.15rem;
-  color: #444;
-  margin-bottom: 0.7rem;
+
+.admin-edit-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px #007bff22;
+  cursor: pointer;
+  text-decoration: none;
+  outline: none;
 }
-.admin-profile-details ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+
+.admin-edit-btn:hover,
+.admin-edit-btn:focus {
+  background-color: #0056b3;
+  box-shadow: 0 4px 16px #007bff33;
+  color: #fff;
+  text-decoration: none;
 }
-.admin-profile-details li {
-  font-size: 1.05rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-.admin-profile-details strong {
-  color: #007bff;
-}
-</style>

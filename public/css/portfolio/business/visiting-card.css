@@ -138,6 +138,97 @@ body {
     position: relative;
     z-index: 2;
 }
+
+/* --- Main Section Styles --- */
+.section-main {
+  width: 100vw;
+  min-height: 40vh;
+  background: #fff;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3rem;
+  padding: 3rem 2rem 4rem 2rem;
+  box-sizing: border-box;
+}
+
+.main-description {
+  flex: 1 1 60%;
+  max-width: 600px;
+  font-family: var(--content-text);
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  background: #f8fafb;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 2rem 2.5rem;
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+.main-contact-links {
+  flex: 1 1 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  justify-content: flex-start;
+  margin-top: 0.5rem;
+}
+.main-contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0.7rem 1.2rem;
+  font-family: var(--subhead-text);
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.main-contact-links a:hover {
+  box-shadow: 0 4px 16px rgba(0,184,148,0.18);
+  transform: translateY(-2px) scale(1.04);
+}
+.main-contact-links svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .section-main {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.2rem;
+    padding: 1.2rem 2vw 2.5rem 2vw;
+  }
+  .main-description {
+    font-size: 1.05rem;
+    padding: 1.2rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .main-contact-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 0.5rem;
+  }
+  .main-contact-links a {
+    font-size: 0.98rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+  }
+  .main-contact-links svg {
+    width: 18px;
+    height: 18px;
+  }
+}
 @media (max-width: 600px) {
   .section-header {
     flex-direction: column;

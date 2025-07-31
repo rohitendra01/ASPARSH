@@ -1,0 +1,130 @@
+<% layout('layouts/dashboard-boilerplate') %>
+
+<div class="admin-profile-container">
+  <form action="/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>" method="POST" enctype="multipart/form-data" class="admin-profile-card">
+    <div class="admin-profile-header">
+      <div class="avatar-wrapper">
+        <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar">
+        <label class="upload-label">
+          <input type="file" name="image" accept="image/*" class="form-control" style="display:none;">
+          <span class="upload-btn">Change</span>
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" value="<%= user.email %>" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary save-btn">Save Changes</button>
+  </form>
+</div>
+<style>
+.admin-profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 71vh;
+  padding: 2.5rem 1rem;
+  background: #f6f8fa;
+  width: 100%;
+}
+.admin-profile-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.admin-profile-header {
+  margin-bottom: 0.5rem;
+}
+.avatar-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.admin-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.7rem;
+  box-shadow: 0 2px 8px #007bff22;
+  border: 3px solid #e9ecef;
+}
+.upload-label {
+  cursor: pointer;
+  display: inline-block;
+}
+.upload-btn {
+  background: #f0f4ff;
+  color: #007bff;
+  border-radius: 6px;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  border: 1px solid #b3d1ff;
+  transition: background 0.2s, color 0.2s;
+  margin-top: 0.1rem;
+  display: inline-block;
+}
+.upload-btn:hover {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+.form-group {
+  text-align: left;
+  margin-bottom: 1.2rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #222;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.form-control {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  background: #f8fafc;
+  color: #222;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.form-control:focus {
+  border-color: #007bff;
+  outline: none;
+  background: #fff;
+}
+.save-btn {
+  background: linear-gradient(90deg, #007bff 60%, #0056b3 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 0;
+  font-size: 1.13rem;
+  font-weight: 700;
+  width: 100%;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px #007bff22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.save-btn:hover, .save-btn:focus {
+  background: linear-gradient(90deg, #0056b3 60%, #007bff 100%);
+  box-shadow: 0 4px 16px #007bff33;
+}
+</style>

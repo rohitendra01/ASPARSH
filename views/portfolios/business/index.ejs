@@ -1,0 +1,65 @@
+<% layout('layouts/dashboard-boilerplate') %>
+
+<div class="dashboard-container">
+  <h2>Business Visiting Cards</h2>
+  <div class="visiting-cards-list">
+    <% if (cards && cards.length > 0) { %>
+      <% cards.forEach(function(card) { %>
+        <div class="visiting-card-preview">
+          <div class="card-header">
+            <% if (card.image) { %>
+              <img src="<%= card.image %>" alt="<%= card.name %>" class="profile-img" />
+            <% } %>
+            <h3><%= card.name %></h3>
+            <p><%= card.title %></p>
+          </div>
+          <div class="card-body">
+            <p><%= card.description %></p>
+            <p><strong>Email:</strong> <%= card.email %></p>
+            <p><strong>Phone:</strong> <%= card.phone %></p>
+            <p><strong>Address:</strong> <%= card.address %></p>
+            <% if (card.website) { %><p><strong>Website:</strong> <%= card.website %></p><% } %>
+          </div>
+          <a href="/dashboard/visiting-card/<%= card._id %>" class="btn btn-primary">View Card</a>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No visiting cards found.</p>
+    <% } %>
+  </div>
+</div>
+
+<style>
+.visiting-cards-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.visiting-card-preview {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+.card-header h3 {
+  margin: 0.5rem 0 0.2rem 0;
+}
+.card-header p {
+  margin: 0;
+  color: #888;
+}
+.card-body p {
+  margin: 0.2rem 0;
+}
+</style>

@@ -1,3 +1,48 @@
+// Handle form submission to create a new business visiting card (with image upload and correct redirect)
+exports.createBusinessVisitingCard = async (req, res) => {
+  console.log('POST /dashboard/:slug/buisness/visiting-card/new called', req.body);
+  try {
+    const { name, title, description, email, phone, address, website, linkedin, twitter, facebook, instagram } = req.body;
+    let imageUrl = '';
+    if (req.file) {
+      // Upload image to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({
+          folder: 'asparsh/visiting-cards',
+          resource_type: 'image',
+          public_id: `visiting_card_${Date.now()}`,
+          overwrite: true
+        }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+      imageUrl = result.secure_url;
+    }
+    const visitingCard = new VisitingCard({
+      user: req.user._id,
+      name,
+      title,
+      description,
+      email,
+      phone,
+      address,
+      website,
+      linkedin,
+      twitter,
+      facebook,
+      instagram,
+      image: imageUrl
+    });
+    await visitingCard.save();
+    // Redirect to the created card view page (adjust as needed)
+    res.redirect(`/dashboard/${req.user.slug}/portfolio`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('portfolios/business/new', { error: 'Error creating visiting card', layout: 'layouts/dashboard-boilerplate', currentUser: req.user });
+  }
+};
 // Dashboard hotels index page
 exports.dashboardHotelsIndex = async (req, res) => {
   try {
@@ -21,14 +66,31 @@ exports.dashboardHome = (req, res) => {
 };
 
 // Dashboard user profile page
-exports.dashboardUserProfile = (req, res) => {
-  // You should fetch the user from req.user or DB as needed
-  res.render('users/view', { user: req.user, layout: 'layouts/dashboard-boilerplate' });
+exports.dashboardUserProfile = async (req, res) => {
+  let user;
+  if (req.params.slug) {
+    user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+  } else {
+    user = req.user;
+  }
+  if (!user) return res.status(404).send('User not found');
+  res.render('users/view', { user, layout: 'layouts/dashboard-boilerplate' });
 };
 // dashboardController.js
 const path = require('path');
 
 const Hotel = require('../models/Hotel');
+const VisitingCard = require('../models/VisitingCard');
+const cloudinary = require('cloudinary').v2;
+const User = require('../models/User');
+const streamifier = require('streamifier');
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
 exports.showHotelPage = async (req, res) => {
     try {
         const hotel = await Hotel.findOne({ hotelId: req.params.hotelId });
@@ -47,4 +109,106 @@ exports.showHotelPage = async (req, res) => {
         console.error(err);
         res.status(500).send('Error loading hotel show page');
     }
+};
+
+// Render form to create a new visiting card
+exports.renderNewVisitingCardForm = (req, res) => {
+  res.render('portfolios/business/new', { layout: 'layouts/dashboard-boilerplate', currentUser: req.user });
+};
+
+// Handle form submission to create a new visiting card
+exports.createVisitingCard = async (req, res) => {
+  try {
+    const { name, title, description, email, phone, address, website, linkedin, twitter, facebook, instagram } = req.body;
+    const visitingCard = new VisitingCard({
+      user: req.user._id,
+      name,
+      title,
+      description,
+      email,
+      phone,
+      address,
+      website,
+      linkedin,
+      twitter,
+      facebook,
+      instagram
+    });
+    await visitingCard.save();
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('portfolios/business/new', { error: 'Error creating visiting card', layout: 'layouts/dashboard-boilerplate' });
+  }
+};
+
+// Fetch and show visiting card by user ID
+exports.showVisitingCard = async (req, res) => {
+  try {
+    const visitingCard = await VisitingCard.findById(req.params.cardId);
+    if (!visitingCard) return res.status(404).send('Visiting card not found');
+    res.render('portfolios/business/visiting-card', { card: visitingCard });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading visiting card');
+  }
+};
+
+// Dashboard business portfolio index page
+exports.dashboardPortfolioIndex = async (req, res) => {
+  try {
+    const cards = await VisitingCard.find({});
+    res.render('portfolios/business/index', { cards, layout: 'layouts/dashboard-boilerplate' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error loading business visiting cards');
+  }
+};
+
+exports.getEditUserProfile = async (req, res) => {
+  let user;
+  if (req.params.slug) {
+    user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+  } else {
+    user = req.user;
+  }
+  if (!user) return res.status(404).send('User not found');
+  res.render('users/edit', { user, layout: 'layouts/dashboard-boilerplate' });
+};
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    let user;
+    if (req.params.slug) {
+      user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+    } else {
+      user = req.user;
+    }
+    if (!user) return res.status(404).send('User not found');
+    user.username = req.body.username;
+    user.email = req.body.email;
+    if (req.file) {
+      // Upload image to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({
+          folder: 'asparsh/users',
+          resource_type: 'image',
+          public_id: `user_${user._id}`,
+          overwrite: true
+        }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        });
+        require('streamifier').createReadStream(req.file.buffer).pipe(stream);
+      });
+      user.image = result.secure_url;
+    }
+    await user.save();
+    req.flash('success_msg', 'Profile updated successfully!');
+    return res.redirect(`/dashboard/${user.slug}/user/view/${user.slug}`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error_msg', 'Error updating profile');
+    res.redirect('back');
+  }
 };

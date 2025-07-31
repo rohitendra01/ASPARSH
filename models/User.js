@@ -22,9 +22,36 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter a password'],
         minlength: [6, 'Password must be at least 6 characters']
+    },
+    image: {
+        type: String, // Cloudinary image URL
+        default: ''
+    },
+    slug: {
+        type: String,
+        unique: true,
+        index: true
     }
 }, {
     timestamps: true
+});
+
+// Slug generation middleware (ensures uniqueness)
+userSchema.pre('save', async function(next) {
+    if (this.isModified('username')) {
+        let baseSlug = this.username
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)+/g, '');
+        let slug = baseSlug;
+        let count = 0;
+        while (await this.constructor.findOne({ slug, _id: { $ne: this._id } })) {
+            count++;
+            slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
+        }
+        this.slug = slug;
+    }
+    next();
 });
 
 // Password hashing middleware
