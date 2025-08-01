@@ -1,0 +1,136 @@
+.create-hotel-btn-fixed {
+  position: fixed;
+  top: 130px;
+  right: 40px;
+  z-index: 100;
+  box-shadow: 0 4px 16px #007bff33;
+  opacity: 0.97;
+}
+
+.dashboard-main {
+  overflow-y: auto;
+  height: calc(100vh - 180px);
+}
+.create-hotel-btn {
+  background-color: var(--text-dark);
+  color: var(--text-light);
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 2px 8px #007bff22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-bottom: 1rem;
+}
+.create-hotel-btn:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 16px #007bff33;
+}
+.hotel-cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.hotel-card {
+  background: var(--text-light);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: .5rem;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--text-dark);
+  transition: box-shadow 0.2s;
+}
+
+.hotel-card-logo {
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 2px 8px #007bff22;
+  border-radius: 14px;
+}
+.hotel-card-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  overflow: hidden;
+
+}
+
+.hotel-card-body {
+  width: 100%;
+  display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hotel-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--head-text);
+  color: var(--text-dark);
+}
+
+.hotel-card-type {
+    font-family: var(--subhead-text);
+  color: var(--text-dark);
+  font-size: 1.08rem;
+  margin-bottom: 0.2rem;
+}
+
+.hotel-card-address {
+    font-family: var(--subhead-text);
+  color: var(--text-dark);
+  font-size: 1rem;
+}
+
+.hotel-card-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.hotel-card-link, .hotel-card-edit {
+  background-color: var(--text-dark);
+  color: var(--text-light);
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px #007bff22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.hotel-card-edit {
+  background-color: var(--text-dark);
+  color: var(--text-light);
+}
+.hotel-card-link:hover, .hotel-card-edit:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 16px #007bff33;
+}
+.hotel-card-edit:hover {
+  background-color: #ca6c1c;
+}

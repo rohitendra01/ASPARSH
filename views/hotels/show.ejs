@@ -1,6 +1,8 @@
 <% layout('layouts/hotel-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/show.css" />`) %>
-<img src="/assets/hotel-banner.jpg" alt="Hero" class="mobile-hero-image">
+<% if (hotelOfferBanner) { %>
+  <img src="<%= hotelOfferBanner %>" alt="Hotel Banner" class="mobile-hero-image">
+<% } %>
 <hr>
 <div class="category-filter-bar" id="categoryFilterBar">
   <button class="category-btn" data-category="all">All</button>

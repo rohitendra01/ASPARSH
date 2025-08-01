@@ -12,7 +12,7 @@ router.use(authMiddleware.storeReturnTo);
 
 router.get('/login', loginOtpController.getLoginPage);
 router.post('/login', loginOtpController.loginUser);
-router.get('/logout', authMiddleware.isLoggedIn, loginOtpController.logoutUser);
+router.post('/logout', authMiddleware.isLoggedIn, loginOtpController.logoutUser);
 router.post('/request-otp', loginOtpController.requestOtp);
 router.post('/resend-otp', loginOtpController.resendOtp);
 router.post('/verify-otp', loginOtpController.verifyOtp);

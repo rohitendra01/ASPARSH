@@ -1,7 +1,9 @@
 <% layout('layouts/dashboard-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/index.css" />`) %>
 
-<div class="hotel-list-container">
+<div class="dashboard-main">
+  <a href="/dashboard/<%= user.slug %>/hotels/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Hotel</a>
+  <div class="hotel-list-container">
   <% if (typeof error !== 'undefined') { %>
     <div class="alert alert-danger"><%= error %></div>
   <% } %>
@@ -11,10 +13,19 @@
         <div class="hotel-card">
           <img src="<%= hotel.hotelLogo %>" alt="<%= hotel.hotelName %> Logo" class="hotel-card-logo">
           <div class="hotel-card-body">
-            <h2 class="hotel-card-title"><%= hotel.hotelName %></h2>
-            <p class="hotel-card-type"><%= hotel.hotelType %></p>
-            <p class="hotel-card-desc"><%= hotel.hotelDescription %></p>
-            <a href="/hotel/<%= hotel.hotelId %>" class="hotel-card-link">View Hotel</a>
+            <div class="hotel-card-heading">
+              <h2 class="hotel-card-title"><%= hotel.hotelName %></h2>
+              <p class="hotel-card-type"><%= hotel.hotelType %></p>
+            </div>
+            <div class="hotel-card-others">
+              <p class="hotel-card-address">
+                <%= hotel.hotelAddress.street %>, <%= hotel.hotelAddress.city %>, <%= hotel.hotelAddress.state %>
+              </p>
+            </div>
+            <div class="hotel-card-links">
+              <a href="/hotel/<%= hotel.hotelId %>" class="hotel-card-link">View Hotel</a>
+              <a href="/hotel/<%= hotel.hotelId %>/edit" class="hotel-card-edit">Edit</a>
+            </div>
           </div>
         </div>
       <% }) %>
@@ -23,70 +34,3 @@
     <p>No hotels found.</p>
   <% } %>
 </div>
-
-<style>
-.hotel-list-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 6rem 1rem;
-}
-.hotel-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 2rem;
-}
-.hotel-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.2s;
-}
-.hotel-card:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.16);
-}
-.hotel-card-logo {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  background: #f5f5f5;
-}
-.hotel-card-body {
-  padding: 1.2rem 1rem 1.5rem 1rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.hotel-card-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem 0;
-  color: #222;
-}
-.hotel-card-type {
-  font-size: 1.05rem;
-  color: #007bff;
-  margin-bottom: 0.5rem;
-}
-.hotel-card-desc {
-  font-size: 1rem;
-  color: #444;
-  margin-bottom: 1.2rem;
-}
-.hotel-card-link {
-  display: inline-block;
-  background: #007bff;
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-.hotel-card-link:hover {
-  background: #0056b3;
-}
-</style>

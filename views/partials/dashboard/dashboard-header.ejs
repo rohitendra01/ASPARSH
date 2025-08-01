@@ -6,6 +6,22 @@
         <a href="https://caendar.google.com" class="calender"><img src="/assets/calendar-svg.svg" alt=""></a>
         <a href="" class="messages"><img src="/assets/messages-svg.svg" alt=""></a>
         <a href="" class="notifications"><img src="/assets/notifications-svg.svg" alt=""></a>
-        <div class="user-logo"><img src="/assets/admin-user-logo.jpg" alt="" style="background-color: black;"><p>User Name</p></div>
-    </div>
-</header>
+        <div class="user-logo" style="position: relative;">
+            <img src="<%= currentUser.image %>" alt="<%= currentUser.username %>" />
+            <p><%= currentUser.username %></p>
+            <form id="logoutForm" action="/logout" method="POST" class="logout-form">
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+        </div>
+        </header>
+        <script>
+          const userLogo = document.querySelector('.user-logo');
+          const logoutForm = document.getElementById('logoutForm');
+          userLogo.addEventListener('mouseenter', () => {
+            logoutForm.style.display = 'block';
+          });
+          userLogo.addEventListener('mouseleave', () => {
+            logoutForm.style.display = 'none';
+          });
+        </script>

@@ -1,5 +1,5 @@
 :root {
-    --text-dark: #0a0f0d;
+  --text-dark: #0a0f0d;
     --text-light: #e1f6e0;
     --hea-foo: #083235;
     --head-text: 'Raleway', Arial, Helvetica, sans-serif;
@@ -26,14 +26,13 @@ header {
 .header-logo {
     font-size: 2rem;
     font-weight: 700;
-    color: #007bff;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 8px #007bff11;
-}
-
-.header-logo a{
+    text-shadow: 0 2px 8px #007bff27;
+  }
+  
+  .header-logo a{
     font-family: var(--head-text);
     color: var(--text-dark);
+    letter-spacing: 1px;
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s;
@@ -83,9 +82,32 @@ header {
   background: #fff;
 }
 .user-logo p {
+  font-family: var(--head-text);
   margin: 0;
   font-size: 1.08rem;
   font-weight: 600;
   color: #222;
   letter-spacing: 0.5px;
 }
+  .logout-form {
+    display: none;
+    position: absolute;
+    top: 120%; /* Move further down below user logo */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 0.5rem 1rem;
+    z-index: 10;
+  }
+  
+  .logout-btn {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }

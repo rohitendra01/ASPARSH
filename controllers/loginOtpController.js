@@ -40,7 +40,7 @@ exports.logoutUser = (req, res) => {
       return res.redirect('/');
     }
     req.flash('success_msg', 'Successfully logged out');
-    res.redirect(req.headers.referer || '/');
+    res.redirect('/');
   });
 };
 

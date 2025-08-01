@@ -1,10 +1,10 @@
 <% layout('layouts/dashboard-boilerplate') %>
 
 <div class="admin-profile-container">
-  <form action="/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>" method="POST" enctype="multipart/form-data" class="admin-profile-card">
+  <form action="/dashboard/<%= currentUser.slug %>/user/edit/<%= currentUser.slug %>" method="POST" enctype="multipart/form-data" class="admin-profile-card">
     <div class="admin-profile-header">
       <div class="avatar-wrapper">
-        <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar">
+        <img src="<%= currentUser.image ? currentUser.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar">
         <label class="upload-label">
           <input type="file" name="image" accept="image/*" class="form-control" style="display:none;">
           <span class="upload-btn">Change</span>
@@ -13,11 +13,11 @@
     </div>
     <div class="form-group">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username" value="<%= user.username %>" class="form-control" required>
+      <input type="text" id="username" name="username" value="<%= currentUser.username %>" class="form-control" required>
     </div>
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" value="<%= user.email %>" class="form-control" required>
+      <input type="email" id="email" name="email" value="<%= currentUser.email %>" class="form-control" required>
     </div>
     <button type="submit" class="btn btn-primary save-btn">Save Changes</button>
   </form>

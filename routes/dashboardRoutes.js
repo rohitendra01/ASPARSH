@@ -31,7 +31,7 @@ router.post('/:slug/visiting-card/new', isLoggedIn, dashboardController.createVi
 // New business visiting card route (with typo as requested)
 router.get('/visiting-card/:cardId', dashboardController.showVisitingCard);
 router.get('/:slug/portfolios/business/new', isLoggedIn, (req, res) => {
-    res.render('portfolios/business/new', { layout: 'layouts/dashboard-boilerplate', currentUser: req.user });
+  res.render('portfolios/business/new', { layout: 'layouts/dashboard-boilerplate', currentUser: req.user });
 });
 router.post('/:slug/portfolios/business/visiting-card/new', isLoggedIn, upload.single('image'), dashboardController.createBusinessVisitingCard);
 
@@ -42,4 +42,14 @@ router.get('/:slug/portfolios', isLoggedIn, dashboardController.dashboardPortfol
 router.get('/:slug/user/edit/:userSlug', isLoggedIn, dashboardController.getEditUserProfile);
 router.post('/:slug/user/edit/:userSlug', isLoggedIn, upload.single('image'), dashboardController.updateUserProfile);
 
+// Create new hotel form (dashboard context)
+router.get('/:slug/hotels/new', isLoggedIn, (req, res) => {
+  res.render('hotels/new', { layout: 'layouts/dashboard-boilerplate', user: req.user });
+});
+
+// Handle new hotel creation (dashboard context)
+router.post('/:slug/hotels/new', isLoggedIn, upload.fields([
+  { name: 'hotelLogo', maxCount: 1 },
+  { name: 'hotelOfferBanner', maxCount: 1 }
+]), dashboardController.createHotelFromDashboard);
 module.exports = router;

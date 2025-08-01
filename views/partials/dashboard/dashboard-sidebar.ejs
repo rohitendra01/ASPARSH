@@ -1,6 +1,8 @@
 <aside class="dashboard-sidebar">
   <nav class="sidebar-nav">
-    <div class="sidebar-title">Dashboard</div>
+    <div class="sidebar-title">
+      <a href="/dashboard/<%= currentUser.slug %>" class="sidebar-title-link">Dashboard</a>
+    </div>
     <ul class="sidebar-links">
       <li><a href="/dashboard/<%= currentUser.slug %>/user/view/<%= currentUser.slug %>" class="sidebar-link-user"><span class="sidebar-icon">👤</span> User</a></li>
       <li><a href="/dashboard/<%= currentUser.slug %>/hotels/index"><span class="sidebar-icon">🏨</span> Hotels</a></li>

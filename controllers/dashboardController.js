@@ -1,3 +1,69 @@
+// Handle hotel creation from dashboard POST route
+exports.createHotelFromDashboard = async (req, res) => {
+  try {
+    const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
+    const createdBy = req.user._id;
+    const cloudinary = require('cloudinary').v2;
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    // Upload images to Cloudinary
+    const logoFile = req.files['hotelLogo'] ? req.files['hotelLogo'][0] : null;
+    const bannerFile = req.files['hotelOfferBanner'] ? req.files['hotelOfferBanner'][0] : null;
+    let hotelLogoUrl = '';
+    let hotelOfferBannerUrl = '';
+    async function uploadToCloudinary(file, folderName) {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: folderName }, (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        });
+        stream.end(file.buffer);
+      });
+    }
+    if (logoFile) {
+      hotelLogoUrl = await uploadToCloudinary(logoFile, 'hotels');
+    }
+    if (bannerFile) {
+      hotelOfferBannerUrl = await uploadToCloudinary(bannerFile, 'hotels');
+    }
+    // Parse foodCategories from form
+    let foodCategories = [];
+    if (req.body.foodCategories) {
+      const categories = Array.isArray(req.body.foodCategories) ? req.body.foodCategories : [req.body.foodCategories];
+      foodCategories = categories
+        .filter(cat => cat.categoryName && cat.categoryName.trim())
+        .map(cat => ({
+          ...cat,
+          foodItems: (cat.foodItems || []).filter(item => item.itemName && item.itemName.trim())
+        }));
+    }
+    // Check required fields
+    if (!hotelId || !hotelName || !hotelDescription || !hotelType || !hotelLogoUrl || !hotelOfferBannerUrl || !street || !city || !state || !country || !zipCode || !createdBy) {
+      return res.status(400).send('Missing required hotel fields');
+    }
+    const Hotel = require('../models/Hotel');
+    const hotel = new Hotel({
+      hotelId,
+      hotelName,
+      hotelDescription,
+      hotelType,
+      hotelLogo: hotelLogoUrl,
+      hotelOfferBanner: hotelOfferBannerUrl,
+      hotelAddress: { street, city, state, country, zipCode },
+      foodCategories,
+      createdBy,
+      createdByUsername: req.user.username || req.user.email || ''
+    });
+    await hotel.save();
+    res.redirect(`/dashboard/${req.user.slug}/hotels/index`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error saving hotel data');
+  }
+};
 // Handle form submission to create a new business visiting card (with image upload and correct redirect)
 exports.createBusinessVisitingCard = async (req, res) => {
   console.log('POST /dashboard/:slug/buisness/visiting-card/new called', req.body);
@@ -47,8 +113,15 @@ exports.createBusinessVisitingCard = async (req, res) => {
 exports.dashboardHotelsIndex = async (req, res) => {
   try {
     const hotels = await Hotel.find({});
+    let user = req.user;
+    // If slug is in params, try to get user by slug
+    if (req.params.slug && (!user || !user.slug || req.params.slug !== user.slug)) {
+      const UserModel = require('../models/User');
+      user = await UserModel.findOne({ slug: req.params.slug }) || user;
+    }
     res.render('hotels/index', {
       hotels,
+      user,
       layout: 'layouts/dashboard-boilerplate'
     });
   } catch (err) {
@@ -100,6 +173,7 @@ exports.showHotelPage = async (req, res) => {
             hotelName: hotel.hotelName,
             hotelDescription: hotel.hotelDescription,
             hotelLogo: hotel.hotelLogo,
+            hotelOfferBanner: hotel.hotelOfferBanner,
             hotelType: hotel.hotelType,
             foodCategories: hotel.foodCategories || [],
             hotelAddress: hotel.hotelAddress,

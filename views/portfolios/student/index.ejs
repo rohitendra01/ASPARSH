@@ -8,8 +8,8 @@
     <div class="alert alert-danger"><%= error %></div>
   <% } %>
   <div class="portfolio-user-info">
-    <p><strong>Name:</strong> <%= user && user.name ? user.name : (user && user.username ? user.username : 'N/A') %></p>
-    <p><strong>Email:</strong> <%= user && user.email ? user.email : 'N/A' %></p>
+    <p><strong>Name:</strong> <%= currentUser && currentUser.name ? currentUser.name : (currentUser && currentUser.username ? currentUser.username : 'N/A') %></p>
+    <p><strong>Email:</strong> <%= currentUser && currentUser.email ? currentUser.email : 'N/A' %></p>
   </div>
   <h2 class="portfolio-hotels-title">Hotels Managed</h2>
   <% if (hotels && hotels.length) { %>

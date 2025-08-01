@@ -1,26 +1,31 @@
 <% layout('layouts/dashboard-boilerplate') %>
-
 <div class="admin-profile-container">
   <div class="admin-profile-card">
     <div class="admin-profile-header">
-      <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar">
+      <div style="position: relative; display: inline-block;">
+        <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="admin-avatar" id="avatarImg">
+        <div id="avatarPreview" class="avatar-preview-box">
+          <img src="<%= user.image ? user.image : '/assets/user-login.png' %>" alt="Admin Avatar" class="avatar-preview-img">
+        </div>
+      </div>
       <h2 class="admin-username"><%= user.username %></h2>
-      <p class="admin-email"><%= user.email %></p>
     </div>
     <div class="admin-profile-actions">
-      <a href="/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>" class="btn btn-primary admin-edit-btn">Edit Profile</a>
+      <button type="button" class="admin-edit-btn" onclick="window.location.href='/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>'">Edit Profile</button>
+      <form action="/logout" method="POST" class="admin-logout-form">
+        <button type="submit" class="admin-logout-btn">Logout</button>
+      </form>
     </div>
     </div>
   </div>
 </div>
-
 <style>
 .admin-profile-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 80vh;
-  padding: 2rem 1rem;
+  height: 100%;
+  padding: 2rem 0;
 }
 .admin-profile-card {
   background: #fff;
@@ -34,6 +39,15 @@
 .admin-profile-header {
   margin-bottom: 1.5rem;
 }
+
+.admin-profile-header h2{
+  font-family: var(--subhead-text);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
 .admin-avatar {
   width: 90px;
   height: 90px;
@@ -59,27 +73,86 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
 }
 
-.admin-edit-btn {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
+
+/* Shared button styles */
+.admin-edit-btn, .admin-logout-btn {
   padding: 0.7rem 2rem;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 600;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px #007bff22;
-  cursor: pointer;
-  text-decoration: none;
+  border: none;
   outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
 }
-
+.admin-edit-btn {
+  font-family: var(--content-text);
+  background-color: var(--hea-foo);
+  color: var(--text-light);
+}
 .admin-edit-btn:hover,
 .admin-edit-btn:focus {
   background-color: #0056b3;
   box-shadow: 0 4px 16px #007bff33;
-  color: #fff;
-  text-decoration: none;
 }
+.admin-logout-btn {
+  font-family: var(--content-text);
+  background-color: var(--text-dark);
+  color: var(--text-light);
+}
+.admin-logout-btn:hover,
+.admin-logout-btn:focus {
+  background-color: #c0392b;
+  box-shadow: 0 4px 16px #e74c3c33;
+}
+.admin-logout-form {
+  display: inline;
+}
+.admin-username {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.3rem;
+}
+
+.avatar-preview-box {
+  display: none;
+  position: absolute;
+  left: 90px;
+  top: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px #007bff22;
+  padding: 0.5rem;
+  z-index: 100;
+}
+.avatar-preview-img {
+  width: 520px;
+  height: 520px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px #007bff11;
+}
+</style>
+<script>
+  // Avatar image preview box logic
+  const avatarImg = document.getElementById('avatarImg');
+  const avatarPreview = document.getElementById('avatarPreview');
+  avatarImg.addEventListener('mouseenter', function() {
+    avatarPreview.style.display = 'block';
+  });
+  avatarImg.addEventListener('mouseleave', function() {
+    setTimeout(function() {
+      if (!avatarPreview.matches(':hover')) {
+        avatarPreview.style.display = 'none';
+      }
+    }, 100);
+  });
+  avatarPreview.addEventListener('mouseleave', function() {
+    avatarPreview.style.display = 'none';
+  });
+</script>

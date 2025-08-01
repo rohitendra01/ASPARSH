@@ -19,8 +19,9 @@ const hotelSchema = new mongoose.Schema({
         type: String, required: true // Store Cloudinary URL
     },
     hotelOfferBanner: {
-         // Store Cloudinary URL
-            },
+        type: String,
+        required: true // Store Cloudinary URL
+    },
             foodCategories: [{
                 categoryName: { type: String, required: true },
                 foodItems: [{
