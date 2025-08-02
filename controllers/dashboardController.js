@@ -1,7 +1,135 @@
+// Delete hotel
+exports.deleteHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.findOneAndDelete({ hotelSlug: req.params.hotelSlug });
+    if (!hotel) {
+      return res.status(404).send('Hotel not found');
+    }
+    res.redirect(`/dashboard/${req.params.slug}/hotels/index`);
+  } catch (err) {
+    console.error('Error deleting hotel:', err);
+    res.status(500).send('Server error');
+  }
+};
+// Render edit hotel form
+exports.renderEditHotelForm = async (req, res) => {
+  try {
+    const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
+    if (!hotel) {
+      return res.status(404).render('hotels/edit', {
+        hotel: null,
+        error: 'Hotel not found',
+        layout: 'layouts/dashboard-boilerplate',
+        currentUser: req.user
+      });
+    }
+    res.render('hotels/edit', { hotel, currentUser: req.user });
+  } catch (err) {
+    console.error('DEBUG: Error in renderEditHotelForm:', err);
+    res.status(500).send('Server error');
+  }
+};
+
+// Update hotel
+exports.updateHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
+    if (!hotel) return res.status(404).send('Hotel not found');
+    // Update fields
+    hotel.hotelName = req.body.hotelName;
+    hotel.hotelType = req.body.hotelType;
+    hotel.hotelDescription = req.body.hotelDescription;
+    hotel.hotelAddress = {
+      street: req.body.street,
+      city: req.body.city,
+      state: req.body.state,
+      country: req.body.country,
+      zipCode: req.body.zipCode
+    };
+    // Handle file uploads for hotelLogo and hotelOfferBanner
+    const cloudinary = require('cloudinary').v2;
+    // Update hotelLogo if a new file is provided
+    if (req.files && req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
+      // Delete previous image from Cloudinary if exists
+      if (hotel.hotelLogo) {
+        // Extract public_id from URL
+        const logoPublicId = hotel.hotelLogo.split('/').pop().split('.')[0];
+        try {
+          await cloudinary.uploader.destroy(`hotels/${logoPublicId}`);
+        } catch (err) {
+          console.error('Error deleting previous hotelLogo from Cloudinary:', err);
+        }
+      }
+      // Upload new image
+      const logoFile = req.files['hotelLogo'][0];
+      const logoUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: 'hotels' }, (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        });
+        stream.end(logoFile.buffer);
+      });
+      hotel.hotelLogo = logoUrl;
+    }
+    // Update hotelOfferBanner if a new file is provided
+    if (req.files && req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
+      if (hotel.hotelOfferBanner) {
+        const bannerPublicId = hotel.hotelOfferBanner.split('/').pop().split('.')[0];
+        try {
+          await cloudinary.uploader.destroy(`hotels/${bannerPublicId}`);
+        } catch (err) {
+          console.error('Error deleting previous hotelOfferBanner from Cloudinary:', err);
+        }
+      }
+      const bannerFile = req.files['hotelOfferBanner'][0];
+      const bannerUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: 'hotels' }, (error, result) => {
+          if (error) return reject(error);
+          resolve(result.secure_url);
+        });
+        stream.end(bannerFile.buffer);
+      });
+      hotel.hotelOfferBanner = bannerUrl;
+    }
+
+    // Parse foodCategories and foodItems with prices
+    let foodCategories = [];
+    if (req.body.foodCategories) {
+      // If sent as array
+      const categories = Array.isArray(req.body.foodCategories) ? req.body.foodCategories : Object.values(req.body.foodCategories);
+      foodCategories = categories.map((cat, catIdx) => {
+        let foodItems = [];
+        if (cat.foodItems) {
+          const items = Array.isArray(cat.foodItems) ? cat.foodItems : Object.values(cat.foodItems);
+          foodItems = items.map(item => ({
+            itemName: item.itemName,
+            price: item.itemPrice !== undefined ? item.itemPrice : item.price
+          })).filter(item => item.itemName && item.itemName.trim());
+        }
+        return {
+          categoryName: cat.categoryName,
+          foodItems
+        };
+      }).filter(cat => cat.categoryName && cat.categoryName.trim());
+    }
+    hotel.foodCategories = foodCategories;
+
+    await hotel.save();
+    res.redirect(`/hotel/${hotel.hotelSlug}`);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
+};
 // Handle hotel creation from dashboard POST route
 exports.createHotelFromDashboard = async (req, res) => {
   try {
-    const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
+    const { hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
+    // Generate hotelSlug from hotelName
+    const hotelSlug = hotelName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+      .substring(0, 50);
     const createdBy = req.user._id;
     const cloudinary = require('cloudinary').v2;
     cloudinary.config({
@@ -41,12 +169,12 @@ exports.createHotelFromDashboard = async (req, res) => {
         }));
     }
     // Check required fields
-    if (!hotelId || !hotelName || !hotelDescription || !hotelType || !hotelLogoUrl || !hotelOfferBannerUrl || !street || !city || !state || !country || !zipCode || !createdBy) {
+    if (!hotelName || !hotelDescription || !hotelType || !hotelLogoUrl || !hotelOfferBannerUrl || !street || !city || !state || !country || !zipCode || !createdBy) {
       return res.status(400).send('Missing required hotel fields');
     }
     const Hotel = require('../models/Hotel');
     const hotel = new Hotel({
-      hotelId,
+      hotelSlug,
       hotelName,
       hotelDescription,
       hotelType,
@@ -58,7 +186,7 @@ exports.createHotelFromDashboard = async (req, res) => {
       createdByUsername: req.user.username || req.user.email || ''
     });
     await hotel.save();
-    res.redirect(`/dashboard/${req.user.slug}/hotels/index`);
+    res.redirect(`/hotel/${hotelSlug}`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error saving hotel data');
@@ -166,7 +294,7 @@ cloudinary.config({
 
 exports.showHotelPage = async (req, res) => {
     try {
-        const hotel = await Hotel.findOne({ hotelId: req.params.hotelId });
+        const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
         if (!hotel) return res.status(404).send('Hotel not found');
         res.render('hotels/show', {
             hotelId: hotel.hotelId,

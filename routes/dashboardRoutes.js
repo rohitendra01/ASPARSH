@@ -1,3 +1,4 @@
+// Delete hotel (dashboard context)
 
 const express = require('express');
 const router = express.Router();
@@ -23,6 +24,14 @@ router.get('/:slug/user/view/:userSlug', isLoggedIn, dashboardController.dashboa
 
 // Hotels index
 router.get('/:slug/hotels/index', isLoggedIn, dashboardController.dashboardHotelsIndex);
+// Edit hotel form (dashboard context)
+router.get('/:slug/hotels/:hotelSlug/edit', isLoggedIn, dashboardController.renderEditHotelForm);
+
+// Handle hotel update (dashboard context)
+router.post('/:slug/hotels/:hotelSlug/edit', isLoggedIn, upload.fields([
+  { name: 'hotelLogo', maxCount: 1 },
+  { name: 'hotelOfferBanner', maxCount: 1 }
+]), dashboardController.updateHotel);
 
 // Visiting card creation form (admin)
 router.get('/:slug/visiting-card/new', isLoggedIn, dashboardController.renderNewVisitingCardForm);
@@ -52,4 +61,5 @@ router.post('/:slug/hotels/new', isLoggedIn, upload.fields([
   { name: 'hotelLogo', maxCount: 1 },
   { name: 'hotelOfferBanner', maxCount: 1 }
 ]), dashboardController.createHotelFromDashboard);
+router.post('/:slug/hotels/:hotelSlug/delete', isLoggedIn, dashboardController.deleteHotel);
 module.exports = router;

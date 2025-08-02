@@ -1,25 +1,31 @@
-
-.dashboard-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: #222;
-  text-align: center;
-}
-
+/* Edit Hotel Form Styles */
 .dashboard-container {
-    padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 8px 32px #00eaff44;
   width: 100%;
-  text-align: left;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-family: var(--head-text);
+  color: var(--text-dark);
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 2px;
 }
 
 .dashboard-options {
   display: flex;
   gap: 32px;
   flex-wrap: wrap;
+  height: 100%;
 }
 
 .option-card {
@@ -95,27 +101,6 @@
   margin-bottom: 0.5rem;
 }
 
-.food-category-group {
-  background: #f3f7fa;
-  border-radius: 6px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 4px #007bff11;
-}
-
-.food-items-group {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.food-items-group label {
-  font-weight: 500;
-  margin-bottom: 0;
-}
-
-.form-row button,
 .hotel-form button {
   margin-top: 0.5rem;
   padding: 10px 24px;
@@ -130,7 +115,6 @@
   transition: background 0.2s, box-shadow 0.2s;
 }
 
-.form-row button:hover,
 .hotel-form button:hover {
   background: #0056b3;
   box-shadow: 0 4px 16px #007bff33;

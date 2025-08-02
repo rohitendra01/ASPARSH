@@ -1,5 +1,5 @@
 <% layout('layouts/dashboard-boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/dashboard/new.css" />`) %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/hotel/new.css" />`) %>
 
 
   <div class="dashboard-container">
@@ -9,26 +9,22 @@
         <form action="/dashboard/<%= user.slug %>/hotels/new" method="POST" enctype="multipart/form-data" class="hotel-form">
           <div class="form-row">
             <div class="form-group">
-              <label for="hotelId">Hotel ID</label>
-              <input type="text" id="hotelId" name="hotelId" required>
-            </div>
-            <div class="form-group">
               <label for="hotelName">Hotel Name</label>
-              <input type="text" id="hotelName" name="hotelName" required>
+              <input type="text" id="hotelName" name="hotelName" value="" required>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="hotelType">Type</label>
-              <input type="text" id="hotelType" name="hotelType" required>
+              <input type="text" id="hotelType" name="hotelType" value="" required>
             </div>
             <div class="form-group">
               <label for="hotelLogo">Hotel Logo</label>
-              <input type="file" id="hotelLogo" name="hotelLogo" accept="image/*" required>
+              <input type="file" id="hotelLogo" name="hotelLogo" accept="image/*" value="" required>
             </div>
             <div class="form-group">
               <label for="hotelOfferBanner">Offer Banner</label>
-              <input type="file" id="hotelOfferBanner" name="hotelOfferBanner" accept="image/*" required>
+              <input type="file" id="hotelOfferBanner" name="hotelOfferBanner" accept="image/*" value="" required>
             </div>
           </div>
           <div class="form-row">
@@ -41,19 +37,19 @@
             <legend>Hotel Address</legend>
             <div class="form-row">
               <div class="form-group">
-                <input type="text" name="street" placeholder="Street" required>
+                <input type="text" name="street" placeholder="Street" value="" required>
               </div>
               <div class="form-group">
-                <input type="text" name="city" placeholder="City" required>
+                <input type="text" name="city" placeholder="City" value="" required>
               </div>
               <div class="form-group">
-                <input type="text" name="state" placeholder="State" required>
+                <input type="text" name="state" placeholder="State" value="" required>
               </div>
               <div class="form-group">
-                <input type="text" name="country" placeholder="Country" required>
+                <input type="text" name="country" placeholder="Country" value="" required>
               </div>
               <div class="form-group">
-                <input type="text" name="zipCode" placeholder="Zip Code" required>
+                <input type="text" name="zipCode" placeholder="Zip Code" value="" required>
               </div>
             </div>
           </fieldset>
@@ -108,6 +104,8 @@
               btn.parentElement.remove();
             }
             window.onload = function() { addCategory(); };
+
+            // ...existing code...
           </script>
         </form>
       </div>

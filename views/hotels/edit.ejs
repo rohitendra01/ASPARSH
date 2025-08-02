@@ -1,0 +1,128 @@
+<% layout('layouts/dashboard-boilerplate') %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/hotel/edit.css" />`) %>
+
+<div class="dashboard-container">
+  <h2 class="dashboard-title">Edit Hotel</h2>
+  <div class="dashboard-options">
+    <div class="option-card">
+      <form action="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/edit" method="POST" enctype="multipart/form-data" class="hotel-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hotelName">Hotel Name</label>
+            <input type="text" id="hotelName" name="hotelName" value="<%= hotel.hotelName %>" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hotelType">Type</label>
+            <input type="text" id="hotelType" name="hotelType" value="<%= hotel.hotelType %>" required>
+          </div>
+          <div class="form-group">
+            <label for="hotelLogo">Hotel Logo</label>
+            <input type="file" id="hotelLogo" name="hotelLogo" accept="image/*">
+            <% if (hotel.hotelLogo) { %>
+              <img src="<%= hotel.hotelLogo %>" alt="Hotel Logo" style="max-width: 100px; margin-top: 8px;">
+            <% } %>
+          </div>
+          <div class="form-group">
+            <label for="hotelOfferBanner">Offer Banner</label>
+            <input type="file" id="hotelOfferBanner" name="hotelOfferBanner" accept="image/*">
+            <% if (hotel.hotelOfferBanner) { %>
+              <img src="<%= hotel.hotelOfferBanner %>" alt="Offer Banner" style="max-width: 100px; margin-top: 8px;">
+            <% } %>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hotelDescription">Description</label>
+            <textarea id="hotelDescription" name="hotelDescription" required><%= hotel.hotelDescription %></textarea>
+          </div>
+        </div>
+        <fieldset>
+          <legend>Hotel Address</legend>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="text" name="street" placeholder="Street" value="<%= hotel.hotelAddress.street %>" required>
+            </div>
+            <div class="form-group">
+              <input type="text" name="city" placeholder="City" value="<%= hotel.hotelAddress.city %>" required>
+            </div>
+            <div class="form-group">
+              <input type="text" name="state" placeholder="State" value="<%= hotel.hotelAddress.state %>" required>
+            </div>
+            <div class="form-group">
+              <input type="text" name="country" placeholder="Country" value="<%= hotel.hotelAddress.country %>" required>
+            </div>
+            <div class="form-group">
+              <input type="text" name="zipCode" placeholder="Zip Code" value="<%= hotel.hotelAddress.zipCode %>" required>
+            </div>
+          </div>
+        </fieldset>
+        
+        <fieldset style="margin-top:2rem;">
+            <legend>Menu <span style="font-size:0.95em;color:#555;">(Food Categories & Items)</span></legend>
+        <div id="menu-categories">
+          <% if (hotel.foodCategories && hotel.foodCategories.length) { %>
+            <% hotel.foodCategories.forEach(function(category, catIdx) { %>
+                <div class="menu-category" data-index="<%= catIdx %>" style="border:1px solid #e0e0e0;padding:1rem;margin-bottom:1rem;border-radius:8px;background:#f9f9fc;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                  <input type="text" name="foodCategories[<%= catIdx %>][categoryName]" value="<%= category.categoryName %>" placeholder="Category Name" required style="flex:1;">
+                  <button type="button" class="remove-category" onclick="removeCategory(this)" style="background:#ff4d4f;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:1.2rem;">×</button>
+                </div>
+                <div class="menu-items">
+                  <% if (category.foodItems && category.foodItems.length) { %>
+                    <% category.foodItems.forEach(function(item, itemIdx) { %>
+                      <div class="menu-item" data-index="<%= itemIdx %>" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+                        <input type="text" name="foodCategories[<%= catIdx %>][foodItems][<%= itemIdx %>][itemName]" value="<%= item.itemName %>" placeholder="Item Name" required style="flex:2;">
+                        <input type="number" step="0.01" name="foodCategories[<%= catIdx %>][foodItems][<%= itemIdx %>][itemPrice]" value="<%= item.itemPrice || item.price %>" placeholder="Price" required style="flex:1;">
+                        <button type="button" class="remove-item" onclick="removeItem(this)" style="background:#ff7875;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:1rem;">×</button>
+                    </div>
+                    <% }) %>
+                    <% } %>
+                    <button type="button" class="add-item" onclick="addItem(this)" style="background:#52c41a;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:1.1rem;margin-top:0.2rem;">+</button>
+                </div>
+            </div>
+            <% }) %>
+            <% } %>
+        </div>
+        <button type="button" id="add-category" style="background:#0e62b0;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:1rem;margin-top:0.5rem;">+ Add Category</button>
+      </fieldset>
+      <script>
+        function removeCategory(btn) {
+          btn.closest('.menu-category').remove();
+        }
+        function removeItem(btn) {
+          btn.closest('.menu-item').remove();
+        }
+        function addItem(btn) {
+          const itemsDiv = btn.parentElement;
+          const catDiv = itemsDiv.closest('.menu-category');
+          const catIdx = Array.from(document.querySelectorAll('.menu-category')).indexOf(catDiv);
+          const itemIdx = itemsDiv.querySelectorAll('.menu-item').length;
+          const itemHtml = `<div class="menu-item" data-index="${itemIdx}" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+            <input type="text" name="foodCategories[${catIdx}][foodItems][${itemIdx}][itemName]" placeholder="Item Name" required style="flex:2;">
+            <input type="number" step="0.01" name="foodCategories[${catIdx}][foodItems][${itemIdx}][itemPrice]" placeholder="Price" required style="flex:1;">
+            <button type="button" class="remove-item" onclick="removeItem(this)" style="background:#ff7875;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:1rem;">×</button>
+          </div>`;
+          btn.insertAdjacentHTML('beforebegin', itemHtml);
+        }
+        document.getElementById('add-category').onclick = function() {
+          const catIdx = document.querySelectorAll('.menu-category').length;
+          const categoryHtml = `<div class="menu-category" data-index="${catIdx}" style="border:1px solid #e0e0e0;padding:1rem;margin-bottom:1rem;border-radius:8px;background:#f9f9fc;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                <input type="text" name="foodCategories[${catIdx}][categoryName]" placeholder="Category Name" required style="flex:1;">
+                <button type="button" class="remove-category" onclick="removeCategory(this)" style="background:#ff4d4f;color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:1.2rem;">×</button>
+                </div>
+                <div class="menu-items">
+                    <button type="button" class="add-item" onclick="addItem(this)" style="background:#52c41a;color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:1.1rem;margin-top:0.2rem;">+</button>
+                    </div>
+                    </div>`;
+                    document.getElementById('menu-categories').insertAdjacentHTML('beforeend', categoryHtml);
+                };
+                </script>
+        <button type="submit">Update Hotel</button>
+        <button type="submit" formaction="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/delete" formmethod="POST" class="delete-hotel-btn" style="background:#ff4d4f;color:#fff;margin-top:2rem;">Delete Hotel</button>
+    </form>
+    </div>
+</div>
+</div>

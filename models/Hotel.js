@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 
 // Add Cloudinary image URLs to schema instead of storing images in MongoDB
 const hotelSchema = new mongoose.Schema({
-    hotelId: { 
-        type: String, required: true, unique: true 
+    hotelSlug: {
+        type: String,
+        required: true,
+        unique: true
     },
     hotelName: { 
         type: String, required: true 

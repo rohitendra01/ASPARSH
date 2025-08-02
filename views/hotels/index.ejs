@@ -1,8 +1,13 @@
 <% layout('layouts/dashboard-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/index.css" />`) %>
 
-<div class="dashboard-main">
-  <a href="/dashboard/<%= user.slug %>/hotels/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Hotel</a>
+  <div class="dashboard-header-row">
+    <form class="search-form" onsubmit="return filterHotels(event)">
+      <input type="text" id="hotelSlugSearch" name="hotelSlug" placeholder="Enter Hotel Slug" required>
+      <button type="submit">Search</button>
+    </form>
+    <a href="/dashboard/<%= user.slug %>/hotels/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Hotel</a>
+  </div>
   <div class="hotel-list-container">
   <% if (typeof error !== 'undefined') { %>
     <div class="alert alert-danger"><%= error %></div>
@@ -10,7 +15,7 @@
   <% if (hotels && hotels.length) { %>
     <div class="hotel-cards-grid">
       <% hotels.forEach(hotel => { %>
-        <div class="hotel-card">
+        <div class="hotel-card" data-hotel-slug="<%= hotel.hotelSlug %>">
           <img src="<%= hotel.hotelLogo %>" alt="<%= hotel.hotelName %> Logo" class="hotel-card-logo">
           <div class="hotel-card-body">
             <div class="hotel-card-heading">
@@ -19,18 +24,42 @@
             </div>
             <div class="hotel-card-others">
               <p class="hotel-card-address">
-                <%= hotel.hotelAddress.street %>, <%= hotel.hotelAddress.city %>, <%= hotel.hotelAddress.state %>
+                <span>
+                  <%= hotel.hotelAddress.street %>, <%= hotel.hotelAddress.city %>
+                </span>
+                <span>
+                 <%= hotel.hotelAddress.state %>
+                </span>
               </p>
             </div>
             <div class="hotel-card-links">
-              <a href="/hotel/<%= hotel.hotelId %>" class="hotel-card-link">View Hotel</a>
-              <a href="/hotel/<%= hotel.hotelId %>/edit" class="hotel-card-edit">Edit</a>
+              <a href="/hotel/<%= hotel.hotelSlug %>" class="hotel-card-link">View Hotel</a>
+              <a href="/dashboard/<%= user.slug %>/hotels/<%= hotel.hotelSlug %>/edit" class="hotel-card-edit">Edit</a>
             </div>
           </div>
         </div>
       <% }) %>
     </div>
+    <script>
+      function filterHotels(event) {
+        event.preventDefault();
+        const input = document.getElementById('hotelSlugSearch').value.trim().toLowerCase();
+        const hotelCards = document.querySelectorAll('.hotel-card');
+        if (!input) {
+          hotelCards.forEach(card => card.style.display = '');
+          return false;
+        }
+        hotelCards.forEach(card => {
+          const slug = card.getAttribute('data-hotel-slug');
+          if (slug && slug.toLowerCase().includes(input)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        return false;
+      }
+    </script>
   <% } else { %>
     <p>No hotels found.</p>
   <% } %>
-</div>

@@ -138,6 +138,12 @@ const testimonials = [
     ]), async (req, res) => {
         try {
             const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
+            // Generate hotelSlug from hotelName
+            const hotelSlug = hotelName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)/g, '')
+              .substring(0, 50);
             const createdBy = req.user._id;
             // Upload images to Cloudinary
             const logoFile = req.files['hotelLogo'] ? req.files['hotelLogo'][0] : null;
@@ -189,6 +195,7 @@ const testimonials = [
             }
             // Create hotel document
             const hotel = new Hotel({
+                hotelSlug,
                 hotelId,
                 hotelName,
                 hotelDescription,
@@ -201,7 +208,7 @@ const testimonials = [
                 createdByUsername: req.user.username || req.user.email || ''
             });
             await hotel.save();
-            res.redirect(`/hotels/${hotelId}`);
+            res.redirect(`/hotel/${hotelSlug}`);
         } catch (err) {
             console.error(err);
             res.status(500).send('Error saving hotel data');
@@ -232,7 +239,7 @@ router.get('/dashboard', isLoggedIn, (req, res) => {
 });
 
     // Public hotel show page
-router.get('/hotel/:hotelId', dashboardController.showHotelPage); // Correct: controller should render views/hotels/show.ejs
+router.get('/hotel/:hotelSlug', dashboardController.showHotelPage); // Correct: controller should render views/hotels/show.ejs
     
     
     

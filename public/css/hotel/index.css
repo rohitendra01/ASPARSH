@@ -1,3 +1,44 @@
+/* Header row for search and create button */
+.dashboard-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.create-hotel-btn-fixed {
+  margin-right: 1rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-form input[type="text"] {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.search-form button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.hotel-list-container {
+  margin-top: 0;
+}
+
+.hotel-cards-grid {
+  margin-top: 0.5rem;
+}
 .create-hotel-btn-fixed {
   position: fixed;
   top: 130px;
@@ -7,10 +48,6 @@
   opacity: 0.97;
 }
 
-.dashboard-main {
-  overflow-y: auto;
-  height: calc(100vh - 180px);
-}
 .create-hotel-btn {
   background-color: var(--text-dark);
   color: var(--text-light);
@@ -99,9 +136,13 @@
 }
 
 .hotel-card-address {
-    font-family: var(--subhead-text);
+  font-family: var(--subhead-text);
   color: var(--text-dark);
   font-size: 1rem;
+}
+.hotel-card-address span:last-child {
+  display: block;
+  margin-top: 2px;
 }
 
 .hotel-card-links {
