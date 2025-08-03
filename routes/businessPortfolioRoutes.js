@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const apicache = require('apicache');
+const cache = apicache.middleware;
 const VisitingCard = require('../models/VisitingCard');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 
 // GET /portfolio/business/visiting-card (for logged-in user)
-router.get('/visiting-card', isLoggedIn, async (req, res) => {
+router.get('/visiting-card', isLoggedIn, cache('5 minutes'), async (req, res) => {
     try {
         const userId = req.user._id;
         const card = await VisitingCard.findOne({ user: userId });
@@ -19,7 +21,7 @@ router.get('/visiting-card', isLoggedIn, async (req, res) => {
 
 // GET /portfolio/business/visiting-card/:userId (public visiting card by userId)
 const mongoose = require('mongoose');
-router.get('/visiting-card/:userId', async (req, res) => {
+router.get('/visiting-card/:userId', cache('5 minutes'), async (req, res) => {
     try {
         const userId = mongoose.Types.ObjectId.isValid(req.params.userId) ? new mongoose.Types.ObjectId(req.params.userId) : null;
         if (!userId) return res.status(400).send('Invalid user ID');
@@ -33,7 +35,7 @@ router.get('/visiting-card/:userId', async (req, res) => {
 });
 
 // GET /portfolio/business/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', cache('5 minutes'), (req, res) => {
     // You can fetch business portfolio data here using req.params.id
     // For now, just render the show.ejs page
     res.render('portfolios/business/show');

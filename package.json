@@ -13,6 +13,7 @@
   "author": "R__",
   "license": "ISC",
   "dependencies": {
+    "apicache": "^1.6.3",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.7",

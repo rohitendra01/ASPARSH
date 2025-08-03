@@ -2,6 +2,8 @@
 
 const express = require('express');
 const router = express.Router();
+const apicache = require('apicache');
+const cache = apicache.middleware;
 const { isLoggedIn } = require('../middleware/authMiddleware');
 const dashboardController = require('../controllers/dashboardController');
 const multer = require('multer');
@@ -17,7 +19,7 @@ router.use('/:slug', (req, res, next) => {
 });
 
 // Dashboard home page
-router.get('/:slug', isLoggedIn, dashboardController.dashboardHome);
+router.get('/:slug', isLoggedIn, cache('5 minutes'), dashboardController.dashboardHome);
 
 // User profile page (dashboard)
 router.get('/:slug/user/view/:userSlug', isLoggedIn, dashboardController.dashboardUserProfile);

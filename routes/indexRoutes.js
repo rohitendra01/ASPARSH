@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const apicache = require('apicache');
+const cache = apicache.middleware;
 const dashboardController = require('../controllers/dashboardController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 
-router.get('/hotels/:hotelId', dashboardController.showHotelPage);
+router.get('/hotels/:hotelId', cache('5 minutes'), dashboardController.showHotelPage);
 
 const products = [
     {
