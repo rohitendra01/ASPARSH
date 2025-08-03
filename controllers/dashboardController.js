@@ -359,8 +359,14 @@ exports.showVisitingCard = async (req, res) => {
 // Dashboard business portfolio index page
 exports.dashboardPortfolioIndex = async (req, res) => {
   try {
-    const cards = await VisitingCard.find({});
-    res.render('portfolios/business/index', { cards, layout: 'layouts/dashboard-boilerplate' });
+    let query = {};
+    if (req.query.search) {
+      const searchRegex = new RegExp(req.query.search, 'i');
+      query = { $or: [ { name: searchRegex }, { slug: searchRegex } ] };
+    }
+    const cards = await VisitingCard.find(query);
+    let userSlug = req.user && req.user.slug ? req.user.slug : '';
+    res.render('portfolios/index', { cards, layout: 'layouts/dashboard-boilerplate', userSlug });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error loading business visiting cards');

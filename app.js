@@ -98,7 +98,7 @@ app.use('/', authRoutes);
 app.use('/', productRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/portfolio', portfolioStudentRoutes);
-app.use('/portfolio', portfolioRoutes);
+app.use('/', portfolioRoutes);
 app.use('/portfolios/business', businessPortfolioRoutes);
 // All OTP and login logic is now handled by loginOtpController via /auth routes
 // Password reset logic is now handled by loginOtpController via /auth routes

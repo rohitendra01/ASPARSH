@@ -21,3 +21,28 @@ exports.showPortfolio = async (req, res) => {
     res.status(500).render('portfolios/show', { error: 'Error loading portfolio' });
   }
 };
+
+// Stub: Render edit business portfolio form
+exports.renderEditBusinessPortfolioForm = (req, res) => {
+  res.send('Edit Business Portfolio Form (stub)');
+};
+
+// Stub: Render edit student portfolio form
+exports.renderEditStudentPortfolioForm = (req, res) => {
+  res.send('Edit Student Portfolio Form (stub)');
+};
+
+// Stub: Update portfolio
+exports.updatePortfolio = (req, res) => {
+  res.send('Update Portfolio (stub)');
+};
+
+// Stub: Delete portfolio
+exports.deletePortfolio = (req, res) => {
+  res.send('Delete Portfolio (stub)');
+};
+
+// Stub: List portfolios
+exports.listPortfolios = (req, res) => {
+  res.send('List Portfolios (stub)');
+};
