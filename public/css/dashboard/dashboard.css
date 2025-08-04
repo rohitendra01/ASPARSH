@@ -16,7 +16,7 @@
   }
   
   .dashboard-sidebar {
-    width: 240px;
+    width: 250px !important;
     border-right: 1.5px solid var(--text-dark);
     height: 100%;
     padding: 2.2rem 1.2rem;

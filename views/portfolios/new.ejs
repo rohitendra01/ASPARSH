@@ -1,49 +1,109 @@
+
 <% layout('layouts/dashboard-boilerplate') %>
 <div class="dashboard-container">
   <h2>Create New Portfolio</h2>
-  <form action="/dashboard/portfolios/business/new" method="POST" enctype="multipart/form-data" style="max-width: 500px; margin: 2rem auto;">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" class="form-control" required>
-    </div>
-    <div class="form-group">
-      <label for="slug">Slug</label>
-      <input type="text" id="slug" name="slug" class="form-control" required>
-    </div>
-    <div class="form-group">
-      <label for="title">Title</label>
-      <input type="text" id="title" name="title" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" name="description" class="form-control"></textarea>
-    </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="phone">Phone</label>
-      <input type="text" id="phone" name="phone" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="address">Address</label>
-      <input type="text" id="address" name="address" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="website">Website</label>
-      <input type="text" id="website" name="website" class="form-control">
-    </div>
-    <div class="form-group">
-      <label for="image">Profile Image</label>
-      <input type="file" id="image" name="image" class="form-control">
-    </div>
-    <button type="submit" class="btn btn-success">Create Portfolio</button>
-  </form>
+  <div class="portfolio-wizard">
+    <nav class="wizard-tabs" role="tablist">
+      <button class="wizard-tab active" role="tab" aria-selected="true" aria-controls="business-form" id="business-tab">Business Portfolio</button>
+      <button class="wizard-tab" role="tab" aria-selected="false" aria-controls="student-form" id="student-tab">Student Portfolio</button>
+    </nav>
+    <form id="business-form" class="wizard-form active" action="/dashboard/<%= userSlug %>/portfolios/new" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="category" value="business">
+      <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" class="form-control" required></div>
+      <div class="form-group"><label for="slug">Slug</label><input type="text" id="slug" name="slug" class="form-control" required></div>
+      <div class="form-group"><label for="title">Title</label><input type="text" id="title" name="title" class="form-control"></div>
+      <div class="form-group"><label for="description">Description</label><textarea id="description" name="description" class="form-control"></textarea></div>
+      <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" class="form-control"></div>
+      <div class="form-group"><label for="phone">Phone</label><input type="text" id="phone" name="phone" class="form-control"></div>
+      <div class="form-group"><label for="address">Address</label><input type="text" id="address" name="address" class="form-control"></div>
+      <div class="form-group"><label for="website">Website</label><input type="text" id="website" name="website" class="form-control"></div>
+      <div class="form-group"><label for="image">Profile Image</label><input type="file" id="image" name="image" class="form-control"></div>
+      <button type="submit" class="btn btn-success">Create Business Portfolio</button>
+    </form>
+    <form id="student-form" class="wizard-form" action="/dashboard/<%= userSlug %>/portfolios/new" method="POST" enctype="multipart/form-data" style="display:none;">
+      <input type="hidden" name="category" value="student">
+      <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" class="form-control" required></div>
+      <div class="form-group"><label for="slug">Slug</label><input type="text" id="slug" name="slug" class="form-control" required></div>
+      <div class="form-group"><label for="title">Title</label><input type="text" id="title" name="title" class="form-control"></div>
+      <div class="form-group"><label for="description">Description</label><textarea id="description" name="description" class="form-control"></textarea></div>
+      <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" class="form-control"></div>
+      <div class="form-group"><label for="phone">Phone</label><input type="text" id="phone" name="phone" class="form-control"></div>
+      <div class="form-group"><label for="address">Address</label><input type="text" id="address" name="address" class="form-control"></div>
+      <div class="form-group"><label for="website">Website</label><input type="text" id="website" name="website" class="form-control"></div>
+      <div class="form-group"><label for="image">Profile Image</label><input type="file" id="image" name="image" class="form-control"></div>
+      <button type="submit" class="btn btn-success">Create Student Portfolio</button>
+    </form>
+  </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.wizard-tab');
+    const forms = document.querySelectorAll('.wizard-form');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        forms.forEach(form => {
+          form.classList.remove('active');
+          form.style.display = 'none';
+        });
+        const targetId = tab.getAttribute('aria-controls');
+        const targetForm = document.getElementById(targetId);
+        targetForm.classList.add('active');
+        targetForm.style.display = 'block';
+      });
+    });
+    // Show only business form by default
+    document.getElementById('business-form').classList.add('active');
+    document.getElementById('business-form').style.display = 'block';
+    document.getElementById('student-form').classList.remove('active');
+    document.getElementById('student-form').style.display = 'none';
+  });
+</script>
 <style>
-.dashboard-container {
-  padding: 2rem;
+.portfolio-wizard {
+  max-width: 540px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 2rem 2rem 1.5rem 2rem;
+}
+.wizard-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.wizard-tab {
+  background: #f8f8f8;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  padding: 0.6rem 1.7rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+  position: relative;
+  z-index: 2;
+}
+.wizard-tab.active {
+  background: #fff;
+  color: #083235;
+  border-bottom: 2px solid #fff;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+}
+.wizard-form {
+  display: none;
+}
+.wizard-form.active {
+  display: block;
 }
 .form-group {
   margin-bottom: 1rem;

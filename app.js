@@ -87,9 +87,7 @@ const authRoutes = require('./routes/authRoutes');
 const indexRoutes = require('./routes/indexRoutes');
 const productRoutes = require('./routes/productRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
-const portfolioRoutes = require('./routes/portfolioRoutes');
 
-const portfolioStudentRoutes = require('./routes/portfolioStudentRoutes');
 const businessPortfolioRoutes = require('./routes/businessPortfolioRoutes');
 
 // Use routes
@@ -97,9 +95,6 @@ app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/', productRoutes);
 app.use('/dashboard', dashboardRoutes);
-app.use('/portfolio', portfolioStudentRoutes);
-app.use('/', portfolioRoutes);
-app.use('/portfolios/business', businessPortfolioRoutes);
 // All OTP and login logic is now handled by loginOtpController via /auth routes
 // Password reset logic is now handled by loginOtpController via /auth routes
 

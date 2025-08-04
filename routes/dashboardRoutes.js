@@ -10,7 +10,6 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
-// View a visiting card by user ID (must be after router is initialized)
 
 // All dashboard routes are now nested under /dashboard/:slug
 router.use('/:slug', (req, res, next) => {
@@ -35,16 +34,6 @@ router.post('/:slug/hotels/:hotelSlug/edit', isLoggedIn, upload.fields([
   { name: 'hotelOfferBanner', maxCount: 1 }
 ]), dashboardController.updateHotel);
 
-// Visiting card creation form (admin)
-router.get('/:slug/visiting-card/new', isLoggedIn, dashboardController.renderNewVisitingCardForm);
-router.post('/:slug/visiting-card/new', isLoggedIn, dashboardController.createVisitingCard);
-
-// New business visiting card route (with typo as requested)
-router.get('/visiting-card/:cardId', dashboardController.showVisitingCard);
-router.get('/:slug/portfolios/business/new', isLoggedIn, (req, res) => {
-  res.render('portfolios/business/new', { layout: 'layouts/dashboard-boilerplate', currentUser: req.user });
-});
-router.post('/:slug/portfolios/business/visiting-card/new', isLoggedIn, upload.single('image'), dashboardController.createBusinessVisitingCard);
 
 // Dashboard business portfolio index
 router.get('/:slug/portfolios', isLoggedIn, dashboardController.dashboardPortfolioIndex);
