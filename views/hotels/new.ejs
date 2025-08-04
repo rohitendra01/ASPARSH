@@ -106,6 +106,22 @@
             window.onload = function() { addCategory(); };
 
             // ...existing code...
+            // Client-side image size validation (max 10,000,000 KB = 10,000,000,000 bytes)
+            document.querySelector('.hotel-form').addEventListener('submit', function(e) {
+              var logo = document.getElementById('hotelLogo').files[0];
+              var banner = document.getElementById('hotelOfferBanner').files[0];
+              var maxSize = 1000 * 1024; // 1000 KB in bytes
+              if (logo && logo.size > maxSize) {
+                alert('Hotel Logo file size must be less than 1000 KB.');
+                e.preventDefault();
+                return false;
+              }
+              if (banner && banner.size > maxSize) {
+                alert('Offer Banner file size must be less than 1000 KB.');
+                e.preventDefault();
+                return false;
+              }
+            });
           </script>
         </form>
       </div>

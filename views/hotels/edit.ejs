@@ -120,8 +120,10 @@
                     document.getElementById('menu-categories').insertAdjacentHTML('beforeend', categoryHtml);
                 };
                 </script>
-        <button type="submit">Update Hotel</button>
-        <button type="submit" formaction="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/delete" formmethod="POST" class="delete-hotel-btn" style="background:#ff4d4f;color:#fff;margin-top:2rem;">Delete Hotel</button>
+                <div class="buttons-new" >
+                  <button type="submit">Update Hotel</button>
+                  <button type="submit" formaction="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/delete" formmethod="POST" class="delete-hotel-btn" style="background:#ff4d4f;color:#fff;margin-top:2rem;">Delete Hotel</button>
+                </div>
     </form>
     </div>
 </div>
