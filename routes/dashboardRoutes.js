@@ -5,52 +5,17 @@ const router = express.Router();
 const apicache = require('apicache');
 const cache = apicache.middleware;
 const { isLoggedIn } = require('../middleware/authMiddleware');
-const dashboardController = require('../controllers/dashboardController');
+// dashboardController removed
 const multer = require('multer');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// All dashboard routes are now nested under /dashboard/:slug
-router.use('/:slug', (req, res, next) => {
-  req.dashboardSlug = req.params.slug;
-  next();
-});
 
 // Dashboard home page
-router.get('/:slug', isLoggedIn, cache('5 minutes'), dashboardController.dashboardHome);
 
-// User profile page (dashboard)
-router.get('/:slug/user/view/:userSlug', isLoggedIn, dashboardController.dashboardUserProfile);
-
-// Hotels index
-router.get('/:slug/hotels/index', isLoggedIn, dashboardController.dashboardHotelsIndex);
-// Edit hotel form (dashboard context)
-router.get('/:slug/hotels/:hotelSlug/edit', isLoggedIn, dashboardController.renderEditHotelForm);
-
-// Handle hotel update (dashboard context)
-router.post('/:slug/hotels/:hotelSlug/edit', isLoggedIn, upload.fields([
-  { name: 'hotelLogo', maxCount: 1 },
-  { name: 'hotelOfferBanner', maxCount: 1 }
-]), dashboardController.updateHotel);
-
-
-// Dashboard business portfolio index
-router.get('/:slug/portfolios', isLoggedIn, dashboardController.dashboardPortfolioIndex);
-
-// Edit user profile
-router.get('/:slug/user/edit/:userSlug', isLoggedIn, dashboardController.getEditUserProfile);
-router.post('/:slug/user/edit/:userSlug', isLoggedIn, upload.single('image'), dashboardController.updateUserProfile);
-
-// Create new hotel form (dashboard context)
-router.get('/:slug/hotels/new', isLoggedIn, (req, res) => {
-  res.render('hotels/new', { layout: 'layouts/dashboard-boilerplate', user: req.user });
+router.get('/', isLoggedIn, cache('5 minutes'), (req, res) => {
+  res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });
 });
 
-// Handle new hotel creation (dashboard context)
-router.post('/:slug/hotels/new', isLoggedIn, upload.fields([
-  { name: 'hotelLogo', maxCount: 1 },
-  { name: 'hotelOfferBanner', maxCount: 1 }
-]), dashboardController.createHotelFromDashboard);
-router.post('/:slug/hotels/:hotelSlug/delete', isLoggedIn, dashboardController.deleteHotel);
 module.exports = router;

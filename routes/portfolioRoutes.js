@@ -1,22 +1,26 @@
 const express = require('express');
-const router = express.Router();
-const apicache = require('apicache');
-const cache = apicache.middleware;
+const router = express.Router({ mergeParams: true });
 const portfolioController = require('../controllers/portfolioController');
-const { renderEditBusinessPortfolioForm, renderEditStudentPortfolioForm, updatePortfolio, deletePortfolio } = require('../controllers/portfolioController');
 
-const { listPortfolios } = require('../controllers/portfolioController');
-const upload = require('../middleware/uploadMiddleware');
+// List all portfolios for a user
+router.get('/', portfolioController.listPortfolios);
 
-const dashboardController = require('../controllers/dashboardController');
+// Render new portfolio form
+router.get('/new', portfolioController.renderNewForm);
 
-// Route: /dashboard/:slug/portfolios/new - create new portfolio form (user-specific)
-router.get('/dashboard/:slug/portfolios/new', (req, res) => {
-  res.render('portfolios/new', { layout: 'layouts/dashboard-boilerplate', userSlug: req.params.slug });
-});
+// Create a new portfolio
+router.post('/', portfolioController.createPortfolio);
 
-// Route: /dashboard/portfolios/business/new - handle new portfolio creation
-router.post('/dashboard/portfolios/business/new', (req, res) => {
-  res.send('Portfolio created (stub)');
-});
+// Show a single portfolio (optional)
+router.get('/:id', portfolioController.showPortfolio);
+
+// Render edit form for a portfolio
+router.get('/:id/edit', portfolioController.renderEditForm);
+
+// Update a portfolio
+router.put('/:id', portfolioController.updatePortfolio);
+
+// Delete a portfolio
+router.delete('/:id', portfolioController.deletePortfolio);
+
 module.exports = router;

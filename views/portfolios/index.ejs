@@ -15,31 +15,6 @@
     <a href="/dashboard/<%= userSlug %>/portfolios/new" class="btn btn-success">Create New Portfolio</a>
   </div>
       <div class="visiting-cards-list">
-        <% let studentCards = (cards || []).filter(card => card.category === 'student'); %>
-        <% if (studentCards.length > 0) { %>
-          <% studentCards.forEach(function(card) { %>
-            <div class="visiting-card-preview">
-              <div class="card-header">
-                <% if (card.image) { %>
-                  <img src="<%= card.image %>" alt="<%= card.name %>" class="profile-img" />
-                <% } else { %>
-                  <div class="profile-img placeholder"></div>
-                <% } %>
-                <h3><%= card.name %></h3>
-                <span class="card-title"><%= card.title %></span>
-              </div>
-              <div class="card-body">
-                <div class="card-details">
-                  <span><i class="fas fa-envelope"></i> <%= card.email %></span>
-                  <span><i class="fas fa-phone"></i> <%= card.phone %></span>
-                </div>
-              </div>
-              <a href="/dashboard/visiting-card/<%= card._id %>" class="btn btn-outline-primary">View Card</a>
-            </div>
-          <% }) %>
-        <% } else { %>
-          <p class="no-cards">No cards found.</p>
-        <% } %>
       </div>
 <script>
   // Tab switching logic for redesigned markup

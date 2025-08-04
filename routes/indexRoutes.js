@@ -2,23 +2,21 @@ const express = require('express');
 const router = express.Router();
 const apicache = require('apicache');
 const cache = apicache.middleware;
-const dashboardController = require('../controllers/dashboardController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 
-router.get('/hotels/:hotelId', cache('5 minutes'), dashboardController.showHotelPage);
 
 const products = [
     {
-    id: 1,
-    image: '/assets/product1.jpg',
+        id: 1,
+        image: '/assets/product1.jpg',
     badge: 'NEW',
     title: 'NFC Business Card',
     subtitle: 'A smart way to connect',
     price: 999,
     description: 'A digital business card that allows you to share your contact details, social media profiles, and website with just a tap. No more paper cards, just instant connections.',
     features: ['Customizable', 'Universal', 'Durable', 'Waterproof', 'Contactless']
-  },
-  {
+},
+{
     id: 2,
     image: '/assets/product2.jpg',
     badge: 'SALE',
@@ -27,8 +25,8 @@ const products = [
     price: 499,
     description: 'A smart keychain that helps you find your keys using your smartphone. It also has a built-in flashlight and can be used as a bottle opener.',
     features: ['Bluetooth enabled', 'Compact design', 'Long battery life', 'Find my keys', 'Multi-functional']
-  },
-  {
+},
+{
     id: 3,
     image: '/assets/product3.jpg',
     badge: 'BEST SELLER',
@@ -51,7 +49,7 @@ const products = [
 ];
 
 const testimonials = [
-        {
+    {
             text: "Asparsh made networking at events effortless. I love how easy it is to update my info!",
             name: "Amit Sharma",
             role: "Marketing Lead, TechNova",
@@ -103,22 +101,22 @@ const testimonials = [
     router.get("/", (req, res) => {
         res.render("index", { products, testimonials, layout: "layouts/boilerplate" });
     });
-
+    
     // Home route
     router.get("/home", (req, res) => {
         res.render("home", { layout: "layouts/boilerplate" });
     });
-
+    
     // Contact Us page
     router.get("/contact", (req, res) => {
         res.render("contact", { layout: "layouts/boilerplate" });
     });
-
+    
     // Pricing page
     router.get("/pricing", (req, res) => {
         res.render("pricing", { layout: "layouts/boilerplate" });
     });
-
+    
     // Dashboard route (protected)
     router.get("/dashboard", isLoggedIn, (req, res) => {
         res.render("dashboard", { layout: "layouts/dashboard-boilerplate" });
@@ -142,10 +140,10 @@ const testimonials = [
             const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
             // Generate hotelSlug from hotelName
             const hotelSlug = hotelName
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/(^-|-$)/g, '')
-              .substring(0, 50);
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '')
+            .substring(0, 50);
             const createdBy = req.user._id;
             // Upload images to Cloudinary
             const logoFile = req.files['hotelLogo'] ? req.files['hotelLogo'][0] : null;
@@ -216,23 +214,23 @@ const testimonials = [
             res.status(500).send('Error saving hotel data');
         }
     });
-
+    
     // About Us page
     router.get("/about", (req, res) => {
         res.render("about", { layout: "layouts/boilerplate" });
     });
     
-
+    
 // Hotels index page (public, hotel-boilerplate)
 const Hotel = require('../models/Hotel');
 router.get('/hotels', async (req, res) => {
   try {
-    const hotels = await Hotel.find({});
+      const hotels = await Hotel.find({});
     res.render('hotels/index', { hotels, layout: 'layouts/hotel-boilerplate' }); // Correct: views/hotels/index.ejs
-  } catch (err) {
+} catch (err) {
     console.error(err);
     res.render('hotels/index', { hotels: [], layout: 'layouts/hotel-boilerplate', error: 'Could not load hotels.' });
-  }
+}
 });
 
 // Dashboard page (protected, dashboard-boilerplate)
@@ -240,9 +238,11 @@ router.get('/dashboard', isLoggedIn, (req, res) => {
   res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });
 });
 
-    // Public hotel show page
-router.get('/hotel/:hotelSlug', dashboardController.showHotelPage); // Correct: controller should render views/hotels/show.ejs
-    
-    
-    
+// Public hotel show page
+const hotelController = require('../controllers/hotelController');
+router.get('/hotel/:hotelSlug', hotelController.showHotelPage); // Correct: controller should render views/hotels/show.ejs
+
+
+router.get('/hotels/:hotelId', cache('5 minutes'), hotelController.showHotelPage);
+
 module.exports = router;
