@@ -7,8 +7,8 @@
         <a href="" class="messages"><img src="/assets/messages-svg.svg" alt=""></a>
         <a href="" class="notifications"><img src="/assets/notifications-svg.svg" alt=""></a>
         <div class="user-logo" style="position: relative;">
-            <img src="<%= currentUser.image %>" alt="<%= currentUser.username %>" />
-            <p><%= currentUser.username %></p>
+            <img src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>" alt="<%= currentUser && currentUser.username ? currentUser.username : 'User' %>" />
+            <p><%= currentUser && currentUser.username ? currentUser.username : 'User' %></p>
             <form id="logoutForm" action="/logout" method="POST" class="logout-form">
               <button type="submit" class="logout-btn">Logout</button>
             </form>

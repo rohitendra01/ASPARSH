@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const adminUser = require('../models/adminUser');
 const transporter = require('../mailer');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -47,7 +47,7 @@ exports.logoutUser = (req, res) => {
 // OTP Request
 exports.requestOtp = async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
+  const user = await adminUser.findOne({ email });
   if (!user) {
     return res.render('users/login', { error_msg: 'No account with that email.' });
   }
@@ -93,7 +93,7 @@ exports.verifyOtp = async (req, res) => {
 // Password Reset via OTP
 exports.resetPasswordOtp = async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const user = await adminUser.findOne({ email });
   if (!user) {
     return res.render('users/login', { error_msg: 'User not found.' });
   }

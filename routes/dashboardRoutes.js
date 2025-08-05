@@ -7,6 +7,8 @@ const cache = apicache.middleware;
 const { isLoggedIn } = require('../middleware/authMiddleware');
 // dashboardController removed
 const multer = require('multer');
+const userController = require('../controllers/userController');
+const profileController = require('../controllers/profileController');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -17,5 +19,17 @@ const upload = multer({ storage });
 router.get('/', isLoggedIn, cache('5 minutes'), (req, res) => {
   res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });
 });
+
+// Route for /dashboard/:slug/user to view profile
+router.get('/user', isLoggedIn, userController.viewUserProfile);
+
+// Route for /dashboard/:slug/profiles to view all profiles
+router.get('/profiles', isLoggedIn, profileController.listProfiles);
+
+// Route for /dashboard/:slug/profiles/new (render form)
+router.get('/profiles/new', isLoggedIn, profileController.renderNewProfileForm);
+
+// Route for /dashboard/:slug/profiles/new (handle POST)
+router.post('/profiles/new', isLoggedIn, upload.single('image'), profileController.createProfile);
 
 module.exports = router;

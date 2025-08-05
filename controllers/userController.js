@@ -1,36 +1,37 @@
-const User = require('../models/User');
+const adminUser = require('../models/adminUser');
 
 exports.viewUserProfile = async (req, res) => {
   let user;
   if (req.params.slug) {
-    user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+    user = await adminUser.findOne({ slug: req.params.slug }) || await adminUser.findById(req.params.slug);
   } else {
     user = req.user;
   }
-  if (!user) return res.status(404).send('User not found');
-  res.render('users/view', { user, layout: 'layouts/dashboard-boilerplate' });
+  if (!user) return res.status(404).send('Admin user not found');
+  // Pass both user and currentUser for robust sidebar/profile rendering
+  res.render('users/view', { user, currentUser: req.user, layout: 'layouts/dashboard-boilerplate' });
 };
 
 exports.renderEditUserProfile = async (req, res) => {
   let user;
   if (req.params.slug) {
-    user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+    user = await adminUser.findOne({ slug: req.params.slug }) || await adminUser.findById(req.params.slug);
   } else {
     user = req.user;
   }
-  if (!user) return res.status(404).send('User not found');
-  res.render('users/edit', { user, layout: 'layouts/dashboard-boilerplate' });
+  if (!user) return res.status(404).send('Admin user not found');
+  res.render('users/edit', { user, currentUser: req.user, layout: 'layouts/dashboard-boilerplate' });
 };
 
 exports.updateUserProfile = async (req, res) => {
   try {
     let user;
     if (req.params.slug) {
-      user = await User.findOne({ slug: req.params.slug }) || await User.findById(req.params.slug);
+      user = await adminUser.findOne({ slug: req.params.slug }) || await adminUser.findById(req.params.slug);
     } else {
       user = req.user;
     }
-    if (!user) return res.status(404).send('User not found');
+    if (!user) return res.status(404).send('Admin user not found');
     user.username = req.body.username;
     user.email = req.body.email;
     if (req.file) {
@@ -53,7 +54,7 @@ exports.updateUserProfile = async (req, res) => {
     }
     await user.save();
     req.flash('success_msg', 'Profile updated successfully!');
-    return res.redirect(`/dashboard/user/${user.slug}`);
+    return res.redirect(`/dashboard/${user.slug}/user`);
   } catch (err) {
     console.error(err);
     req.flash('error_msg', 'Error updating profile');

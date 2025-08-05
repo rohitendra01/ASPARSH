@@ -72,7 +72,7 @@
     width: 100%;
     height: 100%;
     padding: 1rem;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .contact-form label {
@@ -112,7 +112,7 @@
 }
 
 .contact-form textarea {
-    min-height: 120px;
+    height: 150px;
     resize: vertical;
 }
 

@@ -1,0 +1,93 @@
+<% layout('layouts/dashboard-boilerplate') -%>
+<div class="search-bar">
+    <form method="GET" action="/profiles">
+      <input type="text" name="search" placeholder="Search portfolios..." class="search-input">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <a href="/dashboard/<%= slug %>/profiles/new" class="btn btn-success">Create New Profile</a>
+  </div>
+<div class="profiles-container">
+  <% if (profiles.length > 0) { %>
+    <div class="profiles-grid">
+      <% profiles.forEach(profile => { %>
+        <div class="profile-card">
+          <a href="/dashboard/<%= userSlug %>/portfolios/<%= profile.slug %>">
+            <div class="profile-image-wrapper">
+              <img src="<%= profile.image ? profile.image : '/assets/user-login.png' %>" alt="<%= profile.name %>" class="profile-image" />
+            </div>
+            <div class="profile-info">
+              <h3 class="profile-name"><%= profile.name %></h3>
+              <p class="profile-email"><%= profile.email %></p>
+              <p class="profile-location"><%= profile.address && profile.address.city ? profile.address.city : '' %> <%= profile.address && profile.address.country ? ', ' + profile.address.country : '' %></p>
+            </div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p class="no-profiles">No profiles found.</p>
+  <% } %>
+</div>
+<style>
+.profiles-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+}
+.profile-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px #007bff22;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.profile-card:hover {
+  box-shadow: 0 8px 32px #007bff33;
+  transform: translateY(-4px) scale(1.03);
+}
+.profile-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.profile-image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 8px #007bff22;
+  border: 2px solid #e9ecef;
+}
+.profile-info {
+  margin-top: 0.5rem;
+}
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0.3rem;
+}
+.profile-email {
+  color: #007bff;
+  font-size: 1.02rem;
+  margin-bottom: 0.2rem;
+}
+.profile-location {
+  color: #888;
+  font-size: 0.98rem;
+}
+.no-profiles {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}
+</style>

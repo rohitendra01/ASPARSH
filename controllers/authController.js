@@ -1,5 +1,5 @@
 const passport = require('passport');
-const User = require('../models/User');
+const adminUser = require('../models/adminUser');
 
 exports.getRegisterPage = (req, res) => {
     res.render("users/register");
@@ -19,7 +19,7 @@ exports.registerUser = async (req, res) => {
 
     // Check if email already exists
     if (email && !errors.email) {
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        const existingUser = await adminUser.findOne({ email: email.toLowerCase() });
         if (existingUser) errors.email = 'Email already registered';
     }
 
@@ -31,7 +31,7 @@ exports.registerUser = async (req, res) => {
 
     // Check if username already exists
     if (username) {
-        const existingUsername = await User.findOne({ username });
+        const existingUsername = await adminUser.findOne({ username });
         if (existingUsername) errors.name = 'Username already taken';
     }
 
@@ -43,7 +43,7 @@ exports.registerUser = async (req, res) => {
     }
 
     try {
-        const user = new User({ username, email: email.toLowerCase(), password });
+        const user = new adminUser({ username, email: email.toLowerCase(), password });
         await user.save();
         req.flash('success_msg', 'Registration successful! You are now logged in.');
         req.logIn(user, (err) => {

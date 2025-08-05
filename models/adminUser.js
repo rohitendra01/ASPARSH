@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { isEmail } = require('validator');
 
-const userSchema = new mongoose.Schema({
+const adminUserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: [true, 'Username is required'],
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Slug generation middleware (ensures uniqueness)
-userSchema.pre('save', async function(next) {
+adminUserSchema.pre('save', async function(next) {
     if (this.isModified('username')) {
         let baseSlug = this.username
             .toLowerCase()
@@ -55,7 +55,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Password hashing middleware
-userSchema.pre('save', async function(next) {
+adminUserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     
     try {
@@ -68,10 +68,10 @@ userSchema.pre('save', async function(next) {
 });
 
 // Password comparison method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+adminUserSchema.methods.comparePassword = async function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
+const AdminUser = mongoose.model('AdminUser', adminUserSchema);
 
-module.exports = User;
+module.exports = AdminUser;

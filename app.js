@@ -8,7 +8,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const User = require('./models/User');
+const adminUser = require('./models/adminUser');
 
 
 app.engine('ejs', ejsMate);
@@ -43,7 +43,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
     try {
         // Convert email to lowercase for case-insensitive search
         const emailLower = email.toLowerCase();
-        const user = await User.findOne({ email: emailLower });
+        const user = await adminUser.findOne({ email: emailLower });
         if (!user) return done(null, false, { message: 'Incorrect email.' });
         
         // Fixed to use comparePassword method
@@ -59,7 +59,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await User.findById(id);
+        const user = await adminUser.findById(id);
         done(null, user);
     } catch (err) {
         done(err);
@@ -68,7 +68,7 @@ passport.deserializeUser(async (id, done) => {
 
 // Enhanced res.locals middleware
 app.use((req, res, next) => {
-    res.locals.currentUser = req.user;
+    res.locals.currentUser = req.user || null;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.success_msg = req.flash('success_msg');

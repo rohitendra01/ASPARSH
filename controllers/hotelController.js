@@ -11,7 +11,7 @@ exports.showHotelPage = async (req, res) => {
       hotelType: hotel.hotelType,
       foodCategories: hotel.foodCategories || [],
       hotelAddress: hotel.hotelAddress,
-      createdByUsername: hotel.createdByUsername
+      createdByUsername: hotel.adminUser ? hotel.adminUser.username : hotel.createdByUsername
     });
   } catch (err) {
     console.error(err);

@@ -8,7 +8,7 @@ exports.createVisitingCard = async (req, res) => {
   try {
     const { name, title, description, email, phone, address, website, linkedin, twitter, facebook, instagram } = req.body;
     const visitingCard = new VisitingCard({
-      user: req.user._id,
+      user: req.adminUser._id, // Updated to use adminUser model
       name,
       title,
       description,
@@ -50,8 +50,10 @@ exports.dashboardPortfolioIndex = async (req, res) => {
       query = { $or: [ { name: searchRegex }, { slug: searchRegex } ] };
     }
     const cards = await VisitingCard.find(query);
-    let userSlug = req.user && req.user.slug ? req.user.slug : '';
-    res.render('portfolios/index', { cards, layout: 'layouts/dashboard-boilerplate', userSlug });
+    let slug = req.user && req.user.slug ? req.user.slug : '';
+    // Ensure slug is never empty
+    if (!slug && req.user) slug = req.user._id ? req.user._id.toString() : '';
+    res.render('portfolios/index', { cards, layout: 'layouts/dashboard-boilerplate', slug });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error loading business visiting cards');
@@ -61,42 +63,42 @@ const Portfolio = require('../models/Portfolio');
 
 exports.listPortfolios = async (req, res) => {
   // List all portfolios for the user
-  const portfolios = await Portfolio.find({ userSlug: req.params.userSlug });
-  res.render('portfolios/index', { portfolios, userSlug: req.params.userSlug, layout: 'layouts/dashboard' });
+  const portfolios = await Portfolio.find({ slug: req.params.slug });
+  res.render('portfolios/index', { portfolios, slug: req.params.slug, layout: 'layouts/dashboard' });
 };
 
 exports.renderNewForm = async (req, res) => {
   // Render form to create a new portfolio
-  res.render('portfolios/new', { userSlug: req.params.userSlug, layout: 'layouts/dashboard' });
+  res.render('portfolios/new', { slug: req.params.slug, layout: 'layouts/dashboard' });
 };
 
 exports.createPortfolio = async (req, res) => {
   // Create a new portfolio for the user
-  const portfolio = new Portfolio({ ...req.body, userSlug: req.params.userSlug });
+  const portfolio = new Portfolio({ ...req.body, slug: req.params.slug });
   await portfolio.save();
-  res.redirect(`/dashboard/${req.params.userSlug}/portfolios`);
+  res.redirect(`/dashboard/${req.params.slug}/portfolios`);
 };
 
 exports.showPortfolio = async (req, res) => {
   // Show a single portfolio
   const portfolio = await Portfolio.findById(req.params.id);
-  res.render('portfolios/show', { portfolio, userSlug: req.params.userSlug, layout: 'layouts/dashboard' });
+  res.render('portfolios/show', { portfolio, slug: req.params.slug, layout: 'layouts/dashboard' });
 };
 
 exports.renderEditForm = async (req, res) => {
   // Render form to edit a portfolio
   const portfolio = await Portfolio.findById(req.params.id);
-  res.render('portfolios/edit', { portfolio, userSlug: req.params.userSlug, layout: 'layouts/dashboard' });
+  res.render('portfolios/edit', { portfolio, slug: req.params.slug, layout: 'layouts/dashboard' });
 };
 
 exports.updatePortfolio = async (req, res) => {
   // Update a portfolio
   await Portfolio.findByIdAndUpdate(req.params.id, req.body);
-  res.redirect(`/dashboard/${req.params.userSlug}/portfolios`);
+  res.redirect(`/dashboard/${req.params.slug}/portfolios`);
 };
 
 exports.deletePortfolio = async (req, res) => {
   // Delete a portfolio
   await Portfolio.findByIdAndDelete(req.params.id);
-  res.redirect(`/dashboard/${req.params.userSlug}/portfolios`);
+  res.redirect(`/dashboard/${req.params.slug}/portfolios`);
 };
