@@ -74,8 +74,6 @@ exports.loginUser = (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) return next(err);
         if (!user) {
-            req.flash('error_msg', info.message || 'Invalid credentials');
-            req.flash('email', req.body.email); // Repopulate email
             return res.redirect(req.headers.referer || '/');
         }
         
