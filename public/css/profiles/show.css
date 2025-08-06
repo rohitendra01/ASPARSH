@@ -1,0 +1,126 @@
+.profile-details-container {
+  color: var(--text-dark);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.profile-details-container > * {
+  flex: 1 1 50%;
+  max-width: 50%;
+}
+
+.profile-general-details-panel{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
+  background-color: var(--text-light);
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background-color: var(--hea-foo);
+}
+
+.profile-details-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background-color: #e9ecef61;
+}
+
+.profile-details-header h2{
+  font-family: var(--head-text);
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 1rem;
+}
+
+.profile-details-header .created-at{
+  font-family: var(--content-text);
+  font-size: 1rem;
+  padding: 1rem;
+}
+
+.profile-details-main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem;
+  color: var(--text-light);
+}
+
+.profile-image-wrapper{
+  width: 100px;
+  height: 100px;
+  border-radius: 10%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.profile-info{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.profile-name{
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--subhead-text);
+  margin-bottom: 0.2rem;
+}
+
+.profile-mobile{
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: var(--content-text);
+}
+
+.profile-address-info{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.profile-details strong {
+  font-family: var(--subhead-text);
+  font-weight: 600;
+}
+
+.profile-details p {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 0.5rem;
+  font-family: var(--content-text);
+}

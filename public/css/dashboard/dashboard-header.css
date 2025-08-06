@@ -7,6 +7,11 @@
     --content-text: 'Poppins', Arial, Helvetica, sans-serif;
 }
 
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 header {
   display: flex;
@@ -19,7 +24,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 100;
-  margin: 0;
+  margin: 1rem;
   border-radius: 20px;
 }
 

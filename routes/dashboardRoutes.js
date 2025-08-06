@@ -32,4 +32,7 @@ router.get('/profiles/new', isLoggedIn, profileController.renderNewProfileForm);
 // Route for /dashboard/:slug/profiles/new (handle POST)
 router.post('/profiles/new', isLoggedIn, upload.single('image'), profileController.createProfile);
 
+// Route for /dashboard/:slug/profiles/:profileSlug (show profile details)
+router.get('/profiles/:profileSlug', isLoggedIn, profileController.showProfile);
+
 module.exports = router;

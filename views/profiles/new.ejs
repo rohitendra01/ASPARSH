@@ -23,23 +23,72 @@
       <label for="addressLine">Address</label>
       <input type="text" id="addressLine" name="addressLine" placeholder="Street Address" class="form-control" />
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="country">Country</label>
-        <input type="text" id="country" name="country" placeholder="Country" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label for="city">City</label>
-        <input type="text" id="city" name="city" placeholder="City" class="form-control" />
-      </div>
+    <div class="form-group">
+      <label for="city">City</label>
+      <input type="text" id="city" name="city" placeholder="City" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="state">State</label>
+      <input type="text" id="state" name="state" placeholder="State" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input type="text" id="country" name="country" placeholder="Country" class="form-control" />
+    </div>
       <div class="form-group">
         <label for="postcode">Postcode</label>
         <input type="text" id="postcode" name="postcode" placeholder="Postcode" class="form-control" />
       </div>
     </div>
+    <div id="social-links-section" class="form-group">
+      <label>Social Links</label>
+      <div id="social-links-list">
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" name="socialLinks[0][type]"
+                   placeholder="Type (e.g. Facebook)" class="form-control" required />
+          </div>
+          <div class="form-group" style="margin-left:1rem;">
+            <input type="text" name="socialLinks[0][url]"
+                   placeholder="https://… " class="form-control" required />
+          </div>
+          <button type="button" onclick="this.parentNode.remove()" class="btn btn-link text-danger">×</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary" onclick="addSocialLinkField()">+ Add Social Link</button>
+    </div>
+
     <button type="submit" class="btn btn-primary">Create Profile</button>
   </form>
 </div>
+
+<script>
+  function addSocialLinkField() {
+    const list = document.getElementById('social-links-list');
+    const idx = list.children.length;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'form-row';
+    wrapper.innerHTML = `
+      <div class="form-group">
+        <input type="text" name="socialLinks[${idx}][type]"
+               placeholder="Type (e.g. Facebook)" class="form-control" required />
+      </div>
+      <div class="form-group" style="margin-left:1rem;">
+        <input type="url" name="socialLinks[${idx}][url]"
+               placeholder="https://… " class="form-control" required />
+      </div>
+      <button type="button" onclick="this.parentNode.remove()" class="btn btn-link text-danger">×</button>
+    `;
+    list.appendChild(wrapper);
+  }
+</script>
+
+<style>
+  #social-links-section { margin-bottom: 1.5rem; }
+  .form-row { display: flex; align-items: center; margin-bottom: .75rem; }
+  .form-row .form-group { flex: 1; }
+</style>
+
 <style>
 .profile-form-container {
   max-width: 480px;

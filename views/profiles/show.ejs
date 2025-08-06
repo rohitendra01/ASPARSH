@@ -1,0 +1,79 @@
+<% layout('layouts/dashboard-boilerplate') -%>
+<% block('styles').append('<link rel="stylesheet" href="/css/profiles/show.css">') %>
+<div class="profile-details-container">
+    <div class="profile-general-details-panel">
+        <div class="profile-details">
+            <div class="profile-details-header">
+                <h2>Customer Profile</h2>
+                <div class="created-at">Joined <%= profile.createdAt.toLocaleDateString() %></div>
+            </div>
+            <div class="profile-details-main">
+                <div class="profile-image-wrapper">
+                    <img src="<%= profile.image || '/assets/user-login.png' %>" alt="<%= profile.name %>" class="profile-image" />
+                </div>
+                <div class="profile-info">
+                    <h3 class="profile-name"><%= profile.name %></h3>
+                    <p class="profile-mobile"><%= profile.mobile || 'N/A' %></p>
+                </div>
+            </div>
+        </div>
+        <div class="profile-details">
+            <div class="profile-details-header">
+                <h2>Contact Information</h2>
+            </div>
+            <div class="profile-details-main">
+                <p><strong>Email:</strong> <%= profile.email %></p>
+                <p><strong>Mobile:</strong> <%= profile.mobile || 'N/A' %></p>
+            </div>
+        </div>
+        <div class="profile-details">
+          <div class="profile-details-header">
+            <h2>Address </h2>
+          </div>
+          <div class="profile-details-main">
+            <div class="profile-address-info">
+              <% const addressFields = [
+                { label: 'Address', key: 'addressLine' },
+                { label: 'City', key: 'city' },
+                { label: 'State', key: 'state' },
+                { label: 'Country', key: 'country' },
+                { label: 'Zip Code', key: 'postcode' }
+              ]; %>
+              <% addressFields.forEach(function(field) { %>
+                <% if (profile.address && profile.address[field.key]) { %>
+                  <p><strong><%= field.label %>:</strong> <%= profile.address[field.key] %></p>
+                <% } %>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+        <div class="profile-details">
+            <div class="profile-details-header">
+                <h2>Social Links</h2>
+            </div>
+            <div class="profile-details-main">
+                <% if (profile.socialLinks && profile.socialLinks.length) { %>
+                    <ul class="social-links-list">
+                        <% profile.socialLinks.forEach(link => { %>
+                            <li><a href="<%= link.url %>" target="_blank"><%= link.type %></a></li>
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p>No social links available.</p>
+                <% } %>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <div class="profile-services-details-panel" style="background-color: aqua;"></div>
+</div>

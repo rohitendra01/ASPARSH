@@ -1,5 +1,5 @@
 .dashboard-layout {
-  display: flex;
+    display: flex;
     flex-direction: row;
     position: fixed;
     margin: 0 1rem;
@@ -13,10 +13,11 @@
     box-shadow: 0 6px 32px rgba(0,0,0,0.10);
     border: 2.5px solid var(--text-dark);
     height: calc(100vh - 180px);
+    width: calc(100% - 2rem);
   }
   
   .dashboard-sidebar {
-    width: 250px !important;
+    width: 280px !important;
     border-right: 1.5px solid var(--text-dark);
     height: 100%;
     padding: 2.2rem 1.2rem;
@@ -26,10 +27,12 @@
     overflow-y: auto;
   }
   
-  .dashboard-main {
+.dashboard-main {
   padding: 1rem;
   height: 100%;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;

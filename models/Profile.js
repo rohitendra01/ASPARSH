@@ -3,8 +3,7 @@ const { Schema } = mongoose;
 
 const profileSchema = new Schema({
     createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'adminUser',
+        type: String,
         required: true
     },
 
@@ -33,11 +32,26 @@ const profileSchema = new Schema({
     address: {
         type: new Schema({
             addressLine: { type: String },
-            country: { type: String },
             city: { type: String },
+            state: { type: String },
+            country: { type: String },
             postcode: { type: String }
         }, { _id: false })
     },
+
+
+    socialLinks: [
+        {
+            type: {
+                type: String,
+                required: true
+            },
+            url: {
+                type: String,
+                required: true
+            }
+        }
+    ],
 
     slug: {
         type: String,
