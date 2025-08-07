@@ -42,10 +42,20 @@ exports.createProfile = async (req, res) => {
     // Auto-generate slug from name
     const slug = data.name ? data.name.trim().toLowerCase().replace(/\s+/g, '-') : '';
 
+    // Build address object from form fields
+    const address = {
+      addressLine: data.addressLine || '',
+      city: data.city || '',
+      state: data.state || '',
+      country: data.country || '',
+      postcode: data.postcode || ''
+    };
+
     const newProfile = new Profile({
       ...data,
       createdBy: req.user._id,
       image: imageUrl || '', // Explicitly set the image URL
+      address,
       socialLinks: data.socialLinks || [],
       slug: slug
     });
@@ -64,7 +74,11 @@ exports.createProfile = async (req, res) => {
 // List all profiles for the current user
 exports.listProfiles = async (req, res) => {
   try {
-    const profiles = await Profile.find({});
+    let query = {};
+    if (req.query.search) {
+      query.name = { $regex: req.query.search, $options: 'i' };
+    }
+    const profiles = await Profile.find(query);
     const slug = req.user.slug;
     res.render('profiles/index', { profiles, userSlug: slug, slug });
   } catch (err) {

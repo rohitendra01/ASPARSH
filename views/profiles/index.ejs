@@ -12,18 +12,18 @@
   <% if (profiles.length > 0) { %>
     <div class="profiles-grid">
       <% profiles.forEach(profile => { %>
+        <a href="/dashboard/<%= slug %>/profiles/<%= profile.slug %>">
         <div class="profile-card">
-          <a href="/dashboard/<%= slug %>/profiles/<%= profile.slug %>">
             <div class="profile-image-wrapper">
               <img src="<%= profile.image%>" alt="<%= profile.name %>" class="profile-image" />
             </div>
             <div class="profile-info">
               <h3 class="profile-name"><%= profile.name %></h3>
-              <p class="profile-email"><%= profile.email %></p>
-              <p class="profile-location"><%= profile.address && profile.address.city ? profile.address.city : '' %> <%= profile.address && profile.address.country ? ', ' + profile.address.country : '' %></p>
+              <p class="profile-mobile"><%= profile.mobile %></p>
+              <p class="profile-location"><%= profile.address && profile.address.city %> <%= profile.address && profile.address.country ? ', ' + profile.address.country : '' %></p>
             </div>
-          </a>
-        </div>
+          </div>
+        </a>
       <% }) %>
     </div>
   <% } else { %>
