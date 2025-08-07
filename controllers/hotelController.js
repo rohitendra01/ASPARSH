@@ -88,10 +88,8 @@ exports.createHotel = async (req, res) => {
     if (hotelOfferBanner) hotelData.hotelOfferBanner = hotelOfferBanner;
     const hotel = new Hotel(hotelData);
     await hotel.save();
-    console.log('Hotel created:', hotel);
     res.redirect(`/hotel/${hotel.hotelSlug}`);
   } catch (err) {
-    console.error('Error in createHotel:', err);
     res.status(500).render('hotels/new', {
       error: 'Error creating hotel.',
       layout: 'layouts/dashboard-boilerplate',
@@ -114,6 +112,7 @@ exports.showHotelPage = async (req, res) => {
       hotelType: hotel.hotelType,
       foodCategories: hotel.foodCategories || [],
       hotelAddress: hotel.hotelAddress,
+      price: hotel.price,
       createdByUsername: hotel.adminUser ? hotel.adminUser.username : hotel.createdByUsername,
       user: req.user
     });
@@ -142,7 +141,7 @@ exports.renderEditHotelForm = async (req, res) => {
 // Update hotel
 exports.updateHotel = async (req, res) => {
   try {
-    const { hotelName, hotelDescription, hotelType, hotelAddress, foodCategories } = req.body;
+    const { hotelName, hotelDescription, hotelType, hotelAddress, foodCategories, price } = req.body;
     const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
     if (!hotel) return res.status(404).send('Hotel not found');
     const originalName = hotel.hotelName;
@@ -150,7 +149,29 @@ exports.updateHotel = async (req, res) => {
     hotel.hotelDescription = hotelDescription || hotel.hotelDescription;
     hotel.hotelType = hotelType || hotel.hotelType;
     hotel.hotelAddress = hotelAddress || hotel.hotelAddress;
-    hotel.foodCategories = Array.isArray(foodCategories) ? foodCategories : (foodCategories ? [foodCategories] : []);
+    // Normalize foodCategories and ensure itemPrice is mapped to item.price
+    if (Array.isArray(foodCategories)) {
+      hotel.foodCategories = foodCategories.map(category => {
+        let newCategory = { ...category };
+        if (Array.isArray(category.foodItems)) {
+          newCategory.foodItems = category.foodItems.map(item => {
+            let newItem = { ...item };
+            // Prefer itemPrice, fallback to price
+            if (typeof item.itemPrice !== 'undefined') {
+              newItem.price = item.itemPrice;
+            } else if (typeof item.price !== 'undefined') {
+              newItem.price = item.price;
+            }
+            return newItem;
+          });
+        }
+        return newCategory;
+      });
+    } else if (foodCategories) {
+      hotel.foodCategories = [foodCategories];
+    } else {
+      hotel.foodCategories = [];
+    }
     if (hotelName && hotelName !== originalName) {
       const newSlug = hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       if (newSlug !== hotel.hotelSlug) {
@@ -170,8 +191,9 @@ exports.updateHotel = async (req, res) => {
     res.redirect(`/hotel/${hotel.hotelSlug}`);
   } catch (err) {
     console.error(err);
+    const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
     res.status(500).render('hotels/edit', {
-      hotel: await Hotel.findOne({ hotelSlug: req.params.hotelSlug }),
+      hotel,
       user: req.user,
       layout: 'layouts/dashboard-boilerplate',
       error: 'Error updating hotel.'
@@ -183,7 +205,6 @@ exports.updateHotel = async (req, res) => {
 exports.deleteHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
-    if (!hotel) return res.status(404).send('Hotel not found');
     const deleteFromCloudinary = async (imageUrl) => {
       if (!imageUrl) return;
       const match = imageUrl.match(/\/hotels\/([^./]+)\./);

@@ -39,10 +39,8 @@ const profileSchema = new Schema({
         }, { _id: false })
     },
 
-
-    socialLinks: [
-        {
-            type: {
+    socialLinks: [{
+            platform: {
                 type: String,
                 required: true
             },
@@ -50,16 +48,14 @@ const profileSchema = new Schema({
                 type: String,
                 required: true
             }
-        }
+        }, { _id: false }
     ],
 
     slug: {
         type: String,
         unique: true
     }
-    
 }, 
-
 {
     timestamps: true
 });

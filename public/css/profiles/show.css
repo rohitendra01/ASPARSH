@@ -124,3 +124,15 @@
   padding: 0.5rem;
   font-family: var(--content-text);
 }
+
+.social-links-list li{
+  list-style: none;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.social-links-list li>a{
+  text-decoration: none;
+  font-family: var(--content-text);
+  color: var(--text-light);
+}

@@ -55,7 +55,7 @@
                 <% if (profile.socialLinks && profile.socialLinks.length) { %>
                     <ul class="social-links-list">
                         <% profile.socialLinks.forEach(link => { %>
-                            <li><a href="<%= link.url %>" target="_blank"><%= link.type %></a></li>
+                            <li><a href="<%= link.url %>" target="_blank"><%= link.platform %></a></li>
                         <% }) %>
                     </ul>
                 <% } else { %>
