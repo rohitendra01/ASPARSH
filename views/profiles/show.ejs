@@ -54,11 +54,13 @@
             <div class="profile-details-main">
                 <ul class="social-links-list">
                   <% const platformIcons = {
-                    facebook: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M22.675 0h-21.35C.6 0 0 .6 0 1.326v21.348C0 23.4.6 24 1.326 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.4 24 24 23.4 24 22.674V1.326C24 .6 23.4 0 22.675 0'></path></svg>`,
-                    twitter: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M24 4.557a9.83 9.83 0 0 1-2.828.775 4.932 4.932 0 0 0 2.165-2.724c-.951.555-2.005.959-3.127 1.184A4.916 4.916 0 0 0 16.616 3c-2.717 0-4.92 2.206-4.92 4.917 0 .386.044.762.127 1.124C7.728 8.77 4.1 6.797 1.671 3.149c-.423.722-.666 1.561-.666 2.475 0 1.708.87 3.216 2.188 4.099a4.904 4.904 0 0 1-2.229-.616c-.054 2.281 1.581 4.415 3.949 4.89a4.936 4.936 0 0 1-2.224.084c.627 1.956 2.444 3.377 4.6 3.417A9.867 9.867 0 0 1 0 21.543a13.94 13.94 0 0 0 7.548 2.212c9.058 0 14.009-7.513 14.009-14.009 0-.213-.005-.425-.014-.636A10.025 10.025 0 0 0 24 4.557z'></path></svg>`,
-                    linkedin: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 20h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 11.268h-3v-5.604c0-1.337-.026-3.063-1.868-3.063-1.868 0-2.156 1.459-2.156 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.604v5.592z'></path></svg>`,
-                    instagram: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.974.974 1.246 2.241 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.974.974-2.241 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.974-.974-1.246-2.241-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.974-.974 2.241-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.012-4.947.072-1.276.06-2.637.334-3.608 1.308-.974.974-1.246 2.241-1.308 3.608-.058 1.266-.07 1.646-.07 4.85s.012 3.584.07 4.85c.062 1.366.334 2.633 1.308 3.608.974.974 2.241 1.246 3.608 1.308 1.266.058 1.646.07 4.85.07s3.584-.012 4.85-.07c1.366-.062 2.633-.334 3.608-1.308.974-.974 1.246-2.241 1.308-3.608.058-1.266.07-1.646.07-4.85s-.012-3.584-.07-4.85c-.062-1.366-.334-2.633-1.308-3.608-.974-.974-2.241-1.246-3.608-1.308-1.266-.058-1.646-.07-4.85-.07zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z'></path></svg>`,
-                    website: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8 0-4.411 3.589-8 8-8 4.411 0 8 3.589 8 8 0 4.411-3.589 8-8 8zm0-14c-3.309 0-6 2.691-6 6 0 3.309 2.691 6 6 6 3.309 0 6-2.691 6-6 0-3.309-2.691-6-6-6z'></path></svg>`
+                    facebook: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M18.896 0H5.104A5.104 5.104 0 0 0 0 5.104v13.792A5.104 5.104 0 0 0 5.104 24h7.417v-9.294H9.692v-3.622h2.829V8.413c0-2.797 1.708-4.324 4.204-4.324 1.193 0 2.436.213 2.436.213v2.675h-1.374c-1.355 0-1.776.841-1.776 1.703v2.047h3.022l-.483 3.622h-2.539V24h4.979A5.104 5.104 0 0 0 24 18.896V5.104A5.104 5.104 0 0 0 18.896 0z'/></svg>`,
+                    x: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M17.53 3.5h3.97l-7.02 8.06L22.5 20.5h-4.01l-5.13-5.89-5.13 5.89H3.5l7.02-8.06L1.5 3.5h4.01l5.13 5.89L17.53 3.5z'/></svg>`,
+                    linkedin: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 20h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 11.268h-3v-5.604c0-1.337-.026-3.063-1.868-3.063-1.868 0-2.156 1.459-2.156 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.604v5.592z'/></svg>`,
+                    instagram: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.974.974 1.246 2.241 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.974.974-2.241 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.974-.974-1.246-2.241-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.974-.974 2.241-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.012-4.947.072-1.276.06-2.637.334-3.608 1.308-.974.974-1.246 2.241-1.308 3.608-.058 1.266-.07 1.646-.07 4.85s.012 3.584.07 4.85c.062 1.366.334 2.633 1.308 3.608.974.974 2.241 1.246 3.608 1.308 1.266.058 1.646.07 4.85.07s3.584-.012 4.85-.07c1.366-.062 2.633-.334 3.608-1.308.974-.974 1.246-2.241 1.308-3.608.058-1.266.07-1.646.07-4.85s-.012-3.584-.07-4.85c-.062-1.366-.334-2.633-1.308-3.608-.974-.974-2.241-1.246-3.608-1.308-1.266-.058-1.646-.07-4.85-.07zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z'/></svg>`,
+                    youtube: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M23.498 6.186c-.27-1.01-1.06-1.8-2.07-2.07C19.4 4 12 4 12 4s-7.4 0-9.43.116c-1.01.27-1.8 1.06-2.07 2.07C0 8.6 0 12 0 12s0 3.4.116 5.43c.27 1.01 1.06 1.8 2.07 2.07C4 20 12 20 12 20s7.4 0 9.43-.116c1.01-.27 1.8-1.06 2.07-2.07C24 15.4 24 12 24 12s0-3.4-.116-5.43zM9.75 15V9l6.25 3L9.75 15z'/></svg>`,
+                    pinterest: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.396 7.646 11.093-.106-.942-.202-2.389.042-3.419.221-.956 1.423-6.096 1.423-6.096s-.362-.724-.362-1.797c0-1.684.976-2.942 2.188-2.942 1.032 0 1.531.775 1.531 1.704 0 1.039-.661 2.591-1.001 4.034-.285 1.207.604 2.192 1.789 2.192 2.147 0 3.797-2.266 3.797-5.537 0-2.892-2.08-4.915-5.054-4.915-3.453 0-5.482 2.588-5.482 5.263 0 1.045.403 2.168.907 2.777.101.122.115.229.084.352-.092.385-.299 1.207-.339 1.374-.053.221-.173.269-.401.163-1.497-.697-2.431-2.885-2.431-4.646 0-3.783 3.073-8.312 9.166-8.312 4.903 0 8.122 3.548 8.122 7.363 0 5.045-2.803 8.797-6.953 8.797-1.393 0-2.703-.753-3.148-1.604l-.857 3.263c-.26.991-.768 2.232-1.146 2.991.862.267 1.771.412 2.722.412 6.627 0 12-5.373 12-12S18.627 0 12 0z'/></svg>`,
+                    website: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M2 12h20M12 2c2.5 3.5 2.5 14 0  20M12 2C9.5 5.5 9.5 18.5 12 22"/></svg>`
                   };
                   let hasLinks = false;
                   if (profile.socialLinks && profile.socialLinks.length) {
@@ -81,6 +83,7 @@
                 </ul>
             </div>
         </div>
+    </div>
 
 
 
@@ -93,5 +96,326 @@
 
 
     
-    <div class="profile-services-details-panel" style="background-color: aqua;"></div>
+    <div class="profile-services-details-panel">
+      <div style="height: 0; width: 0; overflow: hidden;">
+
+        <% 
+        const services = (profile.services && profile.services.length) ? profile.services : [
+        {
+      key: 'visiting_card',
+      name: 'Visiting Card',
+      enabled: false,
+      details: 'NFC-enabled digital visiting card (design + hosting).',
+      features: ['NFC Tag', 'vCard export', 'Custom template'],
+      usageStats: { views: 124, taps: 18 },
+      pendingPayments: [
+      { id: 'inv-101', amount: 299, descr: 'Design fee', due: '2025-09-01' }
+      ],
+      subscribedPlan: null,
+      metadata: { createdAt: '2025-03-12' }
+    },
+    {
+      key: 'portfolio_student',
+      name: 'Portfolio (Student)',
+      enabled: true,
+      details: 'Public student portfolio: projects, blogs & contact.',
+      features: ['Project gallery', 'Blog', 'Contact form'],
+      usageStats: { views: 2050, contacts: 14 },
+      pendingPayments: [],
+      subscribedPlan: { name: 'Free', price: 0, billingCycle: 'monthly', expires: null },
+      metadata: { createdAt: '2024-11-20' }
+    },
+    {
+      key: 'portfolio_business',
+      name: 'Portfolio (Business)',
+      enabled: true,
+      details: 'Business portfolio with analytics and lead capture.',
+      features: ['Lead capture', 'Custom domain', 'SEO tools'],
+      usageStats: { views: 5120, leads: 32 },
+      pendingPayments: [
+      { id: 'inv-220', amount: 499, descr: 'Custom domain setup', due: '2025-08-20' }
+      ],
+      subscribedPlan: { name: 'Pro', price: 499, billingCycle: 'yearly', expires: '2026-02-15' },
+      metadata: { createdAt: '2024-02-01' }
+    },
+    {
+      key: 'hotel_menu',
+      name: 'Hotel Menu Card',
+      enabled: false,
+      details: 'Create hotel menus, item photos, and QR ordering.',
+      features: ['QR menu', 'Item photos', 'Order link'],
+      usageStats: { menuScans: 78, orders: 5 },
+      pendingPayments: [{ id: 'inv-202', amount: 749, descr: 'Setup fee', due: '2025-08-31' }],
+      subscribedPlan: null,
+      metadata: { createdAt: '2024-12-01' }
+    },
+    {
+      key: 'ecommerce_store',
+      name: 'E-commerce Store',
+      enabled: true,
+      details: 'Simple store for small businesses with checkout.',
+      features: ['Products', 'Checkout', 'Coupons', 'Inventory'],
+      usageStats: { views: 8240, orders: 62, revenue: 45230 },
+      pendingPayments: [{ id: 'inv-303', amount: 1299, descr: 'Payment gateway fee', due: '2025-09-10' }],
+      subscribedPlan: { name: 'Business', price: 1499, billingCycle: 'monthly', expires: '2025-12-31' },
+      metadata: { createdAt: '2023-08-05' }
+    },
+    {
+      key: 'analytics_dashboard',
+      name: 'Analytics Dashboard',
+      enabled: true,
+      details: 'Detailed metrics for portfolio and campaigns.',
+      features: ['Traffic', 'Conversion funnel', 'Event tracking'],
+      usageStats: { dashboards: 5, reportsDownloaded: 12 },
+      pendingPayments: [],
+      subscribedPlan: { name: 'Pro', price: 499, billingCycle: 'monthly', expires: '2025-10-01' },
+      metadata: { createdAt: '2024-06-11' }
+    },
+    {
+      key: 'seo_boost',
+      name: 'SEO Boost',
+      enabled: false,
+      details: 'Automated SEO recommendations & sitemap generation.',
+      features: ['Auto sitemap', 'Meta suggestions', 'Link audit'],
+      usageStats: { audits: 3 },
+      pendingPayments: [{ id: 'inv-404', amount: 349, descr: 'SEO audit', due: '2025-09-12' }],
+      subscribedPlan: null,
+      metadata: { createdAt: '2025-01-10' }
+    },
+    {
+      key: 'premium_support',
+      name: 'Premium Support',
+      enabled: true,
+      details: 'Priority support, dedicated manager and SLAs.',
+      features: ['Priority email', 'Monthly call', 'Account manager'],
+      usageStats: { tickets: 2 },
+      pendingPayments: [],
+      subscribedPlan: { name: 'Support Plus', price: 999, billingCycle: 'monthly', expires: '2025-11-30' },
+      metadata: { createdAt: '2023-10-22' }
+    }
+    ];
+    %>
+  </div>
+
+    <div class="profile-details-header">
+      <h2 id="services-subscriptions">Services & Subscriptions</h2>
+    </div>
+
+  <div class="services-grid">
+    <% services.forEach(function(svc, idx){ %>
+      <div class="service-card" data-key="<%= svc.key %>" data-enabled="<%= svc.enabled %>" data-note="<%= svc.note || '' %>">
+        <div class="card-head">
+          <div>
+            <h4><%= svc.name %></h4>
+            <p class="muted small"><%= svc.details %></p>
+          </div>
+          <div class="card-controls">
+            <span class="badge <%= svc.enabled ? 'badge-active' : 'badge-off' %>">
+              <%= svc.enabled ? 'Active' : 'Inactive' %>
+            </span>
+            <label class="switch">
+              <input type="checkbox" class="service-toggle" <%= svc.enabled ? 'checked' : '' %> aria-label="Toggle <%= svc.name %>">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="card-row">
+            <button class="btn btn-outline configure-btn" data-idx="<%= idx %>">Configure</button>
+            <a class="btn btn-primary manage-link" href="/dashboard/<%= slug %>/services/<%= svc.key %>">Manage</a>
+            <% if (svc.subscribedPlan) { %>
+              <div class="plan-pill">
+                <small>Plan: <strong><%= svc.subscribedPlan.name %></strong></small>
+                <% if (svc.subscribedPlan.expires) { %>
+                  <small class="muted"> • Expires: <%= svc.subscribedPlan.expires %></small>
+                <% } %>
+              </div>
+            <% } else { %>
+              <button class="btn btn-ghost subscribe-btn" data-key="<%= svc.key %>">Subscribe</button>
+            <% } %>
+          </div>
+
+          <% if (svc.pendingPayments && svc.pendingPayments.length) { %>
+            <div class="pending-payments">
+              <div class="pending-header">
+                <small class="muted">Pending payments</small>
+                <small class="muted">(<span class="pending-count"><%= svc.pendingPayments.length %></span>)</small>
+              </div>
+              <ul class="pending-list">
+                <% svc.pendingPayments.forEach(function(inv){ %>
+                  <li data-id="<%= inv.id %>">
+                    <div>
+                      <strong>₹ <%= inv.amount %></strong> — <span class="muted"><%= inv.descr %></span>
+                      <% if (inv.due) { %> <small class="muted"> • due <%= inv.due %></small> <% } %>
+                    </div>
+                    <div class="pending-actions">
+                      <button class="btn btn-sm mark-paid-btn">Mark paid</button>
+                      <button class="btn btn-sm btn-outline">Invoice</button>
+                    </div>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } else { %>
+            <div class="no-pending small muted">No pending payments</div>
+          <% } %>
+
+          <% /* quick stats area (visual testing) */ %>
+          <div class="service-stats small muted" style="margin-top:.6rem;">
+            <% if (svc.usageStats) { %>
+              <% for (const k in svc.usageStats) { %>
+                <span style="margin-right: 1rem;"><strong><%= svc.usageStats[k] %></strong> <%= k %></span>
+              <% } %>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="services-summary">
+    <div class="summary-card">
+      <h4>Quick Summary</h4>
+      <p class="muted">Total services: <strong><%= services.length %></strong></p>
+      <p class="muted">Active: <strong><%= services.filter(s=>s.enabled).length %></strong></p>
+      <p class="muted">Pending payments: <strong><%= services.reduce((acc,s)=>acc + (s.pendingPayments? s.pendingPayments.length:0),0) %></strong></p>
+      <div class="summary-actions">
+        <button id="bulk-on" class="btn btn-sm">Enable all</button>
+        <button id="bulk-off" class="btn btn-sm btn-outline">Disable all</button>
+      </div>
+    </div>
+
+    <div class="summary-card plan-card">
+      <h4>Subscription Center</h4>
+      <p class="muted">Sample plans: Free • Pro • Business • Support Plus</p>
+      <div class="plan-actions">
+        <button class="btn btn-sm">Upgrade all to Pro</button>
+        <button class="btn btn-sm btn-outline">Downgrade all to Free</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Configure Modal (client-side) -->
+<div id="configureModal" class="modal" aria-hidden="true">
+  <div class="modal-inner" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3 id="modalTitle">Configure Service</h3>
+    <form id="configureForm">
+      <input type="hidden" name="serviceKey" id="modalServiceKey">
+      <div class="form-row">
+        <label>Feature toggle</label>
+        <label class="switch">
+          <input id="modalFeatureToggle" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="form-row">
+        <label>Extra note</label>
+        <textarea id="modalNote" name="note" placeholder="Admin note or configuration..."></textarea>
+      </div>
+      <div class="form-row modal-actions">
+        <button type="button" id="saveConfig" class="btn btn-primary">Save</button>
+        <button type="button" id="cancelConfig" class="btn btn-outline">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const services = Array.from(document.querySelectorAll('.service-card'));
+    const modal = document.getElementById('configureModal');
+    const modalKey = document.getElementById('modalServiceKey');
+    const modalNote = document.getElementById('modalNote');
+    const modalToggle = document.getElementById('modalFeatureToggle');
+
+    // toggle service enabled state (client-only)
+    document.addEventListener('click', (e) => {
+      if (e.target.matches('.service-toggle')) {
+        const card = e.target.closest('.service-card');
+        const badge = card.querySelector('.badge');
+        if (e.target.checked) {
+          badge.classList.remove('badge-off');
+          badge.classList.add('badge-active');
+          badge.textContent = 'Active';
+        } else {
+          badge.classList.remove('badge-active');
+          badge.classList.add('badge-off');
+          badge.textContent = 'Inactive';
+        }
+        // TODO: send fetch POST to API to persist change:
+        // fetch(`/api/dashboard/${encodeURIComponent('<%= slug %>')}/services/${card.dataset.key}/toggle`, {method:'POST', body:JSON.stringify({enabled:e.target.checked}), headers:{'Content-Type':'application/json'}});
+      }
+
+      // open configure modal
+      if (e.target.matches('.configure-btn')) {
+        const idx = e.target.dataset.idx;
+        const svcCard = document.querySelectorAll('.service-card')[idx];
+        modalKey.value = svcCard.dataset.key;
+        modalNote.value = svcCard.dataset.note || '';
+        modalToggle.checked = svcCard.dataset.enabled === 'true' || svcCard.querySelector('.service-toggle').checked;
+        modal.setAttribute('aria-hidden','false');
+      }
+
+      // subscribe action
+      if (e.target.matches('.subscribe-btn')) {
+        const key = e.target.dataset.key;
+        alert('Subscribe flow for ' + key + ' (implement backend).');
+      }
+
+      // manage link clicked (for demo)
+      if (e.target.matches('.manage-link')) {
+        // allow normal anchor navigation
+      }
+
+      // mark paid
+      if (e.target.matches('.mark-paid-btn')) {
+        const li = e.target.closest('li');
+        li.style.opacity = '.5';
+        e.target.textContent = 'Paid';
+        e.target.disabled = true;
+        // optionally call backend to mark invoice paid
+      }
+    });
+
+    // modal controls
+    document.querySelector('.modal-close').addEventListener('click', closeModal);
+    document.getElementById('cancelConfig').addEventListener('click', closeModal);
+    document.getElementById('saveConfig').addEventListener('click', () => {
+      // read values and update card UI (client-only)
+      const key = modalKey.value;
+      const enabled = modalToggle.checked;
+      const note = modalNote.value;
+      const card = document.querySelector(`.service-card[data-key="${key}"]`);
+      if (card) {
+        card.dataset.note = note;
+        const toggle = card.querySelector('.service-toggle');
+        toggle.checked = enabled;
+        const badge = card.querySelector('.badge');
+        badge.classList.toggle('badge-active', enabled);
+        badge.classList.toggle('badge-off', !enabled);
+        badge.textContent = enabled ? 'Active' : 'Inactive';
+      }
+      // TODO: send config to backend via fetch
+      closeModal();
+    });
+
+    function closeModal() {
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    // Bulk actions
+    document.getElementById('bulk-on').addEventListener('click', () => {
+      document.querySelectorAll('.service-toggle').forEach(inp => { inp.checked = true; inp.dispatchEvent(new Event('change')); });
+      alert('All services enabled (client-side). Hook this up to your API to persist.');
+    });
+    document.getElementById('bulk-off').addEventListener('click', () => {
+      document.querySelectorAll('.service-toggle').forEach(inp => { inp.checked = false; inp.dispatchEvent(new Event('change')); });
+      alert('All services disabled (client-side). Hook this up to your API to persist.');
+    });
+  })();
+</script>
+
 </div>

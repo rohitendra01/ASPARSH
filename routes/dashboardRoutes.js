@@ -23,6 +23,8 @@ router.get('/', isLoggedIn, cache('5 minutes'), (req, res) => {
 // Route for /dashboard/:slug/user to view profile
 router.get('/user', isLoggedIn, userController.viewUserProfile);
 
+
+
 // Route for /dashboard/:slug/profiles to view all profiles
 router.get('/profiles', isLoggedIn, profileController.listProfiles);
 
@@ -34,5 +36,15 @@ router.post('/profiles/new', isLoggedIn, upload.single('image'), profileControll
 
 // Route for /dashboard/:slug/profiles/:profileSlug (show profile details)
 router.get('/profiles/:profileSlug', isLoggedIn, profileController.showProfile);
+
+// Route for /dashboard/:slug/profiles/:profileSlug/edit (render form)
+router.get('/profiles/:profileSlug/edit', isLoggedIn, profileController.renderEditProfileForm);
+
+
+// Route for /dashboard/:slug/profiles/:profileSlug/edit (handle POST)
+router.post('/profiles/:profileSlug/edit', isLoggedIn, upload.single('image'), profileController.updateProfile);
+
+// Route for /dashboard/:slug/profiles/:profileSlug/delete (handle POST)
+router.post('/profiles/:profileSlug/delete', isLoggedIn, profileController.deleteProfile);
 
 module.exports = router;

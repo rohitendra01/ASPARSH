@@ -41,7 +41,7 @@ exports.createProfile = async (req, res) => {
 
     // Auto-generate slug from name
     const slug = data.name ? data.name.trim().toLowerCase().replace(/\s+/g, '-') : '';
-
+    
     // Build address object from form fields
     const address = {
       addressLine: data.addressLine || '',
@@ -50,7 +50,7 @@ exports.createProfile = async (req, res) => {
       country: data.country || '',
       postcode: data.postcode || ''
     };
-
+    
     const newProfile = new Profile({
       ...data,
       createdBy: req.user._id,
@@ -59,7 +59,7 @@ exports.createProfile = async (req, res) => {
       socialLinks: data.socialLinks || [],
       slug: slug
     });
-
+    
     await newProfile.save();
     req.flash('success_msg', 'Profile created successfully!');
     // Redirect to the newly created profile
@@ -78,7 +78,7 @@ exports.listProfiles = async (req, res) => {
     if (req.query.search) {
       query.name = { $regex: req.query.search, $options: 'i' };
     }
-    const profiles = await Profile.find(query);
+    const profiles = await Profile.find(query).populate({ path: 'createdBy', select: 'username' });
     const slug = req.user.slug;
     res.render('profiles/index', { profiles, userSlug: slug, slug });
   } catch (err) {
@@ -105,3 +105,121 @@ exports.showProfile = async (req, res) => {
   }
 };
 
+
+// Render edit profile form
+exports.renderEditProfileForm = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ slug: req.params.profileSlug });
+    if (!profile) {
+      req.flash('error_msg', 'Profile not found.');
+      return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+    }
+    // Always pass slug from req.params, fallback to req.user.slug if missing
+    let slug = req.params.slug;
+    if (!slug && req.user && req.user.slug) {
+      slug = req.user.slug;
+    }
+    res.render('profiles/edit', { profile, slug });
+  } catch (err) {
+    console.error('Error loading profile for edit:', err);
+    req.flash('error_msg', 'Error loading profile. Please try again.');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  }
+};
+
+// Handle profile update
+exports.updateProfile = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ slug: req.params.profileSlug });
+    if (!profile) {
+      req.flash('error_msg', 'Profile not found.');
+      return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+    }
+    
+    // Update fields
+    profile.name = req.body.name;
+    profile.email = req.body.email;
+    profile.mobile = req.body.mobile;
+    profile.address = {
+      addressLine: req.body.addressLine || '',
+      city: req.body.city || '',
+      state: req.body.state || '',
+      country: req.body.country || '',
+      postcode: req.body.postcode || ''
+    };
+    profile.socialLinks = req.body.socialLinks || [];
+
+    // Handle image deletion
+    if (req.body.deleteImage && profile.image) {
+      try {
+        // Extract public_id from URL
+        const publicIdMatch = profile.image.match(/\/([^\/]+)$/);
+        if (publicIdMatch) {
+          await cloudinary.uploader.destroy('asparsh/profiles/' + publicIdMatch[1]);
+        }
+      } catch (err) {
+        console.error('Cloudinary image delete error:', err);
+      }
+      profile.image = '';
+    }
+    
+    // Handle new image upload
+    if (req.file) {
+      try {
+        const imageUrl = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({
+            folder: 'asparsh/profiles',
+            resource_type: 'image',
+            public_id: `profile_${Date.now()}`,
+            overwrite: true
+          }, (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          });
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+        profile.image = imageUrl;
+      } catch (err) {
+        console.error('Image upload failed:', err);
+        req.flash('error_msg', 'Image upload failed. Please try again.');
+      }
+    }
+    
+    await profile.save();
+    req.flash('success_msg', 'Profile updated successfully!');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    req.flash('error_msg', 'Error updating profile. Please try again.');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  }
+};
+
+// Handle profile deletion
+exports.deleteProfile = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ slug: req.params.profileSlug });
+    if (!profile) {
+      req.flash('error_msg', 'Profile not found.');
+      return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+    }
+    // Delete image from Cloudinary if exists
+    if (profile.image) {
+      try {
+        const publicIdMatch = profile.image.match(/\/([^\/]+)$/);
+        if (publicIdMatch) {
+          await cloudinary.uploader.destroy('asparsh/profiles/' + publicIdMatch[1]);
+        }
+      } catch (err) {
+        console.error('Cloudinary image delete error:', err);
+      }
+    }
+    await Profile.deleteOne({ slug: req.params.profileSlug });
+    req.flash('success_msg', 'Profile deleted successfully!');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  } catch (err) {
+    console.error('Error deleting profile:', err);
+    req.flash('error_msg', 'Error deleting profile. Please try again.');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  }
+};

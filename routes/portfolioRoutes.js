@@ -13,6 +13,9 @@ router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
 // Create a new profile
 router.post('/new', isLoggedIn, profileController.createProfile);
 
+//Edit a profile
+router.get('/edit', isLoggedIn, profileController.renderEditProfileForm);
+
 // Show a single portfolio (optional)
 router.get('/:id', portfolioController.showPortfolio);
 

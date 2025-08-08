@@ -3,7 +3,8 @@ const { Schema } = mongoose;
 
 const profileSchema = new Schema({
     createdBy: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'AdminUser',
         required: true
     },
 
