@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
 :root {
     --text-dark: #0a0f0d;
     --text-light: #e1f6e0;
     --hea-foo: #083235;
-    --head-text: 'Syne', sans-serif;
+    --head-text: 'Playfair Display', sans-serif;
     --category-text: 'Berkshire Swash', sans-serif;
     --food-item: 'Rajdhani', sans-serif;
 }
@@ -190,56 +193,56 @@ header{
 @media (max-width: 600px) {
     html, body {
         overflow-x: hidden;
+        scroll-behavior: smooth;
     }
-
-  header {
-    flex-direction: column;
-    align-items: center;
+    
+    header {
+        flex-direction: column;
     justify-content: center;
     height: auto;
-    padding: 1rem 0;
-    overflow-x: hidden;
+    padding: 1rem;
 }
 
 .header-tag-line {
-  display: none;
+    display: none;
 }
 
 .logo {
     padding: 0;
     margin-bottom: 1rem;
     align-items: center;
-      justify-content: center;
-    }
-    
-    .header-logo {
-        flex-direction: row;
-        gap: 0.5rem;
-    }
-    
-    .header-logo img {
-        width: 100px;
-        padding: 0;
-    }
-    
-    .header-tag-lines h1 {
-        font-size: 3rem;
-        color: #000;
-    }
-    .header-tag-lines p {
-        font-size: 1rem;
-        color: #000;
-    }
-    
-    .hotel-type p {
-        font-size: 2rem;
-    margin-top: 0.5rem;
-        color: #000;
-  }
+    justify-content: center;
+}
 
-  .color1,
-  .color2 {
+.header-logo {
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header-logo img {
+    width: 100px;
+    padding: 0;
+}
+
+.header-tag-lines h1 {
+    font-size: 2.5rem;
+    color: var(--text-dark);
+}
+.header-tag-lines p {
     display: none;
-  }
+}
+
+.hotel-type p {
+    font-size: 1.2rem;
+    text-align: center !important;
+    margin: 0.5rem 0 0 0;
+    color: var(--text-dark);
+    font-family: 'Lato', sans-serif;
+}
+
+.color1,
+.color2 {
+    display: none;
+}
 
 }

@@ -101,8 +101,9 @@ app.use('/dashboard/:slug', dashboardRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
-// All OTP and login logic is now handled by loginOtpController via /auth routes
-// Password reset logic is now handled by loginOtpController via /auth routes
+// Mount API routes
+const apiRoutes = require('./routes/apiRoutes');
+app.use('/api', apiRoutes);
 
 // Export app for server.js
 module.exports = app;

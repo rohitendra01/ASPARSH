@@ -27,11 +27,14 @@ exports.renderNewHotelForm = (req, res) => {
 // Create hotel
 exports.createHotel = async (req, res) => {
   try {
-    const { hotelName, hotelDescription, hotelType, foodCategories, street, city, state, country, zipCode } = req.body;
+  const { hotelName, hotelDescription, hotelType, foodCategories, street, city, state, country, zipCode, selectedProfileId, selectedProfileSlug, selectedProfileName } = req.body;
     const hotelAddress = { street, city, state, country, zipCode };
-    if (!hotelName || !hotelDescription || !hotelType || !street || !city || !zipCode) {
+    if (!hotelName || !hotelDescription || !hotelType || !street || !city || !zipCode || !selectedProfileId || !selectedProfileSlug || !selectedProfileName) {
+      console.error('Hotel creation missing required fields:', {
+        hotelName, hotelDescription, hotelType, street, city, zipCode, selectedProfileId, selectedProfileSlug, selectedProfileName
+      });
       return res.status(400).render('hotels/new', {
-        error: 'All required fields must be filled.',
+        error: 'All required fields must be filled, including user profile.',
         layout: 'layouts/dashboard-boilerplate',
         user: req.user
       });
@@ -39,6 +42,7 @@ exports.createHotel = async (req, res) => {
     const hotelSlug = hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const existing = await Hotel.findOne({ hotelSlug });
     if (existing) {
+      console.error('Hotel creation failed: duplicate hotelSlug', hotelSlug);
       return res.status(400).render('hotels/new', {
         error: 'A hotel with this name already exists.',
         layout: 'layouts/dashboard-boilerplate',
@@ -52,7 +56,7 @@ exports.createHotel = async (req, res) => {
         const logoBuffer = req.files['hotelLogo'][0].buffer;
         const logoStream = Readable.from(logoBuffer);
         const logoUpload = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({ folder: 'hotels' }, (err, result) => {
+          const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels' }, (err, result) => {
             if (err) reject(err);
             else resolve(result);
           });
@@ -64,7 +68,7 @@ exports.createHotel = async (req, res) => {
         const bannerBuffer = req.files['hotelOfferBanner'][0].buffer;
         const bannerStream = Readable.from(bannerBuffer);
         const bannerUpload = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({ folder: 'hotels' }, (err, result) => {
+          const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels' }, (err, result) => {
             if (err) reject(err);
             else resolve(result);
           });
@@ -80,15 +84,34 @@ exports.createHotel = async (req, res) => {
       hotelAddress,
       foodCategories: Array.isArray(foodCategories) ? foodCategories : (foodCategories ? [foodCategories] : []),
       hotelSlug,
-      createdByUsername: req.user ? req.user.username : undefined,
-      adminUser: req.user ? req.user._id : undefined,
-      createdBy: req.user ? req.user._id : undefined
+      hotelLogo,
+      hotelOfferBanner,
+      createdByProfile: selectedProfileId,
+      createdByProfileUsername: selectedProfileSlug,
+      createdByProfileName: selectedProfileName,
+      createdByAdmin: req.user ? req.user._id : undefined,
+      createdByAdminUsername: req.user ? req.user.username : undefined
     };
-    if (hotelLogo) hotelData.hotelLogo = hotelLogo;
-    if (hotelOfferBanner) hotelData.hotelOfferBanner = hotelOfferBanner;
-    const hotel = new Hotel(hotelData);
-    await hotel.save();
-    res.redirect(`/hotel/${hotel.hotelSlug}`);
+    try {
+      const hotel = new Hotel(hotelData);
+      // Add initial version entry
+      hotel.versions = [{
+        changedAt: new Date(),
+        changedBy: req.user ? req.user._id : undefined,
+        changedByName: req.user ? req.user.username : undefined,
+        changes: {},
+        snapshot: hotel.toObject()
+      }];
+      await hotel.save();
+      res.redirect(`/hotel/${hotel.hotelSlug}`);
+    } catch (err) {
+      console.error('Error saving hotel:', err);
+      return res.status(500).render('hotels/new', {
+        error: 'Error saving hotel to database.',
+        layout: 'layouts/dashboard-boilerplate',
+        user: req.user
+      });
+    }
   } catch (err) {
     res.status(500).render('hotels/new', {
       error: 'Error creating hotel.',
@@ -187,6 +210,22 @@ exports.updateHotel = async (req, res) => {
         hotel.hotelSlug = newSlug;
       }
     }
+    // Track admin who updated
+    hotel.updatedBy = req.user ? req.user._id : undefined;
+    // Build changes diff
+    const changes = {};
+    if (hotel.hotelName !== hotelName) changes['hotelName'] = { from: hotel.hotelName, to: hotelName };
+    if (hotel.hotelDescription !== hotelDescription) changes['hotelDescription'] = { from: hotel.hotelDescription, to: hotelDescription };
+    if (hotel.hotelType !== hotelType) changes['hotelType'] = { from: hotel.hotelType, to: hotelType };
+    if (JSON.stringify(hotel.hotelAddress) !== JSON.stringify(hotelAddress)) changes['hotelAddress'] = { from: hotel.hotelAddress, to: hotelAddress };
+    if (JSON.stringify(hotel.foodCategories) !== JSON.stringify(foodCategories)) changes['foodCategories'] = { from: hotel.foodCategories, to: foodCategories };
+    // Version tracking: push new version entry
+    if (!hotel.versions) hotel.versions = [];
+    hotel.versions.push({
+      changedAt: new Date(),
+      changedBy: req.user ? req.user._id : undefined,
+      changedByName: req.user ? req.user.username : undefined,
+    });
     await hotel.save();
     res.redirect(`/hotel/${hotel.hotelSlug}`);
   } catch (err) {
@@ -210,7 +249,7 @@ exports.deleteHotel = async (req, res) => {
       const match = imageUrl.match(/\/hotels\/([^./]+)\./);
       if (match && match[1]) {
         try {
-          await cloudinary.uploader.destroy('hotels/' + match[1]);
+          await cloudinary.uploader.destroy('asparsh/hotels/' + match[1]);
         } catch (e) {
           console.error('Cloudinary deletion error:', e);
         }

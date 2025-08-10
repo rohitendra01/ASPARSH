@@ -1,4 +1,6 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 main{
     display: flex;
     flex-direction: row;
@@ -130,6 +132,11 @@ hr{
     margin: 0.5rem 0;
     padding: 0.5rem;
     box-sizing: border-box;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    flex: none !important;
+    height: auto !important;
 }
 .food-category h3 {
     font-size: 1.1rem;
@@ -163,20 +170,20 @@ hr{
   .category-btn {
     padding: 0.5rem 1.2rem;
     font-size: 1rem;
-    font-family: var(--head-text);
+    font-family: Roboto, var(--head-text);
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 20px;
-    color: #333;
+    color: var(--text-dark);
     cursor: pointer;
     transition: background 0.2s, color 0.2s, border 0.2s;
     outline: none;
   }
   .category-btn:active,
   .category-btn.selected {
-    background: #083235;
-    color: #fff;
-    border: 1px solid #083235;
+    background: var(--text-dark);
+    color: var(--text-light);
+    border: 1px solid var(--text-dark);
   }
 .mobile-hero-image {
     display: block;

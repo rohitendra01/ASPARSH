@@ -97,7 +97,10 @@ exports.showProfile = async (req, res) => {
       req.flash('error_msg', 'Profile not found.');
       return res.redirect(`/dashboard/${req.user.slug}/profiles`);
     }
-    res.render('profiles/show', { profile, slug: req.user.slug });
+    // Fetch hotels created by this profile
+    const Hotel = require('../models/Hotel');
+    const hotels = await Hotel.find({ createdByProfile: profile._id });
+    res.render('profiles/show', { profile, slug: req.user.slug, hotels });
   } catch (err) {
     console.error('Error loading profile:', err);
     req.flash('error_msg', 'Error loading profile. Please try again.');

@@ -55,7 +55,11 @@ const profileSchema = new Schema({
     slug: {
         type: String,
         unique: true
-    }
+    },
+    hotels: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Hotel'
+    }]
 }, 
 {
     timestamps: true

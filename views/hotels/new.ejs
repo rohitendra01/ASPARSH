@@ -2,11 +2,68 @@
 <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/new.css" />`) %>
 
 
-  <div class="dashboard-container">
-    <h2 class="dashboard-title">Create a New Hotel</h2>
-    <div class="dashboard-options">
-      <div class="option-card">
-        <form action="/dashboard/<%= user.slug %>/hotels/new" method="POST" enctype="multipart/form-data" class="hotel-form">
+<div class="dashboard-container">
+  <h2 class="dashboard-title">Create a New Hotel</h2>
+  <div class="dashboard-options">
+    <div class="option-card">
+      <form action="/dashboard/<%= user.slug %>/hotels/new" method="POST" enctype="multipart/form-data" class="hotel-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="profileSearch">Search User Profile</label>
+            <input type="text" id="profileSearch" name="profileSearch" placeholder="Enter user slug, email, or mobile" required autocomplete="off">
+            <div id="profileSearchResults" class="search-results"></div>
+            <input type="hidden" id="selectedProfileId" name="selectedProfileId">
+            <input type="hidden" id="selectedProfileSlug" name="selectedProfileSlug">
+            <input type="hidden" id="selectedProfileName" name="selectedProfileName">
+          </div>
+        </div>
+        <div id="selectedProfileCard" style="display:none; margin-bottom:1rem;"></div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            var profileSearch = document.getElementById('profileSearch');
+            var resultsDiv = document.getElementById('profileSearchResults');
+            var selectedProfileCard = document.getElementById('selectedProfileCard');
+            if (profileSearch) {
+              profileSearch.addEventListener('input', function(e) {
+                var query = e.target.value.trim();
+                if (query.length < 2) {
+                  resultsDiv.innerHTML = '';
+                  return;
+                }
+                fetch('/api/profiles/search?q=' + encodeURIComponent(query))
+                  .then(function(res) { return res.json(); })
+                  .then(function(data) {
+                    if (Array.isArray(data) && data.length) {
+                      resultsDiv.innerHTML = data.map(function(profile) {
+                        return '<div class="search-result-item" data-id="' + profile._id + '" data-slug="' + profile.slug + '" data-name="' + profile.name + '" data-email="' + profile.email + '" data-mobile="' + profile.mobile + '">' +
+                          '<strong>' + profile.name + '</strong> <span class="muted">(' + profile.slug + ')</span><br>' +
+                          '<small>' + profile.email + ' | ' + profile.mobile + '</small>' +
+                        '</div>';
+                      }).join('');
+                    } else {
+                      resultsDiv.innerHTML = '<div class="muted">No user found.</div>';
+                    }
+                  });
+              });
+              resultsDiv.addEventListener('click', function(e) {
+                var item = e.target.closest('.search-result-item');
+                if (!item) return;
+                document.getElementById('selectedProfileId').value = item.dataset.id;
+                document.getElementById('selectedProfileSlug').value = item.dataset.slug;
+                document.getElementById('selectedProfileName').value = item.dataset.name;
+                profileSearch.value = item.dataset.name + ' (' + item.dataset.slug + ')';
+                resultsDiv.innerHTML = '';
+                // Show selected user card
+                selectedProfileCard.innerHTML =
+                  '<div class="profile-card" style="border:1px solid #ccc; padding:1rem; border-radius:8px; background:#f9f9f9;">' +
+                    '<strong>' + item.dataset.name + '</strong> <span class="muted">(' + item.dataset.slug + ')</span><br>' +
+                    '<small>' + item.dataset.email + ' | ' + item.dataset.mobile + '</small>' +
+                  '</div>';
+                selectedProfileCard.style.display = 'block';
+              });
+            }
+          });
+        </script>
           <div class="form-row">
             <div class="form-group">
               <label for="hotelName">Hotel Name</label>

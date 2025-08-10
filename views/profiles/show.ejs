@@ -200,6 +200,19 @@
     <div class="profile-details-header">
       <h2 id="services-subscriptions">Services & Subscriptions</h2>
     </div>
+    <div class="hotels-list">
+        <% if (hotels && hotels.length) { %>
+          <ul class="hotel-names-list">
+            <% hotels.forEach(function(hotel) { %>
+              <li>
+                <a href="/hotel/<%= hotel.hotelSlug %>"><strong><%= hotel.hotelName %></strong></a>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <div class="muted">No hotels created by this user.</div>
+        <% } %>
+      </div>
 
   <div class="services-grid">
     <% services.forEach(function(svc, idx){ %>
