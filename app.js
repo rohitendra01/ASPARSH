@@ -84,6 +84,21 @@ app.use((req, res, next) => {
     next();
 });
 
+
+
+
+
+
+
+
+
+
+
+
+// Mount API routes
+const apiRoutes = require('./routes/apiRoutes');
+app.use('/api', apiRoutes);
+
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const indexRoutes = require('./routes/indexRoutes');
@@ -101,9 +116,13 @@ app.use('/dashboard/:slug', dashboardRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
-// Mount API routes
-const apiRoutes = require('./routes/apiRoutes');
-app.use('/api', apiRoutes);
+
+
+
+
+
+
+
 
 // Export app for server.js
 module.exports = app;
