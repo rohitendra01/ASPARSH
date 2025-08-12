@@ -13,25 +13,27 @@
             </ul>
         </div>
         <div class="user-profile">
-            <% if (!currentUser) { %>
-                <a href="/dashboard" class="dashboard-btn">. Dashboard</a>
-                <% } else { %>
-                    <div class="user-dropdown" id="userDropdown">
-                        <a href="/dashboard" class="user-profile-trigger" id="dropdownTrigger" title="Go to Dashboard">
-                            <img src="/assets/user-login.png" alt="User Profile"
-                                style="width: 32px; height: 28px; cursor: pointer;">
-                        </a>
-                        <div class="user-dropdown-content" id="dropdownContent">
-                            <div class="form">
-                                <p class="p" style="font-weight: 600; text-align: center;">
-                                    Welcome, <%= currentUser.username %>
-                                </p>
-                                <form action="/logout" method="POST">
-                                    <button type="submit" class="button-submit" style="width: 100%;">Logout</button>
-                                </form>
-                            </div>
+                        <% if (!currentUser) { %>
+                                <div style="overflow: visible; position: relative;">
+                                    <a href="/dashboard" class="dashboard-btn">. Dashboard</a>
+                                </div>
+                        <% } else { %>
+                <div class="user-dropdown" id="userDropdown">
+                    <a href="/dashboard" class="user-profile-trigger" id="dropdownTrigger" title="Go to Dashboard">
+                        <img alt="User Profile" class="header-user-image"
+                            src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png'%>" >
+                    </a>
+                    <div class="user-dropdown-content" id="dropdownContent">
+                        <div class="form">
+                            <p class="p" style="font-weight: 600; text-align: center;">
+                                Welcome, <%= currentUser.username %>
+                            </p>
+                            <form action="/logout" method="POST">
+                                <button type="submit" class="button-submit" style="width: 100%;">Logout</button>
+                            </form>
                         </div>
                     </div>
-                    <% } %>
+                </div>
+            <% } %>
         </div>
     </header>

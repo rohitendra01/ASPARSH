@@ -4,8 +4,13 @@ require('dotenv').config();
 
 
 const server = http.createServer(app);
-const PORT = process.env.PORT || 3000;
+// Validate required environment variables
+if (!process.env.MONGO_URI) {
+    console.error('Error: MONGO_URI environment variable is required');
+    process.exit(1);
+}
 
+const PORT = process.env.PORT || 3000;
 const mongoose = require("mongoose");
 
 mongoose.connect(process.env.MONGO_URI, {

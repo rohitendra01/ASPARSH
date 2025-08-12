@@ -1,410 +1,146 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navbar Example</title>
-    <style>
-        /* Basic CSS for demonstration */
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .navbar {
-            background-color: #333;
-            padding: 10px 20px;
-            display: flex; /* Enables Flexbox */
-            justify-content: space-between; /* Distributes items along the main axis */
-            align-items: center; /* Aligns items vertically in the center */
-            color: white;
-        }
-
-        .navbar-brand {
-            font-size: 1.5em;
-            font-weight: bold;
-            text-decoration: none;
-            color: white;
-            margin-right: auto; /* Pushes the next items to the right */
-        }
-
-        .navbar-links {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 20px; /* Space between links */
-            flex-grow: 1; /* Allows the links section to grow and take available space */
-            justify-content: center; /* Centers the links within their available space */
-        }
-
-        .navbar-links li a {
-            text-decoration: none;
-            color: white;
-            padding: 5px 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .navbar-links li a:hover {
-            background-color: #555;
-            border-radius: 4px;
-        }
-
-        .navbar-user-login {
-            display: flex;
-            gap: 15px; /* Space between login elements */
-            margin-left: auto; /* Pushes login elements to the far right */
-        }
-
-        .navbar-user-login a {
-            text-decoration: none;
-            color: white;
-            padding: 5px 10px;
-            border: 1px solid white;
-            border-radius: 4px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .navbar-user-login a:hover {
-            background-color: white;
-            color: #333;
-        }
-
-        /* Responsive adjustments (basic) */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-wrap: wrap; /* Allows items to wrap to the next line */
-                justify-content: center;
-            }
-
-            .navbar-brand,
-            .navbar-links,
-            .navbar-user-login {
-                width: 100%;
-                text-align: center;
-                margin-top: 10px;
-            }
-
-            .navbar-links {
-                justify-content: center;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <nav class="navbar">
-        <a href="#" class="navbar-brand">YourCompany</a>
-
-        <ul class="navbar-links">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-
-        <div class="navbar-user-login">
-            <a href="#">Login</a>
-            <a href="#">Sign Up</a>
-        </div>
-    </nav>
-
-    <div style="padding: 20px;">
-        <h1>Welcome to Our Website!</h1>
-        <p>This is where your main content will go.</p>
+<!-- responsive-card.html -->
+<div class="page">
+  <div class="responsive-card">
+    <div class="card-media">
+      <img src="https://via.placeholder.com/800x600" alt="Product image">
     </div>
-
-</body>
-</html> -->
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Card</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            background-color: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            max-width: 1200px;
-            width: 100%;
-            padding: 40px;
-            gap: 40px;
-        }
-
-        .left-panel {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .right-panel {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header svg {
-            margin-right: 10px;
-        }
-
-        .header h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin: 0;
-        }
-
-        .description {
-            font-size: 16px;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-
-        .price-info {
-            display: flex;
-            align-items: baseline;
-            margin-bottom: 30px;
-        }
-
-        .current-price {
-            font-size: 36px;
-            font-weight: 700;
-            color: #333;
-            margin-right: 15px;
-        }
-
-        .mrp-price {
-            font-size: 24px;
-            color: #888;
-            text-decoration: line-through;
-            font-weight: 400;
-        }
-
-        .features-heading {
-            background-color: #6a0dad; /* A shade of purple */
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        .features-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            margin-bottom: 30px;
-        }
-
-        .features-list li {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 10px;
-            position: relative;
-            padding-left: 25px;
-        }
-
-        .features-list li::before {
-            content: '•';
-            color: #6a0dad; /* Purple bullet point */
-            font-size: 20px;
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .profile-check {
-            display: flex;
-            align-items: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .profile-check p {
-            font-size: 16px;
-            color: #555;
-            margin: 0;
-        }
-
-        .click-here-button {
-            background-color: #e0e0e0;
-            color: #6a0dad;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        .click-here-button:hover {
-            background-color: #d0d0d0;
-        }
-
-        .buy-now-button {
-            background-color: #333;
-            color: #fff;
-            padding: 15px 40px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 18px;
-            display: inline-block;
-            transition: background-color 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .buy-now-button:hover {
-            background-color: #555;
-        }
-
-        .image-container {
-            width: 100%;
-            height: 400px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px;
-                flex-direction: column;
-                gap: 30px;
-            }
-
-            .current-price {
-                font-size: 30px;
-            }
-
-            .mrp-price {
-                font-size: 20px;
-            }
-
-            .header h2 {
-                font-size: 20px;
-            }
-
-            .image-container {
-                height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-            }
-
-            .header h2 {
-                font-size: 18px;
-            }
-
-            .current-price {
-                font-size: 26px;
-            }
-
-            .mrp-price {
-                font-size: 18px;
-            }
-
-            .description,
-            .features-list li,
-            .profile-check p {
-                font-size: 14px;
-            }
-
-            .features-heading {
-                font-size: 14px;
-                padding: 6px 12px;
-            }
-
-            .click-here-button,
-            .buy-now-button {
-                padding: 10px 20px;
-                font-size: 16px;
-            }
-
-            .image-container {
-                height: 250px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="left-panel">
-            <div class="header">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                    <line x1="1" y1="10" x2="23" y2="10"></line>
-                </svg>
-                <h2>Business Card</h2>
-            </div>
-            <p class="description">
-                A NFC enabled Business card with QR code — no app needed, just tap or scan.
-            </p>
-            <div class="price-info">
-                <span class="current-price">₹999/-</span>
-                <span class="mrp-price">MRP: ₹2999/-</span>
-            </div>
-            <div class="features-heading">Features:</div>
-            <ul class="features-list">
-                <li>Smart Profile with elegant design</li>
-                <li>QR code and NFC Facility</li>
-                <li>Integrated with Google Review</li>
-                <li>Add all Social Media Links at one place</li>
-                <li>Easy connectivity</li>
-                <li>and many more</li>
-            </ul>
-            <div class="profile-check">
-                <p>Check how your smart profile will look like</p>
-                <a href="#" class="click-here-button">Click Here</a>
-            </div>
-            <button class="buy-now-button">BUY NOW</button>
-        </div>
-        <div class="right-panel">
-            <div class="image-container">
-                <img src="https://i.imgur.com/your-image-here.png" alt="QR Code on menu display">
-            </div>
-        </div>
+    <div class="card-body">
+      <h1 class="card-title">Fluid responsive heading</h1>
+      <h2 class="card-subtitle">A concise subheading that wraps</h2>
+      <p class="card-desc">
+        This description will reflow and the whole card will grow or shrink
+        depending on the available width and height. Use fluid units and
+        clamp() to keep things readable on every screen.
+      </p>
     </div>
-</body>
-</html>
+  </div>
+
+  <div class="responsive-card">
+    <div class="card-media">
+      <img src="https://via.placeholder.com/800x600" alt="Product image">
+    </div>
+    <div class="card-body">
+      <h1 class="card-title">Another fluid card</h1>
+      <h2 class="card-subtitle">With a different image and text</h2>
+      <p class="card-desc">
+        This card also adapts to the viewport size, ensuring a consistent
+        user experience across devices.
+      </p>
+    </div>
+  </div>
+</div>
+<style>
+    /* responsive-card.css */
+
+/* --- Variables for quick tuning --- */
+:root{
+  --max-content-width: 1200px;
+  --gutter-min: 12px;
+  --gutter-preferred: 4vw;
+  --gutter-max: 48px;
+  --card-radius: 12px;
+  --card-bg: #fff;
+  --accent: #083235;
+}
+
+/* Page centering and global padding that scales with viewport */
+.page{
+  padding: clamp(var(--gutter-min), var(--gutter-preferred), var(--gutter-max));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  background: #f5f7f8;
+  min-height: 100vh;
+}
+
+/* The card itself */
+.responsive-card{
+  display: flex;
+  gap: clamp(12px, 2vw, 32px);        /* gap scales with viewport */
+  width: 100%;
+  max-width: var(--max-content-width);/* limit how wide it becomes on very big screens */
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(8,50,53,0.06);
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+/* Media (image) column: flexible but bounded */
+.card-media{
+  /* flex-basis is the preferred size; it can shrink/grow with flex rules */
+  flex: 0 0 clamp(160px, 30%, 360px);  /* min 160px, preferred 30% of container, max 360px */
+  min-width: 120px;                    /* ensure small but usable preview on tiny screens */
+  max-width: 45%;                      /* avoid dominating the card on wide screens */
+  display: block;
+  position: relative;
+  background: #e9f6f0;
+}
+
+/* Keep the image aspect ratio stable and avoid layout jumps */
+.card-media img{
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;     /* preserves height relative to width */
+  object-fit: cover;       /* crop or cover without stretching */
+}
+
+/* Text column: take remaining space and allow wrapping */
+.card-body{
+  flex: 1 1 0;
+  min-width: 0;            /* critical for flex items so text can truncate correctly */
+  padding: clamp(12px, 2.5vw, 36px);  /* padding scales with viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  box-sizing: border-box;
+}
+
+/* Fluid typography using clamp() */
+.card-title{
+  margin: 0;
+  color: var(--accent);
+  font-weight: 700;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: clamp(1.1rem, 2.6vw, 2.25rem); /* grows on wide screens, shrinks on small ones */
+  line-height: 1.05;
+}
+
+.card-subtitle{
+  margin: 0;
+  color: #2d4f4a;
+  font-weight: 600;
+  font-size: clamp(0.95rem, 2vw, 1.25rem);
+  opacity: 0.9;
+}
+
+.card-desc{
+  margin: 0;
+  color: #333;
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  line-height: 1.6;
+  max-width: 70ch; /* keep very long lines readable */
+}
+
+/* --- Small-screen behavior: stack vertically --- */
+@media (max-width: 720px){
+  .responsive-card{
+    flex-direction: column;
+  }
+  .card-media{
+    flex: 0 0 auto;     /* allow image to decide natural height */
+    width: 100%;
+  }
+  .card-media img{
+    aspect-ratio: 3 / 2; /* slightly taller on mobile */
+  }
+  .card-body{
+    padding: clamp(12px, 4vw, 24px);
+  }
+}
+
+</style>

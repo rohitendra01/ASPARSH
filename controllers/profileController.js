@@ -100,7 +100,13 @@ exports.showProfile = async (req, res) => {
     // Fetch hotels created by this profile
     const Hotel = require('../models/Hotel');
     const hotels = await Hotel.find({ createdByProfile: profile._id });
-    res.render('profiles/show', { profile, slug: req.user.slug, hotels });
+    // Pass currentUser with image for header
+    let currentUser = req.user;
+    if (currentUser && !currentUser.image) {
+      // Fallback to cloudinaryImageUrl if available
+      currentUser.image = currentUser.cloudinaryImageUrl || '';
+    }
+    res.render('profiles/show', { profile, slug: req.user.slug, hotels, currentUser });
   } catch (err) {
     console.error('Error loading profile:', err);
     req.flash('error_msg', 'Error loading profile. Please try again.');
