@@ -1,5 +1,16 @@
-require('dotenv').config();
+const apicache = require('apicache');
+const cache = apicache.middleware;
+
+function cacheBypass(req, res, next) {
+    if (req.user || req.session || typeof req.csrfToken === 'function') {
+        return apicache.disabled(req, res, next);
+    }
+    return next();
+}
+
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const csurf = require('csurf');
 const app = express();
 const bodyParser = require("body-parser");
 const ejsMate = require('ejs-mate');
@@ -19,11 +30,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "assets")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
-
 app.use(bodyParser.json());
-
-
-
+require('dotenv').config();
+app.use(cookieParser());
 app.use(session({
     secret: 'yourSecretKey',
     resave: false,
@@ -57,6 +66,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
         return done(err);
     }
 }));
+app.use(csurf({ cookie: true }));
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
@@ -81,6 +91,7 @@ app.use((req, res, next) => {
     res.locals.returnTo = req.session.returnTo || '/';
     res.locals.name = req.flash('name')[0];
     res.locals.email = req.flash('email')[0];
+    res.locals.csrfToken = req.csrfToken();
     next();
 });
 

@@ -5,10 +5,9 @@ html {
 }
 
 main {
-  /* height: 100vh; */
-  padding-top: 6.5rem;
+  /* Consider min-height on sections instead of forcing a full-height main */
+  padding-top: var(--header-height);
 }
-
 .snap-section {
   scroll-snap-align: start;
   height: calc(100vh - var(--header-height));

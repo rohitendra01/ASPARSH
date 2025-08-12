@@ -118,6 +118,7 @@ body {
 
 <div class="login-container">
   <form class="login-form" method="POST" action="/login">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <h2 class="login-title">Sign In</h2>
     <% if (error_msg) { %>
       <div class="alert alert-danger"><%= error_msg %></div>

@@ -126,6 +126,7 @@
   </style>
   <div class="register-container">
     <form class="register-form" method="POST" action="/register">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <h2 class="register-title">Create Account</h2>
 
       <div class="register-group">

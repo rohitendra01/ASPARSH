@@ -435,8 +435,8 @@ footer {
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   border: 2px solid #a0e6c3;
   padding: clamp(1rem, 1.8vw, 1.6rem);
-  flex: 1 1 22rem;        /* grow | shrink | base */
-  max-width: 18rem;       /* keep legible */
+  flex: 1 1 18rem;        /* grow | shrink | base */
+  max-width: 22rem;       /* keep legible */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -464,14 +464,13 @@ footer {
   border-top: 1px solid rgba(0,0,0,0.06);
   padding-top: .65rem;
   font-family: var(--content-text);
-  font-size: clamp(.45rem, 1.1vw, .95rem); 
+  font-size: clamp(.45rem, 1.1vw, .95rem);
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
   max-height: 10rem;
   color: #2d4f4a;
   line-height: 1.45;
-
-  overflow: auto; 
+  overflow: auto;
 }
-
 /* images: respect parent's size and use object-fit */
 .card-img-ref {
   width: 100%;
@@ -796,28 +795,19 @@ footer {
 }
 
  .buy-now-btn {
-    position: relative;
-    color: #fff;
-    overflow: hidden;
-    background: linear-gradient(90deg, #083235 0%, #e1f6e0 100%);
-    font-size: clamp(0.9rem, 1vw, 1rem);
-    transition:
-        background 0.3s ease,
-        color      0.3s ease;
-}
-
-.buy-now-btn {
+  position: relative;
+  color: #fff;
+  overflow: hidden;
   background: linear-gradient(90deg, #083235 0%, #e1f6e0 100%);
   background-size: 200% 100%;
   background-position: 0 0;
-  color: #fff;
   border: none;
   padding: 0.8rem 1.6rem;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
   border-radius: 6px;
   cursor: pointer;
-  transition: background-position 2s ease, color 0.3s ease;
-}
+  transition: background 0.3s ease, color 0.3s ease, background-position 2s ease;
+}    
 
 .buy-now-btn:hover {
   background-position: 100% 0;
@@ -1404,6 +1394,12 @@ footer {
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
 }
 
+.header-user-image{
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
 
  .button-submit {
      margin: 20px 0 10px 0;

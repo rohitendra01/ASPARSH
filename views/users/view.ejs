@@ -13,6 +13,7 @@
     <div class="admin-profile-actions">
       <button type="button" class="admin-edit-btn" onclick="window.location.href='/dashboard/<%= user.slug %>/user/edit/<%= user.slug %>'">Edit Profile</button>
       <form action="/logout" method="POST" class="admin-logout-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <button type="submit" class="admin-logout-btn">Logout</button>
       </form>
     </div>

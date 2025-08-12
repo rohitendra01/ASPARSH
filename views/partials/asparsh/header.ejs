@@ -29,6 +29,7 @@
                                 Welcome, <%= currentUser.username %>
                             </p>
                             <form action="/logout" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <button type="submit" class="button-submit" style="width: 100%;">Logout</button>
                             </form>
                         </div>

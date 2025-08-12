@@ -11,7 +11,7 @@ exports.getLoginPage = (req, res) => {
     req.flash('error_msg', 'You are already logged in');
     return res.redirect('/');
   }
-  res.render('users/login');
+  res.render('users/login', { csrfToken: req.csrfToken() });
 };
 
 exports.loginUser = (req, res, next) => {
@@ -49,7 +49,7 @@ exports.requestOtp = async (req, res) => {
   const { email } = req.body;
   const user = await adminUser.findOne({ email });
   if (!user) {
-    return res.render('users/login', { error_msg: 'No account with that email.' });
+    return res.render('users/login', { error_msg: 'No account with that email.', csrfToken: req.csrfToken() });
   }
   const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
   otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
@@ -65,7 +65,7 @@ exports.requestOtp = async (req, res) => {
 exports.resendOtp = async (req, res) => {
   const { email } = req.body;
   if (!otpStore[email]) {
-    return res.render('users/login', { error_msg: 'Session expired. Please request again.' });
+    return res.render('users/login', { error_msg: 'Session expired. Please request again.', csrfToken: req.csrfToken() });
   }
   const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
   otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
@@ -82,7 +82,7 @@ exports.verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
   const record = otpStore[email];
   if (!record || record.expires < Date.now()) {
-    return res.render('users/login', { error_msg: 'OTP expired. Please request again.' });
+    return res.render('users/login', { error_msg: 'OTP expired. Please request again.', csrfToken: req.csrfToken() });
   }
   if (record.otp !== otp) {
     return res.render('users/otp', { email, error_msg: 'Invalid OTP. Try again.' });
@@ -95,7 +95,7 @@ exports.resetPasswordOtp = async (req, res) => {
   const { email, password } = req.body;
   const user = await adminUser.findOne({ email });
   if (!user) {
-    return res.render('users/login', { error_msg: 'User not found.' });
+    return res.render('users/login', { error_msg: 'User not found.', csrfToken: req.csrfToken() });
   }
   try {
     user.password = password;
