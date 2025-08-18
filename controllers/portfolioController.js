@@ -1,5 +1,6 @@
 const Portfolio = require('../models/Portfolio');
 const Profile = require('../models/Profile');
+const VisitingCard = require('../models/VisitingCard');
 
 exports.renderNewForm = async (req, res) => {
   try {
@@ -148,7 +149,7 @@ exports.createVisitingCard = async (req, res) => {
   try {
     const { name, title, description, email, phone, address, website, linkedin, twitter, facebook, instagram } = req.body;
     const visitingCard = new VisitingCard({
-      user: req.adminUser._id, // Updated to use adminUser model
+      user: req.user ? req.user._id : undefined,
       name,
       title,
       description,
@@ -213,28 +214,77 @@ exports.dashboardPortfolioIndex = async (req, res) => {
   }
 };
 
+
 exports.listPortfolios = async (req, res) => {
   // List all portfolios for the user (by profile slug)
-  const profile = await Profile.findOne({ slug: req.params.slug });
+  const slugParam = req.params.slug;
+  let profile = null;
   let portfolios = [];
-  if (profile) {
-    portfolios = await Portfolio.find({ profileId: profile._id });
-  }
 
-  // Debug: log what will be passed to the template
   try {
-    console.log('[portfolioController] listPortfolios - rendering portfolios/index with:', {
-      source: 'listPortfolios',
-      profile: profile ? { id: profile._id, slug: profile.slug, name: profile.name || null } : null,
-      portfoliosCount: Array.isArray(portfolios) ? portfolios.length : 0,
-      samplePortfolio: Array.isArray(portfolios) && portfolios.length ? { id: portfolios[0]._id, title: portfolios[0].title || null, isPublished: portfolios[0].isPublished } : null,
-      params: req.params
-    });
-  } catch (logErr) {
-    console.error('[portfolioController] listPortfolios - log error', logErr);
+    // Extra diagnostics: show overall counts to help debugging
+    const totalPortfolios = await Portfolio.countDocuments();
+    const byUserCount = req.user ? await Portfolio.countDocuments({ createdBy: req.user._id }) : 0;
+    const sampleAny = await Portfolio.findOne({}).lean();
+    console.log('[portfolioController] DEBUG totals:', { totalPortfolios, byUserCount, sampleAnyId: sampleAny ? sampleAny._id : null });
+  } catch (diagErr) {
+    console.error('[portfolioController] DEBUG error fetching totals', diagErr);
   }
 
-  res.render('portfolios/index', { portfolios, slug: req.params.slug, profile, layout: 'layouts/dashboard', currentUser: req.user });
+  try {
+    // If route uses special 'me' slug, list portfolios for profiles created by current user
+    if (slugParam === 'me' && req.user) {
+      const userProfiles = await Profile.find({ createdBy: req.user._id });
+      if (userProfiles && userProfiles.length) {
+        const ids = userProfiles.map(p => p._id);
+        portfolios = await Portfolio.find({ profileId: { $in: ids } });
+        // pick first profile as context
+        profile = userProfiles[0];
+      }
+    } else {
+      // try to find profile by slug
+      profile = await Profile.findOne({ slug: slugParam });
+      if (profile) {
+        portfolios = await Portfolio.find({ profileId: profile._id });
+      } else {
+        // If the slug refers to the current logged-in user (own dashboard), list portfolios for profiles created by that user
+        if (req.user && req.user.slug === slugParam) {
+          const userProfiles = await Profile.find({ createdBy: req.user._id });
+          if (userProfiles && userProfiles.length) {
+            const ids = userProfiles.map(p => p._id);
+            portfolios = await Portfolio.find({ profileId: { $in: ids } });
+            profile = userProfiles[0];
+          }
+        }
+        // fallback: some Portfolio documents use the profile slug in their `slug` field — try matching that
+        if ((!portfolios || portfolios.length === 0) && !profile) {
+          portfolios = await Portfolio.find({ slug: slugParam });
+        }
+        // last-resort: portfolios created by the current user
+        if ((!portfolios || portfolios.length === 0) && req.user) {
+          portfolios = await Portfolio.find({ createdBy: req.user._id });
+        }
+      }
+    }
+
+    // Debug: log what will be passed to the template
+    try {
+      console.log('[portfolioController] listPortfolios - rendering portfolios/index with:', {
+        source: 'listPortfolios',
+        profile: profile ? { id: profile._id, slug: profile.slug, name: profile.name || null } : null,
+        portfoliosCount: Array.isArray(portfolios) ? portfolios.length : 0,
+        samplePortfolio: Array.isArray(portfolios) && portfolios.length ? { id: portfolios[0]._id, title: portfolios[0].title || null, isPublished: portfolios[0].isPublished } : null,
+        params: req.params
+      });
+    } catch (logErr) {
+      console.error('[portfolioController] listPortfolios - log error', logErr);
+    }
+
+    res.render('portfolios/index', { portfolios, slug: req.params.slug, profile, layout: 'layouts/dashboard', currentUser: req.user });
+  } catch (err) {
+    console.error('[portfolioController] listPortfolios error:', err);
+    res.status(500).send('Error loading portfolios');
+  }
 };
 
 exports.deletePortfolio = async (req, res) => {
