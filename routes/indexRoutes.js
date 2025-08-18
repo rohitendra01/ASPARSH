@@ -212,4 +212,8 @@ router.get('/hotel/:hotelSlug', hotelController.showHotelPage); // Correct: cont
 
 router.get('/hotels/:hotelId', cache('5 minutes'), hotelController.showHotelPage);
 
+// Public portfolio page (friendly URL)
+const portfolioController = require('../controllers/portfolioController');
+router.get('/p/:slug/:id', portfolioController.showPublic);
+
 module.exports = router;

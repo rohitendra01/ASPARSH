@@ -1,0 +1,27 @@
+<% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <script>window.__CSRF = '<%= csrfToken %>';</script>
+  <script>
+    (function(){
+      // Inject hidden _csrf inputs into non-GET forms if missing
+      function injectCsrfIntoForms() {
+        try {
+          var forms = document.getElementsByTagName('form');
+          for (var i=0;i<forms.length;i++){
+            var f = forms[i];
+            var method = (f.getAttribute('method') || 'GET').toUpperCase();
+            if (method === 'GET') continue;
+            if (f.querySelector('input[name="_csrf"]')) continue;
+            var inp = document.createElement('input');
+            inp.type = 'hidden'; inp.name = '_csrf'; inp.id = '_csrf'; inp.value = window.__CSRF || '';
+            f.appendChild(inp);
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', injectCsrfIntoForms);
+      else injectCsrfIntoForms();
+    })();
+  </script>
+<% } %>

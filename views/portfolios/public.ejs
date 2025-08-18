@@ -1,0 +1,49 @@
+<% layout('layouts/boilerplate') %>
+
+<main class="portfolio-public container">
+  <header class="portfolio-header">
+    <h1><%= portfolio.title %></h1>
+    <% if (portfolio.tagline) { %><p class="tagline"><%= portfolio.tagline %></p><% } %>
+  </header>
+
+  <section class="portfolio-about">
+    <h2>About</h2>
+    <p><%= portfolio.about || 'No summary provided.' %></p>
+  </section>
+
+  <section class="portfolio-projects">
+    <h2>Projects</h2>
+    <% if (portfolio.projects && portfolio.projects.length) { %>
+      <div class="projects-grid">
+        <% portfolio.projects.forEach(function(pr) { %>
+          <article class="project-card">
+            <h3><%= pr.title %></h3>
+            <p><%= pr.description %></p>
+            <% if (pr.link) { %><p><a href="<%= pr.link %>" target="_blank">Visit project</a></p><% } %>
+          </article>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p>No projects yet.</p>
+    <% } %>
+  </section>
+
+  <section class="portfolio-services">
+    <h2>Services</h2>
+    <% if (portfolio.services && portfolio.services.length) { %>
+      <ul class="services-list">
+        <% portfolio.services.forEach(function(s) { %>
+          <li><strong><%= s.name %></strong> — <%= s.description %> <span class="price">(<%= s.price %>)</span></li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>No services listed.</p>
+    <% } %>
+  </section>
+
+  <footer class="portfolio-social">
+    <h3>Connect</h3>
+    <% if (portfolio.social && portfolio.social.website) { %><a href="<%= portfolio.social.website %>" target="_blank">Website</a><% } %>
+    <% if (portfolio.social && portfolio.social.linkedin) { %> | <a href="<%= portfolio.social.linkedin %>" target="_blank">LinkedIn</a><% } %>
+  </footer>
+</main>

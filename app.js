@@ -66,9 +66,16 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
         return done(err);
     }
 }));
-app.use(csurf({ cookie: true }));
 
-passport.serializeUser((user, done) => done(null, user.id));
+// Passport session serialization
+passport.serializeUser((user, done) => {
+    try {
+        done(null, user.id);
+    } catch (err) {
+        done(err);
+    }
+});
+
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await adminUser.findById(id);
@@ -78,9 +85,12 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
+// NOTE: csurf is applied per-router so we can place it after multer for multipart routes
+
 // Enhanced res.locals middleware
 app.use((req, res, next) => {
     res.locals.currentUser = req.user || null;
+    res.locals.user = req.user || null;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.success_msg = req.flash('success_msg');
@@ -91,20 +101,10 @@ app.use((req, res, next) => {
     res.locals.returnTo = req.session.returnTo || '/';
     res.locals.name = req.flash('name')[0];
     res.locals.email = req.flash('email')[0];
-    res.locals.csrfToken = req.csrfToken();
+    // set csrfToken only if csurf has run for this request (router-level)
+    res.locals.csrfToken = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
     next();
 });
-
-
-
-
-
-
-
-
-
-
-
 
 // Mount API routes
 const apiRoutes = require('./routes/apiRoutes');
@@ -128,11 +128,29 @@ app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
 
-
-
-
-
-
+// CSRF error handler - log details to help debug invalid token issues
+app.use((err, req, res, next) => {
+  if (!err) return next();
+  // csurf uses code 'EBADCSRFTOKEN'
+  if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
+    try {
+      console.error('[app] CSRF validation failed', {
+        url: req.originalUrl,
+        method: req.method,
+        headers: Object.keys(req.headers).reduce((acc, k) => { acc[k] = req.headers[k]; return acc; }, {}),
+        body: req.body,
+        cookies: req.cookies
+      });
+    } catch (logErr) {
+      console.error('[app] Error logging CSRF failure', logErr);
+    }
+    // respond with JSON for XHR/JSON requests, otherwise show simple message
+    const accept = (req.headers['accept'] || '').toLowerCase();
+    if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });
+    return res.status(403).send('Invalid CSRF token');
+  }
+  return next(err);
+});
 
 
 // Export app for server.js

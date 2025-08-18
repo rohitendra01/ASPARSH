@@ -59,7 +59,10 @@ const profileSchema = new Schema({
     hotels: [{
         type: Schema.Types.ObjectId,
         ref: 'Hotel'
-    }]
+    }],
+    metadata: {
+        type: Schema.Types.Mixed
+    }
 }, 
 {
     timestamps: true

@@ -8,10 +8,10 @@ const { isLoggedIn } = require('../middleware/authMiddleware');
 router.get('/', portfolioController.listPortfolios);
 
 // Render new portfolio form
-router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
+router.get('/new', isLoggedIn, portfolioController.renderNewForm);
 
-// Create a new profile
-router.post('/new', isLoggedIn, profileController.createProfile);
+// Create a new portfolio (use portfolioController)
+router.post('/new', isLoggedIn, portfolioController.createPortfolio);
 
 //Edit a profile
 router.get('/edit', isLoggedIn, profileController.renderEditProfileForm);
@@ -27,5 +27,10 @@ router.put('/:id', portfolioController.updatePortfolio);
 
 // Delete a portfolio
 router.delete('/:id', portfolioController.deletePortfolio);
+
+// Publish a portfolio (set isPublished = true)
+router.post('/:id/publish', isLoggedIn, portfolioController.publishPortfolio);
+
+// NOTE: profile search API is handled centrally at /api/profiles/search (see routes/apiRoutes.js)
 
 module.exports = router;

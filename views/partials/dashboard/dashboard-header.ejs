@@ -10,6 +10,7 @@
             <img src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>" alt="<%= currentUser && currentUser.username ? currentUser.username : 'User' %>" />
             <p><%= currentUser && currentUser.username ? currentUser.username : 'User' %></p>
             <form id="logoutForm" action="/logout" method="POST" class="logout-form">
+              <%- include('../csrf-input') %>
               <button type="submit" class="logout-btn">Logout</button>
             </form>
         </div>

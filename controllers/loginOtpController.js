@@ -6,12 +6,19 @@ const crypto = require('crypto');
 // In-memory OTP store (use DB in production)
 const otpStore = {};
 
+// Helper to safely obtain CSRF token — works when csurf is applied per-router or not applied
+function getCsrf(req, res) {
+  if (typeof req.csrfToken === 'function') return req.csrfToken();
+  if (res && res.locals && res.locals.csrfToken) return res.locals.csrfToken;
+  return null;
+}
+
 exports.getLoginPage = (req, res) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     req.flash('error_msg', 'You are already logged in');
     return res.redirect('/');
   }
-  res.render('users/login', { csrfToken: req.csrfToken() });
+  res.render('users/login', { csrfToken: getCsrf(req, res) });
 };
 
 exports.loginUser = (req, res, next) => {
@@ -49,7 +56,7 @@ exports.requestOtp = async (req, res) => {
   const { email } = req.body;
   const user = await adminUser.findOne({ email });
   if (!user) {
-    return res.render('users/login', { error_msg: 'No account with that email.', csrfToken: req.csrfToken() });
+    return res.render('users/login', { error_msg: 'No account with that email.', csrfToken: getCsrf(req, res) });
   }
   const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
   otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
@@ -58,14 +65,14 @@ exports.requestOtp = async (req, res) => {
     subject: 'Your OTP for Password Reset',
     html: `<p>Your OTP is <b>${otp}</b>. It is valid for 10 minutes.</p>`
   });
-  res.render('users/otp', { email, error_msg: null });
+  res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
 };
 
 // OTP Resend
 exports.resendOtp = async (req, res) => {
   const { email } = req.body;
   if (!otpStore[email]) {
-    return res.render('users/login', { error_msg: 'Session expired. Please request again.', csrfToken: req.csrfToken() });
+    return res.render('users/login', { error_msg: 'Session expired. Please request again.', csrfToken: getCsrf(req, res) });
   }
   const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
   otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
@@ -74,7 +81,7 @@ exports.resendOtp = async (req, res) => {
     subject: 'Your OTP for Password Reset',
     html: `<p>Your new OTP is <b>${otp}</b>. It is valid for 10 minutes.</p>`
   });
-  res.render('users/otp', { email, error_msg: null });
+  res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
 };
 
 // OTP Verify
@@ -82,12 +89,12 @@ exports.verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
   const record = otpStore[email];
   if (!record || record.expires < Date.now()) {
-    return res.render('users/login', { error_msg: 'OTP expired. Please request again.', csrfToken: req.csrfToken() });
+    return res.render('users/login', { error_msg: 'OTP expired. Please request again.', csrfToken: getCsrf(req, res) });
   }
   if (record.otp !== otp) {
-    return res.render('users/otp', { email, error_msg: 'Invalid OTP. Try again.' });
+    return res.render('users/otp', { email, error_msg: 'Invalid OTP. Try again.', csrfToken: getCsrf(req, res) });
   }
-  return res.render('users/new-password', { email });
+  return res.render('users/new-password', { email, csrfToken: getCsrf(req, res) });
 };
 
 // Password Reset via OTP
@@ -95,7 +102,7 @@ exports.resetPasswordOtp = async (req, res) => {
   const { email, password } = req.body;
   const user = await adminUser.findOne({ email });
   if (!user) {
-    return res.render('users/login', { error_msg: 'User not found.', csrfToken: req.csrfToken() });
+    return res.render('users/login', { error_msg: 'User not found.', csrfToken: getCsrf(req, res) });
   }
   try {
     user.password = password;
@@ -105,6 +112,6 @@ exports.resetPasswordOtp = async (req, res) => {
     return res.redirect('/login');
   } catch (err) {
     console.error('Error resetting password:', err);
-    res.render('users/login', { error_msg: 'Error resetting password. Please try again.' });
+    res.render('users/login', { error_msg: 'Error resetting password. Please try again.', csrfToken: getCsrf(req, res) });
   }
 };

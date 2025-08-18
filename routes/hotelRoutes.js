@@ -22,6 +22,6 @@ router.post('/:hotelSlug/edit', isLoggedIn, upload.fields([
   { name: 'hotelOfferBanner', maxCount: 1 }
 ]), hotelController.updateHotel);
 
-router.post('/:hotelSlug/delete', isLoggedIn, hotelController.deleteHotel);
+router.post('/:hotelSlug/delete', isLoggedIn, upload.none(), hotelController.deleteHotel);
 
 module.exports = router;

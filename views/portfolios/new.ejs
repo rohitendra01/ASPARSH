@@ -1,0 +1,99 @@
+<!-- views/portfolios/new.ejs -->
+<% layout('layouts/dashboard-boilerplate') %>
+<% block('styles').append('<link rel="stylesheet" href="/css/portfolio/new.css" />') %>
+
+
+<div class="portfolio-wizard-root">
+  <h1>Create Portfolio</h1>
+
+  <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+    <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
+    <script>window.__CSRF = '<%= csrfToken %>';</script>
+  <% } %>
+
+  <section class="search-step">
+    <label for="profileSearch">Search User Profile</label>
+    <input type="text" id="profileSearch" name="profileSearch" placeholder="Enter user slug, email, or mobile" required autocomplete="off">
+    <div id="profileSearchResults" class="search-results"></div>
+    <input type="hidden" id="selectedProfileId" name="selectedProfileId">
+    <input type="hidden" id="selectedProfileSlug" name="selectedProfileSlug">
+    <input type="hidden" id="selectedProfileName" name="selectedProfileName">
+    <input type="hidden" id="profileId" name="profileId">
+    <div id="selectedProfileCard" style="display:none; margin-bottom:1rem;"></div>
+  </section>
+
+  <nav class="wizard-progress" aria-hidden="false">
+    <button data-step="0" class="step-btn active">General</button>
+    <button data-step="1" class="step-btn">Social</button>
+    <button data-step="2" class="step-btn">About</button>
+    <button data-step="3" class="step-btn">Projects</button>
+    <button data-step="4" class="step-btn">Services</button>
+    <button data-step="5" class="step-btn">Review</button>
+  </nav>
+
+  <form id="portfolioWizardForm" class="wizard-form" novalidate>
+    <fieldset class="wizard-step active" data-step="0">
+      <h2>General</h2>
+      <input type="hidden" name="profileId" id="profileId">
+      <label>Title <input name="title" id="title"></label>
+      <label>Tagline <input name="tagline" id="tagline"></label>
+      <div class="step-actions">
+        <button type="button" data-action="next">Next</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="1">
+      <h2>Social</h2>
+      <label>Website <input name="social.website" id="socialWebsite"></label>
+      <label>LinkedIn <input name="social.linkedin" id="socialLinkedin"></label>
+      <label>Instagram <input name="social.instagram" id="socialInstagram"></label>
+      <div class="step-actions">
+        <button type="button" data-action="prev">Back</button>
+        <button type="button" data-action="next">Next</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="2">
+      <h2>About</h2>
+      <label>About (short) <textarea name="about" id="about" rows="4"></textarea></label>
+      <div class="step-actions">
+        <button type="button" data-action="prev">Back</button>
+        <button type="button" data-action="next">Next</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="3">
+      <h2>Projects</h2>
+      <div id="projectsList"></div>
+      <button type="button" id="addProjectBtn">Add project</button>
+      <div class="step-actions">
+        <button type="button" data-action="prev">Back</button>
+        <button type="button" data-action="next">Next</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="4">
+      <h2>Services</h2>
+      <div id="servicesList"></div>
+      <button type="button" id="addServiceBtn">Add service</button>
+      <div class="step-actions">
+        <button type="button" data-action="prev">Back</button>
+        <button type="button" data-action="next">Next</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="wizard-step" data-step="5">
+      <h2>Review</h2>
+      <div id="reviewArea"></div>
+      <div class="step-actions">
+        <button type="button" data-action="prev">Back</button>
+        <button type="button" id="publishBtn">Publish</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <div id="autosaveStatus" class="autosave-status" aria-live="polite"></div>
+</div>
+
+<!-- load the client script externally (no inline JS causing EJS compile problems) -->
+<script src="/js/portfolio-wizard.js"></script>

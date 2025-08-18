@@ -1,12 +1,6 @@
 <% layout('layouts/dashboard-boilerplate') -%>
-<% block('styles').append('<link rel="stylesheet" href=\"/css/portfolio/index.css\">') %>
+<% block('styles').append('<link rel="stylesheet" href="/css/portfolio/index.css">') %>
 <div class="dashboard-container">
-  <div class="portfolio-header">
-    <nav class="portfolio-tabs" role="tablist">
-      <button class="portfolio-tab active" role="tab" aria-selected="true" aria-controls="business-content" id="business-tab">Business Portfolios</button>
-      <button class="portfolio-tab" role="tab" aria-selected="false" aria-controls="student-content" id="student-tab">Student Portfolios</button>
-    </nav>
-  </div>
   <div class="search-bar">
     <form method="GET" action="/portfolio">
       <input type="text" name="search" placeholder="Search portfolios..." class="search-input">
@@ -14,30 +8,43 @@
     </form>
     <a href="/dashboard/<%= slug %>/portfolios/new" class="btn btn-success">Create New Portfolio</a>
   </div>
-      <div class="visiting-cards-list">
+
+  <% // support both controllers that pass `portfolios` or `cards` to this view %>
+  <% const items = (typeof portfolios !== 'undefined' && portfolios) ? portfolios : ((typeof cards !== 'undefined' && cards) ? cards : []); %>
+
+  <!-- Quick info cards for portfolios -->
+  <div class="portfolios-grid">
+    <% if (items && items.length) { %>
+      <div class="cards">
+        <% items.forEach(function(p) { %>
+          <article class="portfolio-card">
+            <header>
+              <h3 class="portfolio-title"><%= p.title || p.name || (p.slug || 'Untitled') %></h3>
+              <% if ((p.tagline || p.subtitle)) { %><p class="portfolio-tagline"><%= p.tagline || p.subtitle %></p><% } %>
+            </header>
+            <div class="portfolio-body">
+              <p class="portfolio-about"><%= ((p.about || p.description) && (p.about || p.description).length>160) ? (p.about || p.description).substr(0,160) + '...' : (p.about || p.description || 'No description provided.') %></p>
+              <p class="portfolio-meta">Projects: <strong><%= (p.projects && p.projects.length) || 0 %></strong> &nbsp;|&nbsp; Services: <strong><%= (p.services && p.services.length) || 0 %></strong></p>
+            </div>
+            <footer class="portfolio-actions">
+              <span class="status <%= p.isPublished ? 'published' : (p.isPublished===false ? 'draft' : 'na') %>"><%= p.isPublished ? 'Published' : (p.isPublished===false ? 'Draft' : 'N/A') %></span>
+              <div class="action-buttons">
+                <% // public link when published, otherwise link to dashboard show page %>
+                <% const profileSlugForPublic = p.slug || slug || '' %>
+                <% const publicUrl = '/p/' + encodeURIComponent(profileSlugForPublic) + '/' + (p._id || p.id) %>
+                <% if (p.isPublished) { %>
+                  <a class="btn btn-sm" href="<%= publicUrl %>" target="_blank">View</a>
+                <% } else { %>
+                  <a class="btn btn-sm" href="/dashboard/<%= slug %>/portfolios/<%= p._id %>">View</a>
+                <% } %>
+                <a class="btn btn-sm" href="/dashboard/<%= slug %>/portfolios/<%= p._id %>/edit">Edit</a>
+              </div>
+            </footer>
+          </article>
+        <% }) %>
       </div>
-<script>
-  // Tab switching logic for redesigned markup
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.portfolio-tab');
-    const contents = document.querySelectorAll('.portfolio-content');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        tabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-        contents.forEach(content => {
-          content.classList.remove('active');
-        });
-        const targetId = tab.getAttribute('aria-controls');
-        document.getElementById(targetId).classList.add('active');
-      });
-    });
-    // Show only business tab by default
-    document.getElementById('business-content').classList.add('active');
-    document.getElementById('student-content').classList.remove('active');
-  });
-</script>
+    <% } else { %>
+      <p class="muted">No portfolios yet. Create one to see it here.</p>
+    <% } %>
+  </div>
+</div>

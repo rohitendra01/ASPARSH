@@ -122,8 +122,13 @@
                 </script>
                 <div class="buttons-new" >
                   <button type="submit">Update Hotel</button>
-                  <button type="submit" formaction="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/delete" formmethod="POST" class="delete-hotel-btn" style="background:#ff4d4f;color:#fff;margin-top:2rem;">Delete Hotel</button>
                 </div>
+    </form>
+    
+    <!-- Separate delete form (not multipart) so body-parser handles _csrf before csurf -->
+    <form action="/dashboard/<%= currentUser.slug %>/hotels/<%= hotel.hotelSlug %>/delete" method="POST" style="display:inline;">
+      <%- include('../partials/csrf-input') %>
+      <button type="submit" class="delete-hotel-btn" style="background:#ff4d4f;color:#fff;margin-top:2rem;">Delete Hotel</button>
     </form>
     </div>
 </div>
