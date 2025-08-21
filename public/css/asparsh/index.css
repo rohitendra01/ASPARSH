@@ -1289,50 +1289,6 @@ footer {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .user-dropdown-content {
     opacity: 0; /* Hidden initially */
     visibility: hidden; /* Hidden for accessibility and pointer events */
@@ -1414,4 +1370,271 @@ a.dashboard-btn {
     background: #083235;
     color: #39ff14;
     text-shadow: 0 0 8px #39ff14, 0 0 32px #39ff14;
+}
+
+/* Hamburger and mobile menu styles */
+.hamburger {
+  display: none; /* shown on small screens */
+  background: transparent;
+  border: none;
+  width: 42px;
+  height: 36px;
+  padding: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.hamburger span {
+  display: block;
+  height: 3px;
+  background: var(--text-light);
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+.mobile-menu {
+  position: fixed;
+  top: var(--header-height);
+  right: 0;
+  left: 0;
+  background: linear-gradient(180deg, rgba(8,50,53,0.98), rgba(8,50,53,0.95));
+  color: var(--text-light);
+  padding: 1rem;
+  transform: translateY(-8px) scale(0.995);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+  z-index: 1500;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.mobile-menu.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.mobile-nav-links { list-style: none; padding: 0; margin: 0 0 1rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.mobile-nav-links a { color: var(--text-light); text-decoration: none; padding: 10px 8px; display: block; border-radius: 8px; }
+.mobile-nav-links a:hover { background: rgba(255,255,255,0.04); }
+
+.mobile-user-area { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
+.mobile-user { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.mobile-user-link { display: flex; align-items: center; color: var(--text-light); text-decoration: none; }
+.mobile-user-link img.header-user-image { width: 44px; height: 44px; }
+.button-submit { background: #fff; color: #083235; padding: 10px 12px; border: none; border-radius: 8px; cursor: pointer; }
+.button-submit:hover { background: #e1f6e0; }
+
+/* show hamburger and adjust header layout on small screens */
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+  header { display: flex; align-items: center; gap: 12px; }
+  .logo { flex: 1; }
+  .nav { order: 3; }
+  .user-profile { order: 2; }
+}
+
+/* Responsive: tablet and mobile tweaks */
+@media (max-width: 1024px) {
+  :root {
+    --gutter-preferred: 2rem;
+    --max-content-width: 56rem;
+  }
+
+  header {
+    padding: 0.9rem 3rem;
+  }
+
+  .hero-image {
+    flex: 0 0 45%;
+    max-width: 45%;
+  }
+
+  .hero-head-text h1 {
+    font-size: clamp(1.6rem, 6vw, 2.6rem);
+  }
+
+  .description-card {
+    flex: 1 1 40%;
+    max-width: 45%;
+  }
+
+  .container4-how-it-works-card {
+    max-width: 45%;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  /* overall adjustments for small tablets and phones */
+  :root {
+    --root-font: 1rem;
+    --gutter-preferred: 1rem;
+    --max-content-width: 100%;
+    --header-height: 3.6rem;
+  }
+
+  html, body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  header {
+    padding: 0.5rem 1rem;
+    height: var(--header-height);
+    align-items: center;
+  }
+
+  header h3 { font-size: 1rem; }
+
+  /* collapse desktop nav on small screens (if a mobile toggle exists, it can control .nav-links) */
+  .nav-links {
+    display: none; /* hide full nav on mobile to avoid overflow */
+  }
+
+  .container1,
+  .container2,
+  .container3,
+  .container4,
+  .container5,
+  .container6 {
+    padding-inline: 1rem;
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  .snap-section {
+    padding-top: calc(var(--header-height) + 0.75rem);
+  }
+
+  /* Make hero stack vertically */
+  .container1 {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  .hero-text {
+    order: 1;
+    flex: 1 1 auto;
+    gap: 0.5rem;
+  }
+  .hero-image {
+    order: 2;
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-bottom: 0.5rem;
+  }
+  .hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .hero-head-text h1 {
+    font-size: clamp(1.25rem, 6vw, 1.8rem);
+    line-height: 1.1;
+  }
+
+  .started-button {
+    width: 100%;
+  }
+  .started-button button {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* description cards stack */
+  .description-box {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .description-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  /* product card becomes vertical */
+  .index-product-card {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    max-width: 100%;
+  }
+  .index-product-image {
+    flex: 0 0 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .index-product-image img {
+    width: 100%;
+    height: auto;
+    max-height: 20rem;
+  }
+  .index-product-content {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .tab-headers { gap: 0.5rem; }
+  .tab-header { padding: 8px 6px; }
+
+  /* make buttons full width on mobile for easy tapping */
+  .index-product-button { flex-direction: column; gap: 0.5rem; }
+  .index-product-button button { width: 100%; }
+
+  /* how-it-works cards wrap into two columns (or single on very small) */
+  .container4-how-it-works {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .container4-how-it-works-card {
+    flex: 1 1 48%;
+    width: 48%;
+    max-width: 48%;
+  }
+
+  /* testimonial — single column carousel look */
+  .testimonial-carousel {
+    max-width: 100%;
+    padding: 0 0.25rem;
+  }
+  .testimonial-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0.8rem;
+    min-height: 0;
+  }
+  .testimonial-avatar { width: 64px; height: 64px; }
+
+  /* contact section stacks */
+  .container6-content {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  .container6-content-text {
+    text-align: left;
+    padding: 0;
+  }
+  .container6-content-image { order: 2; width: 100%; }
+  .container6-content-image img { width: 100%; height: auto; }
+
+  /* dropdown adjustments */
+  .user-dropdown-content {
+    right: 12px;
+    left: auto;
+    width: calc(100% - 24px);
+  }
+
+  /* reduce card shadows and border radii a bit to look compact */
+  .description-card, .index-product-card, .container4-how-it-works-card {
+    border-radius: 10px;
+  }
 }

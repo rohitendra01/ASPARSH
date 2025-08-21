@@ -1,0 +1,395 @@
+:root{
+  --color-bg-start: #083235;
+  --color-bg-end: #e1f6e0;
+  --color-primary: #083235;
+  --color-accent: #7f53ac;
+  --text-dark: #0a0f0d;
+  --text-light: #e1f6e0;
+
+  /* Base sizing (in rem) */
+  --root-font: clamp(0.95rem, 0.9vw + .45rem, 1.05rem); /* page base */
+  --header-height: 4rem;    /* change header height if needed */
+  --content-max: 72rem;     /* max page width (72rem ≈ 1152px) */
+  --gutter: clamp(1rem, 3vw, 3.5rem);  /* horizontal inner padding */
+  --section-vpad: clamp(1rem, 3vh, 2.4rem); /* vertical padding for sections */
+  --card-radius: 0.9rem;
+  --shadow: 0 8px 30px rgba(2,6,23,0.08);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html,body { height:100%; margin:0; padding:0; font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; font-size: var(--root-font); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+img { display:block; max-width:100%; height:auto; }
+
+/* Hide horizontal scrollbar and prevent accidental overflow */
+html, body { overflow-x: hidden;
+scroll-behavior: smooth }
+
+/* Links */
+a { color: inherit; text-decoration: none; }
+
+/* ======================
+   Header / Nav
+   ====================== */
+header {
+  position: fixed;
+  top:0; left:0; right:0;
+  height: var(--header-height);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 0 calc(var(--gutter) / 2);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  z-index: 1200;
+}
+
+.user-logo {
+  background:#fff;
+  color: var(--color-accent);
+  padding: 0.45rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  box-shadow: 0 6px 20px rgba(127,83,172,0.06);
+}
+
+/* nav links list */
+.nav-links {
+  display:flex;
+  gap: .8rem;
+  list-style:none;
+  align-items:center;
+  margin-left: 1rem;
+}
+.nav-links a {
+  display:inline-block;
+  padding: .38rem .85rem;
+  border-radius: 20px;
+  font-weight:600;
+  color:#fff;
+  background: rgba(255,255,255,0.06);
+  transition: all .18s ease;
+}
+.nav-links a:hover {
+  background:#fff; color:var(--color-accent);
+}
+
+/* compact header spacing on narrow desktops */
+@media (max-width:1200px){
+  header { padding-inline: 1rem; }
+}
+
+/* ======================
+   Main / section defaults
+   ====================== */
+main {
+  padding-top: calc(var(--header-height) + 0.6rem);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-bg-end));
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* each major section uses this pattern */
+section {
+  width: 100%;
+  padding-block: var(--section-vpad);
+  box-sizing: border-box;
+}
+
+/* centers content, constrains max width */
+.section-inner {
+  width: min(var(--content-max), 100%);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+
+/* ======================
+   .portfolio-hero
+   ====================== */
+.portfolio-hero {
+  display:flex;
+  gap: clamp(1rem, 2vw, 2.5rem);
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap; /* allow stacking on narrower desktops */
+  background-image: url('/assets/portfolio-hero.jpeg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: clamp(1.2rem, 2.5vw, 3rem);
+  color: #fff;
+  width: min(var(--content-max), 100%);
+  margin: calc(var(--gutter) * 1.1) auto;
+}
+
+/* hero content and image split */
+.portfolio-contents { flex: 1 1 42%; min-width: 20rem; }
+.portfolio-image   { flex: 1 1 42%; min-width: 18rem; display:flex; align-items:center; justify-content:center; }
+
+/* fonts in hero */
+.portfolio-hero h2 { font-family: 'Montserrat', sans-serif; font-size: clamp(1.05rem, 1.2vw, 1.3rem); font-weight:600; margin:0 0 .4rem 0; }
+.portfolio-hero h1 { font-family: 'Raleway', sans-serif; font-size: clamp(1.6rem, 4.5vw, 2.5rem); font-weight:800; margin:0 0 .9rem 0; line-height:1.05; }
+.portfolio-hero p  { font-family: 'Poppins', sans-serif; font-size: clamp(.95rem, 1.4vw, 1.08rem); line-height:1.6; margin:0 0 1rem 0; }
+
+/* hero buttons */
+.portfolio-contact { display:flex; gap: .9rem; margin-top:.6rem; }
+.contact-button, .edit-button {
+  border-radius: 22px;
+  padding: .55rem 1.2rem;
+  font-weight:700;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+.contact-button { background: #111; color: #fff; }
+.edit-button    { background: #fff; color: var(--color-accent); border: 2px solid var(--color-accent); }
+
+/* limit the hero image so it doesn't grow too tall */
+.portfolio-image img {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  border-radius: .9rem;
+  box-shadow: 0 8px 36px rgba(0,0,0,0.16);
+  object-fit: cover;
+}
+
+/* ======================
+   .portfolio-biography
+   ====================== */
+.portfolio-biography {
+  display:flex;
+  gap: clamp(.8rem, 1.8vw, 2rem);
+  align-items:flex-start;
+  flex-wrap:wrap;
+  width: min(var(--content-max), 100%);
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: .9rem;
+  box-shadow: var(--shadow);
+}
+
+/* left image / right content flex sizing */
+.biography-image { flex: 1 1 28%; min-width: 200px; display:flex; align-items:center; justify-content:center; }
+.biography-content { flex: 2 1 60%; min-width: 260px; display:flex; flex-direction:column; gap:.6rem; }
+
+/* small info grid */
+.quick-info { display:flex; gap: .9rem; flex-wrap:wrap; margin-top:.6rem; }
+.info-item { background:#f8faf9; padding:.7rem 1rem; border-radius:.6rem; min-width:110px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
+.info-item h4 { margin:0; color: var(--color-accent); font-weight:700; font-size: .95rem; }
+.info-item p { margin: 0; font-weight:600; color:#222; }
+
+/* follow and contact buttons */
+.follow-me { margin-top:.5rem; color:#555; }
+.contact-me { margin-top: .9rem; display:flex; gap:.8rem; }
+
+/* ======================
+   .about-section
+   ====================== */
+.about-section {
+  width: min(var(--content-max), 100%);
+  margin: calc(var(--gutter) * 0.9) auto;
+  background: #fff;
+  border-radius: .9rem;
+  box-shadow: var(--shadow);
+  padding: clamp(1rem, 2vw, 2rem);
+  box-sizing: border-box;
+}
+.about-section h1 { text-align:center; color: var(--color-accent); font-family: 'Raleway', sans-serif; font-weight:800; margin-bottom:1rem; }
+.about-content { display:flex; gap: 1.6rem; align-items:flex-start; flex-wrap:wrap; }
+
+/* about image & text */
+.about-image { flex: 0 0 200px; min-width:160px; display:flex; align-items:center; justify-content:center; }
+.about-text  { flex: 1 1 60%; min-width:240px; display:flex; flex-direction:column; gap:.6rem; }
+
+/* about list */
+.about-list { list-style:none; display:flex; gap:1.2rem; flex-wrap:wrap; padding:0; margin: 0; }
+.about-list li { background:#f8f9fa; padding:.65rem 1rem; border-radius:.6rem; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+
+/* ======================
+   .services-section
+   ====================== */
+.services-section {
+  width: min(var(--content-max), 100%);
+  margin: calc(var(--gutter) * 0.9) auto;
+  padding: clamp(.9rem, 1.6vw, 1.6rem);
+  background: #fff;
+  border-radius: .9rem;
+  box-shadow: var(--shadow);
+}
+.services-content { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+.service-card { background:#f8f9fa; padding:1rem; border-radius: .9rem; min-width:220px; max-width:320px; flex: 1 1 220px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
+
+/* ======================
+   .portfolio-section & .blog-section
+   ====================== */
+.portfolio-section, .blog-section {
+  width: min(var(--content-max), 100%);
+  margin: calc(var(--gutter) * 0.9) auto;
+  padding: clamp(.9rem, 1.6vw, 1.6rem);
+  background:#fff;
+  border-radius:.9rem;
+  box-shadow: var(--shadow);
+  box-sizing:border-box;
+}
+
+/* blog grid */
+.blog-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1rem; }
+.blog-post { background:#f8f9fa; padding:1rem; border-radius:.7rem; }
+
+/* ======================
+   .contact-section
+   ====================== */
+.contact-section {
+  width: min(var(--content-max), 100%);
+  margin: calc(var(--gutter) * 0.9) auto;
+  padding: clamp(.9rem, 1.6vw, 1.6rem);
+  background:#fff;
+  border-radius:.9rem;
+  box-shadow: var(--shadow);
+}
+.contact-content { display:flex; gap:1.2rem; flex-wrap:wrap; align-items:flex-start; }
+.contact-info { flex:1 1 320px; min-width:240px; }
+.contact-form { flex:1 1 360px; min-width:280px; }
+.form-group { margin-bottom:.7rem; display:flex; flex-direction:column; gap:.3rem; }
+.form-group label { font-weight:600; }
+.form-group input, .form-group textarea { padding:.6rem; border-radius:.6rem; border:1px solid #e6eef8; font-size:1rem; }
+
+/* submit btn */
+.submit-btn { background: var(--color-primary); color:#fff; padding:.65rem 1rem; border-radius:.6rem; border:none; cursor:pointer; font-weight:700; }
+
+/* ======================
+   Helpful tweaks & minor responsive
+   ====================== */
+/* Prevent elements from forcing width (critical for flex children) */
+* { min-width: 0; }
+
+/* Slight layout changes for narrower desktop widths */
+@media (max-width: 1200px) {
+  .portfolio-hero { padding: 1.2rem; }
+  .portfolio-image img { max-width: 420px; }
+  .portfolio-hero h1 { font-size: clamp(1.4rem, 4vw, 2rem); }
+  .about-content { flex-direction: column; }
+  .portfolio-biography { flex-direction: column; }
+}
+
+/* Keep everything stacked and readable down to ~980px (you said you'll handle mobile later) */
+@media (max-width: 980px) {
+  .nav-links { display:none; } /* assume mobile menu will be added separately */
+  .portfolio-hero { flex-direction: column-reverse; align-items:flex-start; }
+  .portfolio-image { width:100%; }
+  .portfolio-contents { width:100%; }
+  .section-inner { padding-inline: 1rem; }
+}
+
+/* Hamburger / mobile nav styles */
+.menu-toggle{display:none;background:transparent;border:0;cursor:pointer;align-items:center;justify-content:center;padding:8px;border-radius:8px}
+.menu-toggle .bar{display:block;width:22px;height:3px;background:#fff;margin:4px 0;border-radius:2px;transition:transform .18s,opacity .18s}
+
+/* mobile styles */
+/* Remove JS-overlay and open-class behavior: prefer CSS-only checkbox toggle */
+
+#nav-toggle { display: none; }
+.menu-toggle { display: none; }
+
+@media (max-width: 980px) {
+  /* show native label hamburger on small screens */
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 40px;
+    gap: 4px;
+    cursor: pointer;
+    background: transparent;
+    border-radius: 6px;
+    border: 0;
+  }
+  .menu-toggle .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-dark);
+    border-radius: 2px;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+
+  /* off-canvas nav (hidden by default to the right) */
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -110%; /* off canvas */
+    height: 100%;
+    width: min(420px, 78vw);
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), #f3f3f3);
+    padding: calc(var(--header-height) + 1rem) 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: stretch;
+    transition: right .28s cubic-bezier(.2,.9,.2,1);
+    z-index: 1200;
+    box-shadow: -8px 0 30px rgba(2,6,23,0.06);
+    overflow-y: auto;
+  }
+
+  /* when checkbox is checked, slide the panel in */
+  #nav-toggle:checked + nav .nav-links {
+    right: 0;
+  }
+
+  /* animate hamburger into an X when open */
+  #nav-toggle:checked + nav .menu-toggle .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+  }
+  #nav-toggle:checked + nav .menu-toggle .bar:nth-child(2) {
+    opacity: 0;
+  }
+  #nav-toggle:checked + nav .menu-toggle .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  /* nav link appearance */
+  .nav-links a {
+    display: block;
+    padding: .78rem 1rem;
+    font-weight: 600;
+    font-size: 1.02rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: .5rem;
+    transition: background-color .15s ease, color .12s ease;
+  }
+  .nav-links a:hover,
+  .nav-links a:focus {
+    background: rgba(0,0,0,0.04);
+    outline: none;
+  }
+
+  /* overlay implemented as a label for #nav-toggle so clicking it unchecks the box */
+  .nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3,6,18,0.45);
+    z-index: 1100; /* below panel's 1200 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .24s ease;
+    cursor: pointer;
+  }
+
+  /* show overlay when menu is open */
+  #nav-toggle:checked ~ .nav-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ensure overlay sits under nav panel but over page content */
+  nav { z-index: 1205; }
+  .nav-overlay { z-index: 1199; }
+}
+

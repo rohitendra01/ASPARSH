@@ -4,6 +4,14 @@
                 <h3>ASPARSH</h3>
             </a>
         </div>
+
+        <!-- Mobile hamburger toggle (visible on small screens) -->
+        <button type="button" class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
         <div class="nav">
             <ul class="nav-links">
                 <li><a href="/home">Home</a></li>
@@ -12,6 +20,7 @@
                 <li><a href="/contact">Contact Us</a></li>
             </ul>
         </div>
+
         <div class="user-profile">
                         <% if (!currentUser) { %>
                                 <div style="overflow: visible; position: relative;">
@@ -36,5 +45,31 @@
                     </div>
                 </div>
             <% } %>
+        </div>
+
+        <!-- Mobile menu: contains nav links and user actions for small screens -->
+        <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <ul class="mobile-nav-links">
+                <li><a href="/home">Home</a></li>
+                <li><a href="/pricing">Pricing</a></li>
+                <li><a href="About">About</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+            </ul>
+            <div class="mobile-user-area">
+                <% if (!currentUser) { %>
+                    <a href="/dashboard" class="dashboard-btn">Dashboard</a>
+                <% } else { %>
+                    <div class="mobile-user">
+                        <a href="/dashboard" class="mobile-user-link">
+                            <img alt="User Profile" class="header-user-image" src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png'%>">
+                            <span style="margin-left:10px"><%= currentUser.username %></span>
+                        </a>
+                        <form action="/logout" method="POST" style="margin-top:10px;">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="button-submit">Logout</button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
         </div>
     </header>

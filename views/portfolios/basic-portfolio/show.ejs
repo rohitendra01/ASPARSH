@@ -3,49 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/portfolio/student/show.css">
+    <meta name="description" content="Asparsh — Student web developer portfolio showcasing projects, services, and contact information.">
+    <link rel="icon" href="assets/favicon.ico">
+    <link rel="stylesheet" href="show.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Montserrat:wght@500;700&family=Raleway:wght@700;800&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Asparsh | Student Portfolio">
+    <meta property="og:description" content="Student web developer portfolio showcasing projects, services, and contact information.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/biography-image.jpg">
     <title>Asparsh | Portfolio</title>
 </head>
 <body>
     <header>
         <div class="user-logo">
-            <a href="/"><p>Asparsh</p></a>
+            <a href="#home"><p>Asparsh</p></a>
         </div>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
         <nav>
-            <input type="checkbox" id="menu-toggle" class="menu-toggle" />
-            <label for="menu-toggle" class="menu-icon">
-            <span></span>
-            <span></span>
-            <span></span>
+            <label for="nav-toggle" class="menu-toggle" aria-label="Toggle navigation menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </label>
-            <ul class="nav-links">
-            <li><a href="/portfolio/student/show">Home</a></li>
-            <li><a href="/portfolio/student/about">About</a></li>
-            <li><a href="/portfolio/student/services">Services</a></li>
-            <li><a href="/portfolio/student/portfolio">Portfolio</a></li>
-            <li><a href="/portfolio/student/blog">Blog</a></li>
-            <li><a href="/portfolio/student/contact" class="contact-link">Contact Me</a></li>
+            <ul id="primary-nav" class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#contact" class="contact-link">Contact Me</a></li>
             </ul>
         </nav>
+        <label for="nav-toggle" class="nav-overlay" id="nav-overlay" tabindex="-1" aria-hidden="true"></label>
     </header>
+
     <main>
-        <section class="portfolio-hero">
+        <section id="home" class="portfolio-hero">
             <div class="portfolio-contents">
                 <h2>Hello, I'm a Student</h2>
                 <h1>My name is John Doe</h1>
                 <p>I am a passionate web developer. I have experience in building responsive websites and web applications. Apart from that, I enjoy learning new technologies and improving my skills. My hobbies include hiking, photography, and playing the guitar.</p>
                 <div class="portfolio-contact">
-                    <a href="/portfolio/student/contact" class="contact-button">Contact Me</a>
-                    <a href="/portfolio/edit" class="edit-button">My  Portfolio</a>
+                    <a href="#contact" class="contact-button">Contact Me</a>
+                    <a href="#portfolio" class="edit-button">My  Portfolio</a>
                 </div>
             </div>
             <div class="portfolio-image">
-                <img src="/assets/portfolio-image.jpg" alt="Portfolio Image">
+                <img src="assets/portfolio-image.jpg" alt="Portfolio Image">
             </div>
         </section>
         <section class="portfolio-biography">
             <div class="biography-image">
-                <img src="/assets/biography-image.jpg" alt="Biography Image">
+                <img src="assets/biography-image.jpg" alt="Biography Image">
             </div>
             <div class="biography-content">
                 <h3>My Biography</h3>
@@ -71,28 +80,163 @@
                 </div>
                 <div class="follow-me">
                     Follow me on:
-                    <a href="https://github.com" target="_blank" class="social-link">
+                    <a href="https://github.com" target="_blank" rel="noopener" class="social-link">
                         GitHub
                     </a>
-                    <a href="https://linkedin.com" target="_blank" class="social-link">
+                    <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-link">
                         LinkedIn
                     </a>
-                    <a href="https://twitter.com" target="_blank" class="social-link">
+                    <a href="https://twitter.com" target="_blank" rel="noopener" class="social-link">
                         Twitter
                     </a>
-                    <a href="https://instagram.com" target="_blank" class="social-link">
+                    <a href="https://instagram.com" target="_blank" rel="noopener" class="social-link">
                         Instagram
                     </a>
-                    <a href="https://facebook.com" target="_blank" class="social-link">
+                    <a href="https://facebook.com" target="_blank" rel="noopener" class="social-link">
                         Facebook
                     </a>
                 </div>
                 <div class="contact-me">
-                    <button onclick="window.location.href='/portfolio/student/contact'" class="hire-me">Hire Me</button>
-                    <a href="/assets/cv.pdf" class="download-cv" download>
+                    <button onclick="window.location.href='contact.html'" class="hire-me">Hire Me</button>
+                    <a href="assets/cv.pdf" class="download-cv" download>
                         <button type="button">Download CV</button>
                     </a>
                 </div>
+            </div>
+        </section>
+        <section id="about" class="about-section">
+            <h1>About Me</h1>
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="assets/biography-image.jpg" alt="About Image">
+                </div>
+                <div class="about-text">
+                    <h2>Hello! I'm John Doe</h2>
+                    <p>
+                        I am a passionate web developer and student, always eager to learn and grow. My journey in tech started with curiosity and has grown into a deep love for building beautiful, functional web applications.
+                    </p>
+                    <p>
+                        I enjoy working with HTML, CSS, JavaScript, and modern frameworks. My goal is to become a full-stack developer and contribute to impactful projects. Outside of coding, I love hiking, photography, and music.
+                    </p>
+                    <ul class="about-list">
+                        <li><strong>Age:</strong> 20</li>
+                        <li><strong>Location:</strong> New York, USA</li>
+                        <li><strong>Email:</strong> tempmail@example.com</li>
+                        <li><strong>Phone:</strong> +1 234 567 890</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <section id="services" class="services-section">
+            <h1>My Services</h1>
+            <div class="services-content">
+                <div class="service-card">
+                    <h2>Web Development</h2>
+                    <p>Building responsive and modern websites using HTML, CSS, JavaScript, and frameworks like React.</p>
+                </div>
+                <div class="service-card">
+                    <h2>UI/UX Design</h2>
+                    <p>Designing user-friendly interfaces and experiences for web and mobile applications.</p>
+                </div>
+                <div class="service-card">
+                    <h2>Backend Development</h2>
+                    <p>Creating robust server-side logic with Node.js, Express, and MongoDB.</p>
+                </div>
+                <div class="service-card">
+                    <h2>Project Collaboration</h2>
+                    <p>Working with teams using Git, GitHub, and agile methodologies.</p>
+                </div>
+            </div>
+        </section>
+        <section id="portfolio" class="portfolio-section">
+            <h1>My Portfolio</h1>
+            <div class="portfolio-content">
+                <p>Showcase your projects here...</p>
+            </div>
+        </section>
+        <section id="blog" class="blog-section">
+            <h1>My Blog</h1>
+            <div class="blog-grid">
+                <article class="blog-post">
+                    <div class="blog-image">
+                        <img src="assets/feature1.jpg" alt="Blog Post 1">
+                    </div>
+                    <div class="blog-content">
+                        <h2>Getting Started with Web Development</h2>
+                        <p class="blog-date">January 15, 2024</p>
+                        <p>Learn the fundamentals of web development and how to build your first website...</p>
+                        <a href="#" class="read-more">Read More</a>
+                    </div>
+                </article>
+                
+                <article class="blog-post">
+                    <div class="blog-image">
+                        <img src="assets/feature2.jpg" alt="Blog Post 2">
+                    </div>
+                    <div class="blog-content">
+                        <h2>JavaScript Tips and Tricks</h2>
+                        <p class="blog-date">February 8, 2024</p>
+                        <p>Discover useful JavaScript techniques that will make your code more efficient...</p>
+                        <a href="#" class="read-more">Read More</a>
+                    </div>
+                </article>
+                
+                <article class="blog-post">
+                    <div class="blog-image">
+                        <img src="assets/feature3.jpg" alt="Blog Post 3">
+                    </div>
+                    <div class="blog-content">
+                        <h2>Building Responsive Websites</h2>
+                        <p class="blog-date">March 3, 2024</p>
+                        <p>Learn how to create websites that look great on all devices...</p>
+                        <a href="#" class="read-more">Read More</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+        <section id="contact" class="contact-section">
+            <h1>Contact Me</h1>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>Get In Touch</h2>
+                    <p>I'd love to hear from you! Whether you have a project in mind or just want to connect, feel free to reach out.</p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <h3>Email</h3>
+                            <p>tempmail@example.com</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>Phone</h3>
+                            <p>+1 234 567 890</p>
+                        </div>
+                        <div class="contact-item">
+                            <h3>Location</h3>
+                            <p>New York, USA</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form action="/portfolio/student/contact" method="POST">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
         </section>
     </main>
 </body>

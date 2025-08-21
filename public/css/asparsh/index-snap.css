@@ -25,3 +25,16 @@ main {
 #snap{
   scroll-snap-align: start;   
 }
+
+/* Disable snap scrolling on small screens to avoid UX and interaction problems (mobile) */
+@media (max-width: 768px) {
+  html {
+    scroll-snap-type: none;
+  }
+  .snap-section {
+    scroll-snap-align: none;
+    height: auto;
+    min-height: 0;
+    margin-block: 1rem;
+  }
+}
