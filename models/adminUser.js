@@ -27,6 +27,11 @@ const adminUserSchema = new mongoose.Schema({
         type: String, // Cloudinary image URL
         default: ''
     },
+    // Track the active session id for single-device login enforcement
+    currentSessionId: {
+        type: String,
+        default: null,
+    },
     slug: {
         type: String,
         unique: true,

@@ -30,12 +30,24 @@ exports.loginUser = (req, res, next) => {
       req.flash('email', req.body.email);
       return res.redirect(req.headers.referer || '/');
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) return next(err);
-      req.flash('success_msg', 'Successfully logged in!');
-      const redirectUrl = req.session.returnTo || '/';
-      delete req.session.returnTo;
-      res.redirect(redirectUrl);
+      try {
+        if (user.currentSessionId && req.sessionStore && typeof req.sessionStore.destroy === 'function') {
+          try {
+            await new Promise((resolve) => req.sessionStore.destroy(user.currentSessionId, () => resolve()));
+          } catch (e) {}
+        }
+        user.currentSessionId = req.sessionID || null;
+        await user.save();
+
+        req.flash('success_msg', 'Successfully logged in!');
+        const redirectUrl = req.session.returnTo || '/';
+        delete req.session.returnTo;
+        res.redirect(redirectUrl);
+      } catch (saveErr) {
+        return next(saveErr);
+      }
     });
   })(req, res, next);
 };

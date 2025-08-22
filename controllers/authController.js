@@ -48,10 +48,16 @@ exports.registerUser = async (req, res) => {
         const user = new adminUser({ username, email: email.toLowerCase(), password });
         await user.save();
         req.flash('success_msg', 'Registration successful! You are now logged in.');
-        req.logIn(user, (err) => {
+        req.logIn(user, async (err) => {
             if (err) {
                 req.flash('error_msg', 'Login after registration failed. Please log in manually.');
                 return res.redirect('/login');
+            }
+            try {
+                user.currentSessionId = req.sessionID || null;
+                await user.save();
+            } catch (e) {
+                // ignore save errors
             }
             return res.redirect('/');
         });
@@ -81,22 +87,50 @@ exports.loginUser = (req, res, next) => {
             return res.redirect(req.headers.referer || '/');
         }
         
-        req.logIn(user, (err) => {
+        req.logIn(user, async (err) => {
             if (err) return next(err);
-            req.flash('success_msg', 'Successfully logged in!');
-            
-            const redirectUrl = req.session.returnTo || '/';
-            delete req.session.returnTo;
-            res.redirect(redirectUrl);
+            try {
+                // Enforce single active session for admin: destroy previous session if exists
+                if (user.currentSessionId && req.sessionStore && typeof req.sessionStore.destroy === 'function') {
+                    try {
+                        await new Promise((resolve) => req.sessionStore.destroy(user.currentSessionId, () => resolve()));
+                    } catch (e) {
+                        // ignore errors destroying old session
+                    }
+                }
+                // Save the new session id on user
+                user.currentSessionId = req.sessionID || null;
+                await user.save();
+
+                req.flash('success_msg', 'Successfully logged in!');
+                const redirectUrl = req.session.returnTo || '/';
+                delete req.session.returnTo;
+                res.redirect(redirectUrl);
+            } catch (saveErr) {
+                return next(saveErr);
+            }
         });
     })(req, res, next);
 };
 
 exports.logoutUser = (req, res) => {
-    req.logout((err) => {
+    // Clear stored session id for user so they can login from another device
+    const user = req.user;
+    req.logout(async (err) => {
         if (err) {
             req.flash('error_msg', 'Error logging out');
             return res.redirect('/');
+        }
+        try {
+            if (user && user.currentSessionId) {
+                // Only clear if it matches current session (prevents race)
+                if (user.currentSessionId === req.sessionID) {
+                    user.currentSessionId = null;
+                    await user.save();
+                }
+            }
+        } catch (e) {
+            // ignore save errors
         }
         req.flash('success_msg', 'Successfully logged out');
         res.redirect(req.headers.referer || '/');

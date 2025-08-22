@@ -16,6 +16,13 @@ const bodyParser = require("body-parser");
 const ejsMate = require('ejs-mate');
 const path = require("path");
 const session = require('express-session');
+let MongoStore;
+try {
+    // prefer connect-mongo v4 style
+    MongoStore = require('connect-mongo');
+} catch (e) {
+    MongoStore = null;
+}
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -33,21 +40,45 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 require('dotenv').config();
 app.use(cookieParser());
-app.use(session({
-    secret: 'yourSecretKey',
+const sessionOptions = {
+    secret: process.env.SESSION_SECRET || 'yourSecretKey',
     resave: false,
     saveUninitialized: false,
-    cookie: { 
+    cookie: {
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
-}));
+};
+
+// Use Mongo-backed session store when connect-mongo is available and MONGO_URI/ mongoose connection exists
+if (MongoStore) {
+    try {
+        const mongoose = require('mongoose');
+        // connect-mongo v4 expects MongoStore.create
+        sessionOptions.store = MongoStore.create({
+            mongoUrl: process.env.MONGO_URI || (mongoose.connection && mongoose.connection.client && mongoose.connection.client.s.url) || undefined,
+            ttl: 14 * 24 * 60 * 60 // 14 days
+        });
+    } catch (e) {
+        console.warn('connect-mongo could not be initialized, falling back to default session store');
+    }
+}
+
+app.use(session(sessionOptions));
 app.use(flash());
 
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Enforce single-session middleware (forces logout when session id doesn't match stored id)
+try {
+    const { enforceSingleSession } = require('./middleware/authMiddleware');
+    app.use(enforceSingleSession);
+} catch (e) {
+    console.warn('Could not mount enforceSingleSession middleware:', e && e.message);
+}
 
 // Passport config - fixed to use comparePassword method
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
