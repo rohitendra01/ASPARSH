@@ -2,7 +2,9 @@ const passport = require('passport');
 const adminUser = require('../models/adminUser');
 
 exports.getRegisterPage = (req, res) => {
-    res.render("users/register", { csrfToken: req.csrfToken() });
+    // Only call req.csrfToken() if csurf middleware has been applied for this route
+    const token = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
+    res.render("users/register", { csrfToken: token });
 };
 
 exports.registerUser = async (req, res) => {
@@ -67,7 +69,9 @@ exports.getLoginPage = (req, res) => {
         req.flash('error_msg', 'You are already logged in');
         return res.redirect('/');
     }
-    res.render("users/login", { csrfToken: req.csrfToken() });
+    // Only call req.csrfToken() if csurf middleware has been applied for this route
+    const token = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
+    res.render("users/login", { csrfToken: token });
 };
 
 exports.loginUser = (req, res, next) => {
