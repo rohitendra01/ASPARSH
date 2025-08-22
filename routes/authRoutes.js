@@ -6,12 +6,14 @@ const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: false });
 const loginOtpController = require('../controllers/loginOtpController');
 const authController = require('../controllers/authController');
-// Registration routes - do NOT cache CSRF-protected pages
-router.get('/register', csrfProtection, authController.getRegisterPage);
-router.post('/register', csrfProtection, authController.registerUser);
 const authMiddleware = require('../middleware/authMiddleware');
 
+// Registration routes - do NOT cache CSRF-protected pages
+// router.get('/register', csrfProtection, authController.getRegisterPage);
+// router.post('/register', csrfProtection, authController.registerUser);
+
 // Apply storeReturnTo middleware globally
+
 router.use(authMiddleware.storeReturnTo);
 
 router.get('/login', csrfProtection, loginOtpController.getLoginPage);
