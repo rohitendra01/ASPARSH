@@ -317,7 +317,8 @@
   <div class="modal-inner" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <button class="modal-close" aria-label="Close">&times;</button>
     <h3 id="modalTitle">Configure Service</h3>
-    <form id="configureForm">
+    <form id="configureForm" method="POST" action="/dashboard/<%= slug %>/services/configure">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <input type="hidden" name="serviceKey" id="modalServiceKey">
       <div class="form-row">
         <label>Feature toggle</label>

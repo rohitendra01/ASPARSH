@@ -73,3 +73,48 @@
             </div>
         </div>
     </header>
+    <script>
+(function () {
+  const btn = document.getElementById('hamburgerBtn');
+  const panel = document.getElementById('mobileMenu');
+  if (!btn || !panel) return;
+
+  function openMenu() {
+    btn.setAttribute('aria-expanded', 'true');
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    // prevent background scroll while open
+    document.documentElement.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    btn.setAttribute('aria-expanded', 'false');
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    if (expanded) closeMenu(); else openMenu();
+  });
+
+  // Close when clicking outside: click anywhere not inside panel or button
+  document.addEventListener('click', (e) => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    if (!expanded) return;
+    if (!panel.contains(e.target) && !btn.contains(e.target)) closeMenu();
+  });
+
+  // Close on ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') closeMenu();
+  });
+
+  // Close on link click inside mobile panel (keeps UX simple)
+  panel.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (a) closeMenu();
+  });
+})();
+</script>

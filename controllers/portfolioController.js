@@ -203,50 +203,16 @@ exports.listPortfolios = async (req, res) => {
   let profile = null;
   let portfolios = [];
 
-  try {
-    // Extra diagnostics: show overall counts to help debugging
-    const totalPortfolios = await Portfolio.countDocuments();
-    const byUserCount = req.user ? await Portfolio.countDocuments({ createdBy: req.user._id }) : 0;
-    const sampleAny = await Portfolio.findOne({}).lean();
-    console.log('[portfolioController] DEBUG totals:', { totalPortfolios, byUserCount, sampleAnyId: sampleAny ? sampleAny._id : null });
-  } catch (diagErr) {
-    console.error('[portfolioController] DEBUG error fetching totals', diagErr);
-  }
-
-  try {
-      // try to find profile by slug
-      profile = await Profile.findOne({ slug: slugParam });
-      if (profile) {
-        portfolios = await Portfolio.find({ profileId: profile._id });
-      } else {
-        // If the slug refers to the current logged-in user (own dashboard), list portfolios for profiles created by that user
-        if (req.user && req.user.slug === slugParam) {
-          const userProfiles = await Profile.find({ createdBy: req.user._id });
-          if (userProfiles && userProfiles.length) {
-            const ids = userProfiles.map(p => p._id);
-            portfolios = await Portfolio.find({ profileId: { $in: ids } });
-            profile = userProfiles[0];
-          }
-
-        // fallback: some Portfolio documents use the profile slug in their `slug` field — try matching that
-        if ((!portfolios || portfolios.length === 0) && !profile) {
-          portfolios = await Portfolio.find({ slug: slugParam });
-        }
-        // last-resort: portfolios created by the current user
-        if ((!portfolios || portfolios.length === 0) && req.user) {
-          portfolios = await Portfolio.find({ createdBy: req.user._id });
-        }
-      }
-    }
-
-    res.render('portfolios/index', { portfolios, slug: req.params.slug, profile, layout: 'layouts/dashboard', currentUser: req.user });
+try {
+    // List all portfolios created by the logged-in admin user (createdBy)
+    portfolios = await Portfolio.find({ createdBy: req.user._id });
+    res.render('portfolios/index', { portfolios, slug: req.params.slug, layout: 'layouts/dashboard', currentUser: req.user });
   } catch (err) {
     res.status(500).send('Error loading portfolios');
   }
 };
 
 exports.deletePortfolio = async (req, res) => {
-  // Delete a portfolio
   await Portfolio.findByIdAndDelete(req.params.id);
   res.redirect(`/dashboard/${req.params.slug}/portfolios`);
 };

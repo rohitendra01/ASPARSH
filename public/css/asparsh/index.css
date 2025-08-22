@@ -32,6 +32,7 @@ body {
   margin: 0;
   position: relative;
   z-index: 0;
+  overflow-x: hidden; /* prevent horizontal scroll caused by overflowing children */
 }
 
 body::before {
@@ -46,18 +47,23 @@ body::before {
 
 /* header styles */
 
-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 10rem 1rem 10rem ;
-    position: fixed;
-    width: 100vw;
-    height: var(--header-height);
-    z-index: 2000;
-    background: var(--hea-foo);
-    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.07);
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.0rem clamp(1rem, 4vw, 4rem);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: var(--header-height);
+  z-index: 2000;
+  background: var(--hea-foo);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  box-sizing: border-box;
 }
+
 
 header  h3{
     font-family: var(--head-text);
@@ -103,6 +109,186 @@ a{
     text-shadow: 0 4px 6px rgba(255, 255, 255, 0.3);
     transition: 0.3s ease-in-out;
 }
+
+.user-dropdown-content {
+    opacity: 0; /* Hidden initially */
+    visibility: hidden; /* Hidden for accessibility and pointer events */
+    pointer-events: none; /* Prevents interaction when hidden */
+
+    position: absolute;
+    top: calc(100% + 10px); /* Position 10px below the user-dropdown */
+    right: 30px; /* Align to the right of the user-dropdown */
+
+    background: var(--text-light);
+    width: 300px; /* Explicit width for the form (from your partials/login form) */
+    padding: 16px 12px 8px 12px;
+    box-shadow: 1px 4px 16px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    z-index: 1000; /* Ensure dropdown content is above other elements */
+    box-sizing: border-box; /* Include padding/border in width */
+
+    transform: translateY(-5px); /* Start slightly above for slide-down effect */
+
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+}
+
+.user-dropdown-content.show {
+    opacity: 1; /* Fully visible */
+    visibility: visible; /* Make visible */
+    pointer-events: auto; /* Enable interaction */
+    transform: translateY(0); /* Slide to final position */
+
+    /* When showing: appear immediately (no delay on visibility) and fade/slide in */
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
+}
+
+.header-user-image{
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+ .button-submit {
+     margin: 20px 0 10px 0;
+     background-color: #151717;
+     border: none;
+     color: var(--text-light);
+     font-family: var(--content-text);
+     font-size: clamp(0.9rem, 1vw, 1rem);
+     font-weight: 500;
+     border-radius: 10px;
+     height: 50px;
+     cursor: pointer;
+}
+
+.button-submit:hover {
+    background-color: #252727;
+}
+
+ p {
+     text-align: center;
+     color: var(--text-dark);
+     font-family: var(--content-text);
+     font-size: clamp(0.85rem, 1vw, 1rem);
+}
+
+
+a.dashboard-btn {
+    text-decoration: none;
+    background: var(--hea-foo);
+    color: white;
+    padding: 12px 26px;
+    border: 2px solid white;
+    border-radius: 16px;
+    cursor: pointer;
+    
+    font-weight: 700;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.dashboard-btn:hover {
+    background: #083235;
+    color: #39ff14;
+    text-shadow: 0 0 8px #39ff14, 0 0 32px #39ff14;
+}
+
+/* helper: allow logo / nav / profile to shrink nicely */
+.logo { flex: 0 0 auto; display:flex; align-items:center; }
+.nav { display:flex; align-items:center; gap:1rem; flex: 1 1 auto; justify-content:center; }
+.user-profile { flex: 0 0 auto; display:flex; align-items:center; gap:.5rem; }
+
+/* nav links (desktop) */
+.nav-links { display:flex; list-style:none; gap:1.25rem; margin:0; padding:0; align-items:center; }
+.nav-links li { list-style:none; }
+.nav-links a { color: var(--text-light); text-decoration:none; padding: .35rem .6rem; border-radius:8px; font-weight:600; }
+
+/* make sure no horizontal overflow */
+* { box-sizing: border-box; min-width: 0; }
+
+/* HAMBURGER - positioned at top-right on small screens */
+.hamburger {
+  display: none;               /* shown only on small screens below */
+  position: absolute;
+  top: 50%;
+  right: clamp(0.75rem, 3vw, 1.25rem);
+  transform: translateY(-50%);
+  z-index: 2200;
+  width: 44px;
+  height: 40px;
+  padding: 6px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 3px;
+  background: var(--text-light);
+  margin: 4px 0;
+  border-radius: 2px;
+  transition: transform .22s ease, opacity .18s ease;
+}
+.hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(.9); }
+.hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Mobile menu panel */
+.mobile-menu {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  z-index: 1500;
+  background: linear-gradient(180deg, rgba(8,50,53,0.98), rgba(8,50,53,0.95));
+  color: var(--text-light);
+  padding: 1rem;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  transform: translateY(-6%) scale(.995);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .22s ease, opacity .22s ease;
+  max-height: calc(100vh - var(--header-height));
+  overflow:auto;
+}
+.mobile-menu.open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* mobile menu inner styles */
+.mobile-nav-links { list-style:none; padding:0; margin:0 0 .8rem 0; display:flex; flex-direction:column; gap:.6rem; }
+.mobile-nav-links a { color: inherit; text-decoration:none; padding:.65rem .7rem; border-radius:8px; display:block; font-weight:600; }
+.mobile-nav-links a:hover { background: rgba(255,255,255,0.04); }
+
+/* mobile user area */
+.mobile-user-area { border-top: 1px dashed rgba(255,255,255,0.06); padding-top:.8rem; margin-top:.8rem; display:flex; flex-direction:column; gap:.5rem; }
+.mobile-user-link { display:flex; align-items:center; gap:.6rem; color:var(--text-light); text-decoration:none; font-weight:600; }
+
+/* button style inside mobile panel */
+.button-submit { background:#fff; color:var(--hea-foo); padding:.6rem .9rem; border-radius:8px; border:0; font-weight:700; cursor:pointer; }
+
+/* Desktop: hide mobile-menu entirely */
+@media (min-width: 1025px) {
+  .mobile-menu { display: none !important; }
+}
+
+/* Small screens: show hamburger, hide desktop nav & profile */
+@media (max-width: 768px) {
+  .hamburger { display:flex; }
+  .nav-links { display: none; }        /* hide desktop links */
+  .user-profile { display: none !important; } /* hide avatar / desktop dashboard area */
+}
+
+
+
+
 
 
 
@@ -997,7 +1183,7 @@ footer {
   width: min(var(--max-content-width), 100%);
   margin-inline: auto;
   gap: clamp(1.5rem, 3vw, 3rem);
-  overflow: visible;
+  overflow: hidden; /* ensure children (carousel/cards) can't push outside */
   box-sizing: border-box;
 }
 
@@ -1019,15 +1205,19 @@ footer {
   max-width: 900px;
   max-height: 24rem;
   margin: 0 auto 2.5rem auto;
-  overflow: visible;
+  overflow: visible; /* clip carousel content to container width */
   box-sizing: border-box;
   border-radius: 1rem;
 }
 
 .testimonial-carousel-wrapper {
   display: flex;
+  flex-wrap: wrap;
   transition: transform 1s cubic-bezier(.77,0,.18,1);
   will-change: transform;
+  align-items: center;    
+  justify-content: center;
+  gap: 1rem;              
 }
 
 .testimonial-card {
@@ -1289,154 +1479,6 @@ footer {
 
 
 
-.user-dropdown-content {
-    opacity: 0; /* Hidden initially */
-    visibility: hidden; /* Hidden for accessibility and pointer events */
-    pointer-events: none; /* Prevents interaction when hidden */
-
-    position: absolute;
-    top: calc(100% + 10px); /* Position 10px below the user-dropdown */
-    right: 30px; /* Align to the right of the user-dropdown */
-
-    background: var(--text-light);
-    width: 300px; /* Explicit width for the form (from your partials/login form) */
-    padding: 16px 12px 8px 12px;
-    box-shadow: 1px 4px 16px rgba(0,0,0,0.15);
-    border-radius: 10px;
-    z-index: 1000; /* Ensure dropdown content is above other elements */
-    box-sizing: border-box; /* Include padding/border in width */
-
-    transform: translateY(-5px); /* Start slightly above for slide-down effect */
-
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
-}
-
-.user-dropdown-content.show {
-    opacity: 1; /* Fully visible */
-    visibility: visible; /* Make visible */
-    pointer-events: auto; /* Enable interaction */
-    transform: translateY(0); /* Slide to final position */
-
-    /* When showing: appear immediately (no delay on visibility) and fade/slide in */
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
-}
-
-.header-user-image{
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-}
-
- .button-submit {
-     margin: 20px 0 10px 0;
-     background-color: #151717;
-     border: none;
-     color: var(--text-light);
-     font-family: var(--content-text);
-     font-size: clamp(0.9rem, 1vw, 1rem);
-     font-weight: 500;
-     border-radius: 10px;
-     height: 50px;
-     cursor: pointer;
-}
-
-.button-submit:hover {
-    background-color: #252727;
-}
-
- p {
-     text-align: center;
-     color: var(--text-dark);
-     font-family: var(--content-text);
-     font-size: clamp(0.85rem, 1vw, 1rem);
-}
-
-
-a.dashboard-btn {
-    text-decoration: none;
-    background: var(--hea-foo);
-    color: white;
-    padding: 12px 26px;
-    border: 2px solid white;
-    border-radius: 16px;
-    cursor: pointer;
-    
-    font-weight: 700;
-    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-}
-
-.dashboard-btn:hover {
-    background: #083235;
-    color: #39ff14;
-    text-shadow: 0 0 8px #39ff14, 0 0 32px #39ff14;
-}
-
-/* Hamburger and mobile menu styles */
-.hamburger {
-  display: none; /* shown on small screens */
-  background: transparent;
-  border: none;
-  width: 42px;
-  height: 36px;
-  padding: 6px;
-  flex-shrink: 0;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-}
-.hamburger span {
-  display: block;
-  height: 3px;
-  background: var(--text-light);
-  margin: 5px 0;
-  border-radius: 2px;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-.hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
-.mobile-menu {
-  position: fixed;
-  top: var(--header-height);
-  right: 0;
-  left: 0;
-  background: linear-gradient(180deg, rgba(8,50,53,0.98), rgba(8,50,53,0.95));
-  color: var(--text-light);
-  padding: 1rem;
-  transform: translateY(-8px) scale(0.995);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 220ms ease, transform 220ms ease;
-  z-index: 1500;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-.mobile-menu.open {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-.mobile-nav-links { list-style: none; padding: 0; margin: 0 0 1rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.mobile-nav-links a { color: var(--text-light); text-decoration: none; padding: 10px 8px; display: block; border-radius: 8px; }
-.mobile-nav-links a:hover { background: rgba(255,255,255,0.04); }
-
-.mobile-user-area { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
-.mobile-user { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.mobile-user-link { display: flex; align-items: center; color: var(--text-light); text-decoration: none; }
-.mobile-user-link img.header-user-image { width: 44px; height: 44px; }
-.button-submit { background: #fff; color: #083235; padding: 10px 12px; border: none; border-radius: 8px; cursor: pointer; }
-.button-submit:hover { background: #e1f6e0; }
-
-/* show hamburger and adjust header layout on small screens */
-@media (max-width: 768px) {
-  .hamburger { display: flex; }
-  header { display: flex; align-items: center; gap: 12px; }
-  .logo { flex: 1; }
-  .nav { order: 3; }
-  .user-profile { order: 2; }
-}
 
 /* Responsive: tablet and mobile tweaks */
 @media (max-width: 1024px) {
@@ -1604,6 +1646,7 @@ a.dashboard-btn {
   .testimonial-carousel {
     max-width: 100%;
     padding: 0 0.25rem;
+    flex-wrap: wrap;
   }
   .testimonial-card {
     flex: 0 0 100%;
