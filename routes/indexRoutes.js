@@ -99,10 +99,13 @@ const testimonials = [
         api_secret: process.env.CLOUDINARY_API_SECRET
     });
     
+    const csurf = require('csurf');
+    const csrfProtection = csurf({ cookie: false });
+
     router.post("/dashboard/create-hotel", isLoggedIn, upload.fields([
         { name: 'hotelLogo', maxCount: 1 },
         { name: 'hotelOfferBanner', maxCount: 1 }
-    ]), async (req, res) => {
+    ]), csrfProtection, async (req, res) => {
         try {
             const { hotelId, hotelName, hotelDescription, hotelType, street, city, state, country, zipCode } = req.body;
             // Generate hotelSlug from hotelName

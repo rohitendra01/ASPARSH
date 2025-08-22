@@ -132,8 +132,29 @@ app.use((req, res, next) => {
     res.locals.returnTo = req.session.returnTo || '/';
     res.locals.name = req.flash('name')[0];
     res.locals.email = req.flash('email')[0];
-    // set csrfToken only if csurf has run for this request (router-level)
-    res.locals.csrfToken = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
+    // csrfToken is set by a later middleware after csurf has been run for safe GET requests
+    next();
+});
+
+try {
+    const safeCsrf = csurf({ cookie: false });
+    app.use((req, res, next) => {
+        if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+            return safeCsrf(req, res, next);
+        }
+        return next();
+    });
+} catch (e) {
+    console.warn('Could not initialize safe CSRF middleware:', e && e.message);
+}
+
+// After running safeCsrf on GETs, populate res.locals.csrfToken so views can render it.
+app.use((req, res, next) => {
+    try {
+        res.locals.csrfToken = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
+    } catch (e) {
+        res.locals.csrfToken = null;
+    }
     next();
 });
 
@@ -164,18 +185,6 @@ app.use((err, req, res, next) => {
   if (!err) return next();
   // csurf uses code 'EBADCSRFTOKEN'
   if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
-    try {
-      console.error('[app] CSRF validation failed', {
-        url: req.originalUrl,
-        method: req.method,
-        headers: Object.keys(req.headers).reduce((acc, k) => { acc[k] = req.headers[k]; return acc; }, {}),
-        body: req.body,
-        cookies: req.cookies
-      });
-    } catch (logErr) {
-      console.error('[app] Error logging CSRF failure', logErr);
-    }
-    // respond with JSON for XHR/JSON requests, otherwise show simple message
     const accept = (req.headers['accept'] || '').toLowerCase();
     if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });
     return res.status(403).send('Invalid CSRF token');

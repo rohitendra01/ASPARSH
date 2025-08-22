@@ -3,6 +3,8 @@ const router = express.Router({ mergeParams: true });
 const portfolioController = require('../controllers/portfolioController');
 const profileController = require('../controllers/profileController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
+const csurf = require('csurf');
+const csrfProtection = csurf({ cookie: false });
 
 // List all portfolios for a user
 router.get('/', portfolioController.listPortfolios);
@@ -11,7 +13,7 @@ router.get('/', portfolioController.listPortfolios);
 router.get('/new', isLoggedIn, portfolioController.renderNewForm);
 
 // Create a new portfolio (use portfolioController)
-router.post('/new', isLoggedIn, portfolioController.createPortfolio);
+router.post('/new', isLoggedIn, csrfProtection, portfolioController.createPortfolio);
 
 //Edit a profile
 router.get('/edit', isLoggedIn, profileController.renderEditProfileForm);
@@ -29,7 +31,7 @@ router.put('/:id', portfolioController.updatePortfolio);
 router.delete('/:id', portfolioController.deletePortfolio);
 
 // Publish a portfolio (set isPublished = true)
-router.post('/:id/publish', isLoggedIn, portfolioController.publishPortfolio);
+router.post('/:id/publish', isLoggedIn, csrfProtection, portfolioController.publishPortfolio);
 
 // NOTE: profile search API is handled centrally at /api/profiles/search (see routes/apiRoutes.js)
 

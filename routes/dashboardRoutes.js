@@ -5,6 +5,8 @@ const { isLoggedIn } = require('../middleware/authMiddleware');
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+const csurf = require('csurf');
+const csrfProtection = csurf({ cookie: false });
 const userController = require('../controllers/userController');
 const profileController = require('../controllers/profileController');
 const portfolioController = require('../controllers/portfolioController');
@@ -16,7 +18,7 @@ router.get('/:slug/portfolios', isLoggedIn, portfolioController.listPortfolios);
 router.get('/:slug/portfolios/new', isLoggedIn, portfolioController.renderNewForm);
 
 // Route for /:slug/portfolios/new (handle POST)
-router.post('/:slug/portfolios/new', isLoggedIn, upload.single('portfolioImage'), portfolioController.createPortfolio);
+router.post('/:slug/portfolios/new', isLoggedIn, upload.single('portfolioImage'), csrfProtection, portfolioController.createPortfolio);
 
 // Route for /:slug/portfolios/:id (show portfolio details)
 router.get('/:slug/portfolios/:id', isLoggedIn, portfolioController.showPortfolio);
@@ -25,10 +27,10 @@ router.get('/:slug/portfolios/:id', isLoggedIn, portfolioController.showPortfoli
 router.get('/:slug/portfolios/:id/edit', isLoggedIn, portfolioController.renderEditForm);
 
 // Route for /:slug/portfolios/:id/edit (handle POST)
-router.post('/:slug/portfolios/:id/edit', isLoggedIn, upload.single('portfolioImage'), portfolioController.updatePortfolio);
+router.post('/:slug/portfolios/:id/edit', isLoggedIn, upload.single('portfolioImage'), csrfProtection, portfolioController.updatePortfolio);
 
 // Route for /:slug/portfolios/:id/delete (handle POST)
-router.post('/:slug/portfolios/:id/delete', isLoggedIn, portfolioController.deletePortfolio);
+router.post('/:slug/portfolios/:id/delete', isLoggedIn, csrfProtection, portfolioController.deletePortfolio);
 
 // Route: dashboard home (protected)
 router.get('/', isLoggedIn, (req, res) => {
@@ -45,7 +47,7 @@ router.get('/profiles', isLoggedIn, profileController.listProfiles);
 router.get('/profiles/new', isLoggedIn, profileController.renderNewProfileForm);
 
 // Route for /:slug/profiles/new (handle POST)
-router.post('/profiles/new', isLoggedIn, upload.single('image'), profileController.createProfile);
+router.post('/profiles/new', isLoggedIn, upload.single('image'), csrfProtection, profileController.createProfile);
 
 // Route for /:slug/profiles/:profileSlug (show profile details)
 router.get('/profiles/:profileSlug', isLoggedIn, profileController.showProfile);
@@ -54,9 +56,9 @@ router.get('/profiles/:profileSlug', isLoggedIn, profileController.showProfile);
 router.get('/profiles/:profileSlug/edit', isLoggedIn, profileController.renderEditProfileForm);
 
 // Route for /:slug/profiles/:profileSlug/edit (handle POST)
-router.post('/profiles/:profileSlug/edit', isLoggedIn, upload.single('image'), profileController.updateProfile);
+router.post('/profiles/:profileSlug/edit', isLoggedIn, upload.single('image'), csrfProtection, profileController.updateProfile);
 
 // Route for /:slug/profiles/:profileSlug/delete (handle POST)
-router.post('/profiles/:profileSlug/delete', isLoggedIn, profileController.deleteProfile);
+router.post('/profiles/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);
 
 module.exports = router;
