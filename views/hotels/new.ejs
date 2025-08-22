@@ -94,19 +94,19 @@
             <legend>Hotel Address</legend>
             <div class="form-row">
               <div class="form-group">
-                <input type="text" name="street" placeholder="Street" value="" required>
+                <input type="text" name="street" placeholder="Street" value="<%= (defaults && defaults.hotelAddress && defaults.hotelAddress.street) || '' %>" required>
               </div>
               <div class="form-group">
-                <input type="text" name="city" placeholder="City" value="" required>
+                  <input type="text" name="city" placeholder="City" value="<%= (defaults && defaults.hotelAddress && defaults.hotelAddress.city) || '' %>" required>
               </div>
               <div class="form-group">
-                <input type="text" name="state" placeholder="State" value="" required>
+                  <input type="text" name="state" placeholder="State" value="<%= (defaults && defaults.hotelAddress && defaults.hotelAddress.state) || '' %>" required>
               </div>
               <div class="form-group">
-                <input type="text" name="country" placeholder="Country" value="" required>
+                  <input type="text" name="country" placeholder="Country" value="<%= (defaults && defaults.hotelAddress && defaults.hotelAddress.country) || '' %>" required>
               </div>
               <div class="form-group">
-                <input type="text" name="zipCode" placeholder="Zip Code" value="" required>
+                  <input type="text" name="zipCode" placeholder="Zip Code" value="<%= (defaults && defaults.hotelAddress && defaults.hotelAddress.zipCode) || '' %>" required>
               </div>
             </div>
           </fieldset>

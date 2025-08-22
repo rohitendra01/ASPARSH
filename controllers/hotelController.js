@@ -2,7 +2,18 @@
 const Hotel = require('../models/Hotel');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
-const { Readable } = require('stream');
+const streamifier = require('streamifier');
+
+// Ensure Cloudinary is configured (safe to call multiple times)
+try {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+} catch (e) {
+  console.warn('Cloudinary config warning:', e && e.message);
+}
 
 // --- Multer config ---
 const storage = multer.memoryStorage();
@@ -10,6 +21,31 @@ exports.uploadHotelImages = multer({ storage }).fields([
   { name: 'hotelLogo', maxCount: 1 },
   { name: 'hotelOfferBanner', maxCount: 1 }
 ]);
+
+// Helper to delete Cloudinary image by url
+async function deleteCloudinaryImage(imageUrl) {
+  if (!imageUrl) return;
+  try {
+    let publicId = null;
+    const m = imageUrl.match(/\/asparsh\/hotels\/([^.?/\\]+)(?:\.|$)/);
+    if (m && m[1]) {
+      publicId = `asparsh/hotels/${m[1]}`;
+    } else {
+      const m2 = imageUrl.match(/\/([^/?#]+)($|\?|#)/);
+      if (m2 && m2[1]) {
+        const name = m2[1].split('.')[0];
+        publicId = `asparsh/hotels/${name}`;
+      }
+    }
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+    } else {
+      console.warn('Could not derive Cloudinary publicId for:', imageUrl);
+    }
+  } catch (e) {
+    console.error('Cloudinary deletion error:', e);
+  }
+}
 
 // --- Controller functions ---
 
@@ -21,7 +57,24 @@ exports.listHotels = async (req, res) => {
 
 // Show new hotel form
 exports.renderNewHotelForm = (req, res) => {
-  res.render('hotels/new', { layout: 'layouts/dashboard-boilerplate', user: req.user });
+  // Derive defaults from schema when available so the form can be prefilled
+  function schemaDefault(path) {
+    try {
+      const p = Hotel.schema.path(path);
+      if (p && p.options && typeof p.options.default !== 'undefined') return p.options.default;
+    } catch (e) {}
+    return '';
+  }
+  const defaults = {
+    hotelAddress: {
+      street: '',
+      city: schemaDefault('hotelAddress.city'),
+      state: schemaDefault('hotelAddress.state'),
+      country: schemaDefault('hotelAddress.country'),
+      zipCode: schemaDefault('hotelAddress.zipCode')
+    }
+  };
+  res.render('hotels/new', { layout: 'layouts/dashboard-boilerplate', user: req.user, defaults });
 };
 
 // Create hotel
@@ -52,29 +105,38 @@ exports.createHotel = async (req, res) => {
     let hotelLogo;
     let hotelOfferBanner;
     if (req.files) {
-      if (req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
+    if (req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
         const logoBuffer = req.files['hotelLogo'][0].buffer;
-        const logoStream = Readable.from(logoBuffer);
-        const logoUpload = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels' }, (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
+        try {
+          const logoUpload = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
+              if (err) return reject(err);
+              resolve(result);
+            });
+            streamifier.createReadStream(logoBuffer).pipe(stream);
           });
-          logoStream.pipe(stream);
-        });
-        hotelLogo = logoUpload.secure_url;
+      hotelLogo = logoUpload.secure_url;
+      // store public id
+      var hotelLogoPublicId = logoUpload.public_id || null;
+        } catch (uploadErr) {
+          console.error('Cloudinary hotelLogo upload failed:', uploadErr);
+        }
       }
-      if (req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
+    if (req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
         const bannerBuffer = req.files['hotelOfferBanner'][0].buffer;
-        const bannerStream = Readable.from(bannerBuffer);
-        const bannerUpload = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels' }, (err, result) => {
-            if (err) reject(err);
-            else resolve(result);
+        try {
+          const bannerUpload = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
+              if (err) return reject(err);
+              resolve(result);
+            });
+            streamifier.createReadStream(bannerBuffer).pipe(stream);
           });
-          bannerStream.pipe(stream);
-        });
-        hotelOfferBanner = bannerUpload.secure_url;
+      hotelOfferBanner = bannerUpload.secure_url;
+      var hotelOfferBannerPublicId = bannerUpload.public_id || null;
+        } catch (uploadErr) {
+          console.error('Cloudinary hotelOfferBanner upload failed:', uploadErr);
+        }
       }
     }
     const hotelData = {
@@ -85,7 +147,9 @@ exports.createHotel = async (req, res) => {
       foodCategories: Array.isArray(foodCategories) ? foodCategories : (foodCategories ? [foodCategories] : []),
       hotelSlug,
       hotelLogo,
-      hotelOfferBanner,
+  hotelOfferBanner,
+  hotelLogoPublicId: hotelLogoPublicId || null,
+  hotelOfferBannerPublicId: hotelOfferBannerPublicId || null,
       createdByProfile: selectedProfileId,
       createdByProfileUsername: selectedProfileSlug,
       createdByProfileName: selectedProfileName,
@@ -210,6 +274,63 @@ exports.updateHotel = async (req, res) => {
         hotel.hotelSlug = newSlug;
       }
     }
+    // Handle uploaded replacement images (if any)
+    try {
+      if (req.files) {
+        // hotelLogo
+        if (req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
+          const logoBuffer = req.files['hotelLogo'][0].buffer;
+          try {
+            const logoUpload = await new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              });
+              streamifier.createReadStream(logoBuffer).pipe(stream);
+            });
+            // Delete old logo if exists and different
+            if (hotel.hotelLogo && hotel.hotelLogo !== logoUpload.secure_url) {
+              // Prefer to delete using stored public id
+              if (hotel.hotelLogoPublicId) {
+                try { await cloudinary.uploader.destroy(hotel.hotelLogoPublicId, { resource_type: 'image' }); } catch (e) { console.error('Error deleting old hotelLogo by publicId:', e); }
+              } else {
+                await deleteCloudinaryImage(hotel.hotelLogo);
+              }
+            }
+            hotel.hotelLogo = logoUpload.secure_url;
+            hotel.hotelLogoPublicId = logoUpload.public_id || hotel.hotelLogoPublicId || null;
+          } catch (uploadErr) {
+            console.error('Cloudinary hotelLogo upload failed during update:', uploadErr);
+          }
+        }
+        // hotelOfferBanner
+        if (req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
+          const bannerBuffer = req.files['hotelOfferBanner'][0].buffer;
+          try {
+            const bannerUpload = await new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              });
+              streamifier.createReadStream(bannerBuffer).pipe(stream);
+            });
+            if (hotel.hotelOfferBanner && hotel.hotelOfferBanner !== bannerUpload.secure_url) {
+              if (hotel.hotelOfferBannerPublicId) {
+                try { await cloudinary.uploader.destroy(hotel.hotelOfferBannerPublicId, { resource_type: 'image' }); } catch (e) { console.error('Error deleting old hotelOfferBanner by publicId:', e); }
+              } else {
+                await deleteCloudinaryImage(hotel.hotelOfferBanner);
+              }
+            }
+            hotel.hotelOfferBanner = bannerUpload.secure_url;
+            hotel.hotelOfferBannerPublicId = bannerUpload.public_id || hotel.hotelOfferBannerPublicId || null;
+          } catch (uploadErr) {
+            console.error('Cloudinary hotelOfferBanner upload failed during update:', uploadErr);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error handling uploaded images in updateHotel:', e);
+    }
     // Track admin who updated
     hotel.updatedBy = req.user ? req.user._id : undefined;
     // Build changes diff
@@ -245,18 +366,60 @@ exports.deleteHotel = async (req, res) => {
   try {
     const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
     const deleteFromCloudinary = async (imageUrl) => {
-      if (!imageUrl) return;
-      const match = imageUrl.match(/\/hotels\/([^./]+)\./);
-      if (match && match[1]) {
-        try {
-          await cloudinary.uploader.destroy('asparsh/hotels/' + match[1]);
-        } catch (e) {
-          console.error('Cloudinary deletion error:', e);
-        }
-      }
+          if (!imageUrl) return;
+          try {
+            // Try to extract public_id including the folder prefix 'asparsh/hotels/<id>'
+            let publicId = null;
+            // Pattern: .../asparsh/hotels/<publicId>.<ext>
+            const m = imageUrl.match(/\/asparsh\/hotels\/([^.?/\\]+)(?:\.|$)/);
+            if (m && m[1]) {
+              publicId = `asparsh/hotels/${m[1]}`;
+            } else {
+              // Fallback: try to capture last path segment without extension
+              const m2 = imageUrl.match(/\/([^/?#]+)($|\?|#)/);
+              if (m2 && m2[1]) {
+                const name = m2[1].split('.')[0];
+                publicId = `asparsh/hotels/${name}`;
+              }
+            }
+            if (publicId) {
+              await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+            } else {
+              console.warn('Could not derive Cloudinary publicId for:', imageUrl);
+            }
+          } catch (e) {
+            console.error('Cloudinary deletion error:', e);
+          }
     };
     await deleteFromCloudinary(hotel.hotelLogo);
     await deleteFromCloudinary(hotel.hotelOfferBanner);
+    // Also delete images referenced inside foodCategories
+    try {
+      if (Array.isArray(hotel.foodCategories)) {
+        for (const cat of hotel.foodCategories) {
+          if (cat) {
+            if (cat.imagePublicId) {
+              try { await cloudinary.uploader.destroy(cat.imagePublicId, { resource_type: 'image' }); } catch (e) { console.error('Error deleting category image by publicId:', e); }
+            } else if (cat.imageUrl) {
+              await deleteFromCloudinary(cat.imageUrl);
+            }
+            if (Array.isArray(cat.foodItems)) {
+              for (const item of cat.foodItems) {
+                if (item) {
+                  if (item.imagePublicId) {
+                    try { await cloudinary.uploader.destroy(item.imagePublicId, { resource_type: 'image' }); } catch (e) { console.error('Error deleting item image by publicId:', e); }
+                  } else if (item.imageUrl) {
+                    await deleteFromCloudinary(item.imageUrl);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error deleting foodCategories images:', e);
+    }
     await Hotel.deleteOne({ hotelSlug: req.params.hotelSlug });
     const hotels = await Hotel.find({});
     const user = req.user && req.user.slug ? req.user : { slug: '' };

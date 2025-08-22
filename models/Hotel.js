@@ -15,20 +15,26 @@ const hotelSchema = new Schema({
   hotelType: { type: String, required: true },
   hotelLogo: { type: String, required: true },
   hotelOfferBanner: { type: String, required: true },
+  // Store Cloudinary public IDs for reliable deletion
+  hotelLogoPublicId: { type: String },
+  hotelOfferBannerPublicId: { type: String },
   foodCategories: [{
     categoryName: { type: String, required: true },
     foodItems: [{
       itemName: { type: String, required: true },
-      price: { type: Number }
+      price: { type: Number },
+      imagePublicId: { type: String },
+      imageUrl: { type: String }
     }],
-    imageUrl: { type: String }
+    imageUrl: { type: String },
+    imagePublicId: { type: String }
   }],
   hotelAddress: {
     street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    country: { type: String, required: true },
-    zipCode: { type: String, required: true }
+    city: { type: String, required: true, default: 'Satna' },
+  state: { type: String, required: true, default: 'Madhya Pradesh' },
+  country: { type: String, required: true, default: 'India' },
+  zipCode: { type: String, required: true, default: '485001' }
   },
 
   createdByProfileUsername: { type: String, required: true },
