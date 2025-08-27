@@ -19,7 +19,7 @@ exports.renderNewForm = async (req, res) => {
       } catch (e) {
       }
       if (!csrfToken && res && res.locals && res.locals.csrfToken) csrfToken = res.locals.csrfToken;
-      return res.render('portfolios/new', { user: req.user || null, slug: req.params ? req.params.slug : undefined, profile, layout: 'layouts/dashboard-boilerplate', csrfToken });
+  return res.render('portfolios/new', { user: req.user || null, slug: req.params ? req.params.slug : undefined, profile, layout: 'layouts/dashboard-boilerplate', csrfToken });
     } catch (renderErr) {
       console.error('[portfolioController] EJS render error for portfolios/new:', renderErr && renderErr.stack ? renderErr.stack : renderErr);
       // Return a helpful error response for debugging (include stack)
@@ -32,7 +32,6 @@ exports.renderNewForm = async (req, res) => {
   }
 };
 
-// Create portfolio (first call - creates draft if publish=false)
 exports.createPortfolio = async (req, res) => {
   try {
     const payload = req.body || {};
@@ -78,7 +77,6 @@ exports.createPortfolio = async (req, res) => {
   }
 };
 
-// Update draft (autosave)
 exports.updatePortfolio = async (req, res) => {
   try {
     const id = req.params.id;
@@ -102,7 +100,6 @@ exports.updatePortfolio = async (req, res) => {
   }
 };
 
-// Optional: publish (set isPublished=true)
 exports.publishPortfolio = async (req, res) => {
   try {
     const id = req.params.id;
@@ -117,7 +114,6 @@ exports.publishPortfolio = async (req, res) => {
   }
 };
 
-// Public view for a portfolio (renders only if published, but allows owner preview)
 exports.showPublic = async (req, res) => {
   try {
     const id = req.params.id;
@@ -130,63 +126,6 @@ exports.showPublic = async (req, res) => {
 
     const profile = await Profile.findById(p.profileId).lean();
     // render public portfolio using the updated view directory
-    return res.render('portfolios/basic-portfolio/show', { portfolio: p, profile, layout: 'layouts/portfolio-boilerplate' });
-  } catch (err) {
-    console.error('[portfolioController] showPublic error', err);
-    res.status(500).send('Error loading portfolio');
-  }
-};
-
-
-
-// Handle form submission to create a new visiting card
-exports.createVisitingCard = async (req, res) => {
-  try {
-    const { name, title, description, email, phone, address, website, linkedin, twitter, facebook, instagram } = req.body;
-    const visitingCard = new VisitingCard({
-      user: req.user ? req.user._id : undefined,
-      name,
-      title,
-      description,
-      email,
-      phone,
-      address,
-      website,
-      linkedin,
-      twitter,
-      facebook,
-      instagram
-    });
-    await visitingCard.save();
-    res.redirect('/dashboard');
-  } catch (err) {
-    console.error(err);
-    res.status(500).render('portfolios/business/new', { error: 'Error creating visiting card', layout: 'layouts/dashboard-boilerplate' });
-  }
-};
-
-// Fetch and show visiting card by user ID
-exports.showVisitingCard = async (req, res) => {
-  try {
-    const visitingCard = await VisitingCard.findById(req.params.cardId);
-    if (!visitingCard) return res.status(404).send('Visiting card not found');
-    res.render('portfolios/business/visiting-card', { card: visitingCard });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error loading visiting card');
-  }
-};
-
-// Dashboard business portfolio index page
-exports.dashboardPortfolioIndex = async (req, res) => {
-  try {
-    let query = {};
-    if (req.query.search) {
-      const searchRegex = new RegExp(req.query.search, 'i');
-      query = { $or: [ { name: searchRegex }, { slug: searchRegex } ] };
-    }
-    const cards = await VisitingCard.find(query);
-    let slug = req.user && req.user.slug ? req.user.slug : '';
 
     if (!slug && req.user) slug = req.user._id ? req.user._id.toString() : '';
     res.render('portfolios/index', { cards, layout: 'layouts/dashboard-boilerplate', slug });

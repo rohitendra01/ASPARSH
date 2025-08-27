@@ -75,6 +75,12 @@
   width: 100%;
 }
 
+/* Align action buttons with hotel styles */
+.edit-profile-btn, .hover-info-btn { background-color: var(--text-light); color: var(--text-dark); border: 1px solid #e9ecef; }
+.edit-profile-btn:hover { background: #0056b3; color:#fff }
+
+.profiles-grid { gap: 1rem }
+
 .profiles-grid {
   display: flex;
   flex-direction: column;

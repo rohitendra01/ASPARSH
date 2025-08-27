@@ -1,0 +1,81 @@
+<% layout('layouts/dashboard-boilerplate') -%>
+<% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
+
+<%
+  // support multiple possible variable names from controllers
+  const list = (typeof visitingCards !== 'undefined') ? visitingCards : (typeof cards !== 'undefined' ? cards : []);
+  const userSlug = (typeof user !== 'undefined') ? user.slug : (typeof slug !== 'undefined' ? slug : '');
+%>
+
+<!-- DEBUG: quick summary of cards passed to the view -->
+<!-- <div class="debug-cards-summary" style="padding:8px 12px; background:#fff8e1; border:1px solid #ffd54f; margin-bottom:12px;">
+  <strong>Debug:</strong> cards received: <%= (list && list.length) || 0 %>
+  <% if (list && list.length) { %>
+    <span style="display:block; margin-top:6px; font-size:0.95rem; color:#333;"> <%= list.map(c => (c.slug || c._id)).join(', ') %></span>
+  <% } %>
+</div> -->
+
+<div class="dashboard-header-row">
+  <form class="search-form" onsubmit="return filterCards(event)">
+    <input type="text" id="cardSlugSearch" name="cardSlug" placeholder="Enter Card Slug" required>
+    <button type="submit">Search</button>
+  </form>
+  <a href="/dashboard/<%= userSlug %>/visiting-cards/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Visiting Card</a>
+</div>
+
+<div class="hotel-list-container visiting-card-list-container">
+  <% if (list && list.length) { %>
+    <div class="visiting-card-cards-grid">
+      <% list.forEach(card => { %>
+        <div class="visiting-card" data-card-slug="<%= card.slug %>">
+          <img src="<%= card.image || '/assets/feature1.jpg' %>" alt="<%= (card.title || card.name || 'Visiting Card') %>" class="visiting-card-logo">
+          <div class="visiting-card-body">
+            <div class="visiting-card-heading">
+              <h2 class="visiting-card-title"><%= card.title || card.name || 'Untitled' %></h2>
+              <% if (card.company) { %>
+                <p class="visiting-card-company"><%= card.company %></p>
+              <% } %>
+            </div>
+            <div class="visiting-card-others">
+              <% if (card.address && card.address.city) { %>
+                <p class="visiting-card-address"><span><%= card.address.street || '' %>, <%= card.address.city %></span><span><%= card.address.state || '' %></span></p>
+              <% } else if (card.profileName) { %>
+                <p class="visiting-card-address"><%= card.profileName %></p>
+              <% } %>
+              <% if (card.description) { %>
+                <p class="visiting-card-desc"><%= card.description.length > 120 ? card.description.substring(0, 117) + '...' : card.description %></p>
+              <% } %>
+            </div>
+            <div class="visiting-card-links">
+              <a href="/visiting-card/<%= encodeURIComponent(card.slug || '') %>" class="visiting-card-link">View Final</a>
+              <a href="/dashboard/<%= encodeURIComponent(userSlug) %>/visiting-cards/<%= card._id %>/edit" class="visiting-card-edit">Edit</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>No visiting cards found.</p>
+  <% } %>
+</div>
+
+<script>
+  function filterCards(event) {
+    event.preventDefault();
+    const input = document.getElementById('cardSlugSearch').value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.visiting-card');
+    if (!input) {
+      cards.forEach(card => card.style.display = '');
+      return false;
+    }
+    cards.forEach(card => {
+      const slug = card.getAttribute('data-card-slug') || '';
+      if (slug.toLowerCase().includes(input)) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+    return false;
+  }
+</script>

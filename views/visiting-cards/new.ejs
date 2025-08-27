@@ -1,0 +1,108 @@
+<% layout('layouts/dashboard-boilerplate') %>
+<% block('styles').append('<link rel="stylesheet" href="/css/portfolio/business/visiting-card.css">') %>
+
+<div class="visiting-card-form-root">
+  <h1>Create Visiting Card</h1>
+
+  <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+    <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
+  <% } %>
+
+  <form action="/dashboard/<%= slug || '' %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
+    <input type="hidden" name="profileId" value="">
+    <input type="hidden" name="slug" value="">
+
+    <!-- Profile search / attach -->
+    <label>
+      Attach Profile
+      <input id="profile-search" type="search" placeholder="Search profile by name, email or slug..." autocomplete="off">
+    </label>
+    <div id="profile-suggestions" class="suggestions"></div>
+  <div id="selected-profile" class="selected-profile">No profile selected</div>
+
+    <!-- Visiting-card-specific fields only (profile-owned fields removed) -->
+    <label>
+      Title / Designation
+      <input type="text" name="title" required>
+    </label>
+
+    <label>
+      Description
+      <textarea name="description" rows="4" required></textarea>
+    </label>
+
+    <label>
+      Website
+      <input type="url" name="website">
+    </label>
+
+    <label>
+      LinkedIn
+  <input type="url" name="linkedin">
+    </label>
+
+    <label>
+      Twitter
+  <input type="url" name="twitter">
+    </label>
+
+    <label>
+      Facebook
+  <input type="url" name="facebook">
+    </label>
+
+    <label>
+      Instagram
+  <input type="url" name="instagram">
+    </label>
+
+    <div class="form-actions">
+  <button type="submit" class="btn btn-primary">Create Visiting Card</button>
+  <a href="/dashboard/<%= slug || '' %>/visiting-cards" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+// Profile search helper
+;(function(){
+  const input = document.getElementById('profile-search');
+  const suggestions = document.getElementById('profile-suggestions');
+  const selected = document.getElementById('selected-profile');
+  const profileIdField = document.querySelector('input[name="profileId"]');
+  const slugField = document.querySelector('input[name="slug"]');
+
+  let timeout = null;
+  input && input.addEventListener('input', function(e){
+    const q = (e.target.value || '').trim();
+    suggestions.innerHTML = '';
+    if (timeout) clearTimeout(timeout);
+    if (!q || q.length < 2) return;
+    timeout = setTimeout(async ()=>{
+      try {
+        const res = await fetch('/api/profiles/search?q=' + encodeURIComponent(q));
+        if (!res.ok) return;
+        const profiles = await res.json();
+        suggestions.innerHTML = '';
+        profiles.forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'suggestion-item';
+          div.textContent = (p.name || p.slug || p.email) + ' — ' + (p.email || p.slug || '');
+          div.dataset.id = p._id;
+          div.dataset.slug = p.slug;
+          div.addEventListener('click', ()=>{
+            profileIdField.value = p._id || '';
+            slugField.value = p.slug || '';
+            selected.textContent = (p.name || p.slug || '') + ' — ' + (p.email || '');
+            suggestions.innerHTML = '';
+            input.value = '';
+          });
+          suggestions.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Profile search error', err);
+      }
+    }, 250);
+  });
+})();
+</script>

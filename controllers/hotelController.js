@@ -1,10 +1,8 @@
-// --- Requires ---
 const Hotel = require('../models/Hotel');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
 
-// Ensure Cloudinary is configured (safe to call multiple times)
 try {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,32 +13,59 @@ try {
   console.warn('Cloudinary config warning:', e && e.message);
 }
 
-// --- Multer config ---
 const storage = multer.memoryStorage();
 exports.uploadHotelImages = multer({ storage }).fields([
   { name: 'hotelLogo', maxCount: 1 },
   { name: 'hotelOfferBanner', maxCount: 1 }
 ]);
 
-// Helper to delete Cloudinary image by url
-async function deleteCloudinaryImage(imageUrl) {
-  if (!imageUrl) return;
-  try {
-    let publicId = null;
-    const m = imageUrl.match(/\/asparsh\/hotels\/([^.?/\\]+)(?:\.|$)/);
-    if (m && m[1]) {
-      publicId = `asparsh/hotels/${m[1]}`;
-    } else {
-      const m2 = imageUrl.match(/\/([^/?#]+)($|\?|#)/);
-      if (m2 && m2[1]) {
-        const name = m2[1].split('.')[0];
-        publicId = `asparsh/hotels/${name}`;
-      }
+// Upload helper: upload a Buffer to Cloudinary using upload_stream
+function uploadBufferToCloudinary(buffer, options = {}) {
+  return new Promise((resolve, reject) => {
+    try {
+      const stream = cloudinary.uploader.upload_stream(options, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+      streamifier.createReadStream(buffer).pipe(stream);
+    } catch (e) {
+      reject(e);
     }
-    if (publicId) {
-      await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
-    } else {
-      console.warn('Could not derive Cloudinary publicId for:', imageUrl);
+  });
+}
+
+// Delete helper: accepts a public_id or a URL and attempts to destroy the image
+async function deleteCloudinaryImage(imageRef) {
+  if (!imageRef) return;
+  try {
+    // If imageRef looks like a public_id (folder/...)
+    if (typeof imageRef === 'string' && imageRef.indexOf('/') >= 0 && imageRef.indexOf('asparsh') === 0) {
+      await cloudinary.uploader.destroy(imageRef, { resource_type: 'image' });
+      return;
+    }
+    // If object with public_id
+    if (imageRef && typeof imageRef === 'object' && imageRef.public_id) {
+      await cloudinary.uploader.destroy(imageRef.public_id, { resource_type: 'image' });
+      return;
+    }
+    // Fallback: try to parse public id from URL
+    if (typeof imageRef === 'string') {
+      let publicId = null;
+      const m = imageRef.match(/\/asparsh\/hotels\/([^.?/\\]+)(?:\.|$)/);
+      if (m && m[1]) {
+        publicId = `asparsh/hotels/${m[1]}`;
+      } else {
+        const m2 = imageRef.match(/\/([^/?#]+)($|\?|#)/);
+        if (m2 && m2[1]) {
+          const name = m2[1].split('.')[0];
+          publicId = `asparsh/hotels/${name}`;
+        }
+      }
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+      } else {
+        console.warn('Could not derive Cloudinary publicId for:', imageRef);
+      }
     }
   } catch (e) {
     console.error('Cloudinary deletion error:', e);
@@ -57,7 +82,6 @@ exports.listHotels = async (req, res) => {
 
 // Show new hotel form
 exports.renderNewHotelForm = (req, res) => {
-  // Derive defaults from schema when available so the form can be prefilled
   function schemaDefault(path) {
     try {
       const p = Hotel.schema.path(path);
@@ -104,36 +128,25 @@ exports.createHotel = async (req, res) => {
     }
     let hotelLogo;
     let hotelOfferBanner;
+    let hotelLogoPublicId = null;
+    let hotelOfferBannerPublicId = null;
     if (req.files) {
-    if (req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
+      if (req.files['hotelLogo'] && req.files['hotelLogo'][0]) {
         const logoBuffer = req.files['hotelLogo'][0].buffer;
         try {
-          const logoUpload = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
-              if (err) return reject(err);
-              resolve(result);
-            });
-            streamifier.createReadStream(logoBuffer).pipe(stream);
-          });
-      hotelLogo = logoUpload.secure_url;
-      // store public id
-      var hotelLogoPublicId = logoUpload.public_id || null;
+          const logoUpload = await uploadBufferToCloudinary(logoBuffer, { folder: 'asparsh/hotels', resource_type: 'image' });
+          hotelLogo = logoUpload.secure_url;
+          hotelLogoPublicId = logoUpload.public_id || null;
         } catch (uploadErr) {
           console.error('Cloudinary hotelLogo upload failed:', uploadErr);
         }
       }
-    if (req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
+      if (req.files['hotelOfferBanner'] && req.files['hotelOfferBanner'][0]) {
         const bannerBuffer = req.files['hotelOfferBanner'][0].buffer;
         try {
-          const bannerUpload = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream({ folder: 'asparsh/hotels', resource_type: 'image' }, (err, result) => {
-              if (err) return reject(err);
-              resolve(result);
-            });
-            streamifier.createReadStream(bannerBuffer).pipe(stream);
-          });
-      hotelOfferBanner = bannerUpload.secure_url;
-      var hotelOfferBannerPublicId = bannerUpload.public_id || null;
+          const bannerUpload = await uploadBufferToCloudinary(bannerBuffer, { folder: 'asparsh/hotels', resource_type: 'image' });
+          hotelOfferBanner = bannerUpload.secure_url;
+          hotelOfferBannerPublicId = bannerUpload.public_id || null;
         } catch (uploadErr) {
           console.error('Cloudinary hotelOfferBanner upload failed:', uploadErr);
         }
@@ -231,11 +244,13 @@ exports.updateHotel = async (req, res) => {
     const { hotelName, hotelDescription, hotelType, hotelAddress, foodCategories, price } = req.body;
     const hotel = await Hotel.findOne({ hotelSlug: req.params.hotelSlug });
     if (!hotel) return res.status(404).send('Hotel not found');
-    const originalName = hotel.hotelName;
-    hotel.hotelName = hotelName || hotel.hotelName;
-    hotel.hotelDescription = hotelDescription || hotel.hotelDescription;
-    hotel.hotelType = hotelType || hotel.hotelType;
-    hotel.hotelAddress = hotelAddress || hotel.hotelAddress;
+    const original = hotel.toObject();
+
+    // Update fields only when provided
+    if (hotelName) hotel.hotelName = hotelName;
+    if (hotelDescription) hotel.hotelDescription = hotelDescription;
+    if (hotelType) hotel.hotelType = hotelType;
+    if (hotelAddress) hotel.hotelAddress = hotelAddress;
     // Normalize foodCategories and ensure itemPrice is mapped to item.price
     if (Array.isArray(foodCategories)) {
       hotel.foodCategories = foodCategories.map(category => {
@@ -256,10 +271,8 @@ exports.updateHotel = async (req, res) => {
       });
     } else if (foodCategories) {
       hotel.foodCategories = [foodCategories];
-    } else {
-      hotel.foodCategories = [];
     }
-    if (hotelName && hotelName !== originalName) {
+    if (hotelName && hotelName !== original.hotelName) {
       const newSlug = hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
       if (newSlug !== hotel.hotelSlug) {
         const exists = await Hotel.findOne({ hotelSlug: newSlug });
@@ -333,19 +346,21 @@ exports.updateHotel = async (req, res) => {
     }
     // Track admin who updated
     hotel.updatedBy = req.user ? req.user._id : undefined;
-    // Build changes diff
+    // Build changes diff by comparing original -> current
     const changes = {};
-    if (hotel.hotelName !== hotelName) changes['hotelName'] = { from: hotel.hotelName, to: hotelName };
-    if (hotel.hotelDescription !== hotelDescription) changes['hotelDescription'] = { from: hotel.hotelDescription, to: hotelDescription };
-    if (hotel.hotelType !== hotelType) changes['hotelType'] = { from: hotel.hotelType, to: hotelType };
-    if (JSON.stringify(hotel.hotelAddress) !== JSON.stringify(hotelAddress)) changes['hotelAddress'] = { from: hotel.hotelAddress, to: hotelAddress };
-    if (JSON.stringify(hotel.foodCategories) !== JSON.stringify(foodCategories)) changes['foodCategories'] = { from: hotel.foodCategories, to: foodCategories };
-    // Version tracking: push new version entry
+    if (original.hotelName !== hotel.hotelName) changes.hotelName = { from: original.hotelName, to: hotel.hotelName };
+    if (original.hotelDescription !== hotel.hotelDescription) changes.hotelDescription = { from: original.hotelDescription, to: hotel.hotelDescription };
+    if (original.hotelType !== hotel.hotelType) changes.hotelType = { from: original.hotelType, to: hotel.hotelType };
+    if (JSON.stringify(original.hotelAddress) !== JSON.stringify(hotel.hotelAddress)) changes.hotelAddress = { from: original.hotelAddress, to: hotel.hotelAddress };
+    if (JSON.stringify(original.foodCategories || []) !== JSON.stringify(hotel.foodCategories || [])) changes.foodCategories = { from: original.foodCategories || [], to: hotel.foodCategories || [] };
+    // Version tracking: push new version entry including snapshot and changes
     if (!hotel.versions) hotel.versions = [];
     hotel.versions.push({
       changedAt: new Date(),
       changedBy: req.user ? req.user._id : undefined,
       changedByName: req.user ? req.user.username : undefined,
+      changes,
+      snapshot: hotel.toObject()
     });
     await hotel.save();
     res.redirect(`/hotel/${hotel.hotelSlug}`);

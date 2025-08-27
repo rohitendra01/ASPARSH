@@ -1,0 +1,133 @@
+/* Dashboard Container */
+.dashboard-container {
+  width: 100%;
+}
+
+/* Portfolio Header & Tabs */
+.portfolio-header {
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 1rem;
+}
+/* Header row adapted from hotel styles */
+.dashboard-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.create-hotel-btn-fixed {
+  margin-right: 1rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-form input[type="text"] {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.search-form button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.hotel-list-container, .visiting-card-list-container {
+  margin-top: 0;
+}
+
+.visiting-card-cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.create-hotel-btn {
+  background-color: var(--text-dark);
+  color: var(--text-light);
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 2px 8px #007bff22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.create-hotel-btn:hover { background-color: #0056b3; box-shadow: 0 4px 16px #007bff33; }
+
+/* Visiting card tiles */
+.visiting-card {
+  background: var(--text-light);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  padding: .5rem;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--text-dark);
+  transition: box-shadow 0.2s;
+}
+
+.visiting-card-logo {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.visiting-card-body { width: 100%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.visiting-card-title { font-size: 1.1rem; font-weight:700; margin-top:0.6rem; color: var(--text-dark); }
+.visiting-card-company { font-size: 1rem; color: var(--text-dark); }
+.visiting-card-address { font-size: 0.95rem; color: var(--text-dark); }
+.visiting-card-desc { color: #666; font-size: 0.95rem; margin-top:0.6rem; text-align:center; padding: 0 0.4rem; }
+
+.visiting-card-links { display:flex; gap: 0.6rem; justify-content:center; margin-top:0.9rem; }
+.visiting-card-link, .visiting-card-edit {
+  background-color: var(--text-dark); color: var(--text-light); border:none; padding:0.5rem 1rem; border-radius:6px; font-weight:600; text-decoration:none; box-shadow:0 2px 8px #007bff22;
+}
+.visiting-card-link:hover, .visiting-card-edit:hover { background-color:#0056b3; box-shadow:0 4px 16px #007bff33; }
+
+/* responsive behaviour */
+@media (max-width: 720px) {
+  .visiting-card { width: calc(50% - 1rem); }
+}
+@media (max-width: 420px) {
+  .visiting-card { width: 100%; }
+}
+
+/* simple search form spacing */
+.search-form input[type="text"] { min-width: 220px; }
+
+.btn-outline-primary {
+  margin-top: 1.2rem;
+  background: none;
+  color: #4f8cff;
+  border: 2px solid #4f8cff;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-outline-primary:hover {
+  background: #4f8cff;
+  color: #fff;
+}
+.no-cards {
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  margin-top: 2rem;
+}

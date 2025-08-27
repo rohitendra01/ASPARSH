@@ -34,6 +34,20 @@ exports.updateUserProfile = async (req, res) => {
     if (!user) return res.status(404).send('Admin user not found');
     user.username = req.body.username;
     user.email = req.body.email;
+    // Password update: only if provided
+    if (req.body.password && req.body.password.length) {
+      const pwd = req.body.password;
+      const pwdConfirm = req.body.passwordConfirm;
+      if (pwd !== pwdConfirm) {
+        req.flash('error_msg', 'Passwords do not match');
+        return res.redirect('back');
+      }
+      if (pwd.length < 6) {
+        req.flash('error_msg', 'Password must be at least 6 characters long');
+        return res.redirect('back');
+      }
+      user.password = pwd; // will be hashed by pre-save middleware
+    }
     if (req.file) {
       // Upload image to Cloudinary
       const cloudinary = require('cloudinary').v2;

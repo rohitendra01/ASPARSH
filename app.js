@@ -45,9 +45,9 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
-        maxAge: 1000 * 60 * 60 * 24 * 7
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 60 * 10), 
+    maxAge: 1000 * 60 * 10
     }
 };
 
@@ -55,10 +55,9 @@ const sessionOptions = {
 if (MongoStore) {
     try {
         const mongoose = require('mongoose');
-        // connect-mongo v4 expects MongoStore.create
         sessionOptions.store = MongoStore.create({
             mongoUrl: process.env.MONGO_URI || (mongoose.connection && mongoose.connection.client && mongoose.connection.client.s.url) || undefined,
-            ttl: 14 * 24 * 60 * 60 // 14 days
+            ttl: 10 * 60 
         });
     } catch (e) {
         console.warn('connect-mongo could not be initialized, falling back to default session store');
@@ -116,7 +115,6 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-// NOTE: csurf is applied per-router so we can place it after multer for multipart routes
 
 // Enhanced res.locals middleware
 app.use((req, res, next) => {
@@ -168,8 +166,10 @@ const indexRoutes = require('./routes/indexRoutes');
 const productRoutes = require('./routes/productRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
+const visitingCardRoutes = require('./routes/visitingCardRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const userRoutes = require('./routes/userRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
 // Use routes
 app.use('/', indexRoutes);
@@ -177,6 +177,8 @@ app.use('/', authRoutes);
 app.use('/', productRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
+app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
+app.use('/dashboard/:slug/profiles', profileRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
 

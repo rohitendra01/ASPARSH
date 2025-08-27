@@ -1,23 +1,23 @@
 <% layout('layouts/dashboard-boilerplate') -%>
 <% block('styles').append('<link rel="stylesheet" href="/css/portfolio/index.css">') %>
-<div class="dashboard-container">
-  <div class="search-bar">
-    <form method="GET" action="/portfolio">
-      <input type="text" name="search" placeholder="Search portfolios..." class="search-input">
-      <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-    <a href="/dashboard/<%= slug %>/portfolios/new" class="btn btn-success">Create New Portfolio</a>
-  </div>
 
-  <% // support both controllers that pass `portfolios` or `cards` to this view %>
-  <% const items = (typeof portfolios !== 'undefined' && portfolios) ? portfolios : ((typeof cards !== 'undefined' && cards) ? cards : []); %>
+<div class="dashboard-header-row">
+  <form class="search-form" onsubmit="return filterPortfolios(event)">
+    <input type="text" id="portfolioSlugSearch" name="portfolioSlug" placeholder="Enter Portfolio Slug" required>
+    <button type="submit">Search</button>
+  </form>
+  <a href="/dashboard/<%= slug %>/portfolios/new" class="create-portfolio-btn create-hotel-btn-fixed">+ Create New Portfolio</a>
+</div>
 
-  <!-- Quick info cards for portfolios -->
-  <div class="portfolios-grid">
-    <% if (items && items.length) { %>
-      <div class="cards">
-        <% items.forEach(function(p) { %>
-          <article class="portfolio-card">
+<% // support both controllers that pass `portfolios` or `cards` to this view %>
+<% const items = (typeof portfolios !== 'undefined' && portfolios) ? portfolios : ((typeof cards !== 'undefined' && cards) ? cards : []); %>
+
+<!-- Quick info cards for portfolios -->
+<div class="portfolios-grid">
+  <% if (items && items.length) { %>
+    <div class="cards">
+      <% items.forEach(function(p) { %>
+        <article class="portfolio-card" data-portfolio-slug="<%= p.slug %>">
             <header>
               <h3 class="portfolio-title"><%= p.title || p.name || (p.slug || 'Untitled') %></h3>
               <% if ((p.tagline || p.subtitle)) { %><p class="portfolio-tagline"><%= p.tagline || p.subtitle %></p><% } %>
@@ -40,11 +40,31 @@
                 <a class="btn btn-sm" href="/dashboard/<%= slug %>/portfolios/<%= p._id %>/edit">Edit</a>
               </div>
             </footer>
-          </article>
-        <% }) %>
-      </div>
-    <% } else { %>
-      <p class="muted">No portfolios yet. Create one to see it here.</p>
-    <% } %>
-  </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p class="muted">No portfolios yet. Create one to see it here.</p>
+  <% } %>
 </div>
+
+<script>
+  function filterPortfolios(event) {
+    event.preventDefault();
+    const input = document.getElementById('portfolioSlugSearch').value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.portfolio-card');
+    if (!input) {
+      cards.forEach(c => c.style.display = '');
+      return false;
+    }
+    cards.forEach(c => {
+      const slug = c.getAttribute('data-portfolio-slug') || '';
+      if (slug.toLowerCase().includes(input)) {
+        c.style.display = '';
+      } else {
+        c.style.display = 'none';
+      }
+    });
+    return false;
+  }
+</script>

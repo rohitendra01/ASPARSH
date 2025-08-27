@@ -6,6 +6,8 @@ const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: false });
 
+// visiting-card routes moved to visitingCardRoutes.js
+
 // List all portfolios for a user
 router.get('/', portfolioController.listPortfolios);
 
@@ -33,6 +35,5 @@ router.delete('/:id', portfolioController.deletePortfolio);
 // Publish a portfolio (set isPublished = true)
 router.post('/:id/publish', isLoggedIn, csrfProtection, portfolioController.publishPortfolio);
 
-// NOTE: profile search API is handled centrally at /api/profiles/search (see routes/apiRoutes.js)
 
 module.exports = router;

@@ -9,9 +9,6 @@
     <a href="/dashboard/<%= user.slug %>/hotels/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Hotel</a>
   </div>
   <div class="hotel-list-container">
-  <% if (typeof error !== 'undefined') { %>
-    <div class="alert alert-danger"><%= error %></div>
-  <% } %>
   <% if (hotels && hotels.length) { %>
     <div class="hotel-cards-grid">
       <% hotels.forEach(hotel => { %>

@@ -1,40 +1,71 @@
-html {
-  overflow-x: hidden; 
+/* Make the page's main element the scroll container. This avoids conflicts with
+   the browser's root scrolling and is more reliable when a fixed header is used. */
+html, body {
+  height: 100%;
+  overflow: hidden; /* prevent body scroll — main will scroll */
+}
+
+/* Smooth behaviour is kept on the scroll container */
+main {
+  height: 100%;
+  padding-top: var(--header-height);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  /* enable vertical snap on the main scrolling element */
   scroll-snap-type: y mandatory;
   scroll-padding-top: var(--header-height);
 }
 
-main {
-  /* Consider min-height on sections instead of forcing a full-height main */
-  padding-top: var(--header-height);
-}
 .snap-section {
   scroll-snap-align: start;
-  height: calc(100vh - var(--header-height));
-  min-height: 28rem;
+  scroll-snap-stop: always;
+  /* allow sections to grow but ensure at least viewport minus header */
+  min-height: calc(100vh - var(--header-height));
   width: 100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding-inline: clamp(1rem, 3.5vw, 4rem);
   padding-block: clamp(.75rem, 2.2vh, 1.5rem);
-  box-sizing:border-box;
+  box-sizing: border-box;
 }
 
 #snap{
-  scroll-snap-align: start;   
+  scroll-snap-align: start;
 }
 
-/* Disable snap scrolling on small screens to avoid UX and interaction problems (mobile) */
-@media (max-width: 768px) {
-  html {
+@media (max-width: 480px) {
+  html, body {
+    overflow: auto !important;
+    height: auto !important;
+  }
+  main {
+    scroll-snap-type: none !important;
+    overflow-y: visible !important;
+    height: auto !important;
+  }
+  .snap-section {
+    scroll-snap-align: none !important;
+    scroll-snap-stop: normal !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  html, body {
+    overflow: auto;
+    height: auto;
+  }
+  main {
     scroll-snap-type: none;
+    overflow-y: visible;
+    height: auto;
   }
   .snap-section {
     scroll-snap-align: none;
-    height: auto;
     min-height: 0;
-    margin-block: 1rem;
+    height: auto;
   }
 }

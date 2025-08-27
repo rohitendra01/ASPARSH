@@ -2,8 +2,8 @@
 <% block('styles').append(`<link rel="stylesheet" href="/css/profiles/index.css" />`) %>
 
 <div class="dashboard-header-row">
-  <form class="search-form" method="GET" action="/dashboard/<%= slug %>/profiles">
-    <input type="text" name="search" placeholder="Search profiles..." class="search-input">
+  <form class="search-form" onsubmit="return filterProfiles(event)">
+    <input type="text" id="profileSlugSearch" name="profileSlug" placeholder="Enter Profile Slug" required>
     <button type="submit">Search</button>
   </form>
   <a href="/dashboard/<%= slug %>/profiles/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Profile</a>
@@ -13,7 +13,7 @@
     <div class="profiles-grid">
       <% profiles.forEach(profile => { %>
         <a href="/dashboard/<%= slug %>/profiles/<%= profile.slug %>">
-        <div class="profile-card">
+        <div class="profile-card" data-profile-slug="<%= profile.slug %>">
           <div class="profile-card-description">
             <div class="profile-image-wrapper">
               <img src="<%= profile.image%>" alt="<%= profile.name %>" class="profile-image" />
@@ -44,3 +44,24 @@
     <p class="no-profiles">No profiles found.</p>
   <% } %>
 </div>
+
+<script>
+  function filterProfiles(event) {
+    event.preventDefault();
+    const input = document.getElementById('profileSlugSearch').value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.profile-card');
+    if (!input) {
+      cards.forEach(c => c.style.display = '');
+      return false;
+    }
+    cards.forEach(c => {
+      const slug = c.getAttribute('data-profile-slug') || '';
+      if (slug.toLowerCase().includes(input)) {
+        c.style.display = '';
+      } else {
+        c.style.display = 'none';
+      }
+    });
+    return false;
+  }
+</script>

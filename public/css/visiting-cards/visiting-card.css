@@ -1,0 +1,296 @@
+:root {
+    --text-dark: #0a0f0d;
+    --text-light: #e1f6e0;
+    --hea-foo: #083235;
+    --head-text: 'Raleway', sans-serif;
+    --subhead-text: 'Montserrat', sans-serif;
+    --content-text: 'Poppins', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-around;
+    width: 100%;
+    min-height: 100vh;
+    max-height: 100vh;
+    background: url('/assets/portfolio-hero.jpeg') center center / cover no-repeat;
+    position: relative;
+    overflow: hidden;
+    gap: 40px;
+    z-index: 0;
+    padding-bottom: 5rem;
+}
+
+.header-content{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 2rem;
+    position: relative;
+}
+
+.header-image {
+    width: 400px;
+    height: 400px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f3f3;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin: 0 2rem;
+}
+
+.header-image img {
+    object-fit: cover;
+    border-radius: 24px;
+    display: block;
+    flex: 0 0 40%;
+}
+
+.header-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+    max-width: 100%;
+    height: 320px;
+    z-index: 1;
+}
+
+.header-intro h1 {
+    font-family: var(--head-text);
+    font-size: 6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    letter-spacing: 1.5px;
+}
+
+.header-intro h2 {
+    font-family: var(--subhead-text);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 8px;
+}
+
+.social-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.social-links a:hover {
+    box-shadow: 0 4px 16px rgba(0,184,148,0.18);
+    transform: translateY(-3px) scale(1.08);
+}
+
+.social-links svg {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+.section-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(255,255,255,0.95) 40%, rgba(255,255,255,0.0) 100%);
+}
+
+.header-image, .header-intro {
+    position: relative;
+    z-index: 2;
+}
+
+/* --- Main Section Styles --- */
+.section-main {
+  width: 100vw;
+  min-height: 40vh;
+  background: #fff;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3rem;
+  padding: 3rem 2rem 4rem 2rem;
+  box-sizing: border-box;
+}
+
+.main-description {
+  flex: 1 1 60%;
+  max-width: 600px;
+  font-family: var(--content-text);
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  background: #f8fafb;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  padding: 2rem 2.5rem;
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+.main-contact-links {
+  flex: 1 1 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  justify-content: flex-start;
+  margin-top: 0.5rem;
+}
+.main-contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0.7rem 1.2rem;
+  font-family: var(--subhead-text);
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.main-contact-links a:hover {
+  box-shadow: 0 4px 16px rgba(0,184,148,0.18);
+  transform: translateY(-2px) scale(1.04);
+}
+.main-contact-links svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .section-main {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.2rem;
+    padding: 1.2rem 2vw 2.5rem 2vw;
+  }
+  .main-description {
+    font-size: 1.05rem;
+    padding: 1.2rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+  }
+  .main-contact-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 0.5rem;
+  }
+  .main-contact-links a {
+    font-size: 0.98rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+  }
+  .main-contact-links svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+@media (max-width: 600px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 0 0 6rem 0;
+    min-height: 94vh;
+    width: 100vw;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+  }
+  .header-image {
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 10px auto;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-image img {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+  .header-intro {
+    width: 100%;
+    text-align: center;
+    max-width: 98vw;
+    padding: 0 1vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+  }
+  .header-intro h1 {
+    font-size: 3rem;
+    margin-bottom: 18px;
+    width: 100%;
+    word-break: break-word;
+  }
+  .header-intro h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    width: 100%;
+    word-break: break-word;
+  }
+  .social-links {
+    gap: 8px;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+  }
+  .social-links svg {
+    width: 18px;
+    height: 18px;
+  }
+}
