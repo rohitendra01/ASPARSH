@@ -45,10 +45,14 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 10), 
-    maxAge: 1000 * 60 * 10
-    }
+    cookie: {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 10), 
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 1000 * 60 * 10
+    }    }
 };
 
 // Use Mongo-backed session store when connect-mongo is available and MONGO_URI/ mongoose connection exists

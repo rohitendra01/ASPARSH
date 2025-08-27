@@ -60,6 +60,13 @@
   font-size: 1rem;
 }
 
+/* Visible focus for keyboard users only (doesn't affect mouse focus when :focus-visible is supported) */
+.search-form input[type="text"]:focus-visible {
+  outline: 2px solid var(--accent, #38cfa7);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(56,207,167,0.12);
+}
+
 .search-form button {
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -68,6 +75,23 @@
   color: #fff;
   font-size: 1rem;
   cursor: pointer;
+  transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+/* Accessible focus for keyboard users and hover feedback */
+.search-form button:focus-visible {
+  outline: 3px solid var(--accent, #38cfa7);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(56,207,167,0.12);
+  border-radius: 4px; /* preserve rounded corners */
+}
+.search-form button:hover {
+  background: #0056b3; /* slightly darker on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.search-form button:active {
+  transform: translateY(0);
 }
 
 .create-portfolio-btn.create-hotel-btn-fixed { position: fixed; top: 130px; right: 40px; z-index:100; box-shadow: 0 4px 16px #007bff33; }
@@ -80,6 +104,14 @@
 .portfolio-title { font-size: 1.15rem; font-weight:700 }
 .portfolio-actions .btn { background: var(--text-dark); color: var(--text-light); padding: 0.5rem 0.9rem; border-radius:6px; text-decoration:none }
 .portfolio-actions .btn:hover { background:#0056b3 }
+/* Ensure keyboard users get the same visual feedback as hover */
+.portfolio-actions .btn:focus-visible {
+  background: #0056b3;
+  outline: 3px solid var(--accent, #38cfa7);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(56,207,167,0.12);
+  border-radius: 6px;
+}
 .visiting-card-preview {
   background: #fff;
   border-radius: 16px;

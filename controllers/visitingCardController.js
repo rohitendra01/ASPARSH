@@ -1,44 +1,152 @@
 const VisitingCard = require('../models/VisitingCard');
 const Profile = require('../models/Profile');
+const mongoose = require('mongoose');
+
+// Helper to consistently extract CSRF token: try req.csrfToken() then fallback to res.locals.csrfToken
+const getCsrfToken = (req, res) => {
+  let token;
+  let generationError = null;
+  if (typeof req.csrfToken === 'function') {
+    try {
+      token = req.csrfToken();
+    } catch (e) {
+      generationError = e;
+      const reqId = req.id || (req.headers && (req.headers['x-request-id'] || req.headers['x-request_id'])) || null;
+      const userId = req.user && (req.user._id || req.user.id) ? String(req.user._id || req.user.id) : null;
+      console.error('CSRF token generation failed', { message: e && e.message, stack: e && e.stack, reqId, userId });
+    }
+  }
+  if (!token && res && res.locals && res.locals.csrfToken) token = res.locals.csrfToken;
+  return { token, generationError };
+};
 
 // Render new visiting card form
 exports.renderNewForm = async (req, res) => {
   try {
     let profile = null;
-    if (req.params && req.params.slug) profile = await Profile.findOne({ slug: req.params.slug });
-    let csrfToken;
-    try { if (typeof req.csrfToken === 'function') csrfToken = req.csrfToken(); } catch (e) {}
-    if (!csrfToken && res && res.locals && res.locals.csrfToken) csrfToken = res.locals.csrfToken;
-    return res.render('visiting-cards/new', { profile, user: req.user, slug: req.params ? req.params.slug : (req.user && req.user.slug) || '', csrfToken, layout: 'layouts/dashboard-boilerplate' });
+    if (req.params && req.params.slug) {
+      profile = await Profile.findOne({ slug: req.params.slug });
+    }
+
+    // Consolidated CSRF extraction
+    const { token: csrfToken, generationError } = getCsrfToken(req, res);
+    if (generationError) {
+      const slugFallback = (req.params && req.params.slug) || (req.user && req.user.slug) || '';
+      return res.status(500).render('visiting-cards/new', {
+        profile,
+        user: req.user || null,
+        slug: slugFallback,
+        csrfToken: null,
+        error: 'Unable to generate security token for this form. Please try again.',
+        layout: 'layouts/dashboard-boilerplate'
+      });
+    }
+
+    // Compute slug using safe fallbacks. Ensure we don't read properties off undefined.
+    const slug = (req.params && req.params.slug) || (req.user && req.user.slug) || '';
+
+    return res.render('visiting-cards/new', {
+      profile,
+      user: req.user || null,
+      slug,
+      csrfToken,
+      layout: 'layouts/dashboard-boilerplate'
+    });
   } catch (err) {
-    console.error('Error rendering visiting card form', err);
-    res.status(500).send('Error rendering form');
+    // Log the error with contextual information but do not leak sensitive data to the client.
+    const reqId = req.id || req.headers && (req.headers['x-request-id'] || req.headers['x-request_id']) || null;
+    const userId = req.user && (req.user._id || req.user.id) ? String(req.user._id || req.user.id) : null;
+    console.error('Error rendering visiting card form', { error: err && (err.stack || err.message || err), reqId, userId });
+    res.status(500).send('Error rendering form. Please try again later.');
   }
 };
-
 // Create visiting card
 exports.create = async (req, res) => {
   try {
-    const { title, description, website, linkedin, twitter, facebook, instagram, image, profileId, slug } = req.body;
-    let name, email, phone, address, profileImage;
-    if (profileId) {
-      const profile = await Profile.findById(profileId).lean();
-      if (profile) {
-        name = profile.name || undefined;
-        email = profile.email || undefined;
-        phone = profile.mobile || undefined;
-        address = profile.address && profile.address.addressLine ? profile.address.addressLine : undefined;
-        profileImage = profile.image || undefined;
+    // Require authenticated user
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const body = req.body || {};
+    const rawProfileId = body.profileId;
+    let profile = null;
+    let profileObjectId;
+    let profileImage;
+
+    // If profileId is provided, validate it and ensure ownership
+    if (rawProfileId) {
+      if (!mongoose.Types.ObjectId.isValid(rawProfileId)) {
+        return res.status(400).json({ error: 'Invalid profileId' });
+      }
+      profileObjectId = new mongoose.Types.ObjectId(rawProfileId);
+      profile = await Profile.findById(profileObjectId).lean();
+      if (!profile) return res.status(404).json({ error: 'Profile not found' });
+
+      // Verify profile ownership: profile.user (owner) must match current user
+      const profileOwner = profile.user || profile.owner || null;
+      if (profileOwner && String(profileOwner) !== String(req.user._id)) {
+        console.warn('Unauthorized profile access attempt', { profileId: String(profileObjectId), attemptedBy: String(req.user._id) });
+        return res.status(403).json({ error: 'Forbidden: you do not own the specified profile' });
+      }
+
+      profileImage = profile.image || undefined;
+    }
+
+    // Extract fields safely from body
+    let {
+      slug,
+      name,
+      title,
+      description,
+      email,
+      phone,
+      address,
+      website,
+      linkedin,
+      twitter,
+      facebook,
+      instagram,
+      image
+    } = body;
+
+    // If profile exists, use profile values as safe fallbacks
+    if (profile) {
+      name = (typeof name === 'string' && name.trim()) ? name.trim() : (profile.name || undefined);
+      email = (typeof email === 'string' && email.trim()) ? email.trim() : (profile.email || undefined);
+      phone = (typeof phone === 'string' && phone.trim()) ? phone.trim() : (profile.mobile || undefined);
+      address = (typeof address === 'string' && address.trim()) ? address.trim() : (profile.address && profile.address.addressLine ? profile.address.addressLine : undefined);
+    } else {
+      name = typeof name === 'string' ? name.trim() : name;
+      email = typeof email === 'string' ? email.trim() : email;
+      phone = typeof phone === 'string' ? phone.trim() : phone;
+      address = typeof address === 'string' ? address.trim() : address;
+    }
+
+    title = typeof title === 'string' ? title.trim() : title;
+    description = typeof description === 'string' ? description.trim() : description;
+
+    // Validate required fields
+    const validationErrors = [];
+    if (!title) validationErrors.push({ field: 'title', message: 'Title is required' });
+    if (!name) validationErrors.push({ field: 'name', message: 'Name is required' });
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ errors: validationErrors });
+    }
+
+    // Slug sanitization: allow only lowercase letters, numbers and hyphens
+    if (slug) {
+      slug = slug.toLowerCase();
+      const slugPattern = /^[a-z0-9-]+$/;
+      if (!slugPattern.test(slug)) {
+        return res.status(400).json({ error: 'Invalid slug. Use only lowercase letters, numbers, and hyphens.' });
       }
     }
-    // Allow overriding by request body if provided (rare, since form no longer sends them)
-    name = req.body.name || name;
-    email = req.body.email || email;
-    phone = req.body.phone || phone;
-    address = req.body.address || address;
+
+    // Build visiting card with safe, validated values
     const visitingCard = new VisitingCard({
-      user: req.user ? req.user._id : undefined,
-      profileId: profileId || undefined,
+      user: req.user._id,
+      profileId: profileObjectId || undefined,
       slug: slug || undefined,
       name,
       title,
@@ -53,11 +161,13 @@ exports.create = async (req, res) => {
       instagram,
       image: image || profileImage
     });
+
     await visitingCard.save();
+
     const redirectTo = (slug && `/dashboard/${slug}/visiting-cards`) || (req.user && req.user.slug ? `/dashboard/${req.user.slug}/visiting-cards` : '/dashboard');
     res.redirect(redirectTo);
   } catch (err) {
-    console.error(err);
+    console.error('Error creating visiting card', { error: err && (err.stack || err.message || err), userId: req.user && req.user._id ? String(req.user._id) : null });
     res.status(500).render('visiting-cards/new', { error: 'Error creating visiting card', layout: 'layouts/dashboard-boilerplate' });
   }
 };
@@ -121,10 +231,18 @@ exports.renderEditForm = async (req, res) => {
     if (!card) return res.status(404).send('Visiting card not found');
     let profile = null;
     if (card.profileId) profile = await Profile.findById(card.profileId).lean();
-    let csrfToken;
-    try { if (typeof req.csrfToken === 'function') csrfToken = req.csrfToken(); } catch (e) {}
-    if (!csrfToken && res && res.locals && res.locals.csrfToken) csrfToken = res.locals.csrfToken;
-    res.render('visiting-cards/new', { profile, user: req.user, slug: req.params ? req.params.slug : (req.user && req.user.slug) || '', csrfToken, card, layout: 'layouts/dashboard-boilerplate' });
+  // Authorization: ensure a logged-in user owns the card or has elevated role
+  if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
+  const isOwner = (card.user && String(card.user) === String(req.user._id)) || (card.profileId && profile && profile.user && String(profile.user) === String(req.user._id));
+  const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
+  if (!isOwner && !hasElevatedRole) return res.status(403).send('Forbidden');
+
+  const { token: csrfToken, generationError } = getCsrfToken(req, res);
+  // If CSRF generation failed, include a clear message but still render the form where appropriate
+  const slugVal = req.params ? req.params.slug : (req.user && req.user.slug) || '';
+  const renderOpts = { profile, user: req.user, slug: slugVal, csrfToken, card, layout: 'layouts/dashboard-boilerplate' };
+  if (generationError) renderOpts.error = 'Unable to generate security token for this form. Please try again.';
+  res.render('visiting-cards/new', renderOpts);
   } catch (err) {
     console.error('Error rendering edit visiting card form', err);
     res.status(500).send('Error rendering form');
@@ -134,20 +252,60 @@ exports.renderEditForm = async (req, res) => {
 // Update visiting card
 exports.update = async (req, res) => {
   try {
+    // Require authentication
+    if (!req.user || !req.user._id) {
+      return res.status(401).send('Authentication required');
+    }
+
     const id = req.params.id;
     const updates = req.body || {};
     const card = await VisitingCard.findById(id);
     if (!card) return res.status(404).send('Visiting card not found');
-  const allowed = ['name','title','description','email','phone','address','website','linkedin','twitter','facebook','instagram','slug','image'];
+
+    // Authorization: owner or admin
+    const isOwner = card.user && String(card.user) === String(req.user._id);
+    // Also allow ownership via profile if profile exists and belongs to user
+    let profileForCard = null;
+    if (!isOwner && card.profileId) {
+      if (mongoose.Types.ObjectId.isValid(card.profileId)) {
+        profileForCard = await Profile.findById(card.profileId).lean();
+        if (profileForCard && profileForCard.user && String(profileForCard.user) === String(req.user._id)) {
+          // user owns the profile associated with this card
+        }
+      }
+    }
+    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
+    const allowedToEdit = isOwner || (profileForCard && profileForCard.user && String(profileForCard.user) === String(req.user._id)) || hasElevatedRole;
+    if (!allowedToEdit) return res.status(403).send('Unauthorized to update this card');
+
+    const allowed = ['name', 'title', 'description', 'email', 'phone', 'address', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'slug', 'image'];
     allowed.forEach(k => { if (updates[k] !== undefined) card[k] = updates[k]; });
-    if (updates.profileId !== undefined) card.profileId = updates.profileId || undefined;
+
+    // Validate profileId change if provided
+    if (updates.profileId !== undefined) {
+      if (updates.profileId) {
+        if (!mongoose.Types.ObjectId.isValid(updates.profileId)) {
+          return res.status(400).send('Invalid profile ID');
+        }
+        const newProfile = await Profile.findById(updates.profileId).lean();
+        if (!newProfile) return res.status(400).send('Invalid profile ID');
+        // Verify user owns the new profile unless admin
+        if (!(req.user.role === 'admin' || req.user.isAdmin) && newProfile.user && String(newProfile.user) !== String(req.user._id)) {
+          return res.status(403).send('Forbidden: you do not own the profile you are assigning');
+        }
+        card.profileId = mongoose.Types.ObjectId(updates.profileId);
+      } else {
+        card.profileId = undefined;
+      }
+    }
+
     await card.save();
     const slug = updates.slug || req.params.slug || (req.user && req.user.slug) || card.slug;
     const redirectTo = (slug && `/dashboard/${slug}/visiting-cards`) || '/dashboard';
     if (req.xhr || (req.headers['accept'] || '').includes('application/json')) return res.json({ ok: true, card });
     res.redirect(redirectTo);
   } catch (err) {
-    console.error('Error updating visiting card', err);
+    console.error('Error updating visiting card', { error: err && (err.stack || err.message || err), userId: req.user && req.user._id ? String(req.user._id) : null });
     res.status(500).send('Error updating visiting card');
   }
 };
@@ -156,12 +314,36 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     const id = req.params.id;
-    const card = await VisitingCard.findByIdAndDelete(id);
+    if (!id) return res.status(400).send('Visiting card ID required');
+
+    // Load the card first
+    const card = await VisitingCard.findById(id).lean();
+    if (!card) return res.status(404).send('Visiting card not found');
+
+    // Require authentication
+    if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
+
+    // Authorization: owner (card.user) or profile owner or admin
+    const isOwner = card.user && String(card.user) === String(req.user._id);
+    let profileOwnerMatch = false;
+    if (!isOwner && card.profileId && mongoose.Types.ObjectId.isValid(card.profileId)) {
+      const profile = await Profile.findById(card.profileId).lean();
+      if (profile && profile.user && String(profile.user) === String(req.user._id)) profileOwnerMatch = true;
+    }
+    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
+    if (!isOwner && !profileOwnerMatch && !hasElevatedRole) {
+      return res.status(403).send('Forbidden');
+    }
+
+    // Authorized: perform delete
+    await VisitingCard.findByIdAndDelete(id);
+
     const slug = req.params.slug || (req.user && req.user.slug) || (card && card.slug) || '';
     const redirectTo = (slug && `/dashboard/${slug}/visiting-cards`) || '/dashboard';
     res.redirect(redirectTo);
   } catch (err) {
-    console.error('Error deleting visiting card', err);
+    console.error('Error deleting visiting card', { error: err && (err.stack || err.message || err), userId: req.user && req.user._id ? String(req.user._id) : null });
     res.status(500).send('Error deleting visiting card');
   }
 };
+// (file ends)
