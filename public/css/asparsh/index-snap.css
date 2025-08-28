@@ -1,26 +1,23 @@
-/* Make the page's main element the scroll container. This avoids conflicts with
-   the browser's root scrolling and is more reliable when a fixed header is used. */
 html, body {
   height: 100%;
-  overflow: hidden; /* prevent body scroll — main will scroll */
+  overflow: auto; 
+  scroll-behavior: smooth;
 }
 
-/* Smooth behaviour is kept on the scroll container */
-main {
-  height: 100%;
-  padding-top: var(--header-height);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  /* enable vertical snap on the main scrolling element */
+body {
   scroll-snap-type: y mandatory;
-  scroll-padding-top: var(--header-height);
+  scroll-padding-top: var(--header-height); 
+}
+
+main {
+  min-height: calc(100vh - var(--header-height));
+  padding-top: var(--header-height);
+  box-sizing: border-box;
 }
 
 .snap-section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  /* allow sections to grow but ensure at least viewport minus header */
   min-height: calc(100vh - var(--header-height));
   width: 100%;
   display: flex;
@@ -40,6 +37,10 @@ main {
     overflow: auto !important;
     height: auto !important;
   }
+  body {
+    scroll-snap-type: none !important;
+    scroll-padding-top: 0 !important;
+  }
   main {
     scroll-snap-type: none !important;
     overflow-y: visible !important;
@@ -51,12 +52,17 @@ main {
     min-height: 0 !important;
     height: auto !important;
   }
+  
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
+@media (max-width: 768px) {
   html, body {
     overflow: auto;
     height: auto;
+  }
+  body {
+    scroll-snap-type: none;
+    scroll-padding-top: 0;
   }
   main {
     scroll-snap-type: none;

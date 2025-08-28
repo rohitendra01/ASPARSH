@@ -1371,18 +1371,16 @@ footer {
 
 /* container 6 contact us section */
 
-/* ---------- container6 (optimized) ---------- */
 .container6 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.75rem, 2.2vh, 1.75rem);        /* vertical spacing between header / content / footer */
+  gap: clamp(0.75rem, 2.2vh, 1.75rem);        
   padding-block: clamp(1rem, 3vh, 3rem);
   box-sizing: border-box;
   width: 100%;
 }
 
-/* header (top small heading) */
 .container6-head-text {
   order: 0;
   width: min(var(--max-content-width), 100%);
@@ -1391,7 +1389,6 @@ footer {
   padding-inline: clamp(1rem, 3vw, 4rem);
 }
 
-/* main area — make this the "big" part (second child) */
 .container6-content {
   order: 1;
   width: min(var(--max-content-width), 100%);
@@ -1402,16 +1399,14 @@ footer {
   gap: clamp(1rem, 3vw, 2.5rem);
   padding-inline: clamp(1rem, 3vw, 4rem);
   box-sizing: border-box;
-  /* keep the content visually prominent but never overflow the viewport */
   min-height: clamp(18rem, 40vh, 36rem);
   max-height: calc(100vh - var(--header-height) - 6rem);
 }
 
-/* text column inside main area (flexible, allowed to shrink) */
 .container6-content-text {
   order: 0;
   flex: 1 1 55%;
-  min-width: 0;                      /* critical: lets text shrink inside flex */
+  min-width: 0;                      
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1421,7 +1416,6 @@ footer {
   box-sizing: border-box;
 }
 
-/* primary paragraph (intro) */
 .container6-content-text p:nth-child(1) {
   font-family: var(--subhead-text);
   font-size: clamp(1rem, 2vw, 1.3rem);
@@ -1431,7 +1425,6 @@ footer {
   overflow-wrap: break-word;
 }
 
-/* highlighted / larger text */
 .container6-content-text p:nth-child(2) {
   font-family: var(--head-text);
   font-size: clamp(1.25rem, 4vw, 2.5rem);
@@ -1441,7 +1434,6 @@ footer {
   line-height: 1.05;
 }
 
-/* image column — constrained and centered */
 .container6-content-image {
   order: 1;
   flex: 0 0 clamp(14rem, 32%, 34rem);
@@ -1452,7 +1444,6 @@ footer {
   box-sizing: border-box;
 }
 
-/* image sizing: fills its column but never overflows parent */
 .container6-content-image img {
   width: 100%;
   height: auto;
@@ -1463,7 +1454,6 @@ footer {
   display: block;
 }
 
-/* final paragraph under the main area */
 .container6 > p {
   order: 2;
   width: min(var(--max-content-width), 100%);
@@ -1480,7 +1470,6 @@ footer {
 
 
 
-/* Responsive: tablet and mobile tweaks */
 @media (max-width: 1024px) {
   :root {
     --gutter-preferred: 2rem;
@@ -1512,7 +1501,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-  /* overall adjustments for small tablets and phones */
   :root {
     --root-font: 1rem;
     --gutter-preferred: 1rem;
@@ -1533,9 +1521,8 @@ footer {
 
   header h3 { font-size: 1rem; }
 
-  /* collapse desktop nav on small screens (if a mobile toggle exists, it can control .nav-links) */
   .nav-links {
-    display: none; /* hide full nav on mobile to avoid overflow */
+    display: none; 
   }
 
   .container1,
@@ -1553,7 +1540,6 @@ footer {
     padding-top: calc(var(--header-height) + 0.75rem);
   }
 
-  /* Make hero stack vertically */
   .container1 {
     display: flex;
     flex-direction: column;
@@ -1592,7 +1578,6 @@ footer {
     font-size: 1rem;
   }
 
-  /* description cards stack */
   .description-box {
     flex-direction: column;
     gap: 0.75rem;
@@ -1602,7 +1587,6 @@ footer {
     max-width: 100%;
   }
 
-  /* product card becomes vertical */
   .index-product-card {
     flex-direction: column;
     gap: 0.75rem;
@@ -1627,11 +1611,9 @@ footer {
   .tab-headers { gap: 0.5rem; }
   .tab-header { padding: 8px 6px; }
 
-  /* make buttons full width on mobile for easy tapping */
   .index-product-button { flex-direction: column; gap: 0.5rem; }
   .index-product-button button { width: 100%; }
 
-  /* how-it-works cards wrap into two columns (or single on very small) */
   .container4-how-it-works {
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -1642,7 +1624,6 @@ footer {
     max-width: 48%;
   }
 
-  /* testimonial — single column carousel look */
   .testimonial-carousel {
     max-width: 100%;
     padding: 0 0.25rem;
@@ -1656,7 +1637,6 @@ footer {
   }
   .testimonial-avatar { width: 64px; height: 64px; }
 
-  /* contact section stacks */
   .container6-content {
     flex-direction: column;
     gap: 1rem;
@@ -1669,14 +1649,12 @@ footer {
   .container6-content-image { order: 2; width: 100%; }
   .container6-content-image img { width: 100%; height: auto; }
 
-  /* dropdown adjustments */
   .user-dropdown-content {
     right: 12px;
     left: auto;
     width: calc(100% - 24px);
   }
 
-  /* reduce card shadows and border radii a bit to look compact */
   .description-card, .index-product-card, .container4-how-it-works-card {
     border-radius: 10px;
   }
