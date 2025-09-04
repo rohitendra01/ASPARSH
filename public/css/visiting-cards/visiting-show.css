@@ -33,7 +33,7 @@
 
 .header-intro {
     text-align: center;
-    color: #fff;
+    color: #000000;
 }
 
 .header-intro h1 {
@@ -41,7 +41,7 @@
     font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 6px;
-    color: #fff;
+    color: #000000;
     letter-spacing: 1.5px;
 }
 

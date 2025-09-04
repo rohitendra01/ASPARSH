@@ -56,8 +56,12 @@ exports.createProfile = async (req, res) => {
       createdBy: req.user._id,
       image: imageUrl || '', // Explicitly set the image URL
       address,
-      socialLinks: data.socialLinks || [],
-      slug: slug
+  socialLinks: data.socialLinks || [],
+  slug: slug,
+  occupation: data.occupation || '',
+  category: data.category || '',
+  experience: data.experience ? Number(data.experience) : 0,
+  subcategory: data.subcategory || ''
     });
     
     await newProfile.save();
@@ -157,6 +161,10 @@ exports.updateProfile = async (req, res) => {
       postcode: req.body.postcode || ''
     };
     profile.socialLinks = req.body.socialLinks || [];
+  profile.occupation = req.body.occupation || '';
+  profile.category = req.body.category || '';
+  profile.experience = req.body.experience ? Number(req.body.experience) : 0;
+  profile.subcategory = req.body.subcategory || '';
 
     // Handle image deletion
     if (req.body.deleteImage && profile.image) {

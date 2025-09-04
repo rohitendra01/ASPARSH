@@ -85,6 +85,23 @@
                 </ul>
             </div>
         </div>
+        <div class="profile-details">
+          <div class="profile-details-header">
+                <h2>Occupation</h2>
+            </div>
+            <div class="profile-details-main">
+                <% if (profile.occupation) { %>
+                      <p class="profile-occupation"><strong>Occupation:</strong> <%= profile.occupation %></p>
+                    <% } %>
+                    <% if (profile.category) { %>
+                      <p class="profile-category"><strong>Category:</strong> <%= profile.category %></p>
+                    <% } %>
+                    <% if (profile.subcategory) { %>
+                      <p class="profile-subcategory"><strong>Subcategory:</strong> <%= profile.subcategory %></p>
+                    <% } %>
+                    <p class="profile-experience"><strong>Experience:</strong> <%= (profile.experience || 0) %> year<%= (profile.experience == 1) ? '' : 's' %></p>
+              </div>
+        </div>
     </div>
 
 

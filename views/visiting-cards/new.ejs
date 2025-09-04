@@ -9,51 +9,72 @@
   <% } %>
 
   <form action="/dashboard/<%= slug || '' %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
-    <input type="hidden" name="profileId" value="">
-    <input type="hidden" name="slug" value="">
+    <% if (profile && profile._id) { %>
+      <input type="hidden" name="profileId" value="<%= profile._id %>">
+      <input type="hidden" name="slug" value="<%= slug || '' %>">
+    <% } else { %>
+      <input type="hidden" name="profileId" value="">
+      <input type="hidden" name="slug" value="">
+    <% } %>
 
-    <!-- Profile search / attach -->
+    <!-- If a profile is attached, show summary and use its data by default -->
+    <% if (profile) { %>
+      <div class="attached-profile">
+        <strong>Attached profile:</strong> <%= profile.name %> — <%= profile.email || profile.mobile || profile.slug %>
+      </div>
+      <p>Most fields will be pre-filled from the attached profile. Uncheck "Use profile data" below to provide custom values.</p>
+      <label>
+        <input type="checkbox" id="use-profile-data" checked> Use profile data (disable to override)
+      </label>
+    <% } else { %>
+      <!-- Profile search / attach -->
+      <label>
+        Attach Profile
+        <input id="profile-search" type="search" placeholder="Search profile by name, email or slug..." autocomplete="off">
+      </label>
+      <div id="profile-suggestions" class="suggestions"></div>
+      <div id="selected-profile" class="selected-profile">No profile selected</div>
+    <% } %>
+
+    <!-- Visiting-card fields; when profile attached these start with profile values and are disabled until override -->
     <label>
-      Attach Profile
-      <input id="profile-search" type="search" placeholder="Search profile by name, email or slug..." autocomplete="off">
+      Name
+      <input type="text" name="name" id="field-name" value="<%= profile ? profile.name : '' %>" <%= profile ? 'disabled' : '' %> required>
     </label>
-    <div id="profile-suggestions" class="suggestions"></div>
-  <div id="selected-profile" class="selected-profile">No profile selected</div>
 
-    <!-- Visiting-card-specific fields only (profile-owned fields removed) -->
     <label>
       Title / Designation
-      <input type="text" name="title" required>
+      <input type="text" name="title" id="field-title" value="" required>
     </label>
 
     <label>
       Description
-      <textarea name="description" rows="4" required></textarea>
+      <textarea name="description" id="field-description" rows="4" required></textarea>
     </label>
 
     <label>
       Website
-      <input type="url" name="website">
+      <input type="url" name="website" id="field-website" value="<%= profile && profile.website ? profile.website : '' %>" <%= profile && profile.website ? 'disabled' : (profile ? 'disabled' : '') %>>
     </label>
 
     <label>
       LinkedIn
-  <input type="url" name="linkedin">
+      <input type="url" name="linkedin" id="field-linkedin" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='linkedin') ? profile.socialLinks.find(s=>s.platform==='linkedin').url : '') %>" <%= profile ? 'disabled' : '' %>>
     </label>
 
     <label>
       Twitter
-  <input type="url" name="twitter">
+      <input type="url" name="twitter" id="field-twitter" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='twitter') ? profile.socialLinks.find(s=>s.platform==='twitter').url : '') %>" <%= profile ? 'disabled' : '' %>>
     </label>
 
     <label>
       Facebook
-  <input type="url" name="facebook">
+      <input type="url" name="facebook" id="field-facebook" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='facebook') ? profile.socialLinks.find(s=>s.platform==='facebook').url : '') %>" <%= profile ? 'disabled' : '' %>>
     </label>
 
     <label>
       Instagram
-  <input type="url" name="instagram">
+      <input type="url" name="instagram" id="field-instagram" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='instagram') ? profile.socialLinks.find(s=>s.platform==='instagram').url : '') %>" <%= profile ? 'disabled' : '' %>>
     </label>
 
     <div class="form-actions">
@@ -74,6 +95,68 @@
 
   let timeout = null;
   input && input.addEventListener('input', function(e){
+    const q = (e.target.value || '').trim();
+    suggestions.innerHTML = '';
+    if (timeout) clearTimeout(timeout);
+    if (!q || q.length < 2) return;
+    timeout = setTimeout(async ()=>{
+      try {
+        const res = await fetch('/api/profiles/search?q=' + encodeURIComponent(q));
+        if (!res.ok) return;
+        const profiles = await res.json();
+        suggestions.innerHTML = '';
+        profiles.forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'suggestion-item';
+          div.textContent = (p.name || p.slug || p.email) + ' — ' + (p.email || p.slug || '');
+          div.dataset.id = p._id;
+          div.dataset.slug = p.slug;
+          div.addEventListener('click', ()=>{
+            profileIdField.value = p._id || '';
+            slugField.value = p.slug || '';
+            selected.textContent = (p.name || p.slug || '') + ' — ' + (p.email || '');
+            suggestions.innerHTML = '';
+            input.value = '';
+          });
+          suggestions.appendChild(div);
+        });
+      } catch (err) {
+        console.error('Profile search error', err);
+      }
+    }, 250);
+  });
+})();
+</script>
+<script>
+// Toggle override of profile data when checkbox changes
+;(function(){
+  const useProfileCheckbox = document.getElementById('use-profile-data');
+  if (!useProfileCheckbox) return;
+  const overridable = ['field-name','field-website','field-linkedin','field-twitter','field-facebook','field-instagram'];
+  function setDisabled(dis) {
+    overridable.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = dis;
+    });
+  }
+  // initial state
+  setDisabled(useProfileCheckbox.checked);
+  useProfileCheckbox.addEventListener('change', function(){
+    setDisabled(this.checked);
+  });
+})();
+
+// Profile search code (only used when creating without an attached profile)
+;(function(){
+  const input = document.getElementById('profile-search');
+  if (!input) return;
+  const suggestions = document.getElementById('profile-suggestions');
+  const selected = document.getElementById('selected-profile');
+  const profileIdField = document.querySelector('input[name="profileId"]');
+  const slugField = document.querySelector('input[name="slug"]');
+
+  let timeout = null;
+  input.addEventListener('input', function(e){
     const q = (e.target.value || '').trim();
     suggestions.innerHTML = '';
     if (timeout) clearTimeout(timeout);

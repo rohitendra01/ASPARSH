@@ -20,6 +20,27 @@
       <input type="text" id="mobile" name="mobile" required value="<%= profile.mobile %>" class="form-control" />
     </div>
     <div class="form-group">
+      <label for="occupation">Occupation</label>
+      <input type="text" id="occupation" name="occupation" value="<%= profile.occupation || '' %>" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="categorySelect">Category</label>
+      <input type="text" id="categorySearch" placeholder="Search or type category" class="form-control" autocomplete="off" />
+      <select id="categorySelect" name="category" class="form-control" style="margin-top:.5rem;">
+        <option value="">-- choose category --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="subcategorySelect">Subcategory</label>
+      <select id="subcategorySelect" name="subcategory" class="form-control">
+        <option value="">-- choose subcategory --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="experience">Experience (years)</label>
+      <input type="number" id="experience" name="experience" min="0" step="1" value="<%= profile.experience || 0 %>" class="form-control" />
+    </div>
+    <div class="form-group">
       <label for="image">Profile Image</label>
       <% if (profile.image) { %>
         <img src="<%= profile.image %>" alt="Current Image" class="profile-image-preview" />
@@ -124,4 +145,113 @@ function reindexSocialLinks() {
     if (urlInput) urlInput.name = `socialLinks[${i}][url]`;
   });
 }
+</script>
+<script>
+  // Reuse the CATEGORY_DATA block from new.ejs — embedded here for edit page
+  const CATEGORY_DATA = (function(){
+    return {
+      "Construction": ["cement shops","bricks & building materials suppliers","construction workers (masons, laborers)","civil contractors","general contractors","demolition services","scaffolding suppliers","heavy equipment rental","concrete mixers","structural engineers","surveyors","site supervisors","plasterers","tilers","roofers","formwork suppliers","insulation installers","waterproofing specialists","paving contractors","flooring specialists","construction estimators"],
+      "Real Estate": ["residential agents","commercial brokers","property managers","leasing agents","real estate developers","brokers for resale","real estate consultants","land surveyors","facilities management","rental/property listings platforms","real estate lawyers","short-term rental managers"],
+      "Architecture & Interior Design": ["architects","interior designers","landscape architects","urban planners","furniture designers","3D visualizers","CAD/BIM modelers","lighting designers","Vastu/ Feng Shui consultants","FF&E suppliers"],
+      "Manufacturing": ["OEM manufacturers","contract manufacturers","metal fabrication","plastics","textiles manufacturing","food processing","packaging manufacturers","electronics assembly","CNC machining","injection molding","sheet metal works","foundries"],
+      "Wholesale & Distribution": ["distributors","importers","exporters","wholesalers (FMCG, electronics, apparel)","drop-shippers","B2B marketplaces","supply chain managers","warehousing & cold storage operators"],
+      "Retail": ["grocery stores","supermarkets","convenience stores","specialty retailers (electronics, apparel, jewelry)","online retailers / e-commerce sellers","mom & pop shops","kiosks","franchise owners","retail managers","visual merchandisers"],
+      "Food & Beverage": ["restaurants","cafes","cloud kitchens","bakeries","food trucks","caterers","confectioners","confectionery suppliers","bar & pubs","microbreweries","beverage distributors","sommeliers","menu designers","food safety consultants"],
+      "Hospitality & Accommodation": ["hotels","resorts","homestays","hostels","boutique hotels","guest houses","hotel management","front-desk","concierge services","housekeeping","event banquet managers"],
+      "Travel & Tourism": ["travel agents","tour operators","guides","OTA platforms","corporate travel managers","visa consultants","adventure tourism operators","travel bloggers/influencers"],
+      "Transportation & Logistics": ["trucking & freight companies","courier & last-mile delivery","freight forwarders","customs brokers","cold chain logistics","rail logistics","intermodal","logistics tech","route planners","fleet managers"],
+      "Automotive": ["car dealerships","motorcycle dealerships","auto repair shops","service centers","spare parts suppliers","car rentals","body shops","detailers","mechanics","vehicle inspectors","EV charging installers"],
+      "Aviation & Aerospace": ["airlines","MRO (maintenance, repair, overhaul)","private jet services","avionics suppliers","pilots","aircraft leasing","aerospace manufacturers","ground handling"],
+      "Marine & Shipping": ["ship owners","shipbuilders","crewing agencies","port operators","ship chandlers","maritime logistics","yacht services","marine surveyors"],
+      "Energy & Utilities": ["power generation (thermal, hydro)","renewable energy developers (solar, wind)","transmission operators","utility companies","energy consultants","smart grid","energy auditors","EV infrastructure","battery suppliers"],
+      "Oil, Gas & Mining": ["upstream exploration","drilling contractors","pipeline operators","mining companies","mineral traders","refinery services","petrochemical suppliers","geologists"],
+      "Agriculture & Agritech": ["farmers","agri-input suppliers (seeds, fertilizers)","equipment dealers","cold storage","agri-tech startups","livestock & dairy","aquaculture","precision farming consultants","agri-commodity traders"],
+      "Healthcare & Medical": ["hospitals","clinics","general practitioners","specialists (cardiology, neurology, orthopedics)","nurses","diagnostic labs","pathology centers","ambulance services","medical equipment suppliers","telemedicine providers"],
+      "Dental & Optical": ["dental clinics","orthodontists","dental labs","optometrists","eyewear retailers","contact lens suppliers","ophthalmologists","optical labs"],
+      "Pharmacy & Pharma": ["retail pharmacies","pharma distribution","pharmaceutical manufacturers","clinical trial CROs","medical reps","pharmacovigilance","compounding pharmacies"],
+      "Biotechnology & Life Sciences": ["biotech startups","research labs","genomics services","biomanufacturing","biotech consultants","lab equipment suppliers"],
+      "Wellness & Personal Care": ["gyms","fitness trainers","yoga studios","physiotherapists","nutritionists","spas","massage therapists","wellness coaches","alternative medicine (Ayurveda, Homeopathy)","beauty salons"],
+      "Education & Training": ["schools","colleges","coaching centers","online course creators","tutors","corporate trainers","edtech startups","exam prep centers","vocational training institutes","language schools"],
+      "Childcare & Eldercare": ["daycare centers","nannies","senior care homes","home caregivers","physiotherapy for elderly","rehabilitation centers"],
+      "Professional Services — Legal": ["corporate lawyers","litigation lawyers","IP attorneys","family law","tax law","notaries","legal consultants","patent agents"],
+      "Professional Services — Accounting & Finance": ["chartered accountants","bookkeepers","tax consultants","payroll services","CFO services","financial planners","auditors","forensic accountants"],
+      "Banking & Financial Services": ["retail bankers","corporate banking","NBFCs","microfinance","investment banking","private banking","wealth managers","loan officers"],
+      "Insurance": ["insurers","brokers","agents","claims adjusters","underwriters","reinsurance","health insurance brokers"],
+      "Fintech & Crypto": ["payments","wallets","neobanks","lending platforms","blockchain developers","crypto exchanges","tokenization platforms","KYC/AML providers"],
+      "Information Technology": ["software development","web development","mobile apps","full-stack developers","DevOps engineers","cloud architects","SaaS companies","product managers","QA/testers","IT support","IT consulting"],
+      "Data & AI": ["data scientists","machine learning engineers","AI researchers","data engineers","analytics consultants","BI developers","NLP specialists","computer vision engineers"],
+      "Hardware & Electronics": ["embedded systems","IoT device manufacturers","PCB designers","semiconductor engineers","electronics repair","contract electronics manufacturers"],
+      "Cybersecurity & Privacy": ["security analysts","penetration testers","SOC operators","identity & access management","privacy consultants","encryption specialists"],
+      "Telecommunications": ["ISPs","mobile operators","fiber providers","network engineers","tower operators","VoIP providers","telecom equipment suppliers"],
+      "Marketing, Advertising & PR": ["digital marketing","SEO/SEM","social media managers","performance marketers","brand strategists","creative agencies","PR firms","content creators","influencer marketing","email marketing","event marketing"],
+      "Sales & Business Development": ["B2B sales reps","account managers","channel partners","inside sales","sales engineers","CRM consultants","lead-gen agencies"],
+      "Human Resources & Recruitment": ["recruiters","staffing agencies","HR consultants","payroll providers","L&D specialists","executive search","HR tech"],
+      "Consulting & Strategy": ["management consultants","IT consultants","strategy consultants","operations consultants","sustainability consultants","supply chain consultants"],
+      "Legal & Compliance Tech": ["regtech providers","contract management","compliance officers","AML/KYC consultants"],
+      "Media, Publishing & Journalism": ["newspapers","magazines","online publishers","editors","reporters","copywriters","content strategists","podcast producers","newsletter writers"],
+      "Film, Video & Photography": ["photographers","videographers","film producers","editors","cinematographers","studios","production houses","stock footage providers","event photographers"],
+      "Music, Arts & Entertainment": ["musicians","bands","artists","galleries","art dealers","stage production","theatre companies","comedians","DJs"],
+      "Gaming & Animation": ["game developers","animators","VFX studios","sound designers","game publishers","indie studios"],
+      "Events & Weddings": ["event planners","wedding planners","decorators","caterers (event)","AV & production","sound & lighting","stage designers","ticketing platforms"],
+      "Sports & Recreation": ["sports clubs","coaches","personal trainers","sports academies","equipment retailers","physiotherapists (sports)","stadium management"],
+      "Beauty, Fashion & Apparel": ["designers","tailors","boutiques","textile suppliers","garment manufacturers","footwear","accessories","fashion stylists","modeling agencies"],
+      "Jewelry & Watches": ["jewelers","watchmakers","repair shops","gemstone dealers","custom jewel design"],
+      "Printing, Signage & Packaging": ["offset printers","digital printers","packaging designers","label printers","signage & hoardings","3D printing services"],
+      "Home Services & Repairs": ["plumbers","electricians","carpenters","handymen","HVAC technicians","pest control","locksmiths","appliance repair"]
+    };
+  })();
+
+  (function initCategoryUI(){
+  document.addEventListener('DOMContentLoaded', function () {
+    const CATEGORY_DATA_LOCAL = CATEGORY_DATA; // already defined above
+    const catSelect = document.getElementById('categorySelect');
+    const catSearch = document.getElementById('categorySearch');
+    const subSelect = document.getElementById('subcategorySelect');
+    const existingCategory = `<%= (profile.category || '') %>`;
+    const existingSub = `<%= (profile.subcategory || '') %>`;
+
+    if (!catSelect || !catSearch || !subSelect) return;
+
+    // datalist
+    let datalist = document.getElementById('categoryDatalist');
+    if (!datalist) {
+      datalist = document.createElement('datalist');
+      datalist.id = 'categoryDatalist';
+      document.body.appendChild(datalist);
+      catSearch.setAttribute('list', 'categoryDatalist');
+    }
+
+    function populateCategories(filter){
+      const keys = Object.keys(CATEGORY_DATA_LOCAL).filter(k => !filter || k.toLowerCase().includes(filter.toLowerCase()));
+      catSelect.innerHTML = '<option value="">-- choose category --</option>' + keys.map(k => `<option value="${k}">${k}</option>`).join('');
+      datalist.innerHTML = keys.map(k => `<option value="${k}"></option>`).join('');
+      if (existingCategory) catSelect.value = existingCategory;
+    }
+
+    function populateSubcategories(category){
+      const items = CATEGORY_DATA_LOCAL[category] || [];
+      subSelect.innerHTML = '<option value="">-- choose subcategory --</option>' + items.map(s => `<option value="${s}">${s}</option>`).join('');
+      if (existingSub) subSelect.value = existingSub;
+    }
+
+    catSearch.addEventListener('input', (e)=>{ populateCategories(e.target.value); });
+    catSearch.addEventListener('change', (e)=>{
+      const val = e.target.value;
+      if (CATEGORY_DATA_LOCAL[val]) {
+        catSelect.value = val;
+        populateSubcategories(val);
+      }
+    });
+    catSelect.addEventListener('change', (e)=>{ populateSubcategories(e.target.value); catSearch.value = e.target.value; });
+
+    populateCategories();
+    if (existingCategory) {
+      catSearch.value = existingCategory;
+      populateSubcategories(existingCategory);
+    }
+  });
+  
+  // end DOMContentLoaded
+  
+  })();
 </script>

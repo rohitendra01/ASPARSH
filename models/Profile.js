@@ -30,6 +30,30 @@ const profileSchema = new Schema({
         required: true
     },
 
+    occupation: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+
+    category: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+
+    subcategory: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+
+    experience: {
+        // years of experience
+        type: Number,
+        default: 0
+    },
+
     address: {
         type: new Schema({
             addressLine: { type: String },
