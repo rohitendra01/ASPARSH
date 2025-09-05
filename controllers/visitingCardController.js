@@ -223,36 +223,46 @@ exports.list = async (req, res) => {
   }
 };
 
-// Render edit form
 exports.renderEditForm = async (req, res) => {
   try {
-    const id = req.params.id;
-    const card = await VisitingCard.findById(id).lean();
-    if (!card) return res.status(404).send('Visiting card not found');
-    let profile = null;
-    if (card.profileId) profile = await Profile.findById(card.profileId).lean();
-  // Authorization: ensure a logged-in user owns the card or has elevated role
-  if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
-  const isOwner = (card.user && String(card.user) === String(req.user._id)) || (card.profileId && profile && profile.user && String(profile.user) === String(req.user._id));
-  const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
-  if (!isOwner && !hasElevatedRole) return res.status(403).send('Forbidden');
+    const maybeId = req.params.id || null;
+    const maybeProfileSlug = req.params.profileSlug || null;
 
-  const { token: csrfToken, generationError } = getCsrfToken(req, res);
-  // If CSRF generation failed, include a clear message but still render the form where appropriate
-  const slugVal = req.params ? req.params.slug : (req.user && req.user.slug) || '';
-  const renderOpts = { profile, user: req.user, slug: slugVal, csrfToken, card, layout: 'layouts/dashboard-boilerplate' };
-  if (generationError) renderOpts.error = 'Unable to generate security token for this form. Please try again.';
-  res.render('visiting-cards/new', renderOpts);
+    let card = null;
+    let profile = null;
+
+    if (maybeId && mongoose.Types.ObjectId.isValid(maybeId)) {
+      card = await VisitingCard.findById(maybeId).lean();
+      if (!card) return res.status(404).send('Visiting card not found');
+      if (card.profileId) profile = await Profile.findById(card.profileId).lean();
+    } else if (maybeProfileSlug) {
+      profile = await Profile.findOne({ slug: maybeProfileSlug }).lean();
+      if (!profile) return res.status(404).send('Profile not found');
+      card = await VisitingCard.findOne({ profileId: profile._id }).sort({ createdAt: -1 }).lean();
+      if (!card) return res.status(404).send('Visiting card not found for this profile');
+    } else {
+      return res.status(400).send('Missing visiting card identifier');
+    }
+
+    if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
+    const isOwner = (card.user && String(card.user) === String(req.user._id)) || (card.profileId && profile && profile.user && String(profile.user) === String(req.user._id));
+    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
+    if (!isOwner && !hasElevatedRole) return res.status(403).send('Forbidden');
+
+    const { token: csrfToken, generationError } = getCsrfToken(req, res);
+    const slugVal = req.params ? req.params.slug : (req.user && req.user.slug) || '';
+    const renderOpts = { profile, user: req.user, slug: slugVal, csrfToken, card, layout: 'layouts/dashboard-boilerplate' };
+    if (generationError) renderOpts.error = 'Unable to generate security token for this form. Please try again.';
+
+    res.render('visiting-cards/edit', renderOpts);
   } catch (err) {
     console.error('Error rendering edit visiting card form', err);
     res.status(500).send('Error rendering form');
   }
 };
 
-// Update visiting card
 exports.update = async (req, res) => {
   try {
-    // Require authentication
     if (!req.user || !req.user._id) {
       return res.status(401).send('Authentication required');
     }
@@ -262,15 +272,12 @@ exports.update = async (req, res) => {
     const card = await VisitingCard.findById(id);
     if (!card) return res.status(404).send('Visiting card not found');
 
-    // Authorization: owner or admin
     const isOwner = card.user && String(card.user) === String(req.user._id);
-    // Also allow ownership via profile if profile exists and belongs to user
     let profileForCard = null;
     if (!isOwner && card.profileId) {
       if (mongoose.Types.ObjectId.isValid(card.profileId)) {
         profileForCard = await Profile.findById(card.profileId).lean();
         if (profileForCard && profileForCard.user && String(profileForCard.user) === String(req.user._id)) {
-          // user owns the profile associated with this card
         }
       }
     }
@@ -281,7 +288,6 @@ exports.update = async (req, res) => {
     const allowed = ['name', 'title', 'description', 'email', 'phone', 'address', 'website', 'linkedin', 'twitter', 'facebook', 'instagram', 'slug', 'image'];
     allowed.forEach(k => { if (updates[k] !== undefined) card[k] = updates[k]; });
 
-    // Validate profileId change if provided
     if (updates.profileId !== undefined) {
       if (updates.profileId) {
         if (!mongoose.Types.ObjectId.isValid(updates.profileId)) {
@@ -289,11 +295,10 @@ exports.update = async (req, res) => {
         }
         const newProfile = await Profile.findById(updates.profileId).lean();
         if (!newProfile) return res.status(400).send('Invalid profile ID');
-        // Verify user owns the new profile unless admin
         if (!(req.user.role === 'admin' || req.user.isAdmin) && newProfile.user && String(newProfile.user) !== String(req.user._id)) {
           return res.status(403).send('Forbidden: you do not own the profile you are assigning');
         }
-        card.profileId = mongoose.Types.ObjectId(updates.profileId);
+  card.profileId = new mongoose.Types.ObjectId(updates.profileId);
       } else {
         card.profileId = undefined;
       }

@@ -11,14 +11,25 @@ jest.mock('csurf', () => {
 });
 
 // We'll mount the real app but mock out any external dependencies like cloudinary and mongoose models.
-jest.mock('cloudinary', () => ({
-  v2: {
-    config: jest.fn(),
-    uploader: {
-      upload_stream: jest.fn((opts, cb) => ({ pipe: () => cb(null, { secure_url: 'http://cloud/fake.jpg', public_id: 'asparsh/hotels/fake' }) }))
+jest.mock('cloudinary', () => {
+  const { PassThrough } = require('stream');
+  return {
+    v2: {
+      config: jest.fn(),
+      uploader: {
+        upload_stream: jest.fn((opts, cb) => {
+          const stream = new PassThrough();
+          // When the writable stream finishes, call the callback like Cloudinary does
+          stream.on('finish', () => {
+            cb(null, { secure_url: 'http://cloud/fake.jpg', public_id: 'asparsh/hotels/fake' });
+          });
+          stream.on('error', (err) => cb(err));
+          return stream;
+        })
+      }
     }
-  }
-}));
+  };
+});
 
 // Mock mailer to prevent nodemailer verify/connection during tests
 jest.mock('../mailer', () => ({ verify: jest.fn(), sendMail: jest.fn() }));
@@ -41,6 +52,15 @@ jest.mock('../models/Hotel', () => {
   return function Hotel(data) {
     this.save = mockSave.mockImplementation(async () => ({ ...data, _id: 'fakeid' }));
     Object.assign(this, data);
+    // Provide toObject used by controller when creating version snapshots
+    this.toObject = function() {
+      // Return a plain clone of current properties
+      const obj = {};
+      Object.keys(this).forEach(k => {
+        if (typeof this[k] !== 'function') obj[k] = this[k];
+      });
+      return obj;
+    };
   };
 });
 

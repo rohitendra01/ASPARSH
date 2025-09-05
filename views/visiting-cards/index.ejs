@@ -20,7 +20,8 @@
     <input type="text" id="cardSlugSearch" name="cardSlug" placeholder="Enter Card Slug" required>
     <button type="submit">Search</button>
   </form>
-  <a href="/dashboard/<%= userSlug %>/visiting-cards/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Visiting Card</a>
+  <% const userSlugSegment = (typeof userSlug !== 'undefined' && userSlug) ? '/' + encodeURIComponent(userSlug) : ''; %>
+  <a href="/dashboard<%= userSlugSegment %>/visiting-cards/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Visiting Card</a>
 </div>
 
 <div class="hotel-list-container visiting-card-list-container">
@@ -48,7 +49,8 @@
             </div>
             <div class="visiting-card-links">
               <a href="/visiting-card/<%= encodeURIComponent(card.slug || '') %>" class="visiting-card-link">View Final</a>
-              <a href="/dashboard/<%= encodeURIComponent(userSlug) %>/visiting-cards/<%= card._id %>/edit" class="visiting-card-edit">Edit</a>
+              <% const editTarget = card.slug ? `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.slug)}/edit` : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
+              <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
             </div>
           </div>
         </div>

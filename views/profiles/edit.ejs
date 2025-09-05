@@ -3,7 +3,8 @@
 <div class="profile-form-container">
 <form class="profile-form"
       method="POST"
-      action="/dashboard/<%= slug %>/profiles/<%= profile.slug %>/edit"
+  <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
+  action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
       enctype="multipart/form-data"
       onsubmit="reindexSocialLinks()">
     <h2 class="form-title">Edit Profile</h2>
@@ -81,7 +82,7 @@
     </div>
     <button type="submit" class="btn btn-primary">Update Profile</button>
 </form>
-<form action="/dashboard/<%= slug %>/profiles/<%= profile.slug %>/delete" method="POST" style="display:inline;">
+<form action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/delete" method="POST" style="display:inline;">
   <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this profile?');">Delete Profile</button>
 </form>
 </div>

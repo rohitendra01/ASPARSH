@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asparsh | Visiting Card</title>
     <link rel="stylesheet" href="/css/visiting-cards/visiting-card.css">
+    <link rel="stylesheet" href="/css/visiting-cards/visiting-show.css">
 </head>
 <body>
     <section class="section-header">
@@ -15,11 +16,9 @@
                 <% } else { %>
                   <img src="/assets/portfolio-image.jpg" alt="Visiting Card Header Image" class="profile-img" />
                 <% } %>
-            </div>
-            <div class="header-intro">
-                <h1><%= card.name %></h1>
-                <h2><%= card.title %></h2>
-                <div class="social-links">
+                <p><%= card.description || 'No description available' %></p>            <div class="header-intro">
+                <h1><%= card.name || 'Name not available' %></h1>
+                <h2><%= card.title || 'Title not available' %></h2>                <div class="social-links">
                     <% if (card.linkedin) { %>
                     <a href="<%= card.linkedin %>" target="_blank" aria-label="LinkedIn">
                         <!-- LinkedIn SVG -->

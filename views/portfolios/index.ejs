@@ -3,8 +3,11 @@
 
 <div class="dashboard-header-row">
   <form class="search-form" onsubmit="return filterPortfolios(event)">
-    <input type="text" id="portfolioSlugSearch" name="portfolioSlug" placeholder="Enter Portfolio Slug" required>
-    <button type="submit">Search</button>
+    <input type="search"
+           id="portfolioSlugSearch"
+           name="portfolioSlug"
+  <a href="/dashboard/<%= encodeURIComponent(slug) %>/portfolios/new" class="create-portfolio-btn create-hotel-btn-fixed">+ Create New Portfolio</a>           aria-label="Filter portfolios by slug"
+           oninput="filterPortfolios(event)">    <button type="submit">Search</button>
   </form>
   <a href="/dashboard/<%= slug %>/portfolios/new" class="create-portfolio-btn create-hotel-btn-fixed">+ Create New Portfolio</a>
 </div>

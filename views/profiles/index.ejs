@@ -2,41 +2,43 @@
 <% block('styles').append(`<link rel="stylesheet" href="/css/profiles/index.css" />`) %>
 
 <div class="dashboard-header-row">
-  <form class="search-form" onsubmit="return filterProfiles(event)">
-    <input type="text" id="profileSlugSearch" name="profileSlug" placeholder="Enter Profile Slug" required>
+  <form class="search-form" role="search" onsubmit="filterProfiles(event)">
+    <input type="search" id="profileSlugSearch" name="profileSlug" placeholder="Enter Profile Slug" aria-label="Filter profiles by slug">
     <button type="submit">Search</button>
   </form>
-  <a href="/dashboard/<%= slug %>/profiles/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Profile</a>
+  <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
+  <a href="/dashboard<%= slugSegment %>/profiles/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Profile</a>
 </div>
+
 <div class="profiles-container">
-  <% if (profiles.length > 0) { %>
+  <% if (profiles && profiles.length > 0) { %>
     <div class="profiles-grid">
       <% profiles.forEach(profile => { %>
-        <a href="/dashboard/<%= slug %>/profiles/<%= profile.slug %>">
-        <div class="profile-card" data-profile-slug="<%= profile.slug %>">
-          <div class="profile-card-description">
-            <div class="profile-image-wrapper">
-              <img src="<%= profile.image%>" alt="<%= profile.name %>" class="profile-image" />
+  <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>">
+          <div class="profile-card" data-profile-slug="<%= profile.slug %>">
+            <div class="profile-card-description">
+              <div class="profile-image-wrapper">
+                <img src="<%= profile.image %>" alt="<%= profile.name %>" class="profile-image" />
+              </div>
+              <div class="profile-info">
+                <h3 class="profile-name"><%= profile.name %></h3>
+                <p class="profile-mobile"><%= profile.mobile %></p>
+                <p class="profile-location">
+                  <%= profile.address && profile.address.addressLine ? profile.address.addressLine : '' %>
+                  <%= profile.address && profile.address.city ? ', ' + profile.address.city : '' %>
+                </p>
+              </div>
             </div>
-            <div class="profile-info">
-              <h3 class="profile-name"><%= profile.name %></h3>
-              <p class="profile-mobile"><%= profile.mobile %></p>
-              <p class="profile-location">
-                <%= profile.address && profile.address.addressLine ? profile.address.addressLine : '' %>
-                <%= profile.address && profile.address.city ? ', ' + profile.address.city : '' %>
-              </p>
+            <div class="profile-card-actions">
+              <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit" class="edit-profile-btn">Edit</a>
+              <button class="hover-info-btn" title="Created by: <%= profile.createdBy && profile.createdBy.username || '' %>">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 15a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm-.93-4.412a.5.5 0 0 1 .707-.707l.646.646V8.5a.5.5 0 0 1 1 0v2.793l.646-.646a.5.5 0 0 1 .707.707l-1.5 1.5a.5.5 0 0 1-.707 0l-1.5-1.5z"/>
+                  <path d="M8 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                </svg>
+              </button>
             </div>
           </div>
-          <div class="profile-card-actions">
-            <a href="/dashboard/<%= slug %>/profiles/<%= profile.slug %>/edit" class="edit-profile-btn">Edit</a>
-            <button class="hover-info-btn" title="Created by: <%= profile.createdBy && profile.createdBy.username || '' %>">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
-                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 15a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm-.93-4.412a.5.5 0 0 1 .707-.707l.646.646V8.5a.5.5 0 0 1 1 0v2.793l.646-.646a.5.5 0 0 1 .707.707l-1.5 1.5a.5.5 0 0 1-.707 0l-1.5-1.5z"/>
-                <path d="M8 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
         </a>
       <% }) %>
     </div>
@@ -50,18 +52,14 @@
     event.preventDefault();
     const input = document.getElementById('profileSlugSearch').value.trim().toLowerCase();
     const cards = document.querySelectorAll('.profile-card');
-    if (!input) {
-      cards.forEach(c => c.style.display = '');
-      return false;
-    }
     cards.forEach(c => {
-      const slug = c.getAttribute('data-profile-slug') || '';
-      if (slug.toLowerCase().includes(input)) {
-        c.style.display = '';
-      } else {
-        c.style.display = 'none';
-      }
+      const container = c.closest('a') || c;
+      const slug = (c.dataset && c.dataset.profileSlug
+        ? c.dataset.profileSlug
+        : c.getAttribute('data-profile-slug') || ''
+      ).toLowerCase();
+      const match = !input || slug.includes(input);
+      container.style.display = match ? '' : 'none';
     });
-    return false;
   }
 </script>

@@ -238,7 +238,8 @@
         <div class="card-body">
           <div class="card-row">
             <button class="btn btn-outline configure-btn" data-idx="<%= idx %>">Configure</button>
-            <a class="btn btn-primary manage-link" href="/dashboard/<%= slug %>/services/<%= svc.key %>">Manage</a>
+            <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
+            <a class="btn btn-primary manage-link" href="/dashboard<%= slugSegment %>/services/<%= encodeURIComponent(svc.key) %>">Manage</a>
             <% if (svc.subscribedPlan) { %>
               <div class="plan-pill">
                 <small>Plan: <strong><%= svc.subscribedPlan.name %></strong></small>
@@ -317,7 +318,7 @@
   <div class="modal-inner" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <button class="modal-close" aria-label="Close">&times;</button>
     <h3 id="modalTitle">Configure Service</h3>
-    <form id="configureForm" method="POST" action="/dashboard/<%= slug %>/services/configure">
+  <form id="configureForm" method="POST" action="/dashboard<%= slugSegment %>/services/configure">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <input type="hidden" name="serviceKey" id="modalServiceKey">
       <div class="form-row">

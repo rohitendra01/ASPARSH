@@ -17,6 +17,6 @@ router.get('/:hotelSlug/edit', isLoggedIn, hotelController.renderEditHotelForm);
 
 router.post('/:hotelSlug/edit', isLoggedIn, uploadHotelImages, csrfProtection, hotelController.updateHotel);
 
-router.post('/:hotelSlug/delete', isLoggedIn, uploadHotelImages, csrfProtection, hotelController.deleteHotel);
+router.post('/:hotelSlug/delete', isLoggedIn, csrfProtection, hotelController.deleteHotel);
 
 module.exports = router;

@@ -9,13 +9,18 @@ const csrfProtection = csurf({ cookie: false });
 router.get('/', isLoggedIn, visitingCardController.list);
 
 // Render new form
-router.get('/new', isLoggedIn, visitingCardController.renderNewForm);
+router.get('/new', isLoggedIn, csrfProtection, visitingCardController.renderNewForm);
+
+// Edit form by profile slug (open the latest card for a profile)
+router.get('/profile/:profileSlug/edit', isLoggedIn, csrfProtection, visitingCardController.renderEditForm);
+
+// Edit form by visiting-card id (existing)
+router.get('/:id/edit', isLoggedIn, csrfProtection, visitingCardController.renderEditForm);
 
 // Create visiting card
 router.post('/', isLoggedIn, csrfProtection, visitingCardController.create);
 
-// Edit form
-router.get('/:id/edit', isLoggedIn, visitingCardController.renderEditForm);
+// (moved above)
 
 // Update (PUT and POST for forms)
 router.put('/:id', isLoggedIn, csrfProtection, visitingCardController.update);

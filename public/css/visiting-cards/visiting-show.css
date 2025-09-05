@@ -78,6 +78,17 @@
     transform: translateY(-3px) scale(1.08);
 }
 
+/* Keyboard focus styles for social links */
+.social-links a:focus {
+    box-shadow: 0 0 0 4px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+    transform: translateY(-3px) scale(1.08);
+}
+.social-links a:focus-visible {
+    outline: 3px solid var(--hea-foo);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+}
+
 .social-links svg {
     width: 28px;
     height: 28px;
@@ -433,6 +444,17 @@ header {
     transform: translateY(-3px) scale(1.08);
 }
 
+/* Keyboard focus styles for about-socials */
+.about-socials a:focus {
+    box-shadow: 0 0 0 4px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+    transform: translateY(-3px) scale(1.08);
+}
+.about-socials a:focus-visible {
+    outline: 3px solid var(--hea-foo);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+}
+
 .about-socials svg {
     width: 28px;
     height: 28px;
@@ -513,7 +535,7 @@ header {
     }
 }
 @media (max-width: 800px) {
-    .about-container {
+    .about-me {
         flex-direction: column;
         gap: 28px;
         align-items: flex-start;

@@ -8,13 +8,9 @@
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    overflow-x: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .section-header {
@@ -46,7 +42,6 @@ body {
 .header-image {
     width: 400px;
     height: 400px;
-    margin-bottom: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -59,10 +54,11 @@ body {
 }
 
 .header-image img {
-    object-fit: cover;
-    border-radius: 24px;
-    display: block;
-    flex: 0 0 40%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 24px;
+  display: block;
 }
 
 .header-intro {
@@ -116,6 +112,18 @@ body {
     transform: translateY(-3px) scale(1.08);
 }
 
+/* Accessible focus styles for social links (keyboard users) */
+.social-links a:focus {
+  /* keep hover background but add a visible focus ring */
+  box-shadow: 0 0 0 4px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+  transform: translateY(-3px) scale(1.08);
+}
+.social-links a:focus-visible {
+  outline: 3px solid var(--hea-foo);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+}
+
 .social-links svg {
     width: 28px;
     height: 28px;
@@ -141,7 +149,9 @@ body {
 
 /* --- Main Section Styles --- */
 .section-main {
-  width: 100vw;
+  /* prefer percentage widths so scrollbars don't add to 100vw and cause overflow */
+  width: 100%;
+  max-width: 100%;
   min-height: 40vh;
   background: #fff;
   display: flex;
@@ -194,6 +204,15 @@ body {
   box-shadow: 0 4px 16px rgba(0,184,148,0.18);
   transform: translateY(-2px) scale(1.04);
 }
+.main-contact-links a:focus {
+  box-shadow: 0 0 0 4px rgba(8,50,53,0.06), 0 4px 16px rgba(0,184,148,0.12);
+  transform: translateY(-2px) scale(1.04);
+}
+.main-contact-links a:focus-visible {
+  outline: 3px solid var(--hea-foo);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(8,50,53,0.08), 0 4px 16px rgba(0,184,148,0.12);
+}
 .main-contact-links svg {
   width: 24px;
   height: 24px;
@@ -235,8 +254,10 @@ body {
     align-items: stretch;
     justify-content: flex-end;
     padding: 0 0 6rem 0;
-    min-height: 94vh;
-    width: 100vw;
+  min-height: 94vh;
+  /* avoid 100vw which can add horizontal overflow when scrollbars appear */
+  width: 100%;
+  max-width: 100%;
   }
 
   .header-content {

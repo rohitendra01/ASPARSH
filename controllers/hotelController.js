@@ -34,6 +34,9 @@ function uploadBufferToCloudinary(buffer, options = {}) {
   });
 }
 
+// Exported for testing and reuse
+exports.uploadBufferToCloudinary = uploadBufferToCloudinary;
+
 // Delete helper: accepts a public_id or a URL and attempts to destroy the image
 async function deleteCloudinaryImage(imageRef) {
   if (!imageRef) return;

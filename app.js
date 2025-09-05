@@ -56,7 +56,9 @@ const sessionOptions = {
 };
 
 // Use Mongo-backed session store when connect-mongo is available and MONGO_URI/ mongoose connection exists
-if (MongoStore) {
+// Avoid creating a real session store during tests since it may open DB connections
+// or background timers that keep the Node process alive and prevent Jest from exiting.
+if (MongoStore && process.env.NODE_ENV !== 'test') {
     try {
         const mongoose = require('mongoose');
         sessionOptions.store = MongoStore.create({
@@ -68,7 +70,22 @@ if (MongoStore) {
     }
 }
 
-app.use(session(sessionOptions));
+// Session middleware: in test mode we avoid mounting the real session store
+// (connect-mongo or the default MemoryStore) because they may create
+// background timers or DB connections which keep the Node process alive
+// and prevent Jest from exiting. During tests we provide a tiny in-memory
+// session stub that satisfies code expecting `req.session`.
+if (process.env.NODE_ENV === 'test') {
+    app.use((req, res, next) => {
+        if (!req.session) req.session = {};
+        // minimal save/destroy to satisfy any code that calls them
+        req.session.save = (cb) => cb && cb();
+        req.session.destroy = (cb) => cb && cb();
+        next();
+    });
+} else {
+    app.use(session(sessionOptions));
+}
 app.use(flash());
 
 // Passport middleware
@@ -179,17 +196,15 @@ const profileRoutes = require('./routes/profileRoutes');
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/', productRoutes);
-app.use('/dashboard/:slug', dashboardRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
 app.use('/dashboard/:slug/profiles', profileRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
+app.use('/dashboard/:slug', dashboardRoutes);
 
-// CSRF error handler - log details to help debug invalid token issues
 app.use((err, req, res, next) => {
   if (!err) return next();
-  // csurf uses code 'EBADCSRFTOKEN'
   if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
     const accept = (req.headers['accept'] || '').toLowerCase();
     if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });

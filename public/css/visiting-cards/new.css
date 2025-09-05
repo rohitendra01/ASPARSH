@@ -1,18 +1,58 @@
 /* public/css/portfolio-wizard.css */
 .portfolio-wizard-root { max-width: 1100px; margin: 2rem auto; padding: 1rem; font-family: system-ui, Arial, sans-serif; }
 .search-results { border: 1px solid #ddd; background:#fff; max-height: 240px; overflow:auto; margin-top: 0.25rem; }
-.search-item { padding: 0.5rem 0.75rem; cursor:pointer; border-bottom: 1px solid #f3f3f3; }
-.search-item:hover, .search-item:focus { background: #f6f6f6; outline: none; }
+.search-item { padding: 0.5rem 0.75rem; cursor: pointer; border-bottom: 1px solid #f3f3f3; }
+.search-item:hover { background: #f6f6f6; }
+/* Do not remove the native focus outline for accessibility. Provide a clear, consistent focus-visible style for keyboard users. */
+.search-item:focus { background: #f6f6f6; }
+.search-item:focus-visible {
+	outline: 3px solid #0056b3; /* high-contrast outline */
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(0,86,179,0.08);
+	background: #eef4ff; /* subtle background to pair with outline */
+}
 .selected-profile { margin-top: 0.75rem; padding: 0.5rem; background: #f7faf9; border-radius:6px; display:flex; align-items:center; gap:0.75rem; }
 .selected-profile img { width:48px;height:48px;border-radius:8px; object-fit:cover; }
 .wizard-progress { display:flex; gap:0.5rem; margin: 1rem 0; flex-wrap:wrap; }
-.wizard-progress .step-btn { padding:0.4rem 0.6rem; border-radius:6px; border:1px solid #eee; background: #fff; cursor:pointer; }
+.wizard-progress .step-btn {
+	padding: 0.4rem 0.6rem;
+	border-radius: 6px;
+	border: 1px solid #eee;
+	background: #fff;
+	cursor: pointer;
+	transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+.wizard-progress .step-btn:hover {
+	background: #f3f7f6; /* slightly darker than white */
+	border-color: #ddd;
+}
+.wizard-progress .step-btn:focus-visible {
+	outline: 3px solid #083235; /* matches active color for high contrast */
+	outline-offset: 3px;
+	box-shadow: 0 0 0 5px rgba(8,50,53,0.06);
+}
 .wizard-progress .step-btn.active { background:#083235;color:#fff;border-color:#083235; }
 .wizard-form { background:#fff;padding:1rem;border-radius:8px;border:1px solid #eee; }
 .wizard-step { display:none; }
 .wizard-step.active { display:block; }
 .wizard-step label { display:block; margin:0.6rem 0; }
 .wizard-step input, .wizard-step textarea { width:100%; padding:0.5rem; border:1px solid #ddd; border-radius:6px; }
+/* Accessible focus styles for wizard form controls */
+.wizard-step input:focus,
+.wizard-step textarea:focus {
+	/* subtle focus for mouse users */
+	box-shadow: 0 0 0 3px rgba(8,50,53,0.06);
+	border-color: #b7d0cf;
+}
+.wizard-step input:focus-visible,
+.wizard-step textarea:focus-visible {
+	/* prominent high-contrast focus for keyboard users */
+	outline: 3px solid #083235; /* high-contrast color matching .step-btn.active */
+	outline-offset: 3px;
+	box-shadow: 0 0 0 6px rgba(8,50,53,0.08);
+	border-color: #083235;
+	border-radius: 6px; /* preserve rounded corners */
+}
 .step-actions { margin-top: 1rem; display:flex; gap:0.5rem; justify-content:flex-end; }
 .project-row, .service-row { border:1px dashed #e8e8e8; padding:0.6rem; margin-bottom:0.6rem; border-radius:6px; }
 .autosave-status { margin-top:0.6rem; color:#6b7280; font-size:0.9rem; }

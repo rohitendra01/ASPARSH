@@ -1,14 +1,15 @@
 <% layout('layouts/dashboard-boilerplate') %>
 <% block('styles').append('<link rel="stylesheet" href="/css/portfolio/business/visiting-card.css">') %>
+<% // Pre-encode slug for safe URL usage and avoid double slashes
+  const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
 
 <div class="visiting-card-form-root">
   <h1>Create Visiting Card</h1>
 
-  <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
-    <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
-  <% } %>
-
-  <form action="/dashboard/<%= slug || '' %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
+  <form action="/dashboard<%= slugSegment %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
+    <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+      <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
+    <% } %>
     <input type="hidden" name="profileId" value="">
     <input type="hidden" name="slug" value="">
 
@@ -58,7 +59,7 @@
 
     <div class="form-actions">
   <button type="submit" class="btn btn-primary">Create Visiting Card</button>
-  <a href="/dashboard/<%= slug || '' %>/visiting-cards" class="btn btn-secondary">Cancel</a>
+  <a href="/dashboard<%= slugSegment %>/visiting-cards" class="btn btn-secondary">Cancel</a>
     </div>
   </form>
 </div>

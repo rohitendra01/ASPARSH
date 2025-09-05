@@ -11,8 +11,8 @@ router.get('/', isLoggedIn, profileController.listProfiles);
 // Render new profile form
 router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
 
-// Create profile
-router.post('/', isLoggedIn, csrfProtection, profileController.createProfile);
+// Create profile (form posts to /new)
+router.post('/new', isLoggedIn, csrfProtection, profileController.createProfile);
 
 // Show profile (public under dashboard)
 router.get('/:profileSlug', profileController.showProfile);
@@ -20,8 +20,8 @@ router.get('/:profileSlug', profileController.showProfile);
 // Render edit form
 router.get('/:profileSlug/edit', isLoggedIn, profileController.renderEditProfileForm);
 
-// Update profile (POST for form submissions)
-router.post('/:profileSlug', isLoggedIn, csrfProtection, profileController.updateProfile);
+// Update profile (form posts to /:profileSlug/edit)
+router.post('/:profileSlug/edit', isLoggedIn, csrfProtection, profileController.updateProfile);
 
 // Delete profile
 router.post('/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);
