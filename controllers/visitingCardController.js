@@ -181,8 +181,9 @@ exports.showByProfile = async (req, res) => {
     if (!profile) return res.status(404).send('Profile not found');
     // pick the latest visiting card for that profile
     const visitingCard = await VisitingCard.findOne({ profileId: profile._id }).sort({ createdAt: -1 });
-    if (!visitingCard) return res.status(404).send('Visiting card not found for this profile');
-    res.render('visiting-cards/show', { card: visitingCard });
+  if (!visitingCard) return res.status(404).send('Visiting card not found for this profile');
+  // Pass both the visiting card and the profile so the view can prefer profile data
+  res.render('visiting-cards/show', { card: visitingCard, profile });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error loading visiting card');
