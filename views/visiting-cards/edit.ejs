@@ -10,52 +10,32 @@
 
   <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ((user && user.slug) ? '/' + encodeURIComponent(user.slug) : ''); %>
   <form id="edit-visiting-card-form" action="/dashboard<%= slugSegment %>/visiting-cards/<%= card._id %>?_method=PUT" method="POST" enctype="application/x-www-form-urlencoded">
-    <input type="hidden" name="profileId" value="<%= card.profileId || (profile && profile._id) || '' %>">
+    <input type="hidden" name="profileSlug" value="<%= card.profileSlug || (profile && profile.slug) || '' %>">
+      <% if (profile) { %>
+        <div class="attached-profile">
+          <strong>Attached profile:</strong> <%= profile.name %> — <%= profile.email || profile.mobile || profile.slug %>
+        </div>
+      <% } else if (card && card.profileSlug) { %>
+        <div class="attached-profile">
+          <strong>Attached profile slug:</strong> <%= card.profileSlug %>
+        </div>
+      <% } %>
 
-    <label>
-      Title / Designation
-      <input type="text" name="title" required value="<%= card.title || '' %>">
-    </label>
+      <label>
+        Title / Designation
+        <input type="text" name="title" required value="<%= card.title || '' %>">
+      </label>
 
-    <label>
-      Name
-      <input type="text" name="name" required value="<%= card.name || '' %>">
-    </label>
+      <label>
+        Description
+        <textarea name="description" rows="4" required><%= card.description || '' %></textarea>
+      </label>
 
-    <label>
-      Description
-      <textarea name="description" rows="4" required><%= card.description || '' %></textarea>
-    </label>
+      <label>
+        Website
+        <input type="url" name="website" value="<%= card.website || '' %>">
+      </label>
 
-    <label>
-      Website
-      <input type="url" name="website" value="<%= card.website || '' %>">
-    </label>
-
-    <label>
-      LinkedIn
-      <input type="url" name="linkedin" value="<%= card.linkedin || '' %>">
-    </label>
-
-    <label>
-      Twitter
-      <input type="url" name="twitter" value="<%= card.twitter || '' %>">
-    </label>
-
-    <label>
-      Facebook
-      <input type="url" name="facebook" value="<%= card.facebook || '' %>">
-    </label>
-
-    <label>
-      Instagram
-      <input type="url" name="instagram" value="<%= card.instagram || '' %>">
-    </label>
-
-    <label>
-      Image URL (Cloudinary)
-      <input type="text" name="image" value="<%= card.image || '' %>">
-    </label>
 
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -63,7 +43,6 @@
     </div>
   </form>
   
-  <!-- Delete form: posts to the existing POST /:id/delete route (CSRF protected) -->
   <form id="delete-visiting-card-form" action="/dashboard<%= slugSegment %>/visiting-cards/<%= card._id %>/delete" method="POST" onsubmit="return confirmDelete(event)">
     <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -75,7 +54,6 @@
 </div>
 
 <script>
-// optional: simple client-side validation could be added here
   function confirmDelete(e) {
     if (!confirm('Delete this visiting card? This action cannot be undone.')) {
       e.preventDefault();

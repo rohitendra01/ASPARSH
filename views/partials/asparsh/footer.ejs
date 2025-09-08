@@ -1,72 +1,194 @@
-<footer id="snap">
-        <div class="footer-tag-line">
-            <div class="tag-line">
-                <span id="text1">No setup. No efforts.</span> <span id="text2" style="font-weight: 800; text-transform: uppercase; color: white;">Just results.</span>
+<footer id="main-footer" role="contentinfo">
+    <!-- Main Footer Content -->
+    <section class="footer-content">
+        <div class="footer-grid">
+            <!-- Company Information -->
+            <div class="footer-brand footer-animate">
+                <h3>Asparsh</h3>
+                <p>Revolutionizing business connections through innovative NFC technology. We create touchless experiences that bring people closer together in a digital world.</p>
+                
+                <!-- Social Media Links -->
+                <div class="social-links" role="list" aria-label="Follow us on social media">
+                    <a href="https://www.facebook.com/Asparsh" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/Asparsh" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987c6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.596-3.205-1.533L12.017 8.68l6.772 6.775c-.757.937-1.908 1.533-3.205 1.533H8.449z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.linkedin.com/company/Asparsh" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on LinkedIn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.x.com/Asparsh" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on X (Twitter)">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
-            <div class="tag-button">
-                <button>Book a call</button>
+
+            <!-- Quick Links -->
+            <div class="footer-section footer-animate">
+                <h4>Quick Links</h4>
+                <ul class="footer-links" role="list">
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                </ul>
+            </div>
+
+            <!-- Products & Services -->
+            <div class="footer-section footer-animate">
+                <h4>Products</h4>
+                <ul class="footer-links" role="list">
+                    <li><a href="/products/business-cards">NFC Business Cards</a></li>
+                    <li><a href="/products/visiting-cards">Digital Visiting Cards</a></li>
+                    <li><a href="/products/portfolios">Smart Portfolios</a></li>
+                    <li><a href="/products/hotel-menus">Hotel Menus</a></li>
+                    <li><a href="/products/custom">Custom Solutions</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter & Support -->
+            <div class="footer-section footer-animate">
+                <h4>Stay Connected</h4>
+                <p>Get the latest updates on NFC technology and exclusive offers.</p>
+                
+                <form class="newsletter-form" action="/newsletter-signup" method="POST" aria-label="Newsletter signup">
+                    <div class="newsletter-input">
+                        <input 
+                            type="email" 
+                            name="email" 
+                            placeholder="Enter your email" 
+                            required 
+                            aria-label="Email address for newsletter"
+                        >
+                        <button type="submit" class="newsletter-submit" aria-label="Subscribe to newsletter">
+                            Subscribe
+                        </button>
+                    </div>
+                    <p class="newsletter-disclaimer">
+                        We respect your privacy. Unsubscribe at any time.
+                    </p>
+                </form>
+
+                <ul class="footer-links" role="list" style="margin-top: var(--space-xl);">
+                    <li><a href="/support">Support Center</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/terms-of-service">Terms of Service</a></li>
+                </ul>
             </div>
         </div>
-        <div class="footer-content">
-                <div class="footer-content-head-text">
-                    <h3>Asparsh</h3>
-                    <p>We are a team of passionate individuals dedicated to <br> revolutionizing the way businesses connect with <br> their customers through NFC technology.</p>
-                </div>
-                <div class="footer-content-links">
-                    <ul>
-                        <li><a href="/home">Home</a></li>
-                        <li><a href="/pricing">Pricing</a></li>
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/contact">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="footer-content-other-links">
-                    <ul>
-                        <li><a href="/privacy">Privacy Policy</a></li>
-                        <li><a href="/terms">Terms of Service</a></li>
-                        <li><a href="/faq">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-content-socials">
-                    <ul>
-                        <li>
-                            <a href="https://www.facebook.com/Asparsh" target="_blank">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="28" height="28" viewBox="0,0,256,256" style="fill:#FFFFFF;">
-                                <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M11.5,6c-3.01977,0 -5.5,2.48023 -5.5,5.5v25c0,3.01977 2.48023,5.5 5.5,5.5h25c3.01977,0 5.5,-2.48023 5.5,-5.5v-25c0,-3.01977 -2.48023,-5.5 -5.5,-5.5zM11.5,9h25c1.39823,0 2.5,1.10177 2.5,2.5v25c0,1.39823 -1.10177,2.5 -2.5,2.5h-6.5v-10h3.625c0.504,0 0.93019,-0.37695 0.99219,-0.87695l0.375,-3c0.036,-0.284 -0.05414,-0.56916 -0.24414,-0.78516c-0.189,-0.215 -0.46105,-0.33789 -0.74805,-0.33789h-4v-3.5c0,-1.103 0.897,-2 2,-2h2c0.552,0 1,-0.447 1,-1v-3.375c0,-0.518 -0.39516,-0.95009 -0.91016,-0.99609c-0.059,-0.005 -1.46986,-0.12891 -3.25586,-0.12891c-4.407,0 -6.83398,2.61619 -6.83398,7.36719v3.63281h-4c-0.552,0 -1,0.447 -1,1v3c0,0.553 0.448,1 1,1h4v10h-12.5c-1.39823,0 -2.5,-1.10177 -2.5,-2.5v-25c0,-1.39823 1.10177,-2.5 2.5,-2.5z"></path></g></g>
-                            </svg>
-                        </a>
-                        </li>
-                        <li>
-                            <a href="https://www.instagram.com/Asparsh" target="_blank">
-                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="28" height="28" viewBox="0,0,256,256" style="fill:#FFFFFF;">
-                                    <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M16.5,5c-6.33361,0 -11.5,5.16639 -11.5,11.5v15c0,6.33276 5.16621,11.5 11.5,11.5h15c6.33294,0 11.5,-5.16706 11.5,-11.5v-15c0,-6.33379 -5.16724,-11.5 -11.5,-11.5zM16.5,8h15c4.71124,0 8.5,3.78779 8.5,8.5v15c0,4.71106 -3.78894,8.5 -8.5,8.5h-15c-4.71221,0 -8.5,-3.78876 -8.5,-8.5v-15c0,-4.71239 3.78761,-8.5 8.5,-8.5zM34,12c-1.105,0 -2,0.895 -2,2c0,1.105 0.895,2 2,2c1.105,0 2,-0.895 2,-2c0,-1.105 -0.895,-2 -2,-2zM24,14c-5.50482,0 -10,4.49518 -10,10c0,5.50482 4.49518,10 10,10c5.50482,0 10,-4.49518 10,-10c0,-5.50482 -4.49518,-10 -10,-10zM24,17c3.88318,0 7,3.11682 7,7c0,3.88318 -3.11682,7 -7,7c-3.88318,0 -7,-3.11682 -7,-7c0,-3.88318 3.11682,-7 7,-7z"></path></g></g>
-                                </svg>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="https://www.linkedin.com/company/Asparsh" target="_blank">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="28" height="28" viewBox="0,0,256,256" style="fill:#FFFFFF;">
-                                <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M11.5,6c-3.01977,0 -5.5,2.48023 -5.5,5.5v25c0,3.01977 2.48023,5.5 5.5,5.5h25c3.01977,0 5.5,-2.48023 5.5,-5.5v-25c0,-3.01977 -2.48023,-5.5 -5.5,-5.5zM11.5,9h25c1.39823,0 2.5,1.10177 2.5,2.5v25c0,1.39823 -1.10177,2.5 -2.5,2.5h-25c-1.39823,0 -2.5,-1.10177 -2.5,-2.5v-25c0,-1.39823 1.10177,-2.5 2.5,-2.5zM15.5,13c-1.38071,0 -2.5,1.11929 -2.5,2.5c0,1.38071 1.11929,2.5 2.5,2.5c1.38071,0 2.5,-1.11929 2.5,-2.5c0,-1.38071 -1.11929,-2.5 -2.5,-2.5zM14,20c-0.553,0 -1,0.447 -1,1v13c0,0.553 0.447,1 1,1h3c0.553,0 1,-0.447 1,-1v-13c0,-0.553 -0.447,-1 -1,-1zM21,20c-0.553,0 -1,0.447 -1,1v13c0,0.553 0.447,1 1,1h3c0.553,0 1,-0.447 1,-1v-7.5c0,-1.379 1.121,-2.5 2.5,-2.5c1.379,0 2.5,1.121 2.5,2.5v7.5c0,0.553 0.447,1 1,1h3c0.553,0 1,-0.447 1,-1v-8c0,-3.309 -2.691,-6 -6,-6c-1.538,0 -2.937,0.58602 -4,1.54102v-0.54102c0,-0.553 -0.447,-1 -1,-1z"></path></g></g>
-                                    </svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.x.com/Asparsh" target="_blank">
-                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="28" height="28" viewBox="0,0,256,256"
-style="fill:#FFFFFF;">
-<g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.33333,5.33333)"><path d="M12.5,6c-3.57194,0 -6.5,2.92806 -6.5,6.5v23c0,3.57194 2.92806,6.5 6.5,6.5h23c3.57194,0 6.5,-2.92806 6.5,-6.5v-23c0,-3.57194 -2.92806,-6.5 -6.5,-6.5zM12.5,9h23c1.95006,0 3.5,1.54994 3.5,3.5v23c0,1.95006 -1.54994,3.5 -3.5,3.5h-23c-1.95006,0 -3.5,-1.54994 -3.5,-3.5v-23c0,-1.95006 1.54994,-3.5 3.5,-3.5zM13.82813,14l7.73633,11.05664l-7.74219,8.94336h2.04297l6.60352,-7.64844l5.35156,7.64844h6.4375l-8.23242,-11.76562l7.11133,-8.23437h-2l-6.01367,6.94336l-4.85742,-6.94336zM16.93555,15.69531h2.5625l11.65234,16.60938h-2.5625z"></path></g></g>
-</svg>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    </section>
+
+    <!-- Footer Bottom -->
+    <section class="footer-bottom">
+        <div class="footer-bottom-content">
+            <div class="footer-copyright">
+                <p>&copy; 2025 Asparsh. All rights reserved. Built with ❤️ for the future of connections.</p>
             </div>
-        <div class="footer-copyright">
-            <span>© 2025 Asparsh. All rights reserved.</span>
+            <nav aria-label="Legal navigation">
+                <ul class="footer-legal" role="list">
+                    <li><a href="/privacy-policy">Privacy</a></li>
+                    <li><a href="/terms-of-service">Terms</a></li>
+                    <li><a href="/cookies-policy">Cookies</a></li>
+                    <li><a href="/accessibility">Accessibility</a></li>
+                </ul>
+            </nav>
         </div>
-    </footer>
+    </section>
+</footer>
+
+<!-- Enhanced JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-<script src="/js/index.js"></script>
+<script src="/js/modern-index.js"></script>
 <script src="/js/nav-user.js"></script>
+
+<!-- Intersection Observer for animations -->
+<script>
+(function() {
+  // Enhanced scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        
+        // Stagger animations for child elements
+        const children = entry.target.querySelectorAll('.animate-on-scroll');
+        children.forEach((child, index) => {
+          setTimeout(() => {
+            child.classList.add('in-view');
+          }, index * 100);
+        });
+      }
+    });
+  }, observerOptions);
+
+  // Observe elements for scroll animations
+  document.querySelectorAll('.animate-on-scroll, .footer-animate').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Newsletter form enhancement
+  const newsletterForm = document.querySelector('.newsletter-form');
+  if (newsletterForm) {
+    newsletterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = e.target.querySelector('.newsletter-submit');
+      const originalText = submitBtn.textContent;
+      
+      submitBtn.textContent = 'Subscribing...';
+      submitBtn.disabled = true;
+      
+      try {
+        const formData = new FormData(e.target);
+        const response = await fetch('/newsletter-signup', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        
+        if (response.ok) {
+          submitBtn.textContent = 'Subscribed!';
+          e.target.reset();
+          setTimeout(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+          }, 2000);
+        } else {
+          throw new Error('Subscription failed');
+        }
+      } catch (error) {
+        submitBtn.textContent = 'Try Again';
+        setTimeout(() => {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }, 2000);
+      }
+    });
+  }
+
+  // Enhanced accessibility: Skip link
+  const skipLink = document.createElement('a');
+  skipLink.href = '#main-content';
+  skipLink.textContent = 'Skip to main content';
+  skipLink.className = 'skip-link';
+  document.body.insertBefore(skipLink, document.body.firstChild);
+})();
+</script>
 </body>
 </html>

@@ -18,7 +18,6 @@ const path = require("path");
 const session = require('express-session');
 let MongoStore;
 try {
-    // prefer connect-mongo v4 style
     MongoStore = require('connect-mongo');
 } catch (e) {
     MongoStore = null;
@@ -45,19 +44,14 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-    cookie: {
         httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 10), 
-        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 10),
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 10
-    }    }
+    }
 };
 
-// Use Mongo-backed session store when connect-mongo is available and MONGO_URI/ mongoose connection exists
-// Avoid creating a real session store during tests since it may open DB connections
-// or background timers that keep the Node process alive and prevent Jest from exiting.
 if (MongoStore && process.env.NODE_ENV !== 'test') {
     try {
         const mongoose = require('mongoose');
@@ -70,15 +64,9 @@ if (MongoStore && process.env.NODE_ENV !== 'test') {
     }
 }
 
-// Session middleware: in test mode we avoid mounting the real session store
-// (connect-mongo or the default MemoryStore) because they may create
-// background timers or DB connections which keep the Node process alive
-// and prevent Jest from exiting. During tests we provide a tiny in-memory
-// session stub that satisfies code expecting `req.session`.
 if (process.env.NODE_ENV === 'test') {
     app.use((req, res, next) => {
         if (!req.session) req.session = {};
-        // minimal save/destroy to satisfy any code that calls them
         req.session.save = (cb) => cb && cb();
         req.session.destroy = (cb) => cb && cb();
         next();
@@ -88,11 +76,9 @@ if (process.env.NODE_ENV === 'test') {
 }
 app.use(flash());
 
-// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Enforce single-session middleware (forces logout when session id doesn't match stored id)
 try {
     const { enforceSingleSession } = require('./middleware/authMiddleware');
     app.use(enforceSingleSession);
@@ -100,15 +86,12 @@ try {
     console.warn('Could not mount enforceSingleSession middleware:', e && e.message);
 }
 
-// Passport config - fixed to use comparePassword method
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
     try {
-        // Convert email to lowercase for case-insensitive search
         const emailLower = email.toLowerCase();
         const user = await adminUser.findOne({ email: emailLower });
         if (!user) return done(null, false, { message: 'Incorrect email.' });
         
-        // Fixed to use comparePassword method
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
         
@@ -118,7 +101,6 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
     }
 }));
 
-// Passport session serialization
 passport.serializeUser((user, done) => {
     try {
         done(null, user.id);
@@ -136,8 +118,6 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-
-// Enhanced res.locals middleware
 app.use((req, res, next) => {
     res.locals.currentUser = req.user || null;
     res.locals.user = req.user || null;
@@ -151,12 +131,11 @@ app.use((req, res, next) => {
     res.locals.returnTo = req.session.returnTo || '/';
     res.locals.name = req.flash('name')[0];
     res.locals.email = req.flash('email')[0];
-    // csrfToken is set by a later middleware after csurf has been run for safe GET requests
     next();
 });
 
 try {
-    const safeCsrf = csurf({ cookie: false });
+    const safeCsrf = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
     app.use((req, res, next) => {
         if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
             return safeCsrf(req, res, next);
@@ -167,7 +146,6 @@ try {
     console.warn('Could not initialize safe CSRF middleware:', e && e.message);
 }
 
-// After running safeCsrf on GETs, populate res.locals.csrfToken so views can render it.
 app.use((req, res, next) => {
     try {
         res.locals.csrfToken = (typeof req.csrfToken === 'function') ? req.csrfToken() : null;
@@ -177,9 +155,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// Mount API routes
-const apiRoutes = require('./routes/apiRoutes');
-app.use('/api', apiRoutes);
+
+
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -191,6 +168,7 @@ const visitingCardRoutes = require('./routes/visitingCardRoutes');
 const hotelRoutes = require('./routes/hotelRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const apiRoutes = require('./routes/apiRoutes');
 
 // Use routes
 app.use('/', indexRoutes);
@@ -202,6 +180,7 @@ app.use('/dashboard/:slug/profiles', profileRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
+app.use('/api', apiRoutes);
 
 app.use((err, req, res, next) => {
   if (!err) return next();
@@ -214,5 +193,4 @@ app.use((err, req, res, next) => {
 });
 
 
-// Export app for server.js
 module.exports = app;

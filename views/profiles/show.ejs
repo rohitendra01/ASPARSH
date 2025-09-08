@@ -214,6 +214,8 @@
     }
     ];
     %>
+  <% /* make slugSegment available to the whole template (modal is outside the loop) */ %>
+  <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
   </div>
 
     <div class="profile-details-header">
@@ -253,9 +255,8 @@
         </div>
 
         <div class="card-body">
-          <div class="card-row">
+            <div class="card-row">
             <button class="btn btn-outline configure-btn" data-idx="<%= idx %>">Configure</button>
-            <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
             <a class="btn btn-primary manage-link" href="/dashboard<%= slugSegment %>/services/<%= encodeURIComponent(svc.key) %>">Manage</a>
             <% if (svc.subscribedPlan) { %>
               <div class="plan-pill">

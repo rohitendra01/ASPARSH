@@ -96,4 +96,33 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.key === 'Escape') closeMobileMenu();
         });
     }
+
+    // Header scroll effect
+    const header = document.querySelector('.site-header, header');
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateHeaderOnScroll() {
+        const scrollY = window.scrollY;
+        
+        if (header) {
+            if (scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+        
+        lastScrollY = scrollY;
+        ticking = false;
+    }
+
+    function onScroll() {
+        if (!ticking) {
+            requestAnimationFrame(updateHeaderOnScroll);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
 });

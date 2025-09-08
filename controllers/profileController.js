@@ -54,7 +54,7 @@ exports.createProfile = async (req, res) => {
     const newProfile = new Profile({
       ...data,
       createdBy: req.user._id,
-      image: imageUrl || '', // Explicitly set the image URL
+      image: imageUrl || '', 
       address,
   socialLinks: data.socialLinks || [],
   slug: slug,

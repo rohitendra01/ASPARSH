@@ -44,11 +44,11 @@
                                 <h1><%= cardOrProfile('name') || '' %></h1>
                                 <h2><%= card && card.title ? card.title : '' %></h2>
                 <div class="social-links">
-                    <% const linkedinLink = (card && card.linkedin) || getProfileSocial('linkedin'); %>
-                    <% const twitterLink = (card && card.twitter) || getProfileSocial('twitter'); %>
-                    <% const facebookLink = (card && card.facebook) || getProfileSocial('facebook'); %>
-                    <% const instagramLink = (card && card.instagram) || getProfileSocial('instagram'); %>
-                    <% const emailLink = (card && card.email) || cardOrProfile('email'); %>
+                    <% const linkedinLink = getProfileSocial('linkedin'); %>
+                    <% const twitterLink = getProfileSocial('twitter'); %>
+                    <% const facebookLink = getProfileSocial('facebook'); %>
+                    <% const instagramLink = getProfileSocial('instagram'); %>
+                    <% const emailLink = cardOrProfile('email'); %>
                                         <% if (linkedinLink) { %>
                                             <a href="<%= linkedinLink %>" target="_blank" aria-label="LinkedIn">
                                                 <!-- LinkedIn SVG -->
@@ -85,13 +85,13 @@
     </section>
     <section class="section-main">
         <div class="main-description">
-            <p><%= card && card.description ? card.description : (profile && profile.metadata && profile.metadata.description ? profile.metadata.description : '') %></p>
+            <p><%= card && card.description%></p>
         </div>
         <div class="main-contact-links">
             <% const mainEmail = cardOrProfile('email'); %>
             <% const mainPhone = cardOrProfile('phone'); %>
             <% const mainAddress = cardOrProfile('address'); %>
-            <% const mainWebsite = (card && card.website) || getProfileSocial('website') || (profile && profile.metadata && profile.metadata.website) || null; %>
+            <% const mainWebsite = (card && card.website) || null; %>
             <% if (mainEmail) { %>
             <a href="mailto:<%= mainEmail %>" class="info-link" aria-label="Email">
                 <!-- Email SVG -->

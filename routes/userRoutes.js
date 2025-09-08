@@ -7,7 +7,7 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const csurf = require('csurf');
-const csrfProtection = csurf({ cookie: false });
+const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 
 

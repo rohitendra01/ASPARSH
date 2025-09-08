@@ -1,0 +1,148 @@
+:root {
+  /* Enhanced Color Palette */
+  --primary-gradient: linear-gradient(135deg, #083235 0%, #0a4a4e 50%, #0c5d62 100%);
+  --secondary-gradient: linear-gradient(135deg, #e1f6e0 0%, #f0fdf4 50%, #ffffff 100%);
+  --accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  
+  /* Semantic Colors */
+  --color-primary: #083235;
+  --color-primary-light: #0a4a4e;
+  --color-primary-dark: #051f21;
+  --color-secondary: #e1f6e0;
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+  
+  /* Text Colors */
+  --text-primary: #0a0f0d;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-inverse: #ffffff;
+  --text-accent: #10b981;
+  
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-dark: #083235;
+  --bg-overlay: rgba(8, 50, 53, 0.9);
+  
+  /* Typography Scale - Modern Fluid Typography */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-heading: 'Poppins', var(--font-family-primary);
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  
+  /* Fluid Typography Scale */
+  --font-size-xs: clamp(0.75rem, 0.69rem + 0.31vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 0.81rem + 0.31vw, 1rem);
+  --font-size-base: clamp(1rem, 0.94rem + 0.31vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 1.06rem + 0.31vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 1.19rem + 0.31vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 1.38rem + 0.63vw, 1.875rem);
+  --font-size-3xl: clamp(1.875rem, 1.69rem + 0.94vw, 2.25rem);
+  --font-size-4xl: clamp(2.25rem, 2rem + 1.25vw, 3rem);
+  --font-size-5xl: clamp(3rem, 2.63rem + 1.88vw, 4rem);
+  --font-size-6xl: clamp(4rem, 3.5rem + 2.5vw, 5.5rem);
+  
+  /* Line Heights */
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  
+  /* Spacing Scale */
+  --space-xs: clamp(0.25rem, 0.19rem + 0.31vw, 0.375rem);
+  --space-sm: clamp(0.5rem, 0.44rem + 0.31vw, 0.625rem);
+  --space-md: clamp(0.75rem, 0.69rem + 0.31vw, 0.875rem);
+  --space-lg: clamp(1rem, 0.94rem + 0.31vw, 1.125rem);
+  --space-xl: clamp(1rem, 0.8rem + 0.3vw, 0.8rem);
+  --space-2xl: clamp(2rem, 1.81rem + 0.94vw, 2.5rem);
+  --space-3xl: clamp(2.5rem, 2.25rem + 1.25vw, 3.25rem);
+  --space-4xl: clamp(3rem, 2.63rem + 1.88vw, 4rem);
+  --space-5xl: clamp(4rem, 3.5rem + 2.5vw, 5.5rem);
+  
+  /* Layout */
+  --container-max-width: 1400px;
+  --container-padding: clamp(1rem, 4vw, 2rem);
+  --header-height: clamp(4rem, 5vw, 5rem);
+  --section-padding: clamp(3rem, 8vw, 6rem);
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  
+  /* Z-index scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  
+  /* Breakpoints for reference in JS */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #f9fafb;
+    --text-secondary: #e5e7eb;
+    --text-muted: #9ca3af;
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0s;
+    --transition-normal: 0s;
+    --transition-slow: 0s;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --shadow-sm: 0 0 0 1px currentColor;
+    --shadow-md: 0 0 0 2px currentColor;
+    --shadow-lg: 0 0 0 3px currentColor;
+  }
+}

@@ -12,10 +12,10 @@
 
   <form action="/dashboard/<%= slug || '' %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
     <% if (profile && profile._id) { %>
-      <input type="hidden" name="profileId" value="<%= profile._id %>">
+      <input type="hidden" name="profileSlug" value="<%= profile.slug %>">
       <input type="hidden" name="slug" value="<%= slug || '' %>">
     <% } else { %>
-      <input type="hidden" name="profileId" value="">
+      <input type="hidden" name="profileSlug" value="">
       <input type="hidden" name="slug" value="">
     <% } %>
 
@@ -38,12 +38,7 @@
       <div id="selected-profile" class="selected-profile">No profile selected</div>
     <% } %>
 
-    <!-- Visiting-card fields; when profile attached these start with profile values and are disabled until override -->
-    <label>
-      Name
-      <input type="text" name="name" id="field-name" value="<%= profile ? profile.name : '' %>" <%= profile ? 'disabled' : '' %> required>
-    </label>
-
+    <!-- Visiting-card fields: keep only card-specific fields. Contact/name/image come from Profile. -->
     <label>
       Title / Designation
       <input type="text" name="title" id="field-title" value="" required>
@@ -55,29 +50,10 @@
     </label>
 
     <label>
-      Website
-      <input type="url" name="website" id="field-website" value="<%= profile && profile.website ? profile.website : '' %>" <%= profile && profile.website ? 'disabled' : (profile ? 'disabled' : '') %>>
+      Website (optional)
+      <input type="url" name="website" id="field-website" value="">
     </label>
 
-    <label>
-      LinkedIn
-      <input type="url" name="linkedin" id="field-linkedin" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='linkedin') ? profile.socialLinks.find(s=>s.platform==='linkedin').url : '') %>" <%= profile ? 'disabled' : '' %>>
-    </label>
-
-    <label>
-      Twitter
-      <input type="url" name="twitter" id="field-twitter" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='twitter') ? profile.socialLinks.find(s=>s.platform==='twitter').url : '') %>" <%= profile ? 'disabled' : '' %>>
-    </label>
-
-    <label>
-      Facebook
-      <input type="url" name="facebook" id="field-facebook" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='facebook') ? profile.socialLinks.find(s=>s.platform==='facebook').url : '') %>" <%= profile ? 'disabled' : '' %>>
-    </label>
-
-    <label>
-      Instagram
-      <input type="url" name="instagram" id="field-instagram" value="<%= (profile && profile.socialLinks && profile.socialLinks.find(s=>s.platform==='instagram') ? profile.socialLinks.find(s=>s.platform==='instagram').url : '') %>" <%= profile ? 'disabled' : '' %>>
-    </label>
 
     <div class="form-actions">
   <button type="submit" class="btn btn-primary">Create Visiting Card</button>
@@ -92,7 +68,7 @@
   const input = document.getElementById('profile-search');
   const suggestions = document.getElementById('profile-suggestions');
   const selected = document.getElementById('selected-profile');
-  const profileIdField = document.querySelector('input[name="profileId"]');
+  const profileIdField = document.querySelector('input[name="profileSlug"]');
   const slugField = document.querySelector('input[name="slug"]');
 
   let timeout = null;
@@ -114,7 +90,7 @@
           div.dataset.id = p._id;
           div.dataset.slug = p.slug;
           div.addEventListener('click', ()=>{
-            profileIdField.value = p._id || '';
+            profileIdField.value = p.slug || '';
             slugField.value = p.slug || '';
             selected.textContent = (p.name || p.slug || '') + ' — ' + (p.email || '');
             suggestions.innerHTML = '';
@@ -130,64 +106,12 @@
 })();
 </script>
 <script>
-// Toggle override of profile data when checkbox changes
+  // Toggle override is now limited to card-level fields (none of which conflict with Profile)
 ;(function(){
   const useProfileCheckbox = document.getElementById('use-profile-data');
   if (!useProfileCheckbox) return;
-  const overridable = ['field-name','field-website','field-linkedin','field-twitter','field-facebook','field-instagram'];
-  function setDisabled(dis) {
-    overridable.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = dis;
-    });
-  }
-  // initial state
-  setDisabled(useProfileCheckbox.checked);
-  useProfileCheckbox.addEventListener('change', function(){
-    setDisabled(this.checked);
-  });
+  // No inputs to disable in the current design; keep UI for clarity
 })();
 
-// Profile search code (only used when creating without an attached profile)
-;(function(){
-  const input = document.getElementById('profile-search');
-  if (!input) return;
-  const suggestions = document.getElementById('profile-suggestions');
-  const selected = document.getElementById('selected-profile');
-  const profileIdField = document.querySelector('input[name="profileId"]');
-  const slugField = document.querySelector('input[name="slug"]');
-
-  let timeout = null;
-  input.addEventListener('input', function(e){
-    const q = (e.target.value || '').trim();
-    suggestions.innerHTML = '';
-    if (timeout) clearTimeout(timeout);
-    if (!q || q.length < 2) return;
-    timeout = setTimeout(async ()=>{
-      try {
-        const res = await fetch('/api/profiles/search?q=' + encodeURIComponent(q));
-        if (!res.ok) return;
-        const profiles = await res.json();
-        suggestions.innerHTML = '';
-        profiles.forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'suggestion-item';
-          div.textContent = (p.name || p.slug || p.email) + ' — ' + (p.email || p.slug || '');
-          div.dataset.id = p._id;
-          div.dataset.slug = p.slug;
-          div.addEventListener('click', ()=>{
-            profileIdField.value = p._id || '';
-            slugField.value = p.slug || '';
-            selected.textContent = (p.name || p.slug || '') + ' — ' + (p.email || '');
-            suggestions.innerHTML = '';
-            input.value = '';
-          });
-          suggestions.appendChild(div);
-        });
-      } catch (err) {
-        console.error('Profile search error', err);
-      }
-    }, 250);
-  });
-})();
+// (legacy duplicate profileId script removed) - profileSlug search handler above is used
 </script>

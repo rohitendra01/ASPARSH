@@ -3,20 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/asparsh/index.css" />
+    <meta name="description" content="Asparsh - Revolutionizing business connections through innovative NFC technology. Create touchless experiences that bring people closer together.">
+    <meta name="keywords" content="NFC, business cards, digital connections, touchless technology, smart cards, asparsh">
+    <meta name="author" content="Asparsh">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:title" content="Asparsh - The Future of Business Connections">
+    <meta property="og:description" content="Transform your business connections with innovative NFC technology. Create touchless, memorable experiences.">
+    <meta property="og:image" content="/assets/og-image.jpg">
+    <meta property="og:url" content="https://asparsh.com">
+    <meta property="og:type" content="website">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Asparsh - The Future of Business Connections">
+    <meta name="twitter:description" content="Transform your business connections with innovative NFC technology.">
+    <meta name="twitter:image" content="/assets/twitter-image.jpg">
+    
+    <link rel="icon" type="image/svg+xml" href="/assets/nfctools-svgrepo-com.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#083235">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css"/>
-    <link rel="icon" type="image/svg+xml" href="assets/nfctools-svgrepo-com.svg">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <link rel="stylesheet" href="/css/asparsh/modern-variables.css">
+    <link rel="stylesheet" href="/css/asparsh/modern-base.css">
+    <link rel="stylesheet" href="/css/asparsh/header.css">
+    <link rel="stylesheet" href="/css/asparsh/footer.css">
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    </noscript>
+    
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    </noscript>
+    
     <%- block('styles') %>
+    
     <%- include('../partials/csrf-meta') %>
-    <title>Asparsh</title>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Asparsh",
+        "description": "Revolutionizing business connections through innovative NFC technology",
+        "url": "https://asparsh.com",
+        "logo": "https://asparsh.com/assets/logo.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-234-567-890",
+            "contactType": "customer service",
+            "email": "info@asparsh.com"
+        },
+        "sameAs": [
+            "https://www.facebook.com/Asparsh",
+            "https://www.instagram.com/Asparsh",
+            "https://www.linkedin.com/company/Asparsh",
+            "https://www.x.com/Asparsh"
+        ]
+    }
+    </script>
+    
+    <title><%- locals.pageTitle ? pageTitle + ' - Asparsh' : 'Asparsh - The Future of Business Connections' %></title>
 </head>
 <body>
 <%- include('../partials/asparsh/header') %>
-    <%- body %>   
-<%- include('../partials/asparsh/footer') %>
+
+    <main class="main-content" id="main-content" role="main">
+        <%- body %>
+    </main>
+    
+    <%- include('../partials/asparsh/footer') %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    
+    <script src="/js/nav-user.js" defer></script>
+    
+    <%- block('scripts').toString() %>
+</body>
+</html>

@@ -5,7 +5,7 @@ const hotelController = require('../controllers/hotelController');
 // Reuse multer instance exported by controller to avoid duplicate configuration
 const { uploadHotelImages } = hotelController;
 const csurf = require('csurf');
-const csrfProtection = csurf({ cookie: false });
+const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 router.get('/', isLoggedIn, hotelController.listHotels);
 

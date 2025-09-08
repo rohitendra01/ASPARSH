@@ -1,120 +1,108 @@
-<header>
-        <div class="logo">
-            <a href="/">
-                <h3>ASPARSH</h3>
-            </a>
-        </div>
+<header class="site-header header-scroll-effect">
+        <div class="header-container">
+            <div class="logo">
+                <a href="/" aria-label="Asparsh - Go to homepage">
+                    <h1>ASPARSH</h1>
+                </a>
+            </div>
 
-        <!-- Mobile hamburger toggle (visible on small screens) -->
-        <button type="button" class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobileMenu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+            <!-- Mobile hamburger toggle -->
+            <button 
+                type="button" 
+                class="hamburger" 
+                id="hamburgerBtn" 
+                aria-label="Toggle navigation menu" 
+                aria-expanded="false" 
+                aria-controls="mobileMenu"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
 
-        <div class="nav">
-            <ul class="nav-links">
-                <li><a href="/home">Home</a></li>
-                <li><a href="/pricing">Pricing</a></li>
-                <li><a href="About">About</a></li>
-                <li><a href="/contact">Contact Us</a></li>
-            </ul>
-        </div>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <ul class="nav-links">
+                    <li><a href="/home" aria-current="<%= locals.currentPage === 'home' ? 'page' : false %>">Home</a></li>
+                    <li><a href="/pricing" aria-current="<%= locals.currentPage === 'pricing' ? 'page' : false %>">Pricing</a></li>
+                    <li><a href="/about" aria-current="<%= locals.currentPage === 'about' ? 'page' : false %>">About</a></li>
+                    <li><a href="/contact" aria-current="<%= locals.currentPage === 'contact' ? 'page' : false %>">Contact</a></li>
+                </ul>
+            </nav>
 
-        <div class="user-profile">
-                        <% if (!currentUser) { %>
-                                <div style="overflow: visible; position: relative;">
-                                    <a href="/dashboard" class="dashboard-btn">. Dashboard</a>
-                                </div>
-                        <% } else { %>
-                <div class="user-dropdown" id="userDropdown">
-                    <a href="/dashboard" class="user-profile-trigger" id="dropdownTrigger" title="Go to Dashboard">
-                        <img alt="User Profile" class="header-user-image"
-                            src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png'%>" >
-                    </a>
-                    <div class="user-dropdown-content" id="dropdownContent">
-                        <div class="form">
-                            <p class="p" style="font-weight: 600; text-align: center;">
-                                Welcome, <%= currentUser.username %>
-                            </p>
-                            <form action="/logout" method="POST">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button type="submit" class="button-submit" style="width: 100%;">Logout</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            <% } %>
-        </div>
-
-        <!-- Mobile menu: contains nav links and user actions for small screens -->
-        <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-            <ul class="mobile-nav-links">
-                <li><a href="/home">Home</a></li>
-                <li><a href="/pricing">Pricing</a></li>
-                <li><a href="About">About</a></li>
-                <li><a href="/contact">Contact Us</a></li>
-            </ul>
-            <div class="mobile-user-area">
+            <div class="user-profile">
                 <% if (!currentUser) { %>
-                    <a href="/dashboard" class="dashboard-btn">Dashboard</a>
+                    <a href="/dashboard" class="dashboard-btn">
+                        <span>Dashboard</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 <% } else { %>
-                    <div class="mobile-user">
-                        <a href="/dashboard" class="mobile-user-link">
-                            <img alt="User Profile" class="header-user-image" src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png'%>">
-                            <span style="margin-left:10px"><%= currentUser.username %></span>
-                        </a>
-                        <form action="/logout" method="POST" style="margin-top:10px;">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button type="submit" class="button-submit">Logout</button>
-                        </form>
+                    <div class="user-dropdown" id="userDropdown">
+                        <button 
+                            type="button"
+                            class="user-profile-trigger" 
+                            id="dropdownTrigger" 
+                            aria-label="User menu"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                        >
+                            <img 
+                                alt="<%= currentUser.username %>'s profile picture" 
+                                class="header-user-image"
+                                src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>"
+                                loading="lazy"
+                            >
+                            <span class="sr-only"><%= currentUser.username %></span>
+                        </button>
+                        <div class="user-dropdown-content" id="dropdownContent" role="menu">
+                            <div class="form">
+                                <p class="p" role="menuitem">
+                                    Welcome, <strong><%= currentUser.username %></strong>
+                                </p>
+                                <form action="/logout" method="POST">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button type="submit" class="button-submit" role="menuitem">
+                                        Sign Out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 <% } %>
             </div>
+
+            <!-- Mobile menu -->
+            <div class="mobile-menu" id="mobileMenu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mobile navigation menu">
+                <nav role="navigation" aria-label="Mobile navigation">
+                    <ul class="mobile-nav-links">
+                        <li><a href="/home" tabindex="-1">Home</a></li>
+                        <li><a href="/pricing" tabindex="-1">Pricing</a></li>
+                        <li><a href="/about" tabindex="-1">About</a></li>
+                        <li><a href="/contact" tabindex="-1">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="mobile-user-area">
+                    <% if (!currentUser) { %>
+                        <a href="/dashboard" class="dashboard-btn" tabindex="-1">Dashboard</a>
+                    <% } else { %>
+                        <div class="mobile-user">
+                            <a href="/dashboard" class="mobile-user-link" tabindex="-1">
+                                <img 
+                                    alt="<%= currentUser.username %>'s profile picture" 
+                                    class="header-user-image" 
+                                    src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>"
+                                    loading="lazy"
+                                >
+                                <span><%= currentUser.username %></span>
+                            </a>
+                            <form action="/logout" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="button-submit" tabindex="-1">Sign Out</button>
+                            </form>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
         </div>
     </header>
-    <script>
-(function () {
-  const btn = document.getElementById('hamburgerBtn');
-  const panel = document.getElementById('mobileMenu');
-  if (!btn || !panel) return;
-
-  function openMenu() {
-    btn.setAttribute('aria-expanded', 'true');
-    panel.classList.add('open');
-    panel.setAttribute('aria-hidden', 'false');
-    // prevent background scroll while open
-    document.documentElement.style.overflow = 'hidden';
-  }
-  function closeMenu() {
-    btn.setAttribute('aria-expanded', 'false');
-    panel.classList.remove('open');
-    panel.setAttribute('aria-hidden', 'true');
-    document.documentElement.style.overflow = '';
-  }
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    if (expanded) closeMenu(); else openMenu();
-  });
-
-  // Close when clicking outside: click anywhere not inside panel or button
-  document.addEventListener('click', (e) => {
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    if (!expanded) return;
-    if (!panel.contains(e.target) && !btn.contains(e.target)) closeMenu();
-  });
-
-  // Close on ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') closeMenu();
-  });
-
-  // Close on link click inside mobile panel (keeps UX simple)
-  panel.addEventListener('click', (e) => {
-    const a = e.target.closest('a');
-    if (a) closeMenu();
-  });
-})();
-</script>

@@ -28,19 +28,17 @@
   <% if (list && list.length) { %>
     <div class="visiting-card-cards-grid">
       <% list.forEach(card => { %>
-        <div class="visiting-card" data-card-slug="<%= card.slug %>">
-          <img src="<%= card.image || '/assets/feature1.jpg' %>" alt="<%= (card.title || card.name || 'Visiting Card') %>" class="visiting-card-logo">
+  <div class="visiting-card" data-card-id="<%= card._id %>">
+          <img src="<%= card.profileImage || '/assets/feature1.jpg' %>" alt="<%= (card.title || card.profileName || 'Visiting Card') %>" class="visiting-card-logo">
           <div class="visiting-card-body">
             <div class="visiting-card-heading">
-              <h2 class="visiting-card-title"><%= card.title || card.name || 'Untitled' %></h2>
+              <h2 class="visiting-card-title"><%= card.title || card.profileName || 'Untitled' %></h2>
               <% if (card.company) { %>
                 <p class="visiting-card-company"><%= card.company %></p>
               <% } %>
             </div>
             <div class="visiting-card-others">
-              <% if (card.address && card.address.city) { %>
-                <p class="visiting-card-address"><span><%= card.address.street || '' %>, <%= card.address.city %></span><span><%= card.address.state || '' %></span></p>
-              <% } else if (card.profileName) { %>
+              <% if (card.profileName) { %>
                 <p class="visiting-card-address"><%= card.profileName %></p>
               <% } %>
               <% if (card.description) { %>
@@ -48,8 +46,9 @@
               <% } %>
             </div>
             <div class="visiting-card-links">
+              <% const viewSlug = card.profileSlug ? encodeURIComponent(card.profileSlug) : null; %>
               <a href="/visiting-card/<%= encodeURIComponent(card.slug || '') %>" class="visiting-card-link">View Final</a>
-              <% const editTarget = card.slug ? `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.slug)}/edit` : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
+              <% const editTarget = card.profileSlug ? `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.profileSlug)}/edit` : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
               <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
             </div>
           </div>

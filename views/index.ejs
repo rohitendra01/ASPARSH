@@ -1,198 +1,474 @@
 <% layout('layouts/boilerplate') -%>
-<% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/index-snap.css" />`) %>
-<main>
-    <section class="container1 snap-section">
-            <div class="hero-text">
-                <div class="hero-head-text">
-                    <h1>
-                        <span id="text1">The future of new </span>
-                        <span id="text1">connection is </span>
-                        <span id="text2">instant </span>
-                        <span id="text2">with NFC technology</span>
-                    </h1>
-                </div>
-                <div class="hero-sub-text">
-                    <h3>
-                        Empower your business with NFC, turning connectivity issues into opportunities, ensuring
-                        customers receive the support they truly deserve.
-                    </h3>
-                </div>
-                <div class="started-button">
-                    <a href="/home" class="get-started-link">
-                        <button>Get Started</button>
+<% block('styles').append(`
+<link rel="stylesheet" href="/css/asparsh/index.css" />
+<style>
+/* Critical CSS for above-the-fold content */
+.hero-section {
+  min-height: calc(100vh - var(--header-height));
+  background: var(--primary-gradient);
+  display: flex;
+  align-items: center;
+  color: var(--text-inverse);
+}
+</style>
+`) %>
+
+<% block('scripts').append(`
+<script src="/js/modern-index.js" defer></script>
+`) %>
+
+    <!-- Hero Section -->
+    <section class="hero-section" aria-labelledby="hero-title">
+    <div class="hero-container">
+        <div class="hero-content animate-on-scroll">
+            <div class="hero-badge">
+                <div class="badge-icon">⚡</div>
+                <span>The Future of Connections</span>
+            </div>
+                
+                <h1 id="hero-title" class="hero-title">
+                    The future of new connection is 
+                    <span class="highlight">instant</span> 
+                    with NFC technology
+                </h1>
+                
+                <p class="hero-description">
+                    Empower your business with cutting-edge NFC technology, turning connectivity challenges into opportunities, ensuring customers receive the exceptional support they truly deserve.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="/home" class="hero-cta" aria-describedby="cta-description">
+                        <span>Get Started</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#features" class="hero-secondary">
+                        <span>Learn More</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
                     </a>
                 </div>
-            </div>
-            <div class="hero-image">
-                <img src="/assets/hero-image.jpg" alt="NFC Hero Image">
-            </div>
-    </section>
-    <section class="container2 snap-section">
-            <div class="description-head-text">
-                <span>
-                    At Asparsh, we offer NFC tag solutions that modernize business connections.
-                </span>
-                    Our touchless service replaces outdated paper tools, providing digital business cards and product-linked tags for seamless engagement.
-                <div class="description-highlited-text">
-                    <span >We create interactive, tap-and-go experiences </span><span> that feel both modern and timeless.</span>
-                </div>
-                </div>
-            <div class="description-box">
-                <div class="description-card">
-                    <div class="card-title">No Paper Cards. Just One Smart Tap.</div>
-                    <div class="card-desc">Stop using printed business cards that get lost or discarded. Use NFC tags to share your contact details and websites instantly with just one tap.</div>
-                    <div class="card-img-ref"><img src="assets/1.png" alt="A sasmple image"></div>
-                </div>
-                <div class="description-card">
-                    <div class="card-title">No Reprints. Easily Editable.</div>
-                    <div class="card-desc">Traditional cards become outdated fast. With NFC, your information is dynamic — update it anytime without needing to reprint. One tag, endless uses.</div>
-                    <div class="card-img-ref"><img src="assets/2.png" alt="A sasmple image"></div>
-                </div>
-                <div class="description-card">
-                    <div class="card-title">Built for Every Industry and Role</div>
-                    <div class="card-desc">Whether you're a creator, entrepreneur, recruiter, or business exec — NFC cards adapt to your needs and help you connect smarter.</div>
-                    <div class="card-img-ref"><img src="assets/3.png" alt="A sasmple image"></div>
-                </div>
-            </div>
-    </section>
-    <section class="container3 snap-section">
-            <div class="container3-head-text">
-                <div class="container3-head-text1">
-                    <h2>Our Products</h2>
-                </div>
-                <div class="container3-head-text2">
-                    <p>Explore our NFC‑enabled product line designed to streamline and elevate your professional networking.<br>
-                    From smart cards to customizable digital profiles, share contact details, portfolio links, and promotional content with a single tap.</p>
-                </div>
-            </div>
-            <div class="swiper">
-                <div class="swiper-wrapper">
-                    <% products.forEach(product => { %>
-                    <div class="swiper-slide">
-                        <div class="index-product-card">
-                            <div class="index-product-image">
-                                <img src="<%= product.image %>" alt="<%= product.title %>">
-                            </div>
-                            <div class="index-product-content">
-                                <div class="index-product-head">
-                                    <% if (product.badge) { %>
-                                        <div class="flash-message-new"><%= product.badge %></div>
-                                        <% } %>
-                                        <h2><%= product.title %></h2>
-                                        <h3><%= product.subtitle %></h3>
-                                    </div>
-                                    <div class="index-product-price">
-                                        <h3>Price</h3>
-                                        <span class="index-product-current-price">₹ <%= product.price %></span>
-                                    </div>
-                                    <div class="index-product-description-container">
-                                        <div class="tab-headers">
-                                            <div class="tab-header active" data-tab="description-<%= product.id %>">DESCRIPTION</div>
-                                            <div class="tab-header" data-tab="features-<%= product.id %>">DETAILS</div>
-                                            <div class="tab-underline"></div>
-                                        </div>
-                                        <div class="tab-content-wrapper">
-                                            <div id="description-<%= product.id %>" class="tab-pane active">
-                                                <div class="index-product-description-details"><%= product.description %></div>
-                                            </div>
-                                            <div id="features-<%= product.id %>" class="tab-pane">
-                                                <div class="index-product-description-features">
-                                                    <ul>
-                                                        <% product.features.forEach(feature => { %>
-                                                            <li><%= feature %></li>
-                                                            <% }) %>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="index-product-button">
-                                        <button class="buy-now-btn">Buy Now</button>
-                                        <button class="explore-more-btn">Explore More</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% }) %>
-                </div>
-            </div>
-    </section>
-    <section class="container4 snap-section">
-            <div class="container4-head-text">
-                <h2>How Asparsh Works!</h2>
-                <p>Asparsh leverages cutting-edge NFC technology to create seamless and interactive experiences for users. Our platform allows businesses to connect with their customers in innovative ways, enhancing engagement and driving results.</p>
-            </div>
-           <div class="container4-how-it-works">
-                <div class="container4-how-it-works-card">
-                        <img src="/assets/how-it-works-1.jpg" alt="Step 1">
-                        <div class="container4-how-it-works-card-text">
-                            <h3>Step 1</h3>
-                            <p>Choose your NFC product and customize it to fit your brand with ease and flexibility.</p>
-                        </div>
-               </div>
-                <div class="container4-how-it-works-card">
-                        <img src="/assets/how-it-works-2.jpg" alt="Step 2">
-                        <div class="container4-how-it-works-card-text">
-                            <h3>Step 2</h3>
-                            <p>Share your NFC-enabled product with customers, allowing them to tap and connect instantly.</p>
-                        </div>
-                </div>
-                <div class="container4-how-it-works-card">
-                        <img src="/assets/how-it-works-3.jpg" alt="Step 3">
-                        <div class="container4-how-it-works-card-text">
-                            <h3>Step 3</h3>
-                            <p>Engage with your audience through interactive content and track their interactions for better insights.</p>
-                        </div>
-               </div>
-                <div class="container4-how-it-works-card">
-                        <img src="/assets/how-it-works-4.jpg" alt="Step 4">
-                        <div class="container4-how-it-works-card-text">
-                            <h3>Step 4</h3>
-                            <p>Analyze the data collected to refine your marketing strategies and improve customer engagement.</p>
-                        </div>
-                </div> 
-            </div>
-    </section>
-    <section class="container5 snap-section">
-            <div class="container5-head-text">
-                <h2>Happy Customers</h2>
-                <p>Hear from our satisfied customers who have transformed their business connections with Asparsh.
-                    <br>It has always been possible with the help of our innovative solutions. So join the community of happy customers today!
+                
+                <p id="cta-description" class="sr-only">
+                    Start your journey with Asparsh's NFC technology solutions
                 </p>
             </div>
-            <div class="testimonial-carousel">
-                <button class="testimonial-carousel-nav prev">&#10094;</button>
-                <div class="testimonial-carousel-wrapper">
-                  <% testimonials.forEach(function(testimonial, idx) { %>
-                    <div class="testimonial-card">
-                        <img class="testimonial-avatar" src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>">
-                        <div class="testimonial-quote">"<%= testimonial.text %>"</div>
-                        <div class="testimonial-user">
-                            <div class="testimonial-name"><%= testimonial.name %></div>
-                            <div class="testimonial-role"><%= testimonial.role %></div>
-                        </div>
+            
+            <div class="hero-visual animate-on-scroll">
+                <img 
+                    src="/assets/hero-image.jpg" 
+                    alt="Professional demonstrating NFC technology with modern smart devices and digital business cards"
+                    class="hero-image"
+                    loading="eager"
+                    width="500"
+                    height="400"
+                >
+                
+                <!-- Floating elements for visual interest -->
+                <div class="hero-floating float-1" aria-hidden="true">
+                    <span>Instant Connection</span>
+                </div>
+                <div class="hero-floating float-2" aria-hidden="true">
+                    <span>Zero Contact</span>
+                </div>
+                <div class="hero-floating float-3" aria-hidden="true">
+                    <span>100% Digital</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section" aria-labelledby="features-title">
+        <div class="features-container">
+            <div class="section-header animate-on-scroll">
+                <h2 id="features-title" class="features-title">
+                    Revolutionizing Business Connections
+                </h2>
+                <p class="features-description">
+                    At Asparsh, we offer innovative NFC tag solutions that modernize business interactions. 
+                    Our touchless technology replaces outdated paper tools, providing seamless digital experiences 
+                    that feel both cutting-edge and timeless.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <article class="feature-card animate-on-scroll" tabindex="0">
+                    <div class="feature-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10 10 10s10-4.45 10-10V7L12 2z"/>
+                            <path d="M8 11l2 2 4-4"/>
+                        </svg>
                     </div>
-                  <% }) %>
-                </div>
-                <button class="testimonial-carousel-nav next">&#10095;</button>
-                <div class="testimonial-carousel-dots"></div>
+                    <h3 class="feature-title">No Paper Cards. Just One Smart Tap.</h3>
+                    <p class="feature-description">
+                        Eliminate printed business cards that get lost or discarded. Use NFC tags to share 
+                        contact details and websites instantly with just one tap, creating memorable 
+                        first impressions.
+                    </p>
+                </article>
+                
+                <article class="feature-card animate-on-scroll" tabindex="0">
+                    <div class="feature-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">No Reprints. Easily Editable.</h3>
+                    <p class="feature-description">
+                        Traditional cards become outdated fast. With NFC, your information is dynamic — 
+                        update it anytime without needing to reprint. One tag, endless possibilities, 
+                        always current.
+                    </p>
+                </article>
+                
+                <article class="feature-card animate-on-scroll" tabindex="0">
+                    <div class="feature-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Built for Every Industry and Role</h3>
+                    <p class="feature-description">
+                        Whether you're a creator, entrepreneur, recruiter, or business executive — 
+                        NFC cards adapt to your unique needs and help you connect smarter, 
+                        faster, and more effectively.
+                    </p>
+                </article>
             </div>
+        </div>
     </section>
-    <section class="container6 snap-section">
-            <div class="container6-head-text">
-                <h2>Sharing is Caring</h2>
+
+    <!-- Products Section -->
+    <section class="products-section" aria-labelledby="products-title">
+        <div class="products-container">
+            <div class="section-header animate-on-scroll">
+                <h2 id="products-title" class="products-title">Our Products</h2>
+                <p class="products-description">
+                    Explore our NFC-enabled product line designed to streamline and elevate your professional networking. 
+                    From smart cards to customizable digital profiles, share content with a single tap.
+                </p>
             </div>
-            <div class="container6-content">
-                <div class="container6-content-text">
-                    <p>Share your NFC-enabled products with friends and colleagues. Help them discover the convenience of instant connections and interactive experiences.</p>
-                    <p>Join our community of users who are embracing the future of connectivity with Asparsh.</p>
+            
+            <div class="products-swiper swiper animate-on-scroll">
+                <div class="swiper-wrapper">
+                    <% if (locals.products && locals.products.length > 0) { %>
+                        <% locals.products.forEach((product, index) => { %>
+                        <div class="swiper-slide product-slide">
+                            <article class="product-card" tabindex="0">
+                                <div class="product-image">
+                                    <img 
+                                        src="<%= product.image || '/assets/product' + (index + 1) + '.jpg' %>" 
+                                        alt="<%= product.title || 'Product ' + (index + 1) %>"
+                                        loading="lazy"
+                                        width="400"
+                                        height="250"
+                                    >
+                                    <% if (product.badge) { %>
+                                        <div class="product-badge"><%= product.badge %></div>
+                                    <% } else { %>
+                                        <div class="product-badge">Featured</div>
+                                    <% } %>
+                                </div>
+                                <div class="product-content">
+                                    <h3 class="product-title"><%= product.title || 'NFC Smart Card' %></h3>
+                                    <p class="product-description">
+                                        <%= product.description || 'Experience the future of networking with our innovative NFC-enabled cards.' %>
+                                    </p>
+                                    <% if (product.features && product.features.length > 0) { %>
+                                        <ul class="product-features">
+                                            <% product.features.forEach(feature => { %>
+                                                <li><%= feature %></li>
+                                            <% }) %>
+                                        </ul>
+                                    <% } else { %>
+                                        <ul class="product-features">
+                                            <li>Instant information sharing</li>
+                                            <li>Customizable design</li>
+                                            <li>Durable construction</li>
+                                            <li>Works with all smartphones</li>
+                                        </ul>
+                                    <% } %>
+                                    <div class="product-actions">
+                                        <span class="product-price">₹<%= product.price || '29' %></span>
+                                        <a href="/products/<%= product.slug || 'nfc-card' %>" class="product-cta">
+                                            Learn More
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <% }) %>
+                    <% } else { %>
+                        <!-- Default products if none provided -->
+                        <% for (let i = 1; i <= 3; i++) { %>
+                        <div class="swiper-slide product-slide">
+                            <article class="product-card" tabindex="0">
+                                <div class="product-image">
+                                    <img 
+                                        src="/assets/product<%= i %>.jpg" 
+                                        alt="NFC Product <%= i %>"
+                                        loading="lazy"
+                                        width="400"
+                                        height="250"
+                                    >
+                                    <div class="product-badge">Popular</div>
+                                </div>
+                                <div class="product-content">
+                                    <h3 class="product-title">NFC Smart Card <%= i %></h3>
+                                    <p class="product-description">
+                                        Professional NFC-enabled card for modern networking and instant connections.
+                                    </p>
+                                    <ul class="product-features">
+                                        <li>Instant contact sharing</li>
+                                        <li>Custom branding</li>
+                                        <li>Premium materials</li>
+                                        <li>Universal compatibility</li>
+                                    </ul>
+                                    <div class="product-actions">
+                                        <span class="product-price">₹<%= 200 + (i * 100) %></span>
+                                        <a href="/products/card-<%= i %>" class="product-cta">
+                                            Learn More
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <% } %>
+                    <% } %>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="swiper-button-prev" aria-label="Previous product"></div>
+                <div class="swiper-button-next" aria-label="Next product"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section" aria-labelledby="how-it-works-title">
+        <div class="how-it-works-container">
+            <div class="section-header animate-on-scroll">
+                <h2 id="how-it-works-title" class="how-it-works-title">How Asparsh Works!</h2>
+                <p class="how-it-works-description">
+                    Asparsh leverages cutting-edge NFC technology to create seamless and interactive experiences. 
+                    Our platform helps businesses connect with customers in innovative ways, enhancing engagement and driving results.
+                </p>
+            </div>
+            
+            <div class="steps-grid">
+                <article class="step-card animate-on-scroll" tabindex="0">
+                    <div class="step-number" aria-hidden="true">1</div>
+                    <div class="step-image">
+                        <img 
+                            src="/assets/how-it-works-1.jpg" 
+                            alt="Step 1: Choose and customize your NFC product"
+                            loading="lazy"
+                            width="200"
+                            height="200"
+                        >
+                    </div>
+                    <h3 class="step-title">Choose & Customize</h3>
+                    <p class="step-description">
+                        Select your NFC product and customize it to perfectly match your brand 
+                        with our intuitive design tools and professional templates.
+                    </p>
+                </article>
+                
+                <article class="step-card animate-on-scroll" tabindex="0">
+                    <div class="step-number" aria-hidden="true">2</div>
+                    <div class="step-image">
+                        <img 
+                            src="/assets/how-it-works-2.jpg" 
+                            alt="Step 2: Configure your digital content and links"
+                            loading="lazy"
+                            width="200"
+                            height="200"
+                        >
+                    </div>
+                    <h3 class="step-title">Configure Content</h3>
+                    <p class="step-description">
+                        Set up your digital profile, contact information, social links, and 
+                        any other content you want to share instantly with a simple tap.
+                    </p>
+                </article>
+                
+                <article class="step-card animate-on-scroll" tabindex="0">
+                    <div class="step-number" aria-hidden="true">3</div>
+                    <div class="step-image">
+                        <img 
+                            src="/assets/how-it-works-3.jpg" 
+                            alt="Step 3: Receive your professionally crafted NFC product"
+                            loading="lazy"
+                            width="200"
+                            height="200"
+                        >
+                    </div>
+                    <h3 class="step-title">Receive & Deploy</h3>
+                    <p class="step-description">
+                        Get your professionally crafted NFC product delivered to your door, 
+                        ready to use immediately with all your content pre-configured.
+                    </p>
+                </article>
+                
+                <article class="step-card animate-on-scroll" tabindex="0">
+                    <div class="step-number" aria-hidden="true">4</div>
+                    <div class="step-image">
+                        <img 
+                            src="/assets/how-it-works-4.jpg" 
+                            alt="Step 4: Connect and engage with your audience effortlessly"
+                            loading="lazy"
+                            width="200"
+                            height="200"
+                        >
+                    </div>
+                    <h3 class="step-title">Connect & Engage</h3>
+                    <p class="step-description">
+                        Start connecting with your audience effortlessly. Track engagement, 
+                        update content anytime, and watch your network grow exponentially.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials-section" aria-labelledby="testimonials-title">
+        <div class="testimonials-container">
+            <div class="section-header animate-on-scroll">
+                <h2 id="testimonials-title" class="testimonials-title">Happy Customers</h2>
+                <p class="testimonials-description">
+                    Hear from our satisfied customers who have transformed their business connections with Asparsh. 
+                    Join the community of professionals embracing the future of networking today!
+                </p>
+            </div>
+            
+            <div class="testimonial-carousel">
+                <button class="testimonial-carousel-nav prev" aria-label="Previous testimonial">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+                
+                <div class="testimonial-carousel-wrapper" role="region" aria-live="polite" aria-label="Customer testimonials">
+                    <% if (locals.testimonials && locals.testimonials.length > 0) { %>
+                        <% locals.testimonials.forEach((testimonial, index) => { %>
+                        <article class="testimonial-card" tabindex="0">
+                            <blockquote class="testimonial-quote">
+                                "<%= testimonial.text || 'Asparsh has revolutionized how we connect with our clients. The NFC technology is seamless and professional.' %>"
+                            </blockquote>
+                            <footer class="testimonial-author">
+                                <img 
+                                    src="<%= testimonial.avatar || '/assets/testimonial' + (index + 1) + '.jpg' %>" 
+                                    alt="<%= testimonial.name || 'Customer ' + (index + 1) %>"
+                                    class="testimonial-avatar"
+                                    loading="lazy"
+                                    width="50"
+                                    height="50"
+                                >
+                                <div class="testimonial-info">
+                                    <h4><%= testimonial.name || 'Satisfied Customer' %></h4>
+                                    <p><%= testimonial.role || 'Business Professional' %></p>
+                                </div>
+                            </footer>
+                        </article>
+                        <% }) %>
+                    <% } else { %>
+                        <!-- Default testimonials -->
+                        <% for (let i = 1; i <= 5; i++) { %>
+                        <article class="testimonial-card" tabindex="0">
+                            <blockquote class="testimonial-quote">
+                                "Asparsh has completely transformed how we network and connect with potential clients. The technology is intuitive and the results are immediate."
+                            </blockquote>
+                            <footer class="testimonial-author">
+                                <img 
+                                    src="/assets/testimonial<%= i %>.jpg" 
+                                    alt="Customer <%= i %>"
+                                    class="testimonial-avatar"
+                                    loading="lazy"
+                                    width="50"
+                                    height="50"
+                                >
+                                <div class="testimonial-info">
+                                    <h4>Professional <%= i %></h4>
+                                    <p>Business Executive</p>
+                                </div>
+                            </footer>
+                        </article>
+                        <% } %>
+                    <% } %>
+                </div>
+                
+                <button class="testimonial-carousel-nav next" aria-label="Next testimonial">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+                
+                <div class="testimonial-carousel-dots" role="tablist" aria-label="Choose testimonial"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" aria-labelledby="cta-title">
+        <div class="cta-container">
+            <h2 id="cta-title" class="cta-title animate-on-scroll">
+                Ready to Transform Your Connections?
+            </h2>
+            <p class="cta-description animate-on-scroll">
+                Join thousands of professionals who have already embraced the future of networking. 
+                Experience the power of NFC technology and see the difference it makes for your business.
+            </p>
+            <div class="cta-actions animate-on-scroll">
+                <a href="/home" class="footer-cta-button">
+                    <span>Get Started Today</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="/contact" class="cta-secondary">
+                    <span>Contact Us</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Join Us / Sharing Section -->
+    <section class="sharing-section" aria-labelledby="sharing-title">
+        <div class="sharing-container">
+            <div class="sharing-content animate-on-scroll">
+                <div class="section-header">
+                    <h2 id="sharing-title" class="sharing-title">Sharing is Caring</h2>
+                </div>
+                
+                <div class="sharing-body">
+                    <div class="sharing-text">
+                        <p>Share your NFC-enabled products with friends and colleagues. Help them discover the convenience of instant connections and interactive experiences.</p>
+                        <p>Join our community of users who are embracing the future of connectivity with Asparsh.</p>
+                        <p class="sharing-cta-text">Spread the word about Asparsh and let others experience the future of connectivity.</p>
+                    </div>
                     
-                </div>
-                <div class="container6-content-image">
-                    <img src="/assets/share-nfc.jpg" alt="Share NFC Products">
+                    <div class="sharing-image">
+                        <img 
+                            src="/assets/share-nfc.jpg" 
+                            alt="Share NFC Products with friends and colleagues"
+                            loading="lazy"
+                            width="400"
+                            height="300"
+                        >
+                    </div>
                 </div>
             </div>
-            <p>Spread the word about Asparsh and let others experience the future of connectivity.</p>      
+        </div>
     </section>
-</main>
-    

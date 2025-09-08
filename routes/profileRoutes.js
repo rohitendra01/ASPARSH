@@ -3,7 +3,8 @@ const router = express.Router({ mergeParams: true });
 const profileController = require('../controllers/profileController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
-const csrfProtection = csurf({ cookie: false });
+const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
+const upload = require('../middleware/uploadMiddleware');
 
 // List profiles
 router.get('/', isLoggedIn, profileController.listProfiles);
@@ -11,8 +12,8 @@ router.get('/', isLoggedIn, profileController.listProfiles);
 // Render new profile form
 router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
 
-// Create profile (form posts to /new)
-router.post('/new', isLoggedIn, csrfProtection, profileController.createProfile);
+// Create profile (parse file + fields first, then validate CSRF)
+router.post('/', isLoggedIn, upload.single('image'), csrfProtection, profileController.createProfile);
 
 // Show profile (public under dashboard)
 router.get('/:profileSlug', profileController.showProfile);
@@ -20,8 +21,8 @@ router.get('/:profileSlug', profileController.showProfile);
 // Render edit form
 router.get('/:profileSlug/edit', isLoggedIn, profileController.renderEditProfileForm);
 
-// Update profile (form posts to /:profileSlug/edit)
-router.post('/:profileSlug/edit', isLoggedIn, csrfProtection, profileController.updateProfile);
+// Update profile (POST for form submissions)
+router.post('/:profileSlug', isLoggedIn, csrfProtection, profileController.updateProfile);
 
 // Delete profile
 router.post('/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);

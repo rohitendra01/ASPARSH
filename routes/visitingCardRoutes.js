@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const visitingCardController = require('../controllers/visitingCardController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
-const csrfProtection = csurf({ cookie: false });
+const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 // List visiting cards (dashboard)
 router.get('/', isLoggedIn, visitingCardController.list);

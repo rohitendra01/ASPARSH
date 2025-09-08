@@ -4,7 +4,7 @@ const portfolioController = require('../controllers/portfolioController');
 const profileController = require('../controllers/profileController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
-const csrfProtection = csurf({ cookie: false });
+const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 // visiting-card routes moved to visitingCardRoutes.js
 

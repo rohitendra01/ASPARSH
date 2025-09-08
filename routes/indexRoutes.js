@@ -63,6 +63,36 @@ const testimonials = [
             role: "Founder, Asparsh",
             avatar: "/assets/testimonial5.jpg"
         },
+        {
+            text: "The NFC technology is seamless and has greatly improved our customer interactions. Highly recommend!",
+            name: "Priya Sharma",
+            role: "Marketing Manager",
+            avatar: "/assets/testimonial1.jpg"
+        },
+        {
+            text: "Simple, effective, and professional. Asparsh cards have become an essential part of our business toolkit.",
+            name: "Rajesh Kumar",
+            role: "Business Owner",
+            avatar: "/assets/testimonial2.jpg"
+        },
+        {
+            text: "The response from clients has been overwhelmingly positive. These smart cards are a game-changer!",
+            name: "Anita Mehta",
+            role: "Sales Director",
+            avatar: "/assets/testimonial3.jpg"
+        },
+        {
+            text: "No more fumbling with paper cards. Quick, clean, and modern - exactly what we needed.",
+            name: "Vikram Patel",
+            role: "Tech Entrepreneur",
+            avatar: "/assets/testimonial4.jpg"
+        },
+        {
+            text: "Our networking events have been revolutionized. Easy sharing and instant connections every time.",
+            name: "Neha Gupta",
+            role: "Event Coordinator",
+            avatar: "/assets/testimonial6.jpg"
+        }
 ];
 
     
