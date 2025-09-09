@@ -27,8 +27,8 @@
 <div class="hotel-list-container visiting-card-list-container">
   <% if (list && list.length) { %>
     <div class="visiting-card-cards-grid">
-      <% list.forEach(card => { %>
-  <div class="visiting-card" data-card-id="<%= card._id %>">
+    <% list.forEach(card => { %>
+  <div class="visiting-card" data-card-id="<%= card._id %>" data-card-slug="<%= (card.profileSlug || card.slug || '') %>">
           <img src="<%= card.profileImage || '/assets/feature1.jpg' %>" alt="<%= (card.title || card.profileName || 'Visiting Card') %>" class="visiting-card-logo">
           <div class="visiting-card-body">
             <div class="visiting-card-heading">
@@ -45,9 +45,9 @@
                 <p class="visiting-card-desc"><%= card.description.length > 120 ? card.description.substring(0, 117) + '...' : card.description %></p>
               <% } %>
             </div>
-            <div class="visiting-card-links">
-              <% const viewSlug = card.profileSlug ? encodeURIComponent(card.profileSlug) : null; %>
-              <a href="/visiting-card/<%= encodeURIComponent(card.slug || '') %>" class="visiting-card-link">View Final</a>
+              <div class="visiting-card-links">
+              <% const viewSlug = card.profileSlug ? encodeURIComponent(card.profileSlug) : (card.slug ? encodeURIComponent(card.slug) : null); %>
+                <a href="/visiting-card/<%= viewSlug %>" class="visiting-card-link">View Final</a>
               <% const editTarget = card.profileSlug ? `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.profileSlug)}/edit` : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
               <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
             </div>
