@@ -92,8 +92,7 @@
     <section class="footer-bottom">
         <div class="footer-bottom-content">
             <div class="footer-copyright">
-                <p>&copy; 2025 Asparsh. All rights reserved. Built with ❤️ for the future of connections.</p>
-            </div>
+                <p>&copy; <%= new Date().getFullYear() %> Asparsh. All rights reserved. Built with ❤️ for the future of connections.</p>            </div>
             <nav aria-label="Legal navigation">
                 <ul class="footer-legal" role="list">
                     <li><a href="/privacy-policy">Privacy</a></li>
@@ -109,7 +108,6 @@
 <!-- Enhanced JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 <script src="/js/modern-index.js"></script>
-<script src="/js/nav-user.js"></script>
 
 <!-- Intersection Observer for animations -->
 <script>
@@ -182,7 +180,6 @@
     });
   }
 
-  // Enhanced accessibility: Skip link
   const skipLink = document.createElement('a');
   skipLink.href = '#main-content';
   skipLink.textContent = 'Skip to main content';

@@ -6,7 +6,6 @@
                 </a>
             </div>
 
-            <!-- Mobile hamburger toggle -->
             <button 
                 type="button" 
                 class="hamburger" 
@@ -23,11 +22,10 @@
             <nav class="nav" role="navigation" aria-label="Main navigation">
                 <ul class="nav-links">
                     <li><a href="/home" aria-current="<%= locals.currentPage === 'home' ? 'page' : false %>">Home</a></li>
-                    <li><a href="/pricing" aria-current="<%= locals.currentPage === 'pricing' ? 'page' : false %>">Pricing</a></li>
-                    <li><a href="/about" aria-current="<%= locals.currentPage === 'about' ? 'page' : false %>">About</a></li>
-                    <li><a href="/contact" aria-current="<%= locals.currentPage === 'contact' ? 'page' : false %>">Contact</a></li>
-                </ul>
-            </nav>
+                    <li><a href="/home" <%= locals.currentPage === 'home' ? 'aria-current="page"' : '' %>>Home</a></li>
+                    <li><a href="/pricing" <%= locals.currentPage === 'pricing' ? 'aria-current="page"' : '' %>>Pricing</a></li>
+                    <li><a href="/about" <%= locals.currentPage === 'about' ? 'aria-current="page"' : '' %>>About</a></li>
+                    <li><a href="/contact" <%= locals.currentPage === 'contact' ? 'aria-current="page"' : '' %>>Contact</a></li>            </nav>
 
             <div class="user-profile">
                 <% if (!currentUser) { %>
@@ -72,19 +70,23 @@
                 <% } %>
             </div>
 
-            <!-- Mobile menu -->
             <div class="mobile-menu" id="mobileMenu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mobile navigation menu">
-                <nav role="navigation" aria-label="Mobile navigation">
-                    <ul class="mobile-nav-links">
-                        <li><a href="/home" tabindex="-1">Home</a></li>
-                        <li><a href="/pricing" tabindex="-1">Pricing</a></li>
-                        <li><a href="/about" tabindex="-1">About</a></li>
-                        <li><a href="/contact" tabindex="-1">Contact</a></li>
-                    </ul>
-                </nav>
+                <div class="mobile-nav-section">
+                    <nav role="navigation" aria-label="Mobile navigation">
+                        <ul class="mobile-nav-links">
+                            <li><a href="/home" tabindex="-1">Home</a></li>
+                            <li><a href="/pricing" tabindex="-1">Pricing</a></li>
+                            <li><a href="/about" tabindex="-1">About</a></li>
+                            <li><a href="/contact" tabindex="-1">Contact</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                
                 <div class="mobile-user-area">
                     <% if (!currentUser) { %>
-                        <a href="/dashboard" class="dashboard-btn" tabindex="-1">Dashboard</a>
+                        <a href="/dashboard" class="dashboard-btn" tabindex="-1">
+                            <span>Access Dashboard</span>
+                        </a>
                     <% } else { %>
                         <div class="mobile-user">
                             <a href="/dashboard" class="mobile-user-link" tabindex="-1">

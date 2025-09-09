@@ -20,6 +20,35 @@ const getCsrfToken = (req, res) => {
   return { token, generationError };
 };
 
+// Basic slug validation helper. Adjust regex to match your project's slug rules.
+const isValidSlug = (s) => {
+  if (!s || typeof s !== 'string') return false;
+  // allow lowercase/uppercase letters, numbers and hyphens, no leading/trailing hyphens
+  const slug = s.trim();
+  const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/i;
+  return SLUG_REGEX.test(slug);
+};
+
+const checkCardAuthorization = async (card, user) => {
+  if (!user || !user._id) return { authorized: false, reason: 'Authentication required' };
+
+  const isOwner = card.user && String(card.user) === String(user._id);
+  if (isOwner) return { authorized: true };
+
+  if (card.profileSlug) {
+    try {
+      const profile = await Profile.findOne({ slug: card.profileSlug }).lean();
+      if (profile && profile.user && String(profile.user) === String(user._id)) return { authorized: true, profile };
+    } catch (e) {
+    }
+  }
+
+  const hasElevatedRole = user.role === 'admin' || user.isAdmin;
+  if (hasElevatedRole) return { authorized: true };
+
+  return { authorized: false, reason: 'Forbidden' };
+};
+
 // Render new visiting card form
 exports.renderNewForm = async (req, res) => {
   try {
@@ -68,16 +97,20 @@ exports.create = async (req, res) => {
     }
 
     const body = req.body || {};
-  const rawProfileSlug = body.profileSlug || '';
+    const rawProfileSlug = (body.profileSlug && typeof body.profileSlug === 'string') ? body.profileSlug.trim() : '';
     let profile = null;
 
-    // If a profile slug was provided, load the profile and ensure ownership
+    // If a profile slug was provided, validate format then load the profile and ensure ownership
     if (rawProfileSlug) {
-      profile = await Profile.findOne({ slug: rawProfileSlug }).lean();
+      if (!isValidSlug(rawProfileSlug)) {
+        return res.status(400).json({ error: 'Invalid profile slug format' });
+      }
+      const validatedSlug = rawProfileSlug; // already trimmed and format-checked
+      profile = await Profile.findOne({ slug: validatedSlug }).lean();
       if (!profile) return res.status(404).json({ error: 'Profile not found for provided slug' });
       const profileOwner = profile.user || profile.owner || null;
       if (profileOwner && String(profileOwner) !== String(req.user._id)) {
-        console.warn('Unauthorized profile access attempt', { profileSlug: rawProfileSlug, attemptedBy: String(req.user._id) });
+        console.warn('Unauthorized profile access attempt', { profileSlug: validatedSlug, attemptedBy: String(req.user._id) });
         return res.status(403).json({ error: 'Forbidden: you do not own the specified profile' });
       }
     }
@@ -203,10 +236,9 @@ exports.renderEditForm = async (req, res) => {
       return res.status(400).send('Missing visiting card identifier');
     }
 
-    if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
-  const isOwner = (card.user && String(card.user) === String(req.user._id)) || (card.profileSlug && profile && profile.user && String(profile.user) === String(req.user._id));
-    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
-    if (!isOwner && !hasElevatedRole) return res.status(403).send('Forbidden');
+  if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
+  const auth = await checkCardAuthorization(card, req.user);
+  if (!auth.authorized) return res.status(403).send(auth.reason || 'Forbidden');
 
     const { token: csrfToken, generationError } = getCsrfToken(req, res);
     const slugVal = req.params ? req.params.slug : (req.user && req.user.slug) || '';
@@ -232,16 +264,8 @@ exports.update = async (req, res) => {
   const card = await VisitingCard.findById(id);
     if (!card) return res.status(404).send('Visiting card not found');
 
-    const isOwner = card.user && String(card.user) === String(req.user._id);
-    let profileForCard = null;
-    if (!isOwner && card.profileSlug) {
-      profileForCard = await Profile.findOne({ slug: card.profileSlug }).lean();
-      if (profileForCard && profileForCard.user && String(profileForCard.user) === String(req.user._id)) {
-      }
-    }
-    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
-    const allowedToEdit = isOwner || (profileForCard && profileForCard.user && String(profileForCard.user) === String(req.user._id)) || hasElevatedRole;
-    if (!allowedToEdit) return res.status(403).send('Unauthorized to update this card');
+  const auth = await checkCardAuthorization(card, req.user);
+  if (!auth.authorized) return res.status(403).send(auth.reason || 'Unauthorized to update this card');
 
   // Only allow card-specific fields to be updated; profile holds contact data
   const allowed = ['title', 'description', 'website'];
@@ -249,12 +273,13 @@ exports.update = async (req, res) => {
 
   if (updates.profileSlug !== undefined) {
       if (updates.profileSlug) {
+        if (!isValidSlug(updates.profileSlug)) return res.status(400).send('Invalid profile slug format');
         const newProfile = await Profile.findOne({ slug: updates.profileSlug }).lean();
         if (!newProfile) return res.status(400).send('Invalid profile slug');
         if (!(req.user.role === 'admin' || req.user.isAdmin) && newProfile.user && String(newProfile.user) !== String(req.user._id)) {
           return res.status(403).send('Forbidden: you do not own the profile you are assigning');
         }
-  card.profileSlug = updates.profileSlug;
+        card.profileSlug = updates.profileSlug;
       } else {
         card.profileSlug = undefined;
       }
@@ -289,16 +314,8 @@ exports.delete = async (req, res) => {
     if (!req.user || !req.user._id) return res.status(401).send('Authentication required');
 
     // Authorization: owner (card.user) or profile owner or admin
-    const isOwner = card.user && String(card.user) === String(req.user._id);
-    let profileOwnerMatch = false;
-    if (!isOwner && card.profileSlug) {
-      const profile = await Profile.findOne({ slug: card.profileSlug }).lean();
-      if (profile && profile.user && String(profile.user) === String(req.user._id)) profileOwnerMatch = true;
-    }
-    const hasElevatedRole = req.user.role === 'admin' || req.user.isAdmin;
-    if (!isOwner && !profileOwnerMatch && !hasElevatedRole) {
-      return res.status(403).send('Forbidden');
-    }
+  const auth = await checkCardAuthorization(card, req.user);
+  if (!auth.authorized) return res.status(403).send(auth.reason || 'Forbidden');
 
     // Authorized: perform delete
     await VisitingCard.findByIdAndDelete(id);

@@ -95,7 +95,7 @@
             </div>
             
             <div class="features-grid">
-                <article class="feature-card animate-on-scroll" tabindex="0">
+                <article class="feature-card animate-on-scroll">
                     <div class="feature-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 2L2 7v10c0 5.55 3.84 10 10 10s10-4.45 10-10V7L12 2z"/>
@@ -110,7 +110,7 @@
                     </p>
                 </article>
                 
-                <article class="feature-card animate-on-scroll" tabindex="0">
+                <article class="feature-card animate-on-scroll">
                     <div class="feature-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -125,7 +125,7 @@
                     </p>
                 </article>
                 
-                <article class="feature-card animate-on-scroll" tabindex="0">
+                <article class="feature-card animate-on-scroll">
                     <div class="feature-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -161,7 +161,7 @@
                     <% if (locals.products && locals.products.length > 0) { %>
                         <% locals.products.forEach((product, index) => { %>
                         <div class="swiper-slide product-slide">
-                            <article class="product-card" tabindex="0">
+                            <article class="product-card">
                                 <div class="product-image">
                                     <img 
                                         src="<%= product.image || '/assets/product' + (index + 1) + '.jpg' %>" 
@@ -209,7 +209,7 @@
                         <!-- Default products if none provided -->
                         <% for (let i = 1; i <= 3; i++) { %>
                         <div class="swiper-slide product-slide">
-                            <article class="product-card" tabindex="0">
+                            <article class="product-card">
                                 <div class="product-image">
                                     <img 
                                         src="/assets/product<%= i %>.jpg" 
@@ -264,7 +264,7 @@
             </div>
             
             <div class="steps-grid">
-                <article class="step-card animate-on-scroll" tabindex="0">
+                <article class="step-card animate-on-scroll">
                     <div class="step-number" aria-hidden="true">1</div>
                     <div class="step-image">
                         <img 
@@ -282,7 +282,7 @@
                     </p>
                 </article>
                 
-                <article class="step-card animate-on-scroll" tabindex="0">
+                <article class="step-card animate-on-scroll">
                     <div class="step-number" aria-hidden="true">2</div>
                     <div class="step-image">
                         <img 
@@ -300,7 +300,7 @@
                     </p>
                 </article>
                 
-                <article class="step-card animate-on-scroll" tabindex="0">
+                <article class="step-card animate-on-scroll">
                     <div class="step-number" aria-hidden="true">3</div>
                     <div class="step-image">
                         <img 
@@ -318,7 +318,7 @@
                     </p>
                 </article>
                 
-                <article class="step-card animate-on-scroll" tabindex="0">
+                <article class="step-card animate-on-scroll">
                     <div class="step-number" aria-hidden="true">4</div>
                     <div class="step-image">
                         <img 
@@ -360,7 +360,7 @@
                 <div class="testimonial-carousel-wrapper" role="region" aria-live="polite" aria-label="Customer testimonials">
                     <% if (locals.testimonials && locals.testimonials.length > 0) { %>
                         <% locals.testimonials.forEach((testimonial, index) => { %>
-                        <article class="testimonial-card" tabindex="0">
+                        <article class="testimonial-card">
                             <blockquote class="testimonial-quote">
                                 "<%= testimonial.text || 'Asparsh has revolutionized how we connect with our clients. The NFC technology is seamless and professional.' %>"
                             </blockquote>
@@ -383,7 +383,7 @@
                     <% } else { %>
                         <!-- Default testimonials -->
                         <% for (let i = 1; i <= 5; i++) { %>
-                        <article class="testimonial-card" tabindex="0">
+                        <article class="testimonial-card">
                             <blockquote class="testimonial-quote">
                                 "Asparsh has completely transformed how we network and connect with potential clients. The technology is intuitive and the results are immediate."
                             </blockquote>

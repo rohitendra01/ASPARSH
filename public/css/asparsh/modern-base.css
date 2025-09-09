@@ -308,6 +308,21 @@ img {
   opacity: 1;
   transform: translateY(0);
 }
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-in,
+  .animate-slide-left,
+  .animate-slide-right,
+  .animate-on-scroll,
+  .animate-on-scroll.in-view {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
 
 .skip-link {
   position: absolute;

@@ -1,55 +1,65 @@
-/**
- * Modern JavaScript for Asparsh Website
- * Handles modern interactions, animations, and accessibility
- */
-
-console.log('🚀 Asparsh Modern JS Loaded');
-
-// Performance monitoring
 const perfMark = (name) => {
   if ('performance' in window) {
     performance.mark(name);
   }
 };
 
-perfMark('js-start');
 
-/**
- * Initialize application when DOM is ready
- */
 document.addEventListener('DOMContentLoaded', () => {
   perfMark('dom-ready');
-  console.log('🎯 DOM ready, starting initialization...');
-  
-  // Small delay to ensure Swiper library is loaded
-  setTimeout(() => {
+
+  const waitForSwiper = (timeout = 5000) => {
+    return new Promise((resolve, reject) => {
+      if (window.Swiper) return resolve();
+
+      const scripts = Array.from(document.getElementsByTagName('script'));
+      const swiperScript = scripts.find(s => s.src && /swiper/i.test(s.src));
+      if (swiperScript) {
+        const onLoad = () => {
+          swiperScript.removeEventListener('load', onLoad);
+          swiperScript.removeEventListener('error', onErr);
+          requestAnimationFrame(() => resolve());
+        };
+        const onErr = () => {
+          swiperScript.removeEventListener('load', onLoad);
+          swiperScript.removeEventListener('error', onErr);
+        };
+        swiperScript.addEventListener('load', onLoad);
+        swiperScript.addEventListener('error', onErr);
+      }
+
+      const start = (performance && performance.now) ? performance.now() : Date.now();
+      const check = () => {
+        if (window.Swiper) return resolve();
+        const now = (performance && performance.now) ? performance.now() : Date.now();
+        if (now - start >= timeout) return reject(new Error('Timed out waiting for Swiper'));
+        requestAnimationFrame(check);
+      };
+      check();
+    });
+  };
+
+  waitForSwiper(5000).then(() => {
     initializeApp();
-  }, 100);
+  }).catch((err) => {
+    // If Swiper never appears, initialize anyway to avoid blocking the app
+    console.warn('Swiper not available after timeout, continuing initialization', err && err.message);
+    initializeApp();
+  });
 });
 
-/**
- * Also initialize when window loads (fallback)
- */
 window.addEventListener('load', () => {
-  console.log('🌟 Window loaded, checking if app initialized...');
   if (!window.asparshInitialized) {
-    console.log('🔄 App not initialized yet, initializing now...');
     initializeApp();
   }
 });
 
-/**
- * Main application initialization
- */
 function initializeApp() {
   if (window.asparshInitialized) {
-    console.log('⚠️ App already initialized, skipping...');
     return;
   }
   
-  console.log('🚀 Initializing Asparsh app...');
   
-  // Initialize all components
   initializeSwiper();
   initializeAnimations();
   initializeTabSystem();
@@ -60,31 +70,16 @@ function initializeApp() {
   window.asparshInitialized = true;
   perfMark('app-initialized');
   
-  console.log('✅ Asparsh app fully initialized!');
-  
-  // Log performance metrics
-  if ('performance' in window) {
-    window.addEventListener('load', () => {
-      const navigation = performance.getEntriesByType('navigation')[0];
-      console.log(`🔥 Page loaded in ${Math.round(navigation.loadEventEnd - navigation.fetchStart)}ms`);
-    });
-  }
+
 }
 
-/**
- * Modern Swiper initialization with better performance
- */
 function initializeSwiper() {
   const swiperContainer = document.querySelector('.products-swiper');
   if (!swiperContainer) {
-    console.log('❌ Swiper container not found');
     return;
   }
 
-  console.log('✅ Swiper container found, initializing...');
 
-  // Use dynamic import for better performance
-  if (window.Swiper) {
     const swiper = new Swiper('.products-swiper', {
       slidesPerView: 1,
       spaceBetween: 30,
@@ -92,20 +87,17 @@ function initializeSwiper() {
       centeredSlides: true,
       grabCursor: true,
       
-      // Enhanced autoplay
       autoplay: {
         delay: 5000,
         disableOnInteraction: false,
         pauseOnMouseEnter: true
       },
       
-      // Better performance
       lazy: {
         loadPrevNext: true,
         loadPrevNextAmount: 2
       },
       
-      // Accessibility
       a11y: {
         enabled: true,
         prevSlideMessage: 'Previous slide',
@@ -114,7 +106,6 @@ function initializeSwiper() {
         lastSlideMessage: 'This is the last slide'
       },
       
-      // Breakpoints for responsive design
       breakpoints: {
         640: {
           slidesPerView: 1.2,
@@ -134,20 +125,17 @@ function initializeSwiper() {
         }
       },
       
-      // Navigation
       navigation: {
         nextEl: '.swiper-button-next',
         prevEl: '.swiper-button-prev',
       },
       
-      // Pagination
       pagination: {
         el: '.swiper-pagination',
         clickable: true,
         dynamicBullets: true
       },
       
-      // Effects
       effect: 'coverflow',
       coverflowEffect: {
         rotate: 20,
@@ -158,17 +146,9 @@ function initializeSwiper() {
       }
     });
     
-    console.log('✅ Swiper initialized successfully');
-  } else {
-    console.log('❌ Swiper library not loaded');
-  }
 }
 
-/**
- * Modern scroll-based animations using Intersection Observer
- */
 function initializeAnimations() {
-  // Enhanced intersection observer with better performance
   const observerOptions = {
     threshold: [0, 0.1, 0.5, 1],
     rootMargin: '0px 0px -10% 0px'
@@ -179,26 +159,22 @@ function initializeAnimations() {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.1) {
         entry.target.classList.add('in-view');
         
-        // Stagger child animations
         const children = entry.target.querySelectorAll('.animate-on-scroll');
         children.forEach((child, index) => {
           setTimeout(() => {
             child.classList.add('in-view');
-          }, index * 150); // Slightly longer stagger for better effect
+          }, index * 150);
         });
         
-        // Unobserve after animation to improve performance
         animationObserver.unobserve(entry.target);
       }
     });
   }, observerOptions);
 
-  // Observe all animation targets
   document.querySelectorAll('.animate-on-scroll, .feature-card, .step-card, .testimonial-card, .footer-animate').forEach(el => {
     animationObserver.observe(el);
   });
 
-  // Parallax effect for hero section (optional, performance-conscious)
   const heroSection = document.querySelector('.hero-section');
   if (heroSection && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let ticking = false;
@@ -226,9 +202,6 @@ function initializeAnimations() {
   }
 }
 
-/**
- * Enhanced tab system with better accessibility
- */
 function initializeTabSystem() {
   const tabHeaders = document.querySelectorAll('.tab-header');
   const tabPanes = document.querySelectorAll('.tab-pane');
@@ -237,7 +210,6 @@ function initializeTabSystem() {
 
   if (!tabHeaders.length || !tabContainer) return;
 
-  // Enhanced underline positioning
   function updateUnderline(activeHeader) {
     if (!activeHeader || !tabUnderline) return;
 
@@ -249,22 +221,18 @@ function initializeTabSystem() {
     tabUnderline.style.left = `${leftOffset}px`;
   }
 
-  // Initialize active tab
   const initialActiveHeader = document.querySelector('.tab-header.active');
   if (initialActiveHeader) {
     updateUnderline(initialActiveHeader);
   }
 
-  // Enhanced tab switching with keyboard support
   tabHeaders.forEach((header, index) => {
-    // Add ARIA attributes
     header.setAttribute('role', 'tab');
     header.setAttribute('tabindex', header.classList.contains('active') ? '0' : '-1');
     header.setAttribute('aria-selected', header.classList.contains('active') ? 'true' : 'false');
 
     header.addEventListener('click', () => switchTab(header, index));
     
-    // Keyboard navigation
     header.addEventListener('keydown', (e) => {
       let newIndex = index;
       
@@ -292,7 +260,6 @@ function initializeTabSystem() {
   });
 
   function switchTab(targetHeader, targetIndex) {
-    // Update headers
     tabHeaders.forEach((header, i) => {
       const isActive = i === targetIndex;
       header.classList.toggle('active', isActive);
@@ -300,7 +267,6 @@ function initializeTabSystem() {
       header.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
-    // Update panes
     const targetPaneId = targetHeader.dataset.tab;
     tabPanes.forEach(pane => {
       const isActive = pane.id === targetPaneId;
@@ -311,7 +277,6 @@ function initializeTabSystem() {
     updateUnderline(targetHeader);
   }
 
-  // Responsive underline update
   let resizeTimeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
@@ -322,9 +287,6 @@ function initializeTabSystem() {
   });
 }
 
-/**
- * Enhanced testimonial carousel with better touch support
- */
 function initializeTestimonialCarousel() {
   const wrapper = document.querySelector('.testimonial-carousel-wrapper');
   if (!wrapper) return;
@@ -334,7 +296,6 @@ function initializeTestimonialCarousel() {
   const nextBtn = document.querySelector('.testimonial-carousel-nav.next');
   const dotsContainer = document.querySelector('.testimonial-carousel-dots');
 
-  // If 3 or fewer cards, show them all statically
   if (cards.length <= 3) {
     wrapper.style.display = 'flex';
     wrapper.style.flexDirection = 'row';
@@ -353,12 +314,10 @@ function initializeTestimonialCarousel() {
     return;
   }
 
-  // Full carousel implementation for more than 3 cards
   let currentIndex = 0;
   let isTransitioning = false;
   let autoplayInterval;
 
-  // Clone cards for infinite loop
   const firstClone = cards[0].cloneNode(true);
   const lastClone = cards[cards.length - 1].cloneNode(true);
   
@@ -366,13 +325,11 @@ function initializeTestimonialCarousel() {
   wrapper.insertBefore(lastClone, cards[0]);
 
   const allSlides = Array.from(wrapper.children);
-  const slideWidth = 100 / allSlides.length;
-
-  // Set initial position
-  wrapper.style.transform = `translateX(-${slideWidth}%)`;
+  
+  // Each slide should be 100% width, translate by 100% increments
+  wrapper.style.transform = `translateX(-100%)`;
   wrapper.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-  // Create dots
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
     cards.forEach((_, index) => {
@@ -385,15 +342,14 @@ function initializeTestimonialCarousel() {
   }
 
   function updateCarousel() {
-    const translateX = -((currentIndex + 1) * slideWidth);
+    // Translate by 100% for each slide position
+    const translateX = -((currentIndex + 1) * 100);
     wrapper.style.transform = `translateX(${translateX}%)`;
 
-    // Update active states
     allSlides.forEach((slide, index) => {
       slide.classList.toggle('active', index === currentIndex + 1);
     });
 
-    // Update dots
     if (dotsContainer) {
       const dots = dotsContainer.querySelectorAll('.carousel-dot');
       dots.forEach((dot, index) => {
@@ -415,12 +371,11 @@ function initializeTestimonialCarousel() {
     currentIndex++;
     updateCarousel();
 
-    // Handle infinite loop
     if (currentIndex >= cards.length) {
       setTimeout(() => {
         wrapper.style.transition = 'none';
         currentIndex = 0;
-        wrapper.style.transform = `translateX(-${slideWidth}%)`;
+        wrapper.style.transform = `translateX(-100%)`;
         setTimeout(() => {
           wrapper.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
           isTransitioning = false;
@@ -438,12 +393,11 @@ function initializeTestimonialCarousel() {
     currentIndex--;
     updateCarousel();
 
-    // Handle infinite loop
     if (currentIndex < 0) {
       setTimeout(() => {
         wrapper.style.transition = 'none';
         currentIndex = cards.length - 1;
-        wrapper.style.transform = `translateX(-${(currentIndex + 1) * slideWidth}%)`;
+        wrapper.style.transform = `translateX(-${(currentIndex + 1) * 100}%)`;
         setTimeout(() => {
           wrapper.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
           isTransitioning = false;
@@ -454,7 +408,6 @@ function initializeTestimonialCarousel() {
     }
   }
 
-  // Event listeners
   if (nextBtn) {
     nextBtn.addEventListener('click', nextSlide);
     nextBtn.setAttribute('aria-label', 'Next testimonial');
@@ -465,7 +418,6 @@ function initializeTestimonialCarousel() {
     prevBtn.setAttribute('aria-label', 'Previous testimonial');
   }
 
-  // Touch/swipe support
   let startX = 0;
   let startY = 0;
   let isDragging = false;
@@ -478,7 +430,21 @@ function initializeTestimonialCarousel() {
 
   wrapper.addEventListener('touchmove', (e) => {
     if (!isDragging) return;
-    e.preventDefault();
+    const touch = e.touches && e.touches[0];
+    if (!touch) return;
+    const curX = touch.clientX;
+    const curY = touch.clientY;
+    const deltaX = curX - startX;
+    const deltaY = curY - startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const threshold = 10;
+
+    if (absX > absY && absX > threshold) {
+      e.preventDefault();
+    } else {
+      return;
+    }
   }, { passive: false });
 
   wrapper.addEventListener('touchend', (e) => {
@@ -490,7 +456,6 @@ function initializeTestimonialCarousel() {
     const deltaX = startX - endX;
     const deltaY = Math.abs(startY - endY);
 
-    // Only process horizontal swipes
     if (Math.abs(deltaX) > 50 && deltaY < 100) {
       if (deltaX > 0) {
         nextSlide();
@@ -500,7 +465,6 @@ function initializeTestimonialCarousel() {
     }
   }, { passive: true });
 
-  // Autoplay with pause on hover
   function startAutoplay() {
     autoplayInterval = setInterval(nextSlide, 5000);
   }
@@ -512,7 +476,6 @@ function initializeTestimonialCarousel() {
     }
   }
 
-  // Only autoplay if user prefers motion
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     startAutoplay();
     
@@ -522,7 +485,6 @@ function initializeTestimonialCarousel() {
     wrapper.addEventListener('focusout', startAutoplay);
   }
 
-  // Keyboard navigation
   wrapper.addEventListener('keydown', (e) => {
     switch (e.key) {
       case 'ArrowLeft':
@@ -536,41 +498,98 @@ function initializeTestimonialCarousel() {
     }
   });
 
-  // Initial update
   updateCarousel();
 }
 
-/**
- * Form enhancements for better UX
- */
 function initializeFormEnhancements() {
-  // Enhanced contact forms
   const forms = document.querySelectorAll('form');
   
   forms.forEach(form => {
-    // Add loading states
     form.addEventListener('submit', function(e) {
       const submitBtn = form.querySelector('button[type="submit"]');
-      if (submitBtn && !form.dataset.enhanced) {
-        form.dataset.enhanced = 'true';
-        
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        // Re-enable after 3 seconds if no redirect
-        setTimeout(() => {
-          submitBtn.textContent = originalText;
-          submitBtn.disabled = false;
-          form.dataset.enhanced = 'false';
-        }, 3000);
+      if (!submitBtn) return;
+
+      if (form.dataset.submitting === 'true') {
+        return;
       }
+
+      form.dataset.submitting = 'true';
+      form._originalSubmitText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      if (form._submitTimeout) {
+        clearTimeout(form._submitTimeout);
+        form._submitTimeout = null;
+      }
+
+      form._navigationInProgress = false;
+      const onPageHide = () => { form._navigationInProgress = true; };
+      const onBeforeUnload = () => { form._navigationInProgress = true; };
+      window.addEventListener('pagehide', onPageHide, { once: true });
+      window.addEventListener('beforeunload', onBeforeUnload, { once: true });
+
+      if (!window.__asparshNetworkPatched) {
+        window.__asparshNetworkPatched = true;
+
+        if (window.fetch) {
+          const _origFetch = window.fetch.bind(window);
+          window.fetch = function(...args) {
+            const p = _origFetch(...args);
+            try {
+              const f = window.__activeFormForSubmit;
+              if (f) {
+                f._pendingRequests = (f._pendingRequests || 0) + 1;
+                p.finally(() => {
+                  f._pendingRequests = Math.max(0, (f._pendingRequests || 1) - 1);
+                  maybeFinalizeFormSubmission(f);
+                });
+              }
+            } catch (e) {
+            }
+            return p;
+          };
+        }
+
+        if (window.XMLHttpRequest) {
+          const _origSend = XMLHttpRequest.prototype.send;
+          XMLHttpRequest.prototype.send = function(...args) {
+            try {
+              const f = window.__activeFormForSubmit;
+              if (f) {
+                f._pendingRequests = (f._pendingRequests || 0) + 1;
+                const onDone = () => {
+                  try {
+                    f._pendingRequests = Math.max(0, (f._pendingRequests || 1) - 1);
+                    maybeFinalizeFormSubmission(f);
+                  } catch (e) {}
+                  this.removeEventListener('load', onDone);
+                  this.removeEventListener('error', onDone);
+                  this.removeEventListener('abort', onDone);
+                };
+                this.addEventListener('load', onDone);
+                this.addEventListener('error', onDone);
+                this.addEventListener('abort', onDone);
+              }
+            } catch (e) {}
+            return _origSend.apply(this, args);
+          };
+        }
+      }
+
+      window.__activeFormForSubmit = form;
+      form._pendingRequests = 0;
+
+      form._submitTimeout = setTimeout(() => {
+        if (form.dataset.submitting === 'true' && (!form._pendingRequests || form._pendingRequests === 0) && !form._navigationInProgress) {
+          finalizeFormSubmission(form);
+        }
+        if (window.__activeFormForSubmit === form) window.__activeFormForSubmit = null;
+      }, 30000);
     });
 
-    // Enhanced input interactions
     const inputs = form.querySelectorAll('input, textarea');
     inputs.forEach(input => {
-      // Add floating label effect
       const wrapper = input.closest('.wave-group') || input.parentElement;
       
       input.addEventListener('focus', () => {
@@ -583,7 +602,6 @@ function initializeFormEnhancements() {
         }
       });
       
-      // Check initial state
       if (input.value) {
         wrapper.classList.add('focused');
       }
@@ -591,11 +609,7 @@ function initializeFormEnhancements() {
   });
 }
 
-/**
- * Performance optimizations
- */
 function initializePerformanceOptimizations() {
-  // Lazy load images that are not critical
   const lazyImages = document.querySelectorAll('img[loading="lazy"]');
   
   if ('IntersectionObserver' in window) {
@@ -614,7 +628,6 @@ function initializePerformanceOptimizations() {
 
     lazyImages.forEach(img => imageObserver.observe(img));
   } else {
-    // Fallback for older browsers
     lazyImages.forEach(img => {
       if (img.dataset.src) {
         img.src = img.dataset.src;
@@ -623,7 +636,6 @@ function initializePerformanceOptimizations() {
     });
   }
 
-  // Prefetch important pages on hover
   const importantLinks = document.querySelectorAll('a[href^="/dashboard"], a[href^="/contact"], a[href^="/pricing"]');
   
   importantLinks.forEach(link => {
@@ -635,8 +647,22 @@ function initializePerformanceOptimizations() {
     }, { once: true });
   });
 
-  // Service Worker registration (if available)
-  if ('serviceWorker' in navigator && 'production' === 'production') {
+  const isProduction = (() => {
+    try {
+      if (typeof process !== 'undefined' && process && process.env && process.env.NODE_ENV === 'production') return true;
+      if (typeof window !== 'undefined' && window.__ENV__ && window.__ENV__.NODE_ENV === 'production') return true;
+    } catch (e) {
+    }
+    try {
+      if (typeof location !== 'undefined' && location.hostname) {
+        const h = location.hostname;
+        if (!/^(localhost|127(?:\.0\.0\.1)?|::1)$/.test(h)) return true;
+      }
+    } catch (e) {}
+    return false;
+  })();
+
+  if ('serviceWorker' in navigator && isProduction) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
         .then(registration => {
@@ -649,20 +675,40 @@ function initializePerformanceOptimizations() {
   }
 }
 
-// Error handling
-window.addEventListener('error', (e) => {
-  console.error('JavaScript error:', e.error);
-  
-  // Send error to monitoring service in production
-  if ('production' === 'production') {
-    // Analytics or error reporting service integration
-  }
-});
+// Helpers to finalize form submission UI
+function maybeFinalizeFormSubmission(form) {
+  try {
+    if (!form) return;
+    // If navigation is in progress, do nothing
+    if (form._navigationInProgress) return;
+    // If still submitting but there are no pending requests, finalize
+    if (form.dataset.submitting === 'true' && (!form._pendingRequests || form._pendingRequests === 0)) {
+      finalizeFormSubmission(form);
+    }
+  } catch (e) { console.warn('maybeFinalizeFormSubmission error', e && e.message); }
+}
 
-// Performance mark
+function finalizeFormSubmission(form) {
+  try {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (form._submitTimeout) {
+      clearTimeout(form._submitTimeout);
+      form._submitTimeout = null;
+    }
+    // If navigation is happening, avoid re-enabling
+    if (form._navigationInProgress) return;
+    if (submitBtn) {
+      submitBtn.textContent = form._originalSubmitText || submitBtn.textContent;
+      submitBtn.disabled = false;
+    }
+    form.dataset.submitting = 'false';
+    // Clear active form pointer when done
+    if (window.__activeFormForSubmit === form) window.__activeFormForSubmit = null;
+  } catch (e) { console.warn('finalizeFormSubmission error', e && e.message); }
+}
+
 perfMark('js-end');
 
-// Export for potential module usage
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     initializeSwiper,

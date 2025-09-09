@@ -19,9 +19,13 @@
 /* SNAP SCROLL FUNCTIONALITY*/
 
 html {
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-  height: 100%;
+  scroll-snap-type: y proximity;
+  scroll-padding-top: calc(var(--header-height, 60px) + env(safe-area-inset-top));
+  height: 100dvh;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 body {
@@ -34,7 +38,7 @@ body {
 .snap-section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  min-height: 100vh;
+  min-height: min(100dvh, 100vh);
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -815,6 +819,7 @@ body {
   position: relative;
   max-width: 800px;
   margin: var(--space-xl) auto 0;
+  overflow: visible;
 }
 
 .testimonial-carousel-nav {
@@ -853,6 +858,12 @@ body {
   overflow: hidden;
   border-radius: var(--radius-lg);
   position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  will-change: transform;
+  width: 100%;
+  height: auto;
 }
 
 .testimonial-card {
@@ -865,8 +876,12 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 0 0 100%;
+  min-width: 100%;
+  max-width: 100%;
   transform: translateX(0);
   transition: all var(--transition-normal);
+  box-sizing: border-box;
 }
 
 .testimonial-card:focus {
@@ -938,6 +953,23 @@ body {
   margin-top: var(--space-lg);
 }
 
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: none;
+}
+
+.carousel-dot.active,
+.carousel-dot:hover {
+  background: var(--primary-color);
+  transform: scale(1.2);
+}
+
+/* Legacy support for old class name */
 .testimonial-dot {
   width: 12px;
   height: 12px;
@@ -1338,7 +1370,7 @@ body {
   padding: var(--space-lg);
   color: var(--text-inverse);
   font-weight: var(--font-weight-medium);
-  animation: float 6s ease-in-out infinite;
+  animation: float-hero 6s ease-in-out infinite;
 }
 
 .hero-floating.float-1 {
@@ -1359,7 +1391,7 @@ body {
   animation-delay: 4s;
 }
 
-@keyframes float {
+@keyframes float-hero {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   33% { transform: translateY(-10px) rotate(1deg); }
   66% { transform: translateY(5px) rotate(-1deg); }
@@ -1999,9 +2031,13 @@ body {
   }
   
   /* Cards */
-  .feature-card,
-  .testimonial-card {
+  .feature-card {
     padding: var(--space-xl);
+  }
+  
+  .testimonial-card {
+    padding: var(--space-lg);
+    min-height: 250px;
   }
   
   /* CTA Section */
@@ -2017,9 +2053,18 @@ body {
     text-align: center;
   }
   
-  /* Testimonials */
+  /* Testimonials - Keep navigation visible on mobile for better UX */
   .testimonial-carousel-nav {
-    display: none;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .testimonial-carousel-nav.prev {
+    left: -20px;
+  }
+  
+  .testimonial-carousel-nav.next {
+    right: -20px;
   }
 }
 
