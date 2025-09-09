@@ -16,12 +16,6 @@ const bodyParser = require("body-parser");
 const ejsMate = require('ejs-mate');
 const path = require("path");
 const session = require('express-session');
-let MongoStore;
-try {
-    MongoStore = require('connect-mongo');
-} catch (e) {
-    MongoStore = null;
-}
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -40,17 +34,23 @@ app.use(bodyParser.json());
 require('dotenv').config();
 app.use(cookieParser());
 const sessionOptions = {
-    secret: process.env.SESSION_SECRET || 'yourSecretKey',
+    secret: 'yourSecretKey',
     resave: false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 60 * 10),
         sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 10
     }
 };
+
+let MongoStore;
+try {
+    MongoStore = require('connect-mongo');
+} catch (e) {
+    MongoStore = null;
+}
 
 if (MongoStore && process.env.NODE_ENV !== 'test') {
     try {
