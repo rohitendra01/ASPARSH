@@ -2,7 +2,8 @@ console.log('Index JS Loaded'  );
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  new Swiper('.swiper', {
+  // Only initialize Swiper for global/basic carousels (avoid initializing product slider here)
+  new Swiper('.global-swiper', {
     slidesPerView: 1,
     spaceBetween: 20,
     freeMode: true,
