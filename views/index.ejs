@@ -156,114 +156,60 @@
                 </p>
             </div>
             
-            <div class="products-slider-container" role="region" aria-label="Product showcase">
-                <div class="products-swiper swiper animate-on-scroll" 
-                     tabindex="0" 
-                     role="group" 
-                     aria-label="Product slider - use arrow keys to navigate">
-                                        <div class="swiper-wrapper">
-                                                <% if (typeof products !== 'undefined' && products && products.length > 0) { %>
-                                                        <% products.forEach((product, index) => { %>
-                                                        <div class="swiper-slide product-slide" role="group" aria-label="Product <%= index + 1 %> of <%= products.length %>">
-                                <article class="product-card">
-                                    <div class="product-image-container">
-                                        <div class="product-image">
-                                            <img 
-                                                                                                src="<%= product.image || ('/assets/product' + (index + 1) + '.jpg') %>" 
-                                                                                                alt="<%= product.title || ('Product ' + (index + 1)) %> - Professional NFC product"
-                                                loading="lazy"
-                                                width="400"
-                                                height="250"
-                                                decoding="async"
-                                            >
-                                                                                        <% if (product.badge) { %>
-                                                                                                <div class="product-badge" aria-label="Product badge"><%= product.badge %></div>
-                                                                                        <% } %>
-                                        </div>
+            <div class="products-swiper swiper animate-on-scroll" 
+                 tabindex="0" 
+                 role="group" 
+                 aria-label="Product slider - use arrow keys to navigate">
+                <div class="swiper-wrapper">
+                <% if (typeof products !== 'undefined' && products && products.length > 0) { %>
+                <% products.forEach((product, index) => { %>
+                            <div class="swiper-slide">
+                                <div class="index-product-card">
+                                    <div class="index-product-image">
+                                        <img src="<%= product.image %>" alt="<%= product.title %>">
                                     </div>
-                                    <div class="product-content">
-                                        <div class="product-header">
-                                                                                        <div style="flex:1">
-                                                                                            <h3 class="product-title"><%= product.title || 'NFC Smart Card' %></h3>
-                                                                                            <% if (product.subtitle) { %>
-                                                                                                <div class="product-subtitle" style="font-size:var(--font-size-sm); color:var(--text-muted); margin-top:4px;"><%= product.subtitle %></div>
-                                                                                            <% } %>
-                                                                                        </div>
-                                            <div class="product-price-container">
-                                                                                                <span class="product-price" aria-label="Price">₹<%= product.price != null ? product.price : '299' %></span>
+                                    <div class="index-product-content">
+                                        <div class="index-product-head">
+                                            <% if (product.badge) { %>
+                                                <div class="flash-message-<%= product.badge.toLowerCase().replace(' ', '-') %>"><%= product.badge %></div>
+                                            <% } %>
+                                            <h2><%= product.title %></h2>
+                                            <h3><%= product.subtitle %></h3>
+                                        </div>
+                                        <div class="index-product-price">
+                                            <h3>Price</h3>
+                                            <span class="index-product-current-price">₹ <%= product.price %></span>
+                                        </div>
+                                        <div class="index-product-description-container">
+                                            <div class="tab-headers">
+                                                <div class="tab-header active" data-tab="description-<%= product.id %>">DESCRIPTION</div>
+                                                <div class="tab-header" data-tab="features-<%= product.id %>">DETAILS</div>
+                                                <div class="tab-underline"></div>
+                                            </div>
+                                            <div class="tab-content-wrapper">
+                                                <div id="description-<%= product.id %>" class="tab-pane active index-product-description-details">
+                                                    <p><%= product.description %></p>
+                                                </div>
+                                                <div id="features-<%= product.id %>" class="tab-pane index-product-description-features">
+                                                    <ul>
+                                                        <% product.features.forEach(feature => { %>
+                                                            <li><%= feature %></li>
+                                                        <% }) %>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                        <p class="product-description">
-                                            <%= product.description || 'Experience the future of networking with our innovative NFC-enabled cards that instantly share your professional information.' %>
-                                        </p>
-                                        <% if (product.features && product.features.length > 0) { %>
-                                            <ul class="product-features" aria-label="Product features">
-                                                                                                <% product.features.slice(0, 4).forEach(feature => { %>
-                                                    <li>
-                                                        <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                            <path d="M9 12l2 2 4-4"/>
-                                                        </svg>
-                                                        <%= feature %>
-                                                    </li>
-                                                <% }) %>
-                                            </ul>
-                                                                                <% } else { %>
-                                            <ul class="product-features" aria-label="Product features">
-                                                <li>
-                                                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                        <path d="M9 12l2 2 4-4"/>
-                                                    </svg>
-                                                    Instant contact sharing
-                                                </li>
-                                                <li>
-                                                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                        <path d="M9 12l2 2 4-4"/>
-                                                    </svg>
-                                                    Custom branding options
-                                                </li>
-                                                <li>
-                                                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                        <path d="M9 12l2 2 4-4"/>
-                                                    </svg>
-                                                    Premium materials
-                                                </li>
-                                                <li>
-                                                    <svg class="feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                        <path d="M9 12l2 2 4-4"/>
-                                                    </svg>
-                                                    Universal compatibility
-                                                </li>
-                                            </ul>
-                                        <% } %>
-                                        <div class="product-actions">
-                                            <a href="/products/<%= product.id || (product.slug || 'nfc-card') %>" 
-                                               class="product-cta primary"
-                                               aria-label="Buy or learn more about <%= product.title || 'NFC Smart Card' %>">
-                                                Get Started
-                                                <svg class="cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                                                </svg>
-                                            </a>
-                                            <a href="/products/<%= product.id || (product.slug || 'nfc-card') %>#details" 
-                                               class="product-cta secondary">
-                                                View Details
-                                            </a>
+                                        <div class="index-product-button">
+                                            <button class="buy-now-btn" data-product-id="<%= product.id %>">Buy Now</button>
+                                            <button class="explore-more-btn" data-product-id="<%= product.id %>">Explore More</button>
                                         </div>
                                     </div>
-                                </article>
+                                </div>
                             </div>
                             <% }) %>
-                        <% } else { %>
-                            <!-- No products available -->
-                            <div class="swiper-slide product-slide">
-                              <article class="product-card">
-                                <div class="product-image-container"><div class="product-image"><img src="/assets/product1.jpg" alt="Default product" loading="lazy" width="400" height="250"></div></div>
-                                <div class="product-content"><h3 class="product-title">No products available</h3><p class="product-description">Please check back later.</p></div>
-                              </article>
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
+                            <% } %>
+                        
+				</div>
             </div>
         </div>
     </section>
@@ -374,8 +320,8 @@
                 </button>
                 
                 <div class="testimonial-carousel-wrapper" role="region" aria-live="polite" aria-label="Customer testimonials">
-                    <% if (locals.testimonials && locals.testimonials.length > 0) { %>
-                        <% locals.testimonials.forEach((testimonial, index) => { %>
+                    <% if (typeof testimonials !== 'undefined' && testimonials && testimonials.length > 0) { %>
+                        <% testimonials.forEach((testimonial, index) => { %>
                         <article class="testimonial-card">
                             <blockquote class="testimonial-quote">
                                 "<%= testimonial.text || 'Asparsh has revolutionized how we connect with our clients. The NFC technology is seamless and professional.' %>"
