@@ -120,7 +120,28 @@ router.get("/pricing", (req, res) => {
 router.get("/about", (req, res) => {
     res.render("about", { layout: "layouts/boilerplate" });
 });
+
+
+
+// Legal & accessibility pages
+router.get('/privacy-policy', (req, res) => {
+    res.render('privacy', { layout: 'layouts/boilerplate', pageTitle: 'Privacy Policy' });
+});
+
+router.get('/terms-of-service', (req, res) => {
+    res.render('terms', { layout: 'layouts/boilerplate', pageTitle: 'Terms of Service' });
+});
+
+router.get('/cookies-policy', (req, res) => {
+    res.render('cookies', { layout: 'layouts/boilerplate', pageTitle: 'Cookies Policy' });
+});
+
+router.get('/accessibility', (req, res) => {
+    res.render('accessibility', { layout: 'layouts/boilerplate', pageTitle: 'Accessibility' });
+});
     
+
+
 // Dashboard page (protected, dashboard-boilerplate)
 router.get('/dashboard', isLoggedIn, (req, res) => {
   res.render('dashboard', { layout: 'layouts/dashboard-boilerplate' });

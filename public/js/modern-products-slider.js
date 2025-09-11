@@ -1,10 +1,4 @@
-/**
- * Modern Products Slider - Enhanced Product Carousel with Tab Functionality
- * Handles product carousel, tab switching, and interactive animations
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Swiper for product carousel
     const productSwiper = new Swiper('.products-swiper', {
         slidesPerView: 'auto',
         spaceBetween: 30,
@@ -49,105 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         on: {
             init: function () {
-                // Add fade-in animation to slides
                 this.slides.forEach((slide, index) => {
                     slide.style.animationDelay = `${index * 0.1}s`;
                 });
             }
         }
     });
-
-    // Enhanced Tab Functionality for Product Cards
-    function initializeProductTabs() {
-        // Get all product cards
-        const productCards = document.querySelectorAll('.index-product-card');
-        
-        productCards.forEach((card, cardIndex) => {
-            const tabHeaders = card.querySelectorAll('.tab-header');
-            const tabHeaderContainer = card.querySelector('.tab-headers');
-            const tabUnderline = card.querySelector('.tab-underline');
-            
-            function updateUnderline(activeHeader) {
-                if (!activeHeader || !tabHeaderContainer || !tabUnderline) return;
-                
-                const headerRect = activeHeader.getBoundingClientRect();
-                const containerRect = tabHeaderContainer.getBoundingClientRect();
-                const leftOffset = headerRect.left - containerRect.left;
-                
-                tabUnderline.style.width = `${headerRect.width}px`;
-                tabUnderline.style.left = `${leftOffset}px`;
-                tabUnderline.style.opacity = '1';
-            }
-
-            // Initialize underline position for the first active tab
-            const initialActiveHeader = card.querySelector('.tab-header.active');
-            if (initialActiveHeader) {
-                setTimeout(() => updateUnderline(initialActiveHeader), 100);
-            }
-
-            // Add click handlers for tab switching
-            tabHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    // Remove active class from all tabs in this card
-                    const currentActiveHeader = card.querySelector('.tab-header.active');
-                    if (currentActiveHeader) {
-                        currentActiveHeader.classList.remove('active');
-                    }
-
-                    const currentActivePane = card.querySelector('.tab-pane.active');
-                    if (currentActivePane) {
-                        currentActivePane.style.opacity = '0';
-                        currentActivePane.style.transform = 'translateY(-10px)';
-                        
-                        setTimeout(() => {
-                            currentActivePane.classList.remove('active');
-                        }, 150);
-                    }
-
-                    // Add active class to clicked tab
-                    header.classList.add('active');
-
-                    const targetPaneId = header.dataset.tab;
-                    const targetPane = card.querySelector(`#${targetPaneId}`);
-                    if (targetPane) {
-                        setTimeout(() => {
-                            targetPane.classList.add('active');
-                            targetPane.style.opacity = '0';
-                            targetPane.style.transform = 'translateY(10px)';
-                            
-                            requestAnimationFrame(() => {
-                                targetPane.style.opacity = '1';
-                                targetPane.style.transform = 'translateY(0)';
-                            });
-                        }, 150);
-                    }
-
-                    updateUnderline(header);
-                });
-
-                header.addEventListener('mouseenter', () => {
-                    if (!header.classList.contains('active')) {
-                        header.style.transform = 'translateY(-2px)';
-                    }
-                });
-
-                header.addEventListener('mouseleave', () => {
-                    if (!header.classList.contains('active')) {
-                        header.style.transform = 'translateY(0)';
-                    }
-                });
-            });
-
-            window.addEventListener('resize', () => {
-                const activeHeader = card.querySelector('.tab-header.active');
-                if (activeHeader) {
-                    updateUnderline(activeHeader);
-                }
-            });
-        });
-    }
-
-    setTimeout(initializeProductTabs, 200);
 
     function initializeButtonInteractions() {
         const buyNowButtons = document.querySelectorAll('.buy-now-btn');
@@ -163,8 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.style.transform = 'scale(1)';
                 }, 150);
 
-                console.log(`Buy Now clicked for product ${productId}`);
-                
                 showNotification('Added to cart!', 'success');
             });
         });
@@ -180,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 150);
 
                 console.log(`Explore More clicked for product ${productId}`);
-                
             });
         });
     }
@@ -273,6 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.setAttribute('tabindex', '0');
         tab.setAttribute('role', 'tab');
     });
+
+    initTestimonialCarousel();
 });
 
 const animationStyles = `
@@ -295,3 +195,183 @@ const animationStyles = `
         animation: fadeInUp 0.3s ease-out;
     }
 `;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = animationStyles;
+document.head.appendChild(styleSheet);
+
+function initTestimonialCarousel() {
+    const carousel = document.getElementById('testimonialsCarousel');
+    const track = document.getElementById('testimonialsTrack');
+    
+    if (!carousel || !track) return;
+    
+    const cards = track.querySelectorAll('.testimonial-card');
+    
+    if (cards.length === 0) return;
+    
+    let currentSlide = 0;
+    let cardsPerSlide = 3;
+    let totalSlides = Math.ceil(cards.length / cardsPerSlide);
+    let autoSlideInterval;
+    
+    function updateCardsPerSlide() {
+        const width = window.innerWidth;
+        if (width <= 768) {
+            cardsPerSlide = 1;
+        } else if (width <= 1024) {
+            cardsPerSlide = 2;
+        } else {
+            cardsPerSlide = 3;
+        }
+        totalSlides = Math.ceil(cards.length / cardsPerSlide);
+        
+        if (currentSlide >= totalSlides) {
+            currentSlide = 0;
+        }
+        goToSlide(currentSlide);
+        
+        if (autoSlideInterval) {
+            stopAutoSlide();
+            startAutoSlide();
+        }
+    }
+    
+    function goToSlide(slideIndex) {
+        currentSlide = Math.max(0, Math.min(slideIndex, totalSlides - 1));
+        const offset = -(currentSlide * (100 / cardsPerSlide));
+        track.style.transform = `translateX(${offset}%)`;
+        
+        cards.forEach((card, index) => {
+            const slideStart = currentSlide * cardsPerSlide;
+            const slideEnd = slideStart + cardsPerSlide;
+            const isVisible = index >= slideStart && index < slideEnd;
+            card.setAttribute('aria-hidden', !isVisible);
+        });
+    }
+    
+    function startAutoSlide() {
+        if (autoSlideInterval) return; 
+        
+        const isMobile = window.innerWidth <= 768;
+        const intervalTime = isMobile ? 3500 : 4000; 
+        
+        autoSlideInterval = setInterval(() => {
+            const nextSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(nextSlide);
+        }, intervalTime);
+    }
+    
+    function stopAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = null;
+        }
+    }
+    function init() {
+        updateCardsPerSlide();
+        
+        startAutoSlide();
+        
+        carousel.addEventListener('mouseenter', () => {
+            stopAutoSlide();
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+            startAutoSlide();
+        });
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                stopAutoSlide();
+                updateCardsPerSlide();
+                startAutoSlide();
+            }, 150);
+        });
+        
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let hasMoved = false;
+        
+        track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            hasMoved = false;
+            stopAutoSlide(); 
+            track.style.transition = 'none';
+        }, { passive: true });
+        
+        track.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = Math.abs(currentX - startX);
+            const diffY = Math.abs(currentY - startY);
+            
+            if (diffX > diffY && diffX > 10) {
+                e.preventDefault();
+                hasMoved = true;
+            }
+        }, { passive: false });
+        
+        track.addEventListener('touchend', (e) => {
+            if (!isDragging || !hasMoved) {
+                isDragging = false;
+                setTimeout(() => {
+                    startAutoSlide();
+                }, 500);
+                return;
+            }
+            
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            const threshold = window.innerWidth <= 768 ? 30 : 50; 
+            
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) {
+                    const nextSlide = (currentSlide + 1) % totalSlides;
+                    goToSlide(nextSlide);
+                } else {
+                    const prevSlide = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+                    goToSlide(prevSlide);
+                }
+            }
+            
+            isDragging = false;
+            hasMoved = false;
+            
+            track.style.transition = 'transform var(--transition-slow) ease-in-out';
+            
+            setTimeout(() => {
+                startAutoSlide();
+            }, 1000);
+        }, { passive: true });
+        
+        track.addEventListener('touchcancel', () => {
+            isDragging = false;
+            hasMoved = false;
+            startAutoSlide();
+        }, { passive: true });
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoSlide();
+            } else {
+                startAutoSlide();
+            }
+        });
+        
+        console.log('Testimonial carousel initialized:', {
+            totalCards: cards.length,
+            totalSlides: totalSlides,
+            cardsPerSlide: cardsPerSlide
+        });
+    }
+    
+    init();
+}

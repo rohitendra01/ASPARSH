@@ -26,6 +26,9 @@ app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
 
+// Trust first proxy to get real IP addresses
+app.set('trust proxy', true);
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static(path.join(__dirname, "assets")));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -169,11 +172,13 @@ const hotelRoutes = require('./routes/hotelRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
 
 // Use routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/', productRoutes);
+app.use('/', newsletterRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
 app.use('/dashboard/:slug/profiles', profileRoutes);

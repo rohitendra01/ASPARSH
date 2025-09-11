@@ -105,13 +105,10 @@
     </section>
 </footer>
 
-<!-- Enhanced JavaScript -->
 <script src="/js/modern-index.js"></script>
 
-<!-- Intersection Observer for animations -->
 <script>
 (function() {
-  // Enhanced scroll animations
   const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -122,7 +119,6 @@
       if (entry.isIntersecting) {
         entry.target.classList.add('in-view');
         
-        // Stagger animations for child elements
         const children = entry.target.querySelectorAll('.animate-on-scroll');
         children.forEach((child, index) => {
           setTimeout(() => {
@@ -133,50 +129,125 @@
     });
   }, observerOptions);
 
-  // Observe elements for scroll animations
   document.querySelectorAll('.animate-on-scroll, .footer-animate').forEach(el => {
     observer.observe(el);
   });
 
-  // Newsletter form enhancement
   const newsletterForm = document.querySelector('.newsletter-form');
   if (newsletterForm) {
+    checkSubscriptionStatus();
+    
     newsletterForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = e.target.querySelector('.newsletter-submit');
+      const emailInput = e.target.querySelector('input[name="email"]');
       const originalText = submitBtn.textContent;
       
       submitBtn.textContent = 'Subscribing...';
       submitBtn.disabled = true;
       
       try {
-        const formData = new FormData(e.target);
+        const payload = { email: emailInput.value };
         const response = await fetch('/newsletter-signup', {
           method: 'POST',
-          body: formData,
           headers: {
+            'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
-          }
+          },
+          body: JSON.stringify(payload)
         });
         
-        if (response.ok) {
-          submitBtn.textContent = 'Subscribed!';
-          e.target.reset();
-          setTimeout(() => {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-          }, 2000);
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          if (result.alreadySubscribed) {
+            showNewsletterMessage('You are already subscribed! 🎉', 'info');
+          } else {
+            if (result.token) {
+              localStorage.setItem('newsletter_token', result.token);
+            }
+            showNewsletterMessage('Thank you for subscribing! 🎉', 'success');
+            e.target.reset();
+          }
+          updateNewsletterUI(true);
         } else {
-          throw new Error('Subscription failed');
+          throw new Error(result.message || 'Subscription failed');
         }
       } catch (error) {
-        submitBtn.textContent = 'Try Again';
-        setTimeout(() => {
-          submitBtn.textContent = originalText;
-          submitBtn.disabled = false;
-        }, 2000);
+        console.error('Newsletter subscription error:', error);
+        showNewsletterMessage(error.message || 'Something went wrong. Please try again.', 'error');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
       }
     });
+  }
+
+  async function checkSubscriptionStatus() {
+    const token = localStorage.getItem('newsletter_token');
+    if (!token) return;
+    
+    try {
+      const response = await fetch('/newsletter-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ token })
+      });
+      
+      const result = await response.json();
+      if (result.subscribed) {
+        updateNewsletterUI(true, result.email);
+      } else {
+        localStorage.removeItem('newsletter_token');
+        updateNewsletterUI(false);
+      }
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+    }
+  }
+
+  function updateNewsletterUI(isSubscribed, email = null) {
+    const newsletterForm = document.querySelector('.newsletter-form');
+    const newsletterSection = document.querySelector('.footer-section:last-child');
+    
+    if (isSubscribed && newsletterForm) {
+      newsletterForm.innerHTML = `
+        <div class="newsletter-success">
+          <div class="success-icon">✅</div>
+          <h5>You're subscribed!</h5>
+          <p>Thank you for joining our newsletter${email ? ` with ${email}` : ''}.</p>
+          <small>You'll receive updates about our latest NFC innovations.</small>
+        </div>
+      `;
+    }
+  }
+
+  function showNewsletterMessage(message, type = 'info') {
+    const existingMessage = document.querySelector('.newsletter-message');
+    if (existingMessage) {
+      existingMessage.remove();
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `newsletter-message newsletter-${type}`;
+    messageDiv.innerHTML = `
+      <span>${message}</span>
+      <button onclick="this.parentElement.remove()" aria-label="Close message">&times;</button>
+    `;
+    
+    const newsletterForm = document.querySelector('.newsletter-form');
+    if (newsletterForm) {
+      newsletterForm.parentNode.insertBefore(messageDiv, newsletterForm.nextSibling);
+      
+      setTimeout(() => {
+        if (messageDiv.parentNode) {
+          messageDiv.remove();
+        }
+      }, 5000);
+    }
   }
 
   const skipLink = document.createElement('a');

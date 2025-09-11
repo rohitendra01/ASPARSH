@@ -148,7 +148,7 @@
     <!-- Products Section -->
     <section class="products-section" aria-labelledby="products-title">
         <div class="products-container">
-            <div class="section-header animate-on-scroll">
+            <div class="testimonials-header animate-on-scroll">
                 <h2 id="products-title" class="products-title">Our Products</h2>
                 <p class="products-description">
                     Explore our NFC-enabled product line designed to streamline and elevate your professional networking. 
@@ -210,6 +210,7 @@
                             <% } %>
                         
 				</div>
+                
             </div>
         </div>
     </section>
@@ -312,69 +313,26 @@
                 </p>
             </div>
             
-            <div class="testimonial-carousel">
-                <button class="testimonial-carousel-nav prev" aria-label="Previous testimonial">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"/>
-                    </svg>
-                </button>
-                
-                <div class="testimonial-carousel-wrapper" role="region" aria-live="polite" aria-label="Customer testimonials">
-                    <% if (typeof testimonials !== 'undefined' && testimonials && testimonials.length > 0) { %>
+            <div class="testimonials-carousel-wrapper animate-on-scroll">
+                <div class="testimonials-carousel" id="testimonialsCarousel">
+                    <div class="testimonials-track" id="testimonialsTrack">
+                        <% if (typeof testimonials !== 'undefined' && testimonials && testimonials.length > 0) { %>
                         <% testimonials.forEach((testimonial, index) => { %>
-                        <article class="testimonial-card">
+                        <div class="testimonial-card">
+                            <div class="testimonial-avatar">
+                                <img src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>" loading="lazy">
+                            </div>
+                            <h3 class="testimonial-name"><%= testimonial.name %></h3>
+                            <p class="testimonial-role"><%= testimonial.role %></p>
                             <blockquote class="testimonial-quote">
-                                "<%= testimonial.text || 'Asparsh has revolutionized how we connect with our clients. The NFC technology is seamless and professional.' %>"
+                                "<%= testimonial.text %>"
                             </blockquote>
-                            <footer class="testimonial-author">
-                                <img 
-                                    src="<%= testimonial.avatar || '/assets/testimonial' + (index + 1) + '.jpg' %>" 
-                                    alt="<%= testimonial.name || 'Customer ' + (index + 1) %>"
-                                    class="testimonial-avatar"
-                                    loading="lazy"
-                                    width="50"
-                                    height="50"
-                                >
-                                <div class="testimonial-info">
-                                    <h4><%= testimonial.name || 'Satisfied Customer' %></h4>
-                                    <p><%= testimonial.role || 'Business Professional' %></p>
-                                </div>
-                            </footer>
-                        </article>
+                        </div>
                         <% }) %>
-                    <% } else { %>
-                        <!-- Default testimonials -->
-                        <% for (let i = 1; i <= 5; i++) { %>
-                        <article class="testimonial-card">
-                            <blockquote class="testimonial-quote">
-                                "Asparsh has completely transformed how we network and connect with potential clients. The technology is intuitive and the results are immediate."
-                            </blockquote>
-                            <footer class="testimonial-author">
-                                <img 
-                                    src="/assets/testimonial<%= i %>.jpg" 
-                                    alt="Customer <%= i %>"
-                                    class="testimonial-avatar"
-                                    loading="lazy"
-                                    width="50"
-                                    height="50"
-                                >
-                                <div class="testimonial-info">
-                                    <h4>Professional <%= i %></h4>
-                                    <p>Business Executive</p>
-                                </div>
-                            </footer>
-                        </article>
                         <% } %>
-                    <% } %>
+                    </div>
+                    
                 </div>
-                
-                <button class="testimonial-carousel-nav next" aria-label="Next testimonial">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                </button>
-                
-                <div class="testimonial-carousel-dots" role="tablist" aria-label="Choose testimonial"></div>
             </div>
         </div>
     </section>

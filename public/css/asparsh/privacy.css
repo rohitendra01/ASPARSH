@@ -1,0 +1,428 @@
+/* Privacy Policy - Modern Design */
+
+/* Bootstrap Integration & Custom Variables */
+:root {
+    --privacy-primary: #083235;
+    --privacy-secondary: #1e4a52;
+    --privacy-accent: #3498db;
+    --privacy-success: #27ae60;
+    --privacy-warning: #f39c12;
+    --privacy-danger: #e74c3c;
+    --privacy-light: #ecf0f1;
+    --privacy-dark: #2c3e50;
+    --privacy-gradient: linear-gradient(135deg, var(--privacy-primary) 0%, var(--privacy-secondary) 100%);
+}
+
+/* Hero Section */
+.legal-hero {
+    background: var(--privacy-gradient);
+    color: white;
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.legal-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') center/cover;
+    opacity: 0.3;
+}
+
+.legal-hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.legal-hero h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.legal-hero .muted {
+    font-size: 1.1rem;
+    opacity: 0.85;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.legal-hero .lead {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    font-weight: 400;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Main Content */
+.legal-content {
+    padding: 80px 0;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 50%, #f8f9fa 100%);
+}
+
+/* Navigation Pills */
+.legal-nav {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.legal-nav h4 {
+    color: var(--privacy-primary);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+}
+
+.legal-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.legal-nav a {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--privacy-light);
+    color: var(--privacy-dark);
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-size: 0.95rem;
+}
+
+.legal-nav a:hover {
+    background: var(--privacy-accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.legal-nav a.active {
+    background: var(--privacy-primary);
+    color: white;
+    border-color: var(--privacy-secondary);
+}
+
+/* Privacy Highlights Cards */
+.privacy-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.privacy-highlight {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.privacy-highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--privacy-gradient);
+}
+
+.privacy-highlight:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.privacy-highlight .icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    background: var(--privacy-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.privacy-highlight h4 {
+    color: var(--privacy-primary);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.privacy-highlight p {
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem;
+}
+
+/* Article Content */
+article {
+    background: white;
+    padding: 4rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    position: relative;
+}
+
+article::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--privacy-gradient);
+    border-radius: 20px 20px 0 0;
+}
+
+article h2 {
+    color: var(--privacy-primary);
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 3rem 0 1.5rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--privacy-light);
+    position: relative;
+}
+
+article h2:first-child {
+    margin-top: 0;
+}
+
+article h2::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--privacy-gradient);
+}
+
+article h3 {
+    color: var(--privacy-secondary);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem 0;
+}
+
+article h4 {
+    color: var(--privacy-accent);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem 0;
+}
+
+article p {
+    color: #495057;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+}
+
+article ul, article ol {
+    margin: 1.5rem 0;
+    padding-left: 2rem;
+}
+
+article li {
+    color: #495057;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+article ul li::marker {
+    color: var(--privacy-accent);
+}
+
+article ol li::marker {
+    color: var(--privacy-accent);
+    font-weight: 600;
+}
+
+article a {
+    color: var(--privacy-accent);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+article a:hover {
+    color: var(--privacy-primary);
+    border-bottom-color: var(--privacy-primary);
+}
+
+article strong {
+    color: var(--privacy-primary);
+    font-weight: 600;
+}
+
+/* Contact Info Card */
+.contact-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2.5rem;
+    border-radius: 15px;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    margin: 2.5rem 0;
+    position: relative;
+}
+
+.contact-info::before {
+    content: '📧';
+    position: absolute;
+    top: -15px;
+    left: 30px;
+    background: white;
+    padding: 10px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info h4 {
+    color: var(--privacy-primary);
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Last Updated */
+.last-updated {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--privacy-light);
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .legal-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .legal-hero .lead {
+        font-size: 1.1rem;
+    }
+    
+    .legal-content {
+        padding: 60px 0;
+    }
+    
+    .legal-nav {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .legal-nav ul {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .legal-nav a {
+        text-align: center;
+    }
+    
+    article {
+        padding: 2.5rem 1.5rem;
+    }
+    
+    .privacy-highlights {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .privacy-highlight {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .legal-hero {
+        padding: 60px 0 40px;
+    }
+    
+    .legal-hero h1 {
+        font-size: 2rem;
+    }
+    
+    article {
+        padding: 2rem 1rem;
+        border-radius: 15px;
+    }
+    
+    article h2 {
+        font-size: 1.5rem;
+    }
+    
+    .contact-info {
+        padding: 2rem 1.5rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .legal-hero {
+        background: none !important;
+        color: black !important;
+    }
+    
+    .legal-nav {
+        display: none;
+    }
+    
+    .privacy-highlights {
+        display: none;
+    }
+    
+    article {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
