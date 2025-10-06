@@ -49,7 +49,6 @@ const profileSchema = new Schema({
     },
 
     experience: {
-        // years of experience
         type: Number,
         default: 0
     },
