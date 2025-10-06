@@ -40,10 +40,7 @@
             <div class="visiting-card-others">
               <% if (card.profileName) { %>
                 <p class="visiting-card-address"><%= card.profileName %></p>
-              <% } %>
-              <% if (card.description) { %>
-                <p class="visiting-card-desc"><%= card.description.length > 120 ? card.description.substring(0, 117) + '...' : card.description %></p>
-              <% } %>
+              <% } %>              
             </div>
               <div class="visiting-card-links">
               <% const viewSlug = card.profileSlug ? encodeURIComponent(card.profileSlug) : (card.slug ? encodeURIComponent(card.slug) : null); %>
