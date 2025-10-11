@@ -9,8 +9,8 @@ const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Registration routes - do NOT cache CSRF-protected pages
-// router.get('/register', csrfProtection, authController.getRegisterPage);
-// router.post('/register', csrfProtection, authController.registerUser);
+router.get('/register', csrfProtection, authController.getRegisterPage);
+router.post('/register', csrfProtection, authController.registerUser);
 
 // Apply storeReturnTo middleware globally
 
