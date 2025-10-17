@@ -2,18 +2,10 @@
 <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
 
 <%
-  // support multiple possible variable names from controllers
   const list = (typeof visitingCards !== 'undefined') ? visitingCards : (typeof cards !== 'undefined' ? cards : []);
   const userSlug = (typeof user !== 'undefined') ? user.slug : (typeof slug !== 'undefined' ? slug : '');
 %>
 
-<!-- DEBUG: quick summary of cards passed to the view -->
-<!-- <div class="debug-cards-summary" style="padding:8px 12px; background:#fff8e1; border:1px solid #ffd54f; margin-bottom:12px;">
-  <strong>Debug:</strong> cards received: <%= (list && list.length) || 0 %>
-  <% if (list && list.length) { %>
-    <span style="display:block; margin-top:6px; font-size:0.95rem; color:#333;"> <%= list.map(c => (c.slug || c._id)).join(', ') %></span>
-  <% } %>
-</div> -->
 
 <div class="dashboard-header-row">
   <form class="search-form" onsubmit="return filterCards(event)">

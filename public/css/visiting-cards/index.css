@@ -3,17 +3,16 @@
   width: 100%;
 }
 
-/* Portfolio Header & Tabs */
 .portfolio-header {
   border-bottom: 2px solid #e0e0e0;
   margin-bottom: 1rem;
 }
-/* Header row adapted from hotel styles */
 .dashboard-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
+  width: 100%;
 }
 
 .create-hotel-btn-fixed {

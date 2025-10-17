@@ -3,7 +3,14 @@ const adminUser = require('../models/adminUser');
 exports.viewUserProfile = async (req, res) => {
   let user;
   if (req.params.slug) {
-    user = await adminUser.findOne({ slug: req.params.slug }) || await adminUser.findById(req.params.slug);
+    user = await adminUser.findOne({ slug: req.params.slug });
+    try {
+      const mongoose = require('mongoose');
+      if (!user && mongoose.Types.ObjectId.isValid(req.params.slug)) {
+        user = await adminUser.findById(req.params.slug);
+      }
+    } catch (e) {
+    }
   } else {
     user = req.user;
   }
@@ -15,7 +22,14 @@ exports.viewUserProfile = async (req, res) => {
 exports.renderEditUserProfile = async (req, res) => {
   let user;
   if (req.params.slug) {
-    user = await adminUser.findOne({ slug: req.params.slug }) || await adminUser.findById(req.params.slug);
+    user = await adminUser.findOne({ slug: req.params.slug });
+    try {
+      const mongoose = require('mongoose');
+      if (!user && mongoose.Types.ObjectId.isValid(req.params.slug)) {
+        user = await adminUser.findById(req.params.slug);
+      }
+    } catch (e) {
+    }
   } else {
     user = req.user;
   }

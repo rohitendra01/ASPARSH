@@ -45,12 +45,6 @@ const newsletterSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Index for performance
-newsletterSchema.index({ email: 1 });
-newsletterSchema.index({ browserFingerprint: 1 });
-newsletterSchema.index({ ipAddress: 1 });
-
-// Method to check if already subscribed
 newsletterSchema.statics.isAlreadySubscribed = async function(email, browserFingerprint) {
     const existing = await this.findOne({
         $or: [

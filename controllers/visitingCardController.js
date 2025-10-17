@@ -105,7 +105,7 @@ exports.create = async (req, res) => {
       if (!isValidSlug(rawProfileSlug)) {
         return res.status(400).json({ error: 'Invalid profile slug format' });
       }
-      const validatedSlug = rawProfileSlug; // already trimmed and format-checked
+      const validatedSlug = rawProfileSlug;
       profile = await Profile.findOne({ slug: validatedSlug }).lean();
       if (!profile) return res.status(404).json({ error: 'Profile not found for provided slug' });
       const profileOwner = profile.user || profile.owner || null;

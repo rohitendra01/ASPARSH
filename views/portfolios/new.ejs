@@ -1,9 +1,8 @@
-<!-- views/users/new.ejs -->
 <% layout('layouts/dashboard-boilerplate') %>
-<% block('styles').append('<link rel="stylesheet" href="/css/user-wizard.css" />') %>
+<% block('styles').append('<link rel="stylesheet" href="/css/portfolio/new.css" />') %>
 
 <div class="user-wizard-root">
-  <h1>Create User Profile</h1>
+  <h1>Create New Portfolio</h1>
 
   <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
     <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
@@ -11,858 +10,121 @@
   <% } %>
 
   <nav class="wizard-progress" aria-hidden="false">
-    <button data-step="0" class="step-btn active">Basic Info</button>
-    <button data-step="1" class="step-btn">Contact</button>
-    <button data-step="2" class="step-btn">Professional</button>
-    <button data-step="3" class="step-btn">Social Media</button>
-    <button data-step="4" class="step-btn">Gallery</button>
-    <button data-step="5" class="step-btn">Review</button>
+    <button data-step="0" class="step-btn active">Profile</button>
+    <button data-step="1" class="step-btn">Hero Section</button>
+    <button data-step="2" class="step-btn">About</button>
+    <button data-step="3" class="step-btn">Skills</button>
+    <button data-step="4" class="step-btn">Projects</button>
+    <button data-step="5" class="step-btn">Experience</button>
+    <button data-step="6" class="step-btn">Testimonials</button>
+    <button data-step="7" class="step-btn">Gallery</button>
+    <button data-step="8" class="step-btn">Services</button>
+    <button data-step="9" class="step-btn">SEO/Theme</button>
+    <button data-step="10" class="step-btn">Review</button>
   </nav>
 
-  <form id="userWizardForm" class="wizard-form" novalidate enctype="multipart/form-data">
-    <!-- Step 0: Basic Info -->
+  <form id="portfolioWizardForm" class="wizard-form" novalidate enctype="multipart/form-data">
+    <!-- Hidden fields used by the wizard script -->
+    <input type="hidden" id="selectedProfileSlug" name="selectedProfileSlug">
+    <input type="hidden" id="selectedProfileName" name="selectedProfileName">
+    <input type="hidden" id="profileId" name="profileId">
+    <div id="autosaveStatus" style="margin:0.5rem 0; font-size:0.9rem; color:#333"></div>
+    <!-- Step 0: Profile Reference -->
     <fieldset class="wizard-step active" data-step="0">
-      <h2>Basic Information</h2>
-      
-      <div class="form-row">
-        <label>
-          Name *
-          <input type="text" name="name" id="name" required>
-        </label>
-        <label>
-          Title
-          <input type="text" name="title" id="title">
-        </label>
-      </div>
-
-      <label>
-        Description
-        <textarea name="description" id="description" rows="3"></textarea>
-      </label>
-
-      <label>
-        Profile Image
-        <div class="file-input-wrapper">
-          <input type="file" name="profileImage" id="profileImage" class="file-input" accept="image/*">
-          <span class="file-input-display">Choose profile image...</span>
-        </div>
-        <img id="profilePreview" class="image-preview" style="display: none;">
-      </label>
-
-      <div class="step-actions">
-        <button type="button" data-action="next">Next</button>
-      </div>
+      <h2>Link User Profile</h2>
+      <label for="profileSearch">Find Profile (by slug, email, or mobile)</label>
+      <input type="text" id="profileSearch" name="profileSearch" placeholder="Search..." autocomplete="off" required />
+      <div id="profileSearchResults" class="search-results"></div>
+      <input type="hidden" id="selectedProfileId" name="selectedProfileId">
+      <div id="selectedProfileCard" style="display:none; margin-bottom:1rem;"></div>
+      <div class="step-actions"><button type="button" data-action="next">Next</button></div>
     </fieldset>
-
-    <!-- Step 1: Contact Information -->
+    <!-- Step 1: Hero Section -->
     <fieldset class="wizard-step" data-step="1">
-      <h2>Contact Information</h2>
-      
-      <div class="form-row-3">
-        <label>
-          Location
-          <input type="text" name="location" id="location">
-        </label>
-        <label>
-          Email
-          <input type="email" name="email" id="email">
-        </label>
-        <label>
-          Phone
-          <input type="tel" name="phone" id="phone">
-        </label>
+      <h2>Hero Section</h2>
+      <label>Hero Title <input type="text" id="title" name="heroTitle" /></label>
+      <label>Hero Subtitle <input type="text" id="tagline" name="heroSubtitle" /></label>
+      <label>Description <textarea id="about" name="heroDescription" rows="3"></textarea></label>
+      <!-- Social inputs (optional) -->
+      <div class="social-inputs" style="margin-top:.5rem">
+        <label>Website <input type="url" id="socialWebsite" name="socialWebsite" placeholder="https://example.com"/></label>
+        <label>LinkedIn <input type="url" id="socialLinkedin" name="socialLinkedin" placeholder="https://linkedin.com/in/..."/></label>
+        <label>Instagram <input type="url" id="socialInstagram" name="socialInstagram" placeholder="https://instagram.com/..."/></label>
       </div>
-
-      <div class="form-row">
-        <label>
-          Available Days
-          <input type="text" name="day" id="day" placeholder="e.g., Mon-Fri">
-        </label>
-        <label>
-          Experience Years
-          <input type="number" name="experienceYear" id="experienceYear" min="0">
-        </label>
-      </div>
-
-      <div class="form-row">
-        <label>
-          Opening Time
-          <input type="text" name="openTime" id="openTime" placeholder="9:00 AM or 09:00">
-        </label>
-        <label>
-          Closing Time
-          <input type="text" name="closeTime" id="closeTime" placeholder="5:00 PM or 17:00">
-        </label>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
     </fieldset>
-
-    <!-- Step 2: Professional Information -->
+    <!-- Step 2: About Section -->
     <fieldset class="wizard-step" data-step="2">
-      <h2>Professional Information</h2>
-      
-      <label>
-        Service Title
-        <input type="text" name="serviceTitle" id="serviceTitle">
-      </label>
-
-      <label>
-        Service Description
-        <textarea name="serviceDescription" id="serviceDescription" rows="4"></textarea>
-      </label>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
+      <h2>About Section</h2>
+      <label>About Description <textarea name="about" rows="4"></textarea></label>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
     </fieldset>
-
-    <!-- Step 3: Social Media -->
+    <!-- Step 3: Skills Section -->
     <fieldset class="wizard-step" data-step="3">
-      <h2>Social Media Links</h2>
-      
-      <div class="form-row">
-        <label>
-          Facebook URL
-          <input type="url" name="faceBookUrl" id="faceBookUrl">
-        </label>
-        <label>
-          LinkedIn URL
-          <input type="url" name="linkedInUrl" id="linkedInUrl">
-        </label>
+      <h2>Skills</h2>
+      <div id="skillsList">
+        <!-- Dynamic skills inputs: JS will add/remove -->
       </div>
-
-      <div class="form-row">
-        <label>
-          Twitter URL
-          <input type="url" name="twitterUrl" id="twitterUrl">
-        </label>
-        <label>
-          Instagram URL
-          <input type="url" name="instaUrl" id="instaUrl">
-        </label>
-      </div>
-
-      <div class="form-row">
-        <label>
-          Dribbble URL
-          <input type="url" name="dribbleUrl" id="dribbleUrl">
-        </label>
-        <label>
-          Other URL
-          <input type="url" name="otherUrl" id="otherUrl">
-        </label>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
+      <button type="button" onclick="addSkill()">Add Skill</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
     </fieldset>
-
-    <!-- Step 4: Gallery Images -->
+    <!-- Step 4: Projects -->
     <fieldset class="wizard-step" data-step="4">
-      <h2>Gallery Images</h2>
-      
-      <div class="gallery-grid">
-        <div class="gallery-item">
-          <label>
-            Image 1
-            <div class="file-input-wrapper">
-              <input type="file" name="image1" id="image1" class="file-input" accept="image/*">
-              <span class="file-input-display">Choose image 1...</span>
-            </div>
-            <img id="image1Preview" class="image-preview" style="display: none;">
-            <textarea name="description1" id="description1" placeholder="Description for image 1" rows="2"></textarea>
-          </label>
-        </div>
-
-        <div class="gallery-item">
-          <label>
-            Image 2
-            <div class="file-input-wrapper">
-              <input type="file" name="image2" id="image2" class="file-input" accept="image/*">
-              <span class="file-input-display">Choose image 2...</span>
-            </div>
-            <img id="image2Preview" class="image-preview" style="display: none;">
-            <textarea name="description2" id="description2" placeholder="Description for image 2" rows="2"></textarea>
-          </label>
-        </div>
-
-        <div class="gallery-item">
-          <label>
-            Image 3
-            <div class="file-input-wrapper">
-              <input type="file" name="image3" id="image3" class="file-input" accept="image/*">
-              <span class="file-input-display">Choose image 3...</span>
-            </div>
-            <img id="image3Preview" class="image-preview" style="display: none;">
-            <textarea name="description3" id="description3" placeholder="Description for image 3" rows="2"></textarea>
-          </label>
-        </div>
-
-        <div class="gallery-item">
-          <label>
-            Image 4
-            <div class="file-input-wrapper">
-              <input type="file" name="image4" id="image4" class="file-input" accept="image/*">
-              <span class="file-input-display">Choose image 4...</span>
-            </div>
-            <img id="image4Preview" class="image-preview" style="display: none;">
-            <textarea name="description4" id="description4" placeholder="Description for image 4" rows="2"></textarea>
-          </label>
-        </div>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
+      <h2>Projects</h2>
+      <div id="projectsList"></div>
+      <button type="button" id="addProjectBtn">Add Project</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
     </fieldset>
-
-    <!-- Step 5: Review -->
+    <!-- Step 5: Experience -->
     <fieldset class="wizard-step" data-step="5">
+      <h2>Experience Timeline</h2>
+      <div id="experienceList"></div>
+      <button type="button" onclick="addExperience()">Add Experience</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
+    </fieldset>
+    <!-- Step 6: Testimonials -->
+    <fieldset class="wizard-step" data-step="6">
+      <h2>Testimonials</h2>
+      <div id="testimonialsList"></div>
+      <button type="button" onclick="addTestimonial()">Add Testimonial</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
+    </fieldset>
+    <!-- Step 7: Gallery -->
+    <fieldset class="wizard-step" data-step="7">
+      <h2>Gallery Images</h2>
+      <div id="galleryList"></div>
+      <button type="button" onclick="addGalleryImage()">Add Gallery Image</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
+    </fieldset>
+    <!-- Step 8: Services -->
+    <fieldset class="wizard-step" data-step="8">
+      <h2>Services Offered</h2>
+      <div id="servicesList"></div>
+      <button type="button" id="addServiceBtn">Add Service</button>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
+    </fieldset>
+    <!-- Step 9: SEO and Theme -->
+    <fieldset class="wizard-step" data-step="9">
+      <h2>SEO and Theme Settings</h2>
+      <label>Page Title <input type="text" id="seoTitle" name="seoTitle" /></label>
+      <label>Meta Description <textarea id="seoDescription" name="seoDescription" rows="2"></textarea></label>
+      <label>Meta Keywords <input type="text" id="seoKeywords" name="seoKeywords" placeholder="Comma separated" /></label>
+      <label>OG Image URL <input type="url" id="seoOgImage" name="seoOgImage" /></label>
+      <label>Page Theme
+        <input type="text" id="themePrimary" name="themePrimary" placeholder="Primary color (e.g. #00c6ff)" />
+        <input type="text" id="themeSecondary" name="themeSecondary" placeholder="Secondary color (e.g. #0072ff)" />
+        <input type="text" id="themeAccent" name="themeAccent" placeholder="Accent color (e.g. #9c27b0)" />
+        <input type="text" id="themeFont" name="themeFont" placeholder="Font family (e.g. Lato)" />
+      </label>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="button" data-action="next">Next</button></div>
+    </fieldset>
+    <!-- Step 10: Review/Submit -->
+    <fieldset class="wizard-step" data-step="10">
       <h2>Review & Submit</h2>
-      
-      <div id="reviewArea">
-        <div class="review-section">
-          <h3>Basic Information</h3>
-          <div id="reviewBasic"></div>
-        </div>
-        
-        <div class="review-section">
-          <h3>Contact Information</h3>
-          <div id="reviewContact"></div>
-        </div>
-        
-        <div class="review-section">
-          <h3>Professional Information</h3>
-          <div id="reviewProfessional"></div>
-        </div>
-        
-        <div class="review-section">
-          <h3>Social Media</h3>
-          <div id="reviewSocial"></div>
-        </div>
-        
-        <div class="review-section">
-          <h3>Gallery</h3>
-          <div id="reviewGallery"></div>
-        </div>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="submit" id="createUserBtn" class="btn-primary">Create User</button>
-      </div>
+      <div id="reviewArea"></div>
+      <div class="step-actions"><button type="button" data-action="prev">Back</button><button type="submit" class="btn-primary">Create Portfolio</button></div>
     </fieldset>
   </form>
-
-  <div id="autosaveStatus" class="autosave-status" aria-live="polite"></div>
 </div>
 
-<!-- Alert Container -->
-<div id="alertContainer" class="alert-container"></div>
-
-<style>
-/* Enhanced CSS for User Creation Wizard */
-.user-wizard-root {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 1rem;
-  font-family: system-ui, Arial, sans-serif;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.user-wizard-root h1 {
-  text-align: center;
-  color: #2c3e50;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-.wizard-progress {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.wizard-progress .step-btn {
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #e9ecef;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  min-width: 120px;
-}
-
-.wizard-progress .step-btn:hover {
-  border-color: #3498db;
-  color: #3498db;
-}
-
-.wizard-progress .step-btn.active {
-  background: #2c3e50;
-  color: #fff;
-  border-color: #2c3e50;
-}
-
-.wizard-form {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-}
-
-.wizard-step {
-  display: none;
-}
-
-.wizard-step.active {
-  display: block;
-}
-
-.wizard-step h2 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 0.5rem;
-}
-
-.wizard-step label {
-  display: block;
-  margin: 1rem 0;
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.wizard-step input,
-.wizard-step textarea,
-.wizard-step select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  margin-top: 0.25rem;
-}
-
-.wizard-step input:focus,
-.wizard-step textarea:focus,
-.wizard-step select:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.form-row-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.gallery-item {
-  border: 1px dashed #e8e8e8;
-  padding: 1rem;
-  border-radius: 8px;
-  background: #f8f9fa;
-}
-
-.file-input-wrapper {
-  position: relative;
-  display: block;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-.file-input {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
-.file-input-display {
-  display: block;
-  padding: 0.75rem;
-  border: 2px dashed #3498db;
-  border-radius: 8px;
-  text-align: center;
-  color: #3498db;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  background: #fff;
-}
-
-.file-input-display:hover {
-  background: #f8f9fa;
-  border-color: #2980b9;
-}
-
-.image-preview {
-  max-width: 100%;
-  max-height: 150px;
-  border-radius: 8px;
-  margin-top: 0.5rem;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.step-actions {
-  margin-top: 2rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid #e9ecef;
-}
-
-.step-actions button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
-}
-
-.step-actions button[data-action="prev"] {
-  background: #6c757d;
-  color: white;
-}
-
-.step-actions button[data-action="next"],
-.step-actions button[data-action="submit"],
-.btn-primary {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-  color: white;
-}
-
-.step-actions button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.review-section {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #3498db;
-}
-
-.review-section h3 {
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-  font-size: 1.2rem;
-}
-
-.autosave-status {
-  margin-top: 1rem;
-  color: #6b7280;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.alert-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 2000;
-}
-
-.alert {
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  border-left: 4px solid;
-  background: white;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-}
-
-.alert-success {
-  border-left-color: #27ae60;
-  color: #155724;
-  background-color: #d1edcc;
-}
-
-.alert-error {
-  border-left-color: #e74c3c;
-  color: #721c24;
-  background-color: #f8d7da;
-}
-
-.alert-info {
-  border-left-color: #3498db;
-  color: #0c5460;
-  background-color: #d1ecf1;
-}
-
-@media (max-width: 768px) {
-  .form-row,
-  .form-row-3,
-  .gallery-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .wizard-progress {
-    justify-content: flex-start;
-    overflow-x: auto;
-  }
-  
-  .user-wizard-root h1 {
-    font-size: 2rem;
-  }
-  
-  .step-actions {
-    justify-content: center;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('userWizardForm');
-  const steps = document.querySelectorAll('.wizard-step');
-  const stepBtns = document.querySelectorAll('.step-btn');
-  const API_BASE_URL = 'http://localhost:8080/api/users'; // Spring Boot backend URL
-  
-  let currentStep = 0;
-  let formData = {};
-
-  // Navigation functions
-  function showStep(stepIndex) {
-    steps.forEach((step, index) => {
-      step.classList.toggle('active', index === stepIndex);
-    });
-    
-    stepBtns.forEach((btn, index) => {
-      btn.classList.toggle('active', index === stepIndex);
-    });
-    
-    currentStep = stepIndex;
-  }
-
-  function nextStep() {
-    if (currentStep < steps.length - 1) {
-      saveCurrentStepData();
-      showStep(currentStep + 1);
-      if (currentStep === steps.length - 1) {
-        updateReview();
-      }
-    }
-  }
-
-  function prevStep() {
-    if (currentStep > 0) {
-      saveCurrentStepData();
-      showStep(currentStep - 1);
-    }
-  }
-
-  // Save current step data
-  function saveCurrentStepData() {
-    const currentStepElement = steps[currentStep];
-    const inputs = currentStepElement.querySelectorAll('input, textarea, select');
-    
-    inputs.forEach(input => {
-      if (input.type === 'file') {
-        if (input.files[0]) {
-          formData[input.name] = input.files[0];
-        }
-      } else {
-        formData[input.name] = input.value;
-      }
-    });
-  }
-
-  // Image preview function
-  function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    const file = input.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-
-      const display = input.parentElement.querySelector('.file-input-display');
-      display.textContent = file.name;
-    } else {
-      preview.style.display = 'none';
-      const display = input.parentElement.querySelector('.file-input-display');
-      display.textContent = display.textContent.includes('profile') ? 'Choose profile image...' : 'Choose image...';
-    }
-  }
-
-  // Update review section
-  function updateReview() {
-    saveCurrentStepData();
-    
-    const reviewBasic = document.getElementById('reviewBasic');
-    const reviewContact = document.getElementById('reviewContact');
-    const reviewProfessional = document.getElementById('reviewProfessional');
-    const reviewSocial = document.getElementById('reviewSocial');
-    const reviewGallery = document.getElementById('reviewGallery');
-
-    // Basic Info
-    reviewBasic.innerHTML = `
-      <p><strong>Name:</strong> ${formData.name || 'Not provided'}</p>
-      <p><strong>Title:</strong> ${formData.title || 'Not provided'}</p>
-      <p><strong>Description:</strong> ${formData.description || 'Not provided'}</p>
-      ${formData.profileImage ? `<p><strong>Profile Image:</strong> ${formData.profileImage.name}</p>` : ''}
-    `;
-
-    // Contact Info
-    reviewContact.innerHTML = `
-      <p><strong>Location:</strong> ${formData.location || 'Not provided'}</p>
-      <p><strong>Email:</strong> ${formData.email || 'Not provided'}</p>
-      <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-      <p><strong>Available Days:</strong> ${formData.day || 'Not provided'}</p>
-      <p><strong>Experience:</strong> ${formData.experienceYear || 'Not provided'} years</p>
-      <p><strong>Hours:</strong> ${formData.openTime || 'Not provided'} - ${formData.closeTime || 'Not provided'}</p>
-    `;
-
-    // Professional Info
-    reviewProfessional.innerHTML = `
-      <p><strong>Service Title:</strong> ${formData.serviceTitle || 'Not provided'}</p>
-      <p><strong>Service Description:</strong> ${formData.serviceDescription || 'Not provided'}</p>
-    `;
-
-    // Social Media
-    const socialLinks = [
-      { key: 'faceBookUrl', label: 'Facebook' },
-      { key: 'linkedInUrl', label: 'LinkedIn' },
-      { key: 'twitterUrl', label: 'Twitter' },
-      { key: 'instaUrl', label: 'Instagram' },
-      { key: 'dribbleUrl', label: 'Dribbble' },
-      { key: 'otherUrl', label: 'Other' }
-    ];
-
-    reviewSocial.innerHTML = socialLinks
-      .filter(link => formData[link.key])
-      .map(link => `<p><strong>${link.label}:</strong> ${formData[link.key]}</p>`)
-      .join('') || '<p>No social media links provided</p>';
-
-    // Gallery
-    const galleryItems = [];
-    for (let i = 1; i <= 4; i++) {
-      if (formData[`image${i}`]) {
-        galleryItems.push(`<p><strong>Image ${i}:</strong> ${formData[`image${i}`].name}</p>`);
-      }
-    }
-    reviewGallery.innerHTML = galleryItems.join('') || '<p>No gallery images provided</p>';
-  }
-
-  // Alert function
-  function showAlert(message, type = 'info') {
-    const alertContainer = document.getElementById('alertContainer');
-    const alertId = 'alert-' + Date.now();
-
-    const alertDiv = document.createElement('div');
-    alertDiv.id = alertId;
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.innerHTML = message;
-
-    alertContainer.appendChild(alertDiv);
-
-    setTimeout(() => {
-      const alert = document.getElementById(alertId);
-      if (alert) {
-        alert.remove();
-      }
-    }, 5000);
-  }
-
-  // Check backend connectivity
-  async function checkBackendHealth() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/count`, {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        showAlert('Backend connection established', 'success');
-        return true;
-      } else {
-        showAlert('Backend connection issues detected', 'error');
-        return false;
-      }
-    } catch (error) {
-      showAlert('Cannot connect to backend server. Please check if the server is running.', 'error');
-      return false;
-    }
-  }
-
-  // Submit form
-  async function submitForm() {
-    try {
-      saveCurrentStepData();
-      
-      // Validate required fields
-      if (!formData.name || formData.name.trim() === '') {
-        showAlert('Name is required!', 'error');
-        showStep(0); // Go back to first step
-        return;
-      }
-      
-      showAlert('Creating user...', 'info');
-
-      const submitFormData = new FormData();
-      
-      // Add CSRF token if available
-      const csrfToken = document.getElementById('_csrf');
-      if (csrfToken) {
-        submitFormData.append('_csrf', csrfToken.value);
-      }
-      
-      // Add all form fields to FormData with proper field mapping
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== undefined && formData[key] !== '') {
-          // Map frontend field names to backend field names if needed
-          let backendKey = key;
-          switch(key) {
-            case 'faceBookUrl':
-              backendKey = 'facebookUrl';
-              break;
-            case 'linkedInUrl':
-              backendKey = 'linkedinUrl';
-              break;
-            case 'dribbleUrl':
-              backendKey = 'dribbleUrl';
-              break;
-            // Add other mappings if needed
-          }
-          submitFormData.append(backendKey, formData[key]);
-        }
-      });
-
-      const response = await fetch(API_BASE_URL, {
-        method: 'POST',
-        body: submitFormData,
-        credentials: 'include' // Include cookies for session management
-      });
-
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch (e) {
-          // If response isn't JSON, use the status message
-          errorMessage = `Server error: ${response.status} ${response.statusText}`;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const result = await response.json();
-      showAlert('User created successfully! ID: ' + (result.id || 'Generated'), 'success');
-      
-      // Reset form and go back to first step
-      form.reset();
-      formData = {};
-      showStep(0);
-      
-      // Clear image previews
-      document.querySelectorAll('.image-preview').forEach(img => {
-        img.style.display = 'none';
-      });
-      
-      // Reset file input displays
-      document.querySelectorAll('.file-input-display').forEach(display => {
-        if (display.textContent.includes('profile')) {
-          display.textContent = 'Choose profile image...';
-        } else {
-          display.textContent = 'Choose image...';
-        }
-      });
-      
-      // Optional: Redirect to user list or profile page
-      setTimeout(() => {
-        if (result.id) {
-          showAlert(`You can view the user at: ${window.location.origin}/users/${result.id}`, 'info');
-        }
-      }, 2000);
-
-    } catch (error) {
-      console.error('Submission error:', error);
-      showAlert('Failed to create user: ' + error.message, 'error');
-    }
-  }
-
-  // Event listeners
-  form.addEventListener('click', function(e) {
-    if (e.target.dataset.action === 'next') {
-      e.preventDefault();
-      nextStep();
-    } else if (e.target.dataset.action === 'prev') {
-      e.preventDefault();
-      prevStep();
-    }
-  });
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    submitForm();
-  });
-
-  // Step button navigation
-  stepBtns.forEach((btn, index) => {
-    btn.addEventListener('click', function() {
-      saveCurrentStepData();
-      showStep(index);
-      if (index === steps.length - 1) {
-        updateReview();
-      }
-    });
-  });
-
-  // File input change handlers
-  document.querySelectorAll('.file-input').forEach(input => {
-    input.addEventListener('change', function() {
-      const previewId = this.id + 'Preview';
-      previewImage(this, previewId);
-    });
-  });
-
-  // Initialize
-  showStep(0);
-  
-  // Check backend health on load
-  setTimeout(() => {
-    checkBackendHealth();
-  }, 1000);
-});
-</script>
+<script src="/js/portfolio-wizard.js"></script>

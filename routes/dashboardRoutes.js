@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { isLoggedIn } = require('../middleware/authMiddleware');
-// dashboardController removed
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });

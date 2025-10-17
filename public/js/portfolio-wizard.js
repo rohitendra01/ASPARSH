@@ -229,6 +229,10 @@
 
   const projectsList = $('#projectsList');
   const servicesList = $('#servicesList');
+  const skillsList = $('#skillsList');
+  const galleryList = $('#galleryList');
+  const experienceList = $('#experienceList');
+  const testimonialsList = $('#testimonialsList');
 
   function makeProjectNode(data = {}) {
     const wrapper = document.createElement('div');
@@ -259,6 +263,69 @@
   }
   if ($('#addServiceBtn')) $('#addServiceBtn').addEventListener('click', () => servicesList.appendChild(makeServiceNode({})));
 
+  // Skills
+  function makeSkillNode(data={}) {
+    const w = document.createElement('div');
+    w.className = 'skill-row';
+    w.innerHTML = `
+      <input class="skill-name" placeholder="Skill name" value="${(data.name||'').replace(/"/g,'&quot;')}">
+      <input class="skill-level" placeholder="Proficiency (0-100)" value="${(data.level||'')}">
+      <button class="remove-skill">Remove</button>`;
+    w.querySelector('.remove-skill').addEventListener('click', () => { w.remove(); triggerAutosave(); });
+    [...w.querySelectorAll('input')].forEach(el => el.addEventListener('input', triggerAutosave));
+    return w;
+  }
+  // expose addSkill for inline onclicks in the template
+  window.addSkill = function(data) { if (skillsList) skillsList.appendChild(makeSkillNode(data||{})); };
+
+  // Gallery
+  function makeGalleryNode(data={}) {
+    const w = document.createElement('div');
+    w.className = 'gallery-row';
+    w.innerHTML = `
+      <input class="gallery-image" placeholder="Image URL" value="${(data.imageUrl||'').replace(/"/g,'&quot;')}">
+      <input class="gallery-title" placeholder="Title" value="${(data.title||'').replace(/"/g,'&quot;')}">
+      <textarea class="gallery-desc" placeholder="Description">${data.description||''}</textarea>
+      <button class="remove-gallery">Remove</button>`;
+    w.querySelector('.remove-gallery').addEventListener('click', () => { w.remove(); triggerAutosave(); });
+    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
+    return w;
+  }
+  window.addGalleryImage = function(data) { if (galleryList) galleryList.appendChild(makeGalleryNode(data||{})); };
+
+  // Experience
+  function makeExperienceNode(data={}) {
+    const w = document.createElement('div');
+    w.className = 'experience-row';
+    w.innerHTML = `
+      <input class="exp-role" placeholder="Role/Title" value="${(data.title||'').replace(/"/g,'&quot;')}">
+      <input class="exp-company" placeholder="Company" value="${(data.company||'').replace(/"/g,'&quot;')}">
+      <input class="exp-start" placeholder="Start (YYYY-MM)" value="${(data.startDate||'')}">
+      <input class="exp-end" placeholder="End (YYYY-MM or present)" value="${(data.endDate||'')}">
+      <textarea class="exp-desc" placeholder="Description">${data.description||''}</textarea>
+      <button class="remove-exp">Remove</button>`;
+    w.querySelector('.remove-exp').addEventListener('click', () => { w.remove(); triggerAutosave(); });
+    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
+    return w;
+  }
+  window.addExperience = function(data) { if (experienceList) experienceList.appendChild(makeExperienceNode(data||{})); };
+
+  // Testimonials
+  function makeTestimonialNode(data={}) {
+    const w = document.createElement('div');
+    w.className = 'testimonial-row';
+    w.innerHTML = `
+      <input class="t-name" placeholder="Name" value="${(data.name||'').replace(/"/g,'&quot;')}">
+      <input class="t-company" placeholder="Company/Position" value="${(data.company||'').replace(/"/g,'&quot;')}">
+      <textarea class="t-text" placeholder="Testimonial">${data.text||''}</textarea>
+      <input class="t-rating" placeholder="Rating (1-5)" value="${(data.rating||'')}">
+      <button class="remove-t">Remove</button>`;
+    w.querySelector('.remove-t').addEventListener('click', () => { w.remove(); triggerAutosave(); });
+    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
+    return w;
+  }
+  window.addTestimonial = function(data) { if (testimonialsList) testimonialsList.appendChild(makeTestimonialNode(data||{})); };
+
   function buildPayload() {
     const payload = {};
     payload.profileId = profileIdInput ? profileIdInput.value : (selectedProfileIdInput ? selectedProfileIdInput.value : null);
@@ -270,15 +337,57 @@
       linkedin: $('#socialLinkedin').value || '',
       instagram: $('#socialInstagram').value || ''
     };
+    // SEO
+    payload.seo = {
+      title: $('#seoTitle') ? $('#seoTitle').value || '' : '',
+      description: $('#seoDescription') ? $('#seoDescription').value || '' : '',
+      keywords: ($('#seoKeywords') && $('#seoKeywords').value) ? $('#seoKeywords').value.split(',').map(s=>s.trim()).filter(Boolean) : [],
+      ogImage: $('#seoOgImage') ? $('#seoOgImage').value || '' : ''
+    };
+    // Theme
+    payload.theme = {
+      primary: $('#themePrimary') ? $('#themePrimary').value || '' : '',
+      secondary: $('#themeSecondary') ? $('#themeSecondary').value || '' : '',
+      accent: $('#themeAccent') ? $('#themeAccent').value || '' : '',
+      font: $('#themeFont') ? $('#themeFont').value || '' : ''
+    };
+    // Skills
+    payload.skills = Array.from(document.querySelectorAll('.skill-row')).map(r=>({
+      name: (r.querySelector('.skill-name') && r.querySelector('.skill-name').value) || '',
+      level: (r.querySelector('.skill-level') && r.querySelector('.skill-level').value) || ''
+    }));
     payload.projects = Array.from(document.querySelectorAll('.project-row')).map(r => ({
       title: (r.querySelector('.proj-title') && r.querySelector('.proj-title').value) || '',
       link: (r.querySelector('.proj-link') && r.querySelector('.proj-link').value) || '',
       description: (r.querySelector('.proj-desc') && r.querySelector('.proj-desc').value) || ''
+      // images could be added by gallery or project-specific inputs in future
     }));
     payload.services = Array.from(document.querySelectorAll('.service-row')).map(r => ({
       name: (r.querySelector('.svc-name') && r.querySelector('.svc-name').value) || '',
-      price: Number((r.querySelector('.svc-price') && r.querySelector('.svc-price').value) || 0),
+      // preserve empty price instead of forcing zero
+      price: (r.querySelector('.svc-price') && r.querySelector('.svc-price').value) === '' ? null : Number((r.querySelector('.svc-price') && r.querySelector('.svc-price').value)),
       description: (r.querySelector('.svc-desc') && r.querySelector('.svc-desc').value) || ''
+    }));
+    // Gallery
+    payload.gallery = Array.from(document.querySelectorAll('.gallery-row')).map(r=>({
+      imageUrl: (r.querySelector('.gallery-image') && r.querySelector('.gallery-image').value) || '',
+      title: (r.querySelector('.gallery-title') && r.querySelector('.gallery-title').value) || '',
+      description: (r.querySelector('.gallery-desc') && r.querySelector('.gallery-desc').value) || ''
+    }));
+    // Experience
+    payload.experience = Array.from(document.querySelectorAll('.experience-row')).map(r=>({
+      title: (r.querySelector('.exp-role') && r.querySelector('.exp-role').value) || '',
+      company: (r.querySelector('.exp-company') && r.querySelector('.exp-company').value) || '',
+      startDate: (r.querySelector('.exp-start') && r.querySelector('.exp-start').value) || '',
+      endDate: (r.querySelector('.exp-end') && r.querySelector('.exp-end').value) || '',
+      description: (r.querySelector('.exp-desc') && r.querySelector('.exp-desc').value) || ''
+    }));
+    // Testimonials
+    payload.testimonials = Array.from(document.querySelectorAll('.testimonial-row')).map(r=>({
+      name: (r.querySelector('.t-name') && r.querySelector('.t-name').value) || '',
+      position: (r.querySelector('.t-company') && r.querySelector('.t-company').value) || '',
+      text: (r.querySelector('.t-text') && r.querySelector('.t-text').value) || '',
+      rating: (r.querySelector('.t-rating') && r.querySelector('.t-rating').value) ? Number(r.querySelector('.t-rating').value) : null
     }));
     return payload;
   }

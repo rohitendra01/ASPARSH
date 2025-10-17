@@ -1,12 +1,105 @@
 <% layout('layouts/dashboard-boilerplate') %>
 <% block('styles').append(`<link rel="stylesheet" href="/css/dashboard/dashboard.css" />`) %>
-<section class="dashboard-intro">
+<style>
+  :root {
+  --clr-bg: #f5f7fa;
+  --clr-primary: #46e54b;
+  --clr-secondary: #011609;
+  --clr-text: #374151;
+  --clr-card-bg: #ffffff;
+  --clr-shadow: rgba(0, 0, 0, 0.1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  line-height: 1.6;
+}
+
+.dashboard {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  color: var(--clr-primary);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+  font-size: 1.125rem;
+  color: var(--clr-text);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.dashboard-cards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.card {
+  background-color: var(--clr-card-bg);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 8px var(--clr-shadow);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px var(--clr-shadow);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.card h2 {
+  padding: 1rem;
+  font-size: 1.25rem;
+  color: var(--clr-secondary);
+}
+
+</style>
+<section class="dashboard">
+  <div class="dashboard-header">
     <h1>Welcome to Dashboard</h1>
     <p>
-        This dashboard provides a quick overview of your activities, statistics, and recent updates. Use the tools and features below to manage your account and stay informed.
+      This dashboard provides a quick overview of your activities,
+      statistics, and recent updates. Use the tools and features below
+      to manage your account and stay informed.
     </p>
-    <div class="dashboard-illustrations">
-        <img src="/images/overview.svg" alt="Overview Illustration" style="width:80px; margin-right:20px;">
-        <img src="/images/updates.svg" alt="Updates Illustration" style="width:80px;">
+  </div>
+
+  <div class="dashboard-cards">
+    <div class="card">
+      <img src="/assets/overview.png" alt="Overview Illustration">
+      <h2>Overview</h2>
     </div>
+    <div class="card">
+      <img src="/assets/updates.png" alt="Updates Illustration">
+      <h2>Updates</h2>
+    </div>
+  </div>
 </section>

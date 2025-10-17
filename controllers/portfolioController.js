@@ -35,8 +35,8 @@ exports.renderNewForm = async (req, res) => {
 exports.createPortfolio = async (req, res) => {
   try {
     const payload = req.body || {};
-    // Accept profile identifier from various form fields used by hotel form
-    const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.selectedProfileSlug || payload.profileSlug;
+    // Accept profile identifier from several possible fields (wizard may send profileId)
+    const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug || payload.selectedProfileSlug || payload.profileId || payload.profile;
     if (!profileIdentifier) return res.status(400).send('profileId required');
 
     // Find profile by id or slug
@@ -46,31 +46,104 @@ exports.createPortfolio = async (req, res) => {
       profile = await Profile.findById(profileIdentifier);
     }
     if (!profile) {
-      // try as slug
       profile = await Profile.findOne({ slug: profileIdentifier });
     }
-
     if (!profile) return res.status(400).send('Profile not found');
+
+    // If client submitted a portfolioData JSON (from older forms), parse it
+    let portfolioData = {};
+    if (payload.portfolioData) {
+      try { portfolioData = typeof payload.portfolioData === 'string' ? JSON.parse(payload.portfolioData) : payload.portfolioData; } catch (e) { portfolioData = {}; }
+    }
+
+    // Map fields: prefer top-level fields from wizard, fall back to portfolioData, then profile values
+    const title = payload.title || portfolioData.title || profile.name || '';
+    const tagline = payload.tagline || portfolioData.tagline || '';
+    const about = payload.about || portfolioData.about || payload.description || '';
+
+    // Social is sent as an object by the wizard
+    const social = Object.assign({}, (portfolioData.social || {}), (payload.social || {}));
+    // Backwards compatibility for some legacy field names
+    if (!social.facebook && payload.faceBookUrl) social.facebook = payload.faceBookUrl;
+    if (!social.linkedin && payload.linkedInUrl) social.linkedin = payload.linkedInUrl;
+    if (!social.x && payload.twitterUrl) social.x = payload.twitterUrl;
+    if (!social.instagram && payload.instaUrl) social.instagram = payload.instaUrl;
+    if (!social.dribbble && payload.dribbleUrl) social.dribbble = payload.dribbleUrl;
+    if (!social.website && payload.otherUrl) social.website = payload.otherUrl;
+
+  // Gallery: collect descriptions and uploaded file names if present
+    const gallery = [];
+    for (let i = 1; i <= 4; i++) {
+      const desc = payload[`description${i}`];
+      let imageUrl = '';
+
+      // Check parsed portfolioData.gallery first
+      if (portfolioData.gallery && portfolioData.gallery[i-1]) {
+        imageUrl = portfolioData.gallery[i-1].imageUrl || portfolioData.gallery[i-1].imageName || '';
+      }
+
+      // Check uploaded files (support typical multer shapes)
+      if (req.files) {
+        // req.files can be object of arrays or array
+        if (Array.isArray(req.files)) {
+          const f = req.files.find(x => x.fieldname === `image${i}`);
+          if (f) imageUrl = f.filename || f.originalname || imageUrl;
+        } else if (req.files[`image${i}`]) {
+          const farr = req.files[`image${i}`];
+          if (Array.isArray(farr) && farr[0]) imageUrl = farr[0].filename || farr[0].originalname || imageUrl;
+        }
+      }
+
+        if (imageUrl || desc) {
+          gallery.push({ imageUrl, title: '', description: desc || '' });
+        }
+    }
+
+    // Map services: wizard sends payload.services as array
+    const servicesArr = Array.isArray(payload.services) && payload.services.length ? payload.services : (portfolioData.services || []);
+
+    // generate a safe slug: prefer provided slug/title, fall back to profile slug; append timestamp if needed
+    const slugify = (s='') => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    let baseSlug = '';
+    if (payload.slug) baseSlug = payload.slug;
+    else if (portfolioData.slug) baseSlug = portfolioData.slug;
+    else if (title) baseSlug = title;
+    else baseSlug = profile.slug || profile.name || profile._id.toString();
+    baseSlug = slugify(baseSlug) || profile.slug || profile._id.toString();
+    // append timestamp to avoid unique conflicts when multiple portfolios per profile are created
+    const finalSlug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
 
     const p = new Portfolio({
       profileId: profile._id,
-      slug: profile.slug,
-      title: payload.title || payload.hotelName || '',
-      tagline: payload.tagline || '',
-      about: payload.about || '',
-      social: payload.social || {},
-      projects: payload.projects || [],
-      services: payload.services || [],
-      isPublished: payload.isPublished || false,
+      slug: finalSlug,
+      title,
+      tagline,
+      about,
+      social,
+      gallery: gallery.length ? gallery : (portfolioData.gallery || []),
+      skills: payload.skills || portfolioData.skills || [],
+      projects: Array.isArray(payload.projects) && payload.projects.length ? payload.projects : (portfolioData.projects || []),
+      services: servicesArr,
+      isPublished: (payload.isPublished === 'on' || payload.isPublished === true || portfolioData.isPublished === true) || false,
       createdBy: req.user ? req.user._id : undefined
     });
-    await p.save();
-    const accept = (req.headers['accept'] || '').toLowerCase();
-    if (req.xhr || accept.includes('application/json') || req.is('json')) {
-      return res.json({ ok: true, portfolio: p });
+
+    try {
+      await p.save();
+    } catch (saveErr) {
+      // if duplicate key on slug, try a fallback by appending a random suffix
+      if (saveErr && saveErr.code === 11000 && saveErr.keyPattern && saveErr.keyPattern.slug) {
+        p.slug = `${baseSlug}-${Math.floor(Math.random() * 90000) + 10000}`;
+        await p.save();
+      } else throw saveErr;
     }
-    // redirect to profile portfolios list
-    res.redirect(`/dashboard/${profile.slug}/portfolios`);
+
+    // respond JSON if requested (wizard expects JSON containing created portfolio id)
+    const accept = (req.headers['accept'] || '').toLowerCase();
+    if (req.xhr || accept.includes('application/json') || req.is('json')) return res.json({ ok: true, portfolio: p });
+
+    // otherwise redirect to public show route (we use /portfolios/:id)
+    res.redirect(`/portfolios/${p._id}`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error creating portfolio');
@@ -100,40 +173,7 @@ exports.updatePortfolio = async (req, res) => {
   }
 };
 
-exports.publishPortfolio = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const p = await Portfolio.findById(id);
-    if (!p) return res.status(404).json({ error: 'Not found' });
-    p.isPublished = true;
-    await p.save();
-    res.json({ ok: true, portfolio: p });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
 
-exports.showPublic = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const p = await Portfolio.findById(id).lean();
-    if (!p) return res.status(404).send('Portfolio not found');
-
-    // allow owner preview even if not published
-    const isOwner = req.user && req.user._id && p.createdBy && String(p.createdBy) === String(req.user._id);
-    if (!p.isPublished && !isOwner) return res.status(404).send('Portfolio not found');
-
-    const profile = await Profile.findById(p.profileId).lean();
-    // render public portfolio using the updated view directory
-
-    if (!slug && req.user) slug = req.user._id ? req.user._id.toString() : '';
-    res.render('portfolios/index', { cards, layout: 'layouts/dashboard-boilerplate', slug });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error loading business visiting cards');
-  }
-};
 
 
 exports.listPortfolios = async (req, res) => {
@@ -158,10 +198,26 @@ exports.deletePortfolio = async (req, res) => {
 
 exports.showPortfolio = async (req, res) => {
   try {
-    const portfolio = await Portfolio.findById(req.params.id).lean();
+    // Accept several possible param names depending on route: id, slug, profileSlug
+    const identifier = req.params.id || req.params.slug || req.params.profileSlug || req.params.profile;
+    let portfolio = null;
+
+    const mongoose = require('mongoose');
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      portfolio = await Portfolio.findById(identifier).lean();
+    }
+    if (!portfolio) {
+      portfolio = await Portfolio.findOne({ slug: identifier }).lean();
+    }
     if (!portfolio) return res.status(404).send('Portfolio not found');
+
     const profile = await Profile.findById(portfolio.profileId).lean();
-    res.render('portfolios/show', { portfolio, profile, slug: req.params.slug, layout: 'layouts/dashboard', currentUser: req.user });
+
+  portfolio.seo = portfolio.seo || { title: '', description: '', keywords: [], ogImage: '' };
+  portfolio.theme = portfolio.theme || { primary: '#007bff', secondary: '#6c757d', background: '#ffffff', text: '#212529', font: 'Montserrat' };
+  if (!profile) profile = { name: '', image: 'https://placehold.co/160x160' };
+  profile.image = profile.image || 'https://placehold.co/160x160';
+  res.render('portfolios/basic-portfolio/show', { portfolio, profile, layout: false });
   } catch (err) {
     res.status(500).send('Error loading portfolio');
   }

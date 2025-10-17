@@ -6,7 +6,6 @@ const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
-// visiting-card routes moved to visitingCardRoutes.js
 
 // List all portfolios for a user
 router.get('/', portfolioController.listPortfolios);
@@ -20,9 +19,6 @@ router.post('/new', isLoggedIn, csrfProtection, portfolioController.createPortfo
 //Edit a profile
 router.get('/edit', isLoggedIn, profileController.renderEditProfileForm);
 
-// Show a single portfolio (optional)
-router.get('/:id', portfolioController.showPortfolio);
-
 // Render edit form for a portfolio
 router.get('/:id/edit', portfolioController.renderEditForm);
 
@@ -32,8 +28,7 @@ router.put('/:id', portfolioController.updatePortfolio);
 // Delete a portfolio
 router.delete('/:id', portfolioController.deletePortfolio);
 
-// Publish a portfolio (set isPublished = true)
-router.post('/:id/publish', isLoggedIn, csrfProtection, portfolioController.publishPortfolio);
+
 
 
 module.exports = router;

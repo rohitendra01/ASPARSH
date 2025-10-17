@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Profile = require('../models/Profile');
 
-// GET /api/profiles/search?q=searchTerm
 router.get('/profiles/search', async (req, res) => {
   try {
     const q = req.query.q || '';

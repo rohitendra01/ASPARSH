@@ -17,17 +17,18 @@ const profileSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
-    },
-
-    image: {
-        type: String,
-        default: ''
+        unique: true,
+        lowercase: true
     },
 
     mobile: {
         type: String,
         required: true
+    },
+
+    image: {
+        type: String,
+        default: 'https://placehold.co/160x160'
     },
 
     occupation: {
@@ -55,11 +56,11 @@ const profileSchema = new Schema({
 
     address: {
         type: new Schema({
-            addressLine: { type: String },
-            city: { type: String },
-            state: { type: String },
-            country: { type: String },
-            postcode: { type: String }
+            addressLine: { type: String, default: '' },
+            city: { type: String, default: '' },
+            state: { type: String, default: '' },
+            country: { type: String, default: '' },
+            postcode: { type: String, default: '' }
         }, { _id: false })
     },
 
@@ -77,7 +78,8 @@ const profileSchema = new Schema({
 
     slug: {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
     hotels: [{
         type: Schema.Types.ObjectId,
@@ -92,8 +94,16 @@ const profileSchema = new Schema({
 });
 
 
+profileSchema.pre('save', function(next) {
+    if (this.isModified('name') && !this.slug) {
+        this.slug = this.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+    next();
+});
+
 const Profile = mongoose.model('Profile', profileSchema);
-
-
 
 module.exports = Profile;

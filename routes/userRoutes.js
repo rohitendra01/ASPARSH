@@ -11,7 +11,8 @@ const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 
 
-router.get('/:slug', isLoggedIn, userController.viewUserProfile);
+// More specific routes must come before the catch-all '/:slug' route
 router.get('/edit/:slug', isLoggedIn, userController.renderEditUserProfile);
 router.post('/edit/:slug', isLoggedIn, upload.single('image'), csrfProtection, userController.updateUserProfile);
+router.get('/:slug', isLoggedIn, userController.viewUserProfile);
 module.exports = router;

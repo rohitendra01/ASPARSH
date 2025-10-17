@@ -27,15 +27,14 @@ const adminUserSchema = new mongoose.Schema({
         type: String, // Cloudinary image URL
         default: ''
     },
-    // Track the active session id for single-device login enforcement
     currentSessionId: {
         type: String,
         default: null,
     },
     slug: {
         type: String,
-        unique: true,
-        index: true
+        index: true,
+        unique: true
     }
 }, {
     timestamps: true
@@ -59,12 +58,11 @@ adminUserSchema.pre('save', async function(next) {
     next();
 });
 
-// Password hashing middleware
 adminUserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     
     try {
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(7);
         this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (err) {
@@ -72,7 +70,6 @@ adminUserSchema.pre('save', async function(next) {
     }
 });
 
-// Password comparison method
 adminUserSchema.methods.comparePassword = async function(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };

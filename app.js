@@ -44,7 +44,7 @@ const sessionOptions = {
         httpOnly: true,
         expires: new Date(Date.now() + 1000 * 60 * 10),
         sameSite: 'lax',
-        maxAge: 1000 * 60 * 10
+        maxAge: 1000 * 60 * 30
     }
 };
 
