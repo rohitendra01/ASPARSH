@@ -8,7 +8,7 @@ const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
 
 // List all portfolios for a user
-router.get('/', portfolioController.listPortfolios);
+router.get('/', isLoggedIn, portfolioController.listPortfolios);
 
 // Render new portfolio form
 router.get('/new', isLoggedIn, portfolioController.renderNewForm);

@@ -1,15 +1,14 @@
-const Portfolio = require('../models/Portfolio');
+const { Portfolio } = require('../models/Portfolio');
 const Profile = require('../models/Profile');
 const VisitingCard = require('../models/VisitingCard');
 
 exports.renderNewForm = async (req, res) => {
   try {
-    // find profile for context
+    // Find profile for context if slug provided
     let profile = null;
     if (req.params && req.params.slug) {
       profile = await Profile.findOne({ slug: req.params.slug });
     }
-
 
     // Wrap render in its own try/catch to capture EJS compile/render errors
     try {
@@ -17,12 +16,21 @@ exports.renderNewForm = async (req, res) => {
       try {
         if (typeof req.csrfToken === 'function') csrfToken = req.csrfToken();
       } catch (e) {
+        // CSRF not available
       }
-      if (!csrfToken && res && res.locals && res.locals.csrfToken) csrfToken = res.locals.csrfToken;
-  return res.render('portfolios/new', { user: req.user || null, slug: req.params ? req.params.slug : undefined, profile, layout: 'layouts/dashboard-boilerplate', csrfToken });
+      if (!csrfToken && res && res.locals && res.locals.csrfToken) {
+        csrfToken = res.locals.csrfToken;
+      }
+
+      return res.render('portfolios/new', { 
+        user: req.user || null, 
+        slug: req.params ? req.params.slug : undefined, 
+        profile, 
+        layout: 'layouts/dashboard-boilerplate', 
+        csrfToken 
+      });
     } catch (renderErr) {
       console.error('[portfolioController] EJS render error for portfolios/new:', renderErr && renderErr.stack ? renderErr.stack : renderErr);
-      // Return a helpful error response for debugging (include stack)
       res.status(500).send('<h2>Template render error</h2><pre>' + (renderErr && renderErr.stack ? renderErr.stack : String(renderErr)) + '</pre>');
       return;
     }
@@ -35,118 +43,199 @@ exports.renderNewForm = async (req, res) => {
 exports.createPortfolio = async (req, res) => {
   try {
     const payload = req.body || {};
-    // Accept profile identifier from several possible fields (wizard may send profileId)
-    const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug || payload.selectedProfileSlug || payload.profileId || payload.profile;
-    if (!profileIdentifier) return res.status(400).send('profileId required');
+    
+    // ========== 1. Validate Profile ==========
+    const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug;
+    if (!profileIdentifier) {
+      return res.status(400).json({ success: false, message: 'Profile ID required' });
+    }
 
-    // Find profile by id or slug
     let profile = null;
-    const mongoose = require('mongoose');
     if (mongoose.Types.ObjectId.isValid(profileIdentifier)) {
       profile = await Profile.findById(profileIdentifier);
     }
     if (!profile) {
       profile = await Profile.findOne({ slug: profileIdentifier });
     }
-    if (!profile) return res.status(400).send('Profile not found');
-
-    // If client submitted a portfolioData JSON (from older forms), parse it
-    let portfolioData = {};
-    if (payload.portfolioData) {
-      try { portfolioData = typeof payload.portfolioData === 'string' ? JSON.parse(payload.portfolioData) : payload.portfolioData; } catch (e) { portfolioData = {}; }
+    if (!profile) {
+      return res.status(400).json({ success: false, message: 'Profile not found' });
     }
 
-    // Map fields: prefer top-level fields from wizard, fall back to portfolioData, then profile values
-    const title = payload.title || portfolioData.title || profile.name || '';
-    const tagline = payload.tagline || portfolioData.tagline || '';
-    const about = payload.about || portfolioData.about || payload.description || '';
-
-    // Social is sent as an object by the wizard
-    const social = Object.assign({}, (portfolioData.social || {}), (payload.social || {}));
-    // Backwards compatibility for some legacy field names
-    if (!social.facebook && payload.faceBookUrl) social.facebook = payload.faceBookUrl;
-    if (!social.linkedin && payload.linkedInUrl) social.linkedin = payload.linkedInUrl;
-    if (!social.x && payload.twitterUrl) social.x = payload.twitterUrl;
-    if (!social.instagram && payload.instaUrl) social.instagram = payload.instaUrl;
-    if (!social.dribbble && payload.dribbleUrl) social.dribbble = payload.dribbleUrl;
-    if (!social.website && payload.otherUrl) social.website = payload.otherUrl;
-
-  // Gallery: collect descriptions and uploaded file names if present
-    const gallery = [];
-    for (let i = 1; i <= 4; i++) {
-      const desc = payload[`description${i}`];
-      let imageUrl = '';
-
-      // Check parsed portfolioData.gallery first
-      if (portfolioData.gallery && portfolioData.gallery[i-1]) {
-        imageUrl = portfolioData.gallery[i-1].imageUrl || portfolioData.gallery[i-1].imageName || '';
-      }
-
-      // Check uploaded files (support typical multer shapes)
-      if (req.files) {
-        // req.files can be object of arrays or array
-        if (Array.isArray(req.files)) {
-          const f = req.files.find(x => x.fieldname === `image${i}`);
-          if (f) imageUrl = f.filename || f.originalname || imageUrl;
-        } else if (req.files[`image${i}`]) {
-          const farr = req.files[`image${i}`];
-          if (Array.isArray(farr) && farr[0]) imageUrl = farr[0].filename || farr[0].originalname || imageUrl;
-        }
-      }
-
-        if (imageUrl || desc) {
-          gallery.push({ imageUrl, title: '', description: desc || '' });
-        }
+    // ========== 2. Validate Design ==========
+    const designId = payload.designId;
+    if (!designId || !mongoose.Types.ObjectId.isValid(designId)) {
+      return res.status(400).json({ success: false, message: 'Valid Design ID required' });
     }
 
-    // Map services: wizard sends payload.services as array
-    const servicesArr = Array.isArray(payload.services) && payload.services.length ? payload.services : (portfolioData.services || []);
+    const design = await Design.findById(designId);
+    if (!design) {
+      return res.status(400).json({ success: false, message: 'Design not found' });
+    }
 
-    // generate a safe slug: prefer provided slug/title, fall back to profile slug; append timestamp if needed
-    const slugify = (s='') => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    // ========== 3. Generate Unique Slug ==========
+    const slugify = (s = '') => String(s).toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
     let baseSlug = '';
-    if (payload.slug) baseSlug = payload.slug;
-    else if (portfolioData.slug) baseSlug = portfolioData.slug;
-    else if (title) baseSlug = title;
-    else baseSlug = profile.slug || profile.name || profile._id.toString();
-    baseSlug = slugify(baseSlug) || profile.slug || profile._id.toString();
-    // append timestamp to avoid unique conflicts when multiple portfolios per profile are created
-    const finalSlug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
+    if (payload.name) {
+      baseSlug = slugify(payload.name);
+    } else if (profile.name) {
+      baseSlug = slugify(profile.name);
+    } else {
+      baseSlug = profile.slug || profile._id.toString();
+    }
 
-    const p = new Portfolio({
-      profileId: profile._id,
-      slug: finalSlug,
-      title,
-      tagline,
-      about,
-      social,
-      gallery: gallery.length ? gallery : (portfolioData.gallery || []),
-      skills: payload.skills || portfolioData.skills || [],
-      projects: Array.isArray(payload.projects) && payload.projects.length ? payload.projects : (portfolioData.projects || []),
-      services: servicesArr,
-      isPublished: (payload.isPublished === 'on' || payload.isPublished === true || portfolioData.isPublished === true) || false,
-      createdBy: req.user ? req.user._id : undefined
+    // Append random ID to ensure uniqueness
+    const crypto = require('crypto');
+    const uniqueId = crypto.randomBytes(5).toString('hex');
+    const finalSlug = `${baseSlug}-${uniqueId}`;
+
+    // ========== 4. Process Social Links ==========
+    const socialLinks = [];
+    const socialPlatforms = Object.keys(payload).filter(key => key.startsWith('socialPlatform_'));
+    
+    socialPlatforms.forEach(key => {
+      const id = key.split('_')[1];
+      const platform = payload[`socialPlatform_${id}`];
+      const url = payload[`socialUrl_${id}`];
+      
+      if (platform && url) {
+        socialLinks.push({ platform, url });
+      }
     });
 
+    // ========== 5. Process Skills ==========
+    let skills = [];
     try {
-      await p.save();
-    } catch (saveErr) {
-      // if duplicate key on slug, try a fallback by appending a random suffix
-      if (saveErr && saveErr.code === 11000 && saveErr.keyPattern && saveErr.keyPattern.slug) {
-        p.slug = `${baseSlug}-${Math.floor(Math.random() * 90000) + 10000}`;
-        await p.save();
-      } else throw saveErr;
+      if (payload.skills) {
+        skills = typeof payload.skills === 'string' 
+          ? JSON.parse(payload.skills) 
+          : payload.skills;
+      }
+    } catch (e) {
+      console.error('Error parsing skills:', e);
     }
 
-    // respond JSON if requested (wizard expects JSON containing created portfolio id)
-    const accept = (req.headers['accept'] || '').toLowerCase();
-    if (req.xhr || accept.includes('application/json') || req.is('json')) return res.json({ ok: true, portfolio: p });
+    // ========== 6. Process Work Experience ==========
+    const workExperience = [];
+    const workCategories = Object.keys(payload).filter(key => key.startsWith('workCategory_'));
+    
+    workCategories.forEach(key => {
+      const id = key.split('_')[1];
+      const category = payload[`workCategory_${id}`];
+      const title = payload[`workTitle_${id}`];
+      const description = payload[`workDescription_${id}`];
+      const detailsUrl = payload[`workDetailsUrl_${id}`];
+      
+      if (category && title && description && detailsUrl) {
+        workExperience.push({ category, title, description, detailsUrl });
+      }
+    });
 
-    // otherwise redirect to public show route (we use /portfolios/:id)
-    res.redirect(`/portfolios/${p._id}`);
+    // ========== 7. Process Experience Timeline ==========
+    const experience = [];
+    const expDateRanges = Object.keys(payload).filter(key => key.startsWith('expDateRange_'));
+    
+    expDateRanges.forEach(key => {
+      const id = key.split('_')[1];
+      const dateRange = payload[`expDateRange_${id}`];
+      const roleTitle = payload[`expRoleTitle_${id}`];
+      const organization = payload[`expOrganization_${id}`];
+      const description = payload[`expDescription_${id}`];
+      
+      if (dateRange && roleTitle && organization && description) {
+        experience.push({ dateRange, roleTitle, organization, description });
+      }
+    });
+
+    // ========== 8. Process Gallery Images ==========
+    // This will be handled by Cloudinary upload in the route
+    let galleryImages = [];
+    if (payload.galleryImageUrls) {
+      try {
+        galleryImages = typeof payload.galleryImageUrls === 'string' 
+          ? JSON.parse(payload.galleryImageUrls) 
+          : payload.galleryImageUrls;
+      } catch (e) {
+        console.error('Error parsing gallery images:', e);
+      }
+    }
+
+    // ========== 9. Process Hero & About Images ==========
+    let heroImage = 'https://placehold.co/160x160';
+    let aboutImage = 'https://placehold.co/600x400';
+
+    // These will be set after Cloudinary upload in route middleware
+    if (payload.heroImageUrl) heroImage = payload.heroImageUrl;
+    if (payload.aboutImageUrl) aboutImage = payload.aboutImageUrl;
+
+    // ========== 10. Create Portfolio Document ==========
+    const portfolio = new Portfolio({
+      profileId: profile._id,
+      slug: finalSlug,
+      name: payload.name || profile.name,
+      profession: payload.profession || 'Professional',
+      briefIntro: payload.briefIntro || 'This is a brief introduction about me.',
+      heroImage,
+      socialLinks,
+      aboutImage,
+      aboutDescription: payload.aboutDescription || 'This is a detailed description about me.',
+      galleryImages,
+      skills,
+      workExperience,
+      experience,
+      design: design._id,
+      createdBy: req.user ? req.user._id : profile.createdBy
+    });
+
+    // ========== 11. Save Portfolio ==========
+    try {
+      await portfolio.save();
+    } catch (saveErr) {
+      // Handle duplicate slug error
+      if (saveErr && saveErr.code === 11000 && saveErr.keyPattern && saveErr.keyPattern.slug) {
+        const newUniqueId = crypto.randomBytes(5).toString('hex');
+        portfolio.slug = `${baseSlug}-${newUniqueId}`;
+        await portfolio.save();
+      } else {
+        throw saveErr;
+      }
+    }
+
+    // ========== 12. Update Profile Reference ==========
+    await Profile.findByIdAndUpdate(
+      profile._id,
+      { $push: { portfolio: portfolio._id } }
+    );
+
+    // ========== 13. Send Response ==========
+    const accept = (req.headers['accept'] || '').toLowerCase();
+    if (req.xhr || accept.includes('application/json') || req.is('json')) {
+      return res.json({ 
+        success: true, 
+        portfolio: portfolio,
+        slug: portfolio.slug,
+        message: 'Portfolio created successfully'
+      });
+    }
+
+    // Redirect to portfolio view
+    res.redirect(`/portfolio/${portfolio.slug}`);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error creating portfolio');
+    console.error('[portfolioController] Error creating portfolio:', err);
+    
+    const accept = (req.headers['accept'] || '').toLowerCase();
+    if (req.xhr || accept.includes('application/json') || req.is('json')) {
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error creating portfolio',
+        error: err.message 
+      });
+    }
+    
+    res.status(500).send('Error creating portfolio: ' + err.message);
   }
 };
 

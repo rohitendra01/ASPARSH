@@ -1,6 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const Profile = require('../models/Profile');
+const Design = require('../models/Design');
+
+// Get all available designs
+router.get('/designs', async (req, res) => {
+  try {
+    const designs = await Design.find({});
+    res.json(designs);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 router.get('/profiles/search', async (req, res) => {
   try {

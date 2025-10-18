@@ -19,16 +19,7 @@
       <input type="hidden" name="slug" value="">
     <% } %>
 
-    <!-- If a profile is attached, show summary and use its data by default -->
-    <% if (profile) { %>
-      <div class="attached-profile">
-        <strong>Attached profile:</strong> <%= profile.name %> — <%= profile.email || profile.mobile || profile.slug %>
-      </div>
-      <p>Most fields will be pre-filled from the attached profile. Uncheck "Use profile data" below to provide custom values.</p>
-      <label>
-        <input type="checkbox" id="use-profile-data" checked> Use profile data (disable to override)
-      </label>
-    <% } else { %>
+   
       <!-- Profile search / attach -->
       <label>
         Attach Profile
@@ -36,7 +27,6 @@
       </label>
       <div id="profile-suggestions" class="suggestions"></div>
       <div id="selected-profile" class="selected-profile">No profile selected</div>
-    <% } %>
 
     <!-- Visiting-card fields: keep only card-specific fields. Contact/name/image come from Profile. -->
     <label>

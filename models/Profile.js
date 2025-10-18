@@ -1,109 +1,133 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+const crypto = require('crypto');
+
+const addressSchema = new Schema({
+  addressLine: { type: String, default: '' },
+  city:        { type: String, default: '' },
+  state:       { type: String, default: '' },
+  country:     { type: String, default: '' },
+  postcode:    { type: String, default: '' }
+}, { _id: false });
+
+const socialLinkSchema = new Schema({
+  platform: { type: String, required: true },
+  url:      { type: String, required: true }
+}, { _id: false });
 
 const profileSchema = new Schema({
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'AdminUser',
-        required: true
-    },
+  createdBy: {
+    type:     Schema.Types.ObjectId,
+    ref:      'AdminUser',
+    required: true
+  },
 
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
+  name: {
+    type:     String,
+    required: true,
+    trim:     true
+  },
 
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true
-    },
+  slug: {
+    type:     String,
+    unique:   true,
+    required: true
+  },
 
-    mobile: {
-        type: String,
-        required: true
-    },
+  email: {
+    type:     String,
+    required: true,
+    unique:   true,
+    lowercase:true
+  },
 
-    image: {
-        type: String,
-        default: 'https://placehold.co/160x160'
-    },
+  mobile: {
+    type:     String,
+    required: true
+  },
 
-    occupation: {
-        type: String,
-        trim: true,
-        default: ''
-    },
+  image: {
+    type:    String,
+    default: 'https://placehold.co/160x160'
+  },
 
-    category: {
-        type: String,
-        trim: true,
-        default: ''
-    },
+  occupation: {
+    type:    String,
+    trim:    true,
+    default: ''
+  },
 
-    subcategory: {
-        type: String,
-        trim: true,
-        default: ''
-    },
+  category: {
+    type:    String,
+    trim:    true,
+    default: ''
+  },
 
-    experience: {
-        type: Number,
-        default: 0
-    },
+  subcategory: {
+    type:    String,
+    trim:    true,
+    default: ''
+  },
 
-    address: {
-        type: new Schema({
-            addressLine: { type: String, default: '' },
-            city: { type: String, default: '' },
-            state: { type: String, default: '' },
-            country: { type: String, default: '' },
-            postcode: { type: String, default: '' }
-        }, { _id: false })
-    },
+  address: {
+    type: addressSchema,
+    default: () => ({})
+  },
 
-    socialLinks: [{
-            platform: {
-                type: String,
-                required: true
-            },
-            url: {
-                type: String,
-                required: true
-            }
-        }, { _id: false }
-    ],
+  socialLinks: {
+    type: [socialLinkSchema],
+    default: []
+  },
 
-    slug: {
-        type: String,
-        unique: true,
-        required: true
-    },
-    hotels: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Hotel'
-    }],
-    metadata: {
-        type: Schema.Types.Mixed
-    }
-}, 
-{
-    timestamps: true
+  hotels: [{
+    type: Schema.Types.ObjectId,
+    ref:  'Hotel'
+  }],
+
+  visitingCard: [{
+    type: Schema.Types.ObjectId,
+    ref:  'VisitingCard'
+  }],
+
+  portfolio: [{
+    type: Schema.Types.ObjectId,
+    ref:  'Portfolio'
+  }],
+
+  metadata: {
+    type: Schema.Types.Mixed
+  }
+}, {
+  timestamps: true
 });
 
+profileSchema.pre('validate', function(next) {
+  if (!this.slug || this.isModified('name')) {
+    const base = this.name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
 
-profileSchema.pre('save', function(next) {
-    if (this.isModified('name') && !this.slug) {
-        this.slug = this.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+    let uniqueId;
+    if (this._id) {
+      // For existing documents
+      const idSource = `${this._id.toString()}-${Date.now()}`;
+      uniqueId = crypto.createHash('md5')
+        .update(idSource)
+        .digest('hex')
+        .substring(0, 10);
+    } else {
+      // For new documents
+      uniqueId = crypto.randomBytes(5).toString('hex');
     }
-    next();
+
+    this.slug = base ? `${base}-${uniqueId}` : uniqueId;
+  }
+  next();
 });
 
-const Profile = mongoose.model('Profile', profileSchema);
-
-module.exports = Profile;
+module.exports = mongoose.model('Profile', profileSchema);

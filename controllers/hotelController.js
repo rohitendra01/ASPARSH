@@ -107,18 +107,37 @@ exports.renderNewHotelForm = (req, res) => {
 // Create hotel
 exports.createHotel = async (req, res) => {
   try {
-  const { hotelName, hotelDescription, hotelType, foodCategories, street, city, state, country, zipCode, selectedProfileId, selectedProfileSlug, selectedProfileName } = req.body;
+  const { hotelName, hotelDescription, hotelType, foodCategories, street, city, state, country, zipCode, selectedProfileId, selectedProfileSlug } = req.body;
     const hotelAddress = { street, city, state, country, zipCode };
-    if (!hotelName || !hotelDescription || !hotelType || !street || !city || !zipCode || !selectedProfileId || !selectedProfileSlug || !selectedProfileName) {
+    if (!hotelName || !hotelDescription || !hotelType || !street || !city || !zipCode) {
       console.error('Hotel creation missing required fields:', {
-        hotelName, hotelDescription, hotelType, street, city, zipCode, selectedProfileId, selectedProfileSlug, selectedProfileName
+        hotelName, hotelDescription, hotelType, street, city, zipCode, selectedProfileId, selectedProfileSlug
       });
       return res.status(400).render('hotels/new', {
-        error: 'All required fields must be filled, including user profile.',
+        error: 'All required fields must be filled.',
         layout: 'layouts/dashboard-boilerplate',
         user: req.user
       });
     }
+
+    const Profile = require('../models/Profile');
+    let profile = null;
+    const mongoose = require('mongoose');
+    if (selectedProfileId && mongoose.Types.ObjectId.isValid(selectedProfileId)) {
+      profile = await Profile.findById(selectedProfileId);
+    }
+    if (!profile && selectedProfileSlug) {
+      profile = await Profile.findOne({ slug: selectedProfileSlug });
+    }
+    if (!profile) {
+      console.error('Hotel creation failed: profile not found for selectedProfileId/Slug', { selectedProfileId, selectedProfileSlug });
+      return res.status(400).render('hotels/new', {
+        error: 'Selected profile not found. Please select a valid profile.',
+        layout: 'layouts/dashboard-boilerplate',
+        user: req.user
+      });
+    }
+
     const hotelSlug = hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const existing = await Hotel.findOne({ hotelSlug });
     if (existing) {
@@ -166,9 +185,9 @@ exports.createHotel = async (req, res) => {
   hotelOfferBanner,
   hotelLogoPublicId: hotelLogoPublicId || null,
   hotelOfferBannerPublicId: hotelOfferBannerPublicId || null,
-      createdByProfile: selectedProfileId,
-      createdByProfileUsername: selectedProfileSlug,
-      createdByProfileName: selectedProfileName,
+      createdByProfile: profile._id,
+      createdByProfileUsername: profile.slug,
+      createdByProfileName: profile.name,
       createdByAdmin: req.user ? req.user._id : undefined,
       createdByAdminUsername: req.user ? req.user.username : undefined
     };

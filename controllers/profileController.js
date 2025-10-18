@@ -39,8 +39,6 @@ exports.createProfile = async (req, res) => {
 
     
 
-    // Auto-generate slug from name
-    const slug = data.name ? data.name.trim().toLowerCase().replace(/\s+/g, '-') : '';
     
     // Build address object from form fields
     const address = {
@@ -54,14 +52,13 @@ exports.createProfile = async (req, res) => {
     const newProfile = new Profile({
       ...data,
       createdBy: req.user._id,
-      image: imageUrl || '', 
+      image: imageUrl || '',
       address,
-  socialLinks: data.socialLinks || [],
-  slug: slug,
-  occupation: data.occupation || '',
-  category: data.category || '',
-  experience: data.experience ? Number(data.experience) : 0,
-  subcategory: data.subcategory || ''
+      socialLinks: data.socialLinks || [],
+      occupation: data.occupation || '',
+      category: data.category || '',
+      experience: data.experience ? Number(data.experience) : 0,
+      subcategory: data.subcategory || ''
     });
     
     await newProfile.save();

@@ -1,515 +1,622 @@
-// public/js/portfolio-wizard.js
-(function () {
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
+// portfolio-wizard.js
 
-  // hotel-style selectors
-  const profileSearch = $('#profileSearch');
-  const resultsDiv = $('#profileSearchResults');
-  const selectedProfileCard = $('#selectedProfileCard');
-  const selectedProfileIdInput = $('#selectedProfileId');
-  const selectedProfileSlugInput = $('#selectedProfileSlug');
-  const selectedProfileNameInput = $('#selectedProfileName');
-  const profileIdInput = $('#profileId');
+let currentStep = 0;
+let selectedProfileId = null;
+let selectedDesignId = null;
+let selectedSkills = [];
+let socialLinks = [];
+let workExperience = [];
+let experienceTimeline = [];
+let galleryFiles = [];
 
-  const form = $('#portfolioWizardForm');
-  const steps = $$('.wizard-step');
-  const stepBtns = $$('.step-btn');
-  const autosaveStatus = $('#autosaveStatus');
+// Initialize wizard
+document.addEventListener('DOMContentLoaded', () => {
+  initWizard();
+  loadDesigns();
+  setupProfileSearch();
+  setupSkillSearch();
+  setupFormValidation();
+  setupImagePreviews();
+  setupCharCounters();
+});
 
-  let draftId = null;
-  let currentStep = 0;
-  let autosaveTimer = null;
-
-  // Helper to read CSRF token injected by server (from hidden input or window.__CSRF)
-  function getCsrf() {
-    if (typeof window !== 'undefined' && window.__CSRF) return window.__CSRF;
-    const el = document.getElementById('_csrf');
-    if (el && el.value) return el.value;
-    return null;
-  }
-
-  function applyCsrf(headers) {
-    const token = getCsrf();
-    if (!token) return headers;
-    // set token in several common header names to be compatible with server config
-    return Object.assign({}, headers, {
-      'x-csrf-token': token,
-      'x-xsrf-token': token,
-      'csrf-token': token,
-      'X-CSRF-Token': token,
-      'CSRF-Token': token
-    });
-  }
-
-  function debounce(fn, wait=300) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(()=> fn(...args), wait);
-    };
-  }
-
-  async function doSearch(q) {
-    if (!resultsDiv) return;
-    resultsDiv.innerHTML = '';
-    if (!q || q.length < 2) return;
-    try {
-      const res = await fetch('/api/profiles/search?q=' + encodeURIComponent(q));
-      const data = await res.json();
-      if (Array.isArray(data) && data.length) {
-        resultsDiv.innerHTML = data.map(function(profile) {
-          return '<div class="search-result-item" data-id="' + profile._id + '" data-slug="' + profile.slug + '" data-name="' + (profile.name||'') + '" data-email="' + (profile.email||'') + '" data-mobile="' + (profile.mobile||'') + '">' +
-            '<strong>' + (profile.name||'') + '</strong> <span class="muted">(' + (profile.slug||'') + ')</span><br>' +
-            '<small>' + (profile.email||'') + ' | ' + (profile.mobile||'') + '</small>' +
-          '</div>';
-        }).join('');
-      } else {
-        resultsDiv.innerHTML = '<div class="muted">No user found.</div>';
-      }
-    } catch (err) {
-      console.error('search error', err);
-    }
-  }
-
-  const debouncedSearch = debounce((ev) => doSearch(ev.target.value), 250);
-  if (profileSearch) profileSearch.addEventListener('input', debouncedSearch);
-
-  if (resultsDiv) {
-    resultsDiv.addEventListener('click', function(e) {
-      var item = e.target.closest('.search-result-item');
-      if (!item) return;
-      if (selectedProfileIdInput) selectedProfileIdInput.value = item.dataset.id;
-      if (selectedProfileSlugInput) selectedProfileSlugInput.value = item.dataset.slug;
-      if (selectedProfileNameInput) selectedProfileNameInput.value = item.dataset.name;
-      if (profileIdInput) profileIdInput.value = item.dataset.id; // legacy field used by payload
-      if (profileSearch) profileSearch.value = item.dataset.name + ' (' + item.dataset.slug + ')';
-      resultsDiv.innerHTML = '';
-
-      if (selectedProfileCard) {
-        selectedProfileCard.innerHTML = '<div class="profile-card" style="border:1px solid #ccc; padding:1rem; border-radius:8px; background:#f9f9f9;">' +
-          '<strong>' + item.dataset.name + '</strong> <span class="muted">(' + item.dataset.slug + ')</span><br>' +
-          '<small>' + item.dataset.email + ' | ' + item.dataset.mobile + '</small>' +
-        '</div>';
-        selectedProfileCard.style.display = 'block';
-      }
-
-      // After selecting profile, prefill title/tagline and create draft
-      if (!draftId) {
-        const payload = { profileId: item.dataset.id };
-        // include CSRF token in header
-        const headers = applyCsrf({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
-        fetch('/dashboard/' + (window.__SLUG || 'me') + '/portfolios/new', {
-          method: 'POST', headers: headers, body: JSON.stringify(payload), credentials: 'same-origin'
-        }).then(r => r.json()).then(data => {
-          if (data && data.portfolio && (data.portfolio._id || data.portfolio.id)) {
-            draftId = data.portfolio._id || data.portfolio.id;
-            autosaveStatus.textContent = 'Draft created';
-          }
-        }).catch(err => console.error(err));
-      }
-
-      // Prefill fields
-      if (!$('#title').value) $('#title').value = item.dataset.name + ' — Portfolio';
-      if (!$('#tagline').value) $('#tagline').value = 'Portfolio of ' + item.dataset.name;
-    });
-  }
-
-  function renderReviewArea() {
-    const area = document.getElementById('reviewArea');
-    if (!area) return;
-    const payload = buildPayload();
-    // Build a simple summary (escaped values)
-    const esc = s => (String(s||'')
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;'));
-    let html = '<div class="review-summary">';
-    html += `<h3>General</h3><p><strong>Title:</strong> ${esc(payload.title)}</p><p><strong>Tagline:</strong> ${esc(payload.tagline)}</p>`;
-    html += `<p><button type="button" data-action="goto" data-step="0">Edit General</button></p>`;
-    html += '<h3>Social</h3>';
-    html += `<p><strong>Website:</strong> ${esc(payload.social.website)}</p><p><strong>LinkedIn:</strong> ${esc(payload.social.linkedin)}</p><p><strong>Instagram:</strong> ${esc(payload.social.instagram)}</p>`;
-    html += `<p><button type="button" data-action="goto" data-step="1">Edit Social</button></p>`;
-    html += '<h3>About</h3>';
-    html += `<p>${esc(payload.about)}</p>`;
-    html += `<p><button type="button" data-action="goto" data-step="2">Edit About</button></p>`;
-    html += '<h3>Projects</h3>';
-    if (payload.projects && payload.projects.length) {
-      html += '<ul>' + payload.projects.map(p => `<li><strong>${esc(p.title)}</strong> — ${esc(p.description)} ${p.link?('(<a href="'+esc(p.link)+'" target="_blank">link</a>)') : ''}</li>`).join('') + '</ul>';
-    } else {
-      html += '<p class="muted">No projects added.</p>';
-    }
-    html += `<p><button type="button" data-action="goto" data-step="3">Edit Projects</button></p>`;
-
-    html += '<h3>Services</h3>';
-    if (payload.services && payload.services.length) {
-      html += '<ul>' + payload.services.map(s => `<li><strong>${esc(s.name)}</strong> — ${esc(s.description)} (Price: ${esc(s.price)})</li>`).join('') + '</ul>';
-    } else {
-      html += '<p class="muted">No services added.</p>';
-    }
-    html += `<p><button type="button" data-action="goto" data-step="4">Edit Services</button></p>`;
-
-    html += '</div>';
-    area.innerHTML = html;
-
-    // wire quick edit buttons
-    area.querySelectorAll('button[data-action="goto"]').forEach(btn => {
-      btn.addEventListener('click', (ev) => {
-        const step = Number(btn.dataset.step);
+// ========== Wizard Navigation ==========
+function initWizard() {
+  const stepButtons = document.querySelectorAll('.step-btn');
+  const navButtons = document.querySelectorAll('[data-action]');
+  
+  stepButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const step = parseInt(btn.dataset.step);
+      if (step <= currentStep) {
         goToStep(step);
-      });
+      }
     });
-  }
-
-  function goToStep(index) {
-    if (index < 0 || index >= steps.length) return;
-    steps.forEach(s => s.classList.remove('active'));
-    stepBtns.forEach(b => b.classList.remove('active'));
-    steps[index].classList.add('active');
-    stepBtns[index].classList.add('active');
-    currentStep = index;
-    // If entering review step, render summary and force a save
-    if (index === steps.length - 1) {
-      renderReviewArea();
-      // force immediate autosave before review (no debounce)
-      clearTimeout(autosaveTimer);
-      (async () => {
-        autosaveStatus.textContent = 'Saving...';
-        try {
-          const payload = buildPayload();
-          if (!payload.profileId) {
-            autosaveStatus.textContent = 'Select a profile first';
-            return;
-          }
-          // create draft if missing or update existing
-          if (!draftId) {
-            const dashboardSlug = (selectedProfileSlugInput && selectedProfileSlugInput.value) || window.__SLUG || 'me';
-            const res = await fetch('/dashboard/' + dashboardSlug + '/portfolios/new', { method: 'POST', headers: applyCsrf({ 'Content-Type': 'application/json', 'Accept': 'application/json' }), body: JSON.stringify(payload), credentials: 'same-origin' });
-            if (res.ok) {
-              const data = await res.json().catch(()=>null);
-              if (data && data.portfolio && (data.portfolio._id || data.portfolio.id)) {
-                draftId = data.portfolio._id || data.portfolio.id;
-                autosaveStatus.textContent = 'Draft created';
-              } else {
-                autosaveStatus.textContent = 'Save failed';
-              }
-            } else {
-              autosaveStatus.textContent = 'Save failed';
-            }
-            return;
-          }
-          // update existing draft
-          const dashboardSlug = (selectedProfileSlugInput && selectedProfileSlugInput.value) || window.__SLUG || 'me';
-          const res = await fetch('/dashboard/' + dashboardSlug + '/portfolios/' + encodeURIComponent(draftId), { method: 'PUT', headers: applyCsrf({ 'Content-Type': 'application/json', 'Accept': 'application/json' }), body: JSON.stringify(payload), credentials: 'same-origin' });
-          if (res.ok) {
-            autosaveStatus.textContent = `Saved ${new Date().toLocaleTimeString()}`;
-          } else {
-            autosaveStatus.textContent = 'Save failed';
-          }
-        } catch (err) {
-          console.error('[portfolio-wizard] review autosave error', err);
-          autosaveStatus.textContent = 'Save failed';
-        }
-      })();
-    } else {
-      triggerAutosave();
-    }
-  }
-  $$('.step-btn').forEach(btn => btn.addEventListener('click', () => goToStep(Number(btn.dataset.step))));
-
-  form.addEventListener('click', (ev) => {
-    const a = ev.target.closest('[data-action]');
-    if (!a) return;
-    const action = a.dataset.action;
-    if (action === 'next') goToStep(Math.min(currentStep + 1, steps.length - 1));
-    if (action === 'prev') goToStep(Math.max(currentStep - 1, 0));
   });
 
-  const projectsList = $('#projectsList');
-  const servicesList = $('#servicesList');
-  const skillsList = $('#skillsList');
-  const galleryList = $('#galleryList');
-  const experienceList = $('#experienceList');
-  const testimonialsList = $('#testimonialsList');
-
-  function makeProjectNode(data = {}) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'project-row';
-    wrapper.innerHTML = `
-      <input class="proj-title" placeholder="Project title" value="${(data.title||'').replace(/"/g, '&quot;')}">
-      <input class="proj-link" placeholder="Project link (optional)" value="${(data.link||'').replace(/"/g, '&quot;')}">
-      <textarea class="proj-desc" placeholder="Short description">${data.description || ''}</textarea>
-      <button class="remove-proj">Remove</button>`;
-    wrapper.querySelector('.remove-proj').addEventListener('click', () => { wrapper.remove(); triggerAutosave(); });
-    [ ...wrapper.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return wrapper;
-  }
-  function addProject(data) { if (projectsList) projectsList.appendChild(makeProjectNode(data)); }
-  if ($('#addProjectBtn')) $('#addProjectBtn').addEventListener('click', () => addProject({}));
-
-  function makeServiceNode(data={}) {
-    const w = document.createElement('div');
-    w.className = 'service-row';
-    w.innerHTML = `
-      <input class="svc-name" placeholder="Service name" value="${(data.name||'').replace(/"/g, '&quot;')}">
-      <input class="svc-price" placeholder="Price" value="${(data.price||'')}">
-      <textarea class="svc-desc" placeholder="Description">${data.description || ''}</textarea>
-      <button class="remove-svc">Remove</button>`;
-    w.querySelector('.remove-svc').addEventListener('click', () => { w.remove(); triggerAutosave(); });
-    [ ...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return w;
-  }
-  if ($('#addServiceBtn')) $('#addServiceBtn').addEventListener('click', () => servicesList.appendChild(makeServiceNode({})));
-
-  // Skills
-  function makeSkillNode(data={}) {
-    const w = document.createElement('div');
-    w.className = 'skill-row';
-    w.innerHTML = `
-      <input class="skill-name" placeholder="Skill name" value="${(data.name||'').replace(/"/g,'&quot;')}">
-      <input class="skill-level" placeholder="Proficiency (0-100)" value="${(data.level||'')}">
-      <button class="remove-skill">Remove</button>`;
-    w.querySelector('.remove-skill').addEventListener('click', () => { w.remove(); triggerAutosave(); });
-    [...w.querySelectorAll('input')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return w;
-  }
-  // expose addSkill for inline onclicks in the template
-  window.addSkill = function(data) { if (skillsList) skillsList.appendChild(makeSkillNode(data||{})); };
-
-  // Gallery
-  function makeGalleryNode(data={}) {
-    const w = document.createElement('div');
-    w.className = 'gallery-row';
-    w.innerHTML = `
-      <input class="gallery-image" placeholder="Image URL" value="${(data.imageUrl||'').replace(/"/g,'&quot;')}">
-      <input class="gallery-title" placeholder="Title" value="${(data.title||'').replace(/"/g,'&quot;')}">
-      <textarea class="gallery-desc" placeholder="Description">${data.description||''}</textarea>
-      <button class="remove-gallery">Remove</button>`;
-    w.querySelector('.remove-gallery').addEventListener('click', () => { w.remove(); triggerAutosave(); });
-    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return w;
-  }
-  window.addGalleryImage = function(data) { if (galleryList) galleryList.appendChild(makeGalleryNode(data||{})); };
-
-  // Experience
-  function makeExperienceNode(data={}) {
-    const w = document.createElement('div');
-    w.className = 'experience-row';
-    w.innerHTML = `
-      <input class="exp-role" placeholder="Role/Title" value="${(data.title||'').replace(/"/g,'&quot;')}">
-      <input class="exp-company" placeholder="Company" value="${(data.company||'').replace(/"/g,'&quot;')}">
-      <input class="exp-start" placeholder="Start (YYYY-MM)" value="${(data.startDate||'')}">
-      <input class="exp-end" placeholder="End (YYYY-MM or present)" value="${(data.endDate||'')}">
-      <textarea class="exp-desc" placeholder="Description">${data.description||''}</textarea>
-      <button class="remove-exp">Remove</button>`;
-    w.querySelector('.remove-exp').addEventListener('click', () => { w.remove(); triggerAutosave(); });
-    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return w;
-  }
-  window.addExperience = function(data) { if (experienceList) experienceList.appendChild(makeExperienceNode(data||{})); };
-
-  // Testimonials
-  function makeTestimonialNode(data={}) {
-    const w = document.createElement('div');
-    w.className = 'testimonial-row';
-    w.innerHTML = `
-      <input class="t-name" placeholder="Name" value="${(data.name||'').replace(/"/g,'&quot;')}">
-      <input class="t-company" placeholder="Company/Position" value="${(data.company||'').replace(/"/g,'&quot;')}">
-      <textarea class="t-text" placeholder="Testimonial">${data.text||''}</textarea>
-      <input class="t-rating" placeholder="Rating (1-5)" value="${(data.rating||'')}">
-      <button class="remove-t">Remove</button>`;
-    w.querySelector('.remove-t').addEventListener('click', () => { w.remove(); triggerAutosave(); });
-    [...w.querySelectorAll('input,textarea')].forEach(el => el.addEventListener('input', triggerAutosave));
-    return w;
-  }
-  window.addTestimonial = function(data) { if (testimonialsList) testimonialsList.appendChild(makeTestimonialNode(data||{})); };
-
-  function buildPayload() {
-    const payload = {};
-    payload.profileId = profileIdInput ? profileIdInput.value : (selectedProfileIdInput ? selectedProfileIdInput.value : null);
-    payload.title = $('#title').value || '';
-    payload.tagline = $('#tagline').value || '';
-    payload.about = $('#about').value || '';
-    payload.social = {
-      website: $('#socialWebsite').value || '',
-      linkedin: $('#socialLinkedin').value || '',
-      instagram: $('#socialInstagram').value || ''
-    };
-    // SEO
-    payload.seo = {
-      title: $('#seoTitle') ? $('#seoTitle').value || '' : '',
-      description: $('#seoDescription') ? $('#seoDescription').value || '' : '',
-      keywords: ($('#seoKeywords') && $('#seoKeywords').value) ? $('#seoKeywords').value.split(',').map(s=>s.trim()).filter(Boolean) : [],
-      ogImage: $('#seoOgImage') ? $('#seoOgImage').value || '' : ''
-    };
-    // Theme
-    payload.theme = {
-      primary: $('#themePrimary') ? $('#themePrimary').value || '' : '',
-      secondary: $('#themeSecondary') ? $('#themeSecondary').value || '' : '',
-      accent: $('#themeAccent') ? $('#themeAccent').value || '' : '',
-      font: $('#themeFont') ? $('#themeFont').value || '' : ''
-    };
-    // Skills
-    payload.skills = Array.from(document.querySelectorAll('.skill-row')).map(r=>({
-      name: (r.querySelector('.skill-name') && r.querySelector('.skill-name').value) || '',
-      level: (r.querySelector('.skill-level') && r.querySelector('.skill-level').value) || ''
-    }));
-    payload.projects = Array.from(document.querySelectorAll('.project-row')).map(r => ({
-      title: (r.querySelector('.proj-title') && r.querySelector('.proj-title').value) || '',
-      link: (r.querySelector('.proj-link') && r.querySelector('.proj-link').value) || '',
-      description: (r.querySelector('.proj-desc') && r.querySelector('.proj-desc').value) || ''
-      // images could be added by gallery or project-specific inputs in future
-    }));
-    payload.services = Array.from(document.querySelectorAll('.service-row')).map(r => ({
-      name: (r.querySelector('.svc-name') && r.querySelector('.svc-name').value) || '',
-      // preserve empty price instead of forcing zero
-      price: (r.querySelector('.svc-price') && r.querySelector('.svc-price').value) === '' ? null : Number((r.querySelector('.svc-price') && r.querySelector('.svc-price').value)),
-      description: (r.querySelector('.svc-desc') && r.querySelector('.svc-desc').value) || ''
-    }));
-    // Gallery
-    payload.gallery = Array.from(document.querySelectorAll('.gallery-row')).map(r=>({
-      imageUrl: (r.querySelector('.gallery-image') && r.querySelector('.gallery-image').value) || '',
-      title: (r.querySelector('.gallery-title') && r.querySelector('.gallery-title').value) || '',
-      description: (r.querySelector('.gallery-desc') && r.querySelector('.gallery-desc').value) || ''
-    }));
-    // Experience
-    payload.experience = Array.from(document.querySelectorAll('.experience-row')).map(r=>({
-      title: (r.querySelector('.exp-role') && r.querySelector('.exp-role').value) || '',
-      company: (r.querySelector('.exp-company') && r.querySelector('.exp-company').value) || '',
-      startDate: (r.querySelector('.exp-start') && r.querySelector('.exp-start').value) || '',
-      endDate: (r.querySelector('.exp-end') && r.querySelector('.exp-end').value) || '',
-      description: (r.querySelector('.exp-desc') && r.querySelector('.exp-desc').value) || ''
-    }));
-    // Testimonials
-    payload.testimonials = Array.from(document.querySelectorAll('.testimonial-row')).map(r=>({
-      name: (r.querySelector('.t-name') && r.querySelector('.t-name').value) || '',
-      position: (r.querySelector('.t-company') && r.querySelector('.t-company').value) || '',
-      text: (r.querySelector('.t-text') && r.querySelector('.t-text').value) || '',
-      rating: (r.querySelector('.t-rating') && r.querySelector('.t-rating').value) ? Number(r.querySelector('.t-rating').value) : null
-    }));
-    return payload;
-  }
-
-  function triggerAutosave() {
-    autosaveStatus.textContent = 'Saving...';
-    console.log('[portfolio-wizard] triggerAutosave - start');
-    clearTimeout(autosaveTimer);
-    autosaveTimer = setTimeout(async () => {
-      const payload = buildPayload();
-      if (!payload.profileId) {
-        autosaveStatus.textContent = 'Select a profile first';
-        console.log('[portfolio-wizard] triggerAutosave - no profileId');
-        return;
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = btn.dataset.action;
+      
+      if (action === 'next') {
+        if (validateCurrentStep()) {
+          goToStep(currentStep + 1);
+        }
+      } else if (action === 'prev') {
+        goToStep(currentStep - 1);
       }
+    });
+  });
 
-      // helper to perform fetch with timeout
-      const fetchWithTimeout = (url, opts = {}, timeout = 15000) => {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
-        opts.signal = controller.signal;
-        // ensure we don't accidentally lose CSRF header when callers forget
-        if (!opts.headers) opts.headers = {};
-        opts.headers = applyCsrf(opts.headers);
-        // include credentials so session cookie is sent for csurf validation
-        if (!opts.credentials) opts.credentials = 'same-origin';
-        // If content-type is JSON and body is a string, attempt to inject _csrf token in body as well
-        try {
-          const ct = (opts.headers['Content-Type'] || opts.headers['content-type'] || '').toLowerCase();
-          const token = getCsrf();
-          if (token && ct.indexOf('application/json') !== -1 && opts.body && typeof opts.body === 'string') {
-            try {
-              const parsed = JSON.parse(opts.body);
-              if (parsed && typeof parsed === 'object') {
-                parsed._csrf = parsed._csrf || token;
-                opts.body = JSON.stringify(parsed);
-              }
-            } catch (e) {
-              // ignore JSON parse errors
-            }
-          }
-        } catch (e) {
-          // ignore
-        }
-        return fetch(url, opts).finally(() => clearTimeout(id));
-      };
+  // Form submission
+  document.getElementById('portfolioWizardForm').addEventListener('submit', handleSubmit);
+}
 
+function goToStep(stepNum) {
+  const steps = document.querySelectorAll('.wizard-step');
+  const stepButtons = document.querySelectorAll('.step-btn');
+  
+  if (stepNum < 0 || stepNum >= steps.length) return;
+  
+  // Hide current step
+  steps[currentStep].classList.remove('active');
+  stepButtons[currentStep].classList.remove('active');
+  
+  // Show new step
+  currentStep = stepNum;
+  steps[currentStep].classList.add('active');
+  stepButtons[currentStep].classList.add('active');
+  
+  // Mark completed steps
+  stepButtons.forEach((btn, idx) => {
+    if (idx < currentStep) {
+      btn.classList.add('completed');
+    }
+  });
+  
+  // Update review if on final step
+  if (currentStep === 8) {
+    generateReview();
+  }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ========== Step 0: Design & Profile Selection ==========
+async function loadDesigns() {
+  try {
+    const response = await fetch('/api/designs');
+    if (!response.ok) throw new Error('Failed to fetch designs');
+    
+    const designs = await response.json();
+    const grid = document.getElementById('designGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = designs.map(design => `
+      <div class="design-card" data-design-id="${design._id}" onclick="selectDesign('${design._id}', this)">
+        <img src="${design.previewImage || '/assets/default-design.png'}" alt="${design.name}">
+        <h4>${design.name}</h4>
+        <p>${design.description}</p>
+        <div class="design-overlay">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+    `).join('');
+
+    if (designs.length === 0) {
+      grid.innerHTML = '<div class="no-designs">No portfolio designs available.</div>';
+    }
+  } catch (err) {
+    console.error('Error loading designs:', err);
+    const grid = document.getElementById('designGrid');
+    if (grid) {
+      grid.innerHTML = '<div class="error">Failed to load designs. Please try again later.</div>';
+    }
+    showNotification('Failed to load designs', 'error');
+  }
+}
+
+function selectDesign(designId, element) {
+  selectedDesignId = designId;
+  document.getElementById('designId').value = designId;
+  
+  // Visual feedback
+  document.querySelectorAll('.design-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  element.classList.add('selected');
+  
+  checkStep0Completion();
+}
+
+function setupProfileSearch() {
+  const searchInput = document.getElementById('profileSearch');
+  const resultsDiv = document.getElementById('profileSearchResults');
+  let debounceTimer;
+  
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const query = e.target.value.trim();
+    
+    if (query.length < 2) {
+      resultsDiv.innerHTML = '';
+      return;
+    }
+    
+    debounceTimer = setTimeout(async () => {
       try {
-        if (!draftId) {
-          const dashboardSlug = (selectedProfileSlugInput && selectedProfileSlugInput.value) || window.__SLUG || 'me';
-          const url = '/dashboard/' + dashboardSlug + '/portfolios/new';
-          console.log('[portfolio-wizard] creating draft', url, payload);
-          const res = await fetchWithTimeout(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' }, 15000);
-          if (!res.ok) {
-            autosaveStatus.textContent = 'Save failed';
-            console.error('[portfolio-wizard] create draft failed', res.status, await res.text());
-            return;
-          }
-          const data = await res.json().catch(e => { console.error('[portfolio-wizard] invalid json create response', e); return null; });
-          if (data && data.portfolio && (data.portfolio._id || data.portfolio.id)) {
-            draftId = data.portfolio._id || data.portfolio.id;
-            autosaveStatus.textContent = 'Draft created';
-            console.log('[portfolio-wizard] draft created', draftId);
-          } else {
-            autosaveStatus.textContent = 'Save failed';
-            console.error('[portfolio-wizard] unexpected create response', data);
-          }
-          return;
-        }
-
-        const dashboardSlug = (selectedProfileSlugInput && selectedProfileSlugInput.value) || window.__SLUG || 'me';
-        const url = '/dashboard/' + dashboardSlug + '/portfolios/' + encodeURIComponent(draftId);
-        console.log('[portfolio-wizard] updating draft', url, payload);
-        const res = await fetchWithTimeout(url, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' }, 15000);
-        if (res.ok) {
-          autosaveStatus.textContent = `Saved ${new Date().toLocaleTimeString()}`;
-          console.log('[portfolio-wizard] update saved');
+        const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Failed to fetch profiles');
+        
+        const profiles = await response.json();
+        
+        if (profiles && profiles.length > 0) {
+          resultsDiv.innerHTML = profiles.map(profile => `
+            <div class="search-result-item" onclick="selectProfile('${profile._id}', '${profile.name || ''}', '${profile.slug || ''}')">
+              ${profile.image ? `<img src="${profile.image}" alt="${profile.name || 'Profile'}" />` : ''}
+              <div class="profile-info">
+                <strong>${profile.name || profile.slug || 'Unnamed Profile'}</strong>
+                <small>${[profile.email, profile.mobile].filter(Boolean).join(' | ') || 'No contact info'}</small>
+              </div>
+            </div>
+          `).join('');
         } else {
-          autosaveStatus.textContent = 'Save failed';
-          console.error('[portfolio-wizard] update failed', res.status, await res.text());
+          resultsDiv.innerHTML = '<div class="no-results">No profiles found</div>';
         }
       } catch (err) {
-        if (err.name === 'AbortError') {
-          autosaveStatus.textContent = 'Save timed out';
-          console.error('[portfolio-wizard] fetch aborted (timeout)');
-        } else {
-          autosaveStatus.textContent = 'Save failed';
-          console.error('[portfolio-wizard] autosave error', err);
-        }
+        console.error('Profile search error:', err);
+        resultsDiv.innerHTML = '<div class="error">Failed to search profiles. Please try again.</div>';
+        showNotification('Failed to search profiles', 'error');
       }
-    }, 700);
+    }, 300);
+  });
+}
+
+function selectProfile(profileId, name, slug) {
+  if (!profileId) {
+    showNotification('Invalid profile selection', 'error');
+    return;
   }
 
-  form && form.addEventListener('input', () => triggerAutosave());
+  selectedProfileId = profileId;
+  document.getElementById('profileId').value = profileId;
+  
+  const cardDiv = document.getElementById('selectedProfileCard');
+  cardDiv.innerHTML = `
+    <div class="profile-card-selected">
+      <i class="fas fa-user-check"></i>
+      <strong>Selected:</strong> ${name || 'Unnamed Profile'} ${slug ? `(${slug})` : ''}
+      <button type="button" onclick="clearProfile()" class="btn-clear">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+  cardDiv.style.display = 'block';
+  
+  document.getElementById('profileSearchResults').innerHTML = '';
+  document.getElementById('profileSearch').value = '';
+  
+  checkStep0Completion();
+}
 
-  $('#publishBtn') && $('#publishBtn').addEventListener('click', async () => {
-    try {
-      if (!draftId) return alert('Please select a profile and fill at least general info.');
-      // include CSRF when doing explicit save before publish
-      const headers = applyCsrf({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
-      await fetch('/dashboard/' + (window.__SLUG || 'me') + '/portfolios/' + encodeURIComponent(draftId), {
-        method: 'PUT', headers: headers, body: JSON.stringify(buildPayload()), credentials: 'same-origin'
-      });
-      const pubHeaders = applyCsrf({});
-      const pub = await fetch('/dashboard/' + (window.__SLUG || 'me') + '/portfolios/' + encodeURIComponent(draftId) + '/publish', { method: 'POST', headers: pubHeaders, credentials: 'same-origin' });
-      const data = await pub.json();
-      if (data && data.ok) {
-        alert('Portfolio published');
-        window.location.href = `/dashboard/${(window.__SLUG || 'me')}/portfolios`;
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Publish failed');
-    }
-  });
+function clearProfile() {
+  selectedProfileId = null;
+  document.getElementById('profileId').value = '';
+  document.getElementById('selectedProfileCard').style.display = 'none';
+  checkStep0Completion();
+}
 
-  goToStep(0);
+function checkStep0Completion() {
+  const nextBtn = document.getElementById('step0NextBtn');
+  nextBtn.disabled = !(selectedDesignId && selectedProfileId);
+}
 
-  document.addEventListener('click', e => {
-    if (profileSearch && !profileSearch.contains(e.target) && resultsDiv && !resultsDiv.contains(e.target)) {
+// ========== Step 2: Social Links ==========
+let socialLinkCounter = 0;
+
+function addSocialLink() {
+  const container = document.getElementById('socialLinksList');
+  const id = socialLinkCounter++;
+  
+  const div = document.createElement('div');
+  div.className = 'dynamic-item';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <div class="form-row">
+      <div class="form-group">
+        <label>Platform</label>
+        <select name="socialPlatform_${id}" required>
+          <option value="">Select platform...</option>
+          <option value="Website">Website</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="GitHub">GitHub</option>
+          <option value="Twitter">Twitter</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="YouTube">YouTube</option>
+          <option value="Behance">Behance</option>
+          <option value="Dribbble">Dribbble</option>
+        </select>
+      </div>
+      <div class="form-group flex-grow">
+        <label>URL</label>
+        <input type="url" name="socialUrl_${id}" placeholder="https://..." required>
+      </div>
+      <button type="button" class="btn-remove" onclick="removeSocialLink(${id})">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function removeSocialLink(id) {
+  const item = document.querySelector(`[data-id="${id}"]`);
+  if (item) item.remove();
+}
+
+// ========== Step 5: Skills Search ==========
+function setupSkillSearch() {
+  const searchInput = document.getElementById('skillSearch');
+  const resultsDiv = document.getElementById('skillSearchResults');
+  let debounceTimer;
+  
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    const query = e.target.value.trim();
+    
+    if (query.length < 2) {
       resultsDiv.innerHTML = '';
+      return;
+    }
+    
+    debounceTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/skills/search?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        
+        resultsDiv.innerHTML = data.skills.map(skill => `
+          <div class="skill-result-item" onclick="addSkillToPortfolio('${skill._id}', '${skill.name}', '${skill.iconClass}', '${skill.description}')">
+            <i class="${skill.iconClass}"></i>
+            <div>
+              <strong>${skill.name}</strong>
+              <small>${skill.description}</small>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Skill search error:', err);
+      }
+    }, 300);
+  });
+}
+
+function addSkillToPortfolio(skillId, name, iconClass, description) {
+  if (selectedSkills.find(s => s.id === skillId)) {
+    showNotification('Skill already added', 'warning');
+    return;
+  }
+  
+  selectedSkills.push({ id: skillId, name, iconClass, description });
+  
+  const container = document.getElementById('selectedSkillsList');
+  const div = document.createElement('div');
+  div.className = 'selected-skill-item';
+  div.dataset.skillId = skillId;
+  div.innerHTML = `
+    <i class="${iconClass}"></i>
+    <div>
+      <strong>${name}</strong>
+      <small>${description}</small>
+    </div>
+    <button type="button" class="btn-remove" onclick="removeSkill('${skillId}')">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+  container.appendChild(div);
+  
+  document.getElementById('skillSearch').value = '';
+  document.getElementById('skillSearchResults').innerHTML = '';
+}
+
+function removeSkill(skillId) {
+  selectedSkills = selectedSkills.filter(s => s.id !== skillId);
+  const item = document.querySelector(`[data-skill-id="${skillId}"]`);
+  if (item) item.remove();
+}
+
+// ========== Step 6: Work Experience ==========
+let workExpCounter = 0;
+
+function addWorkExperience() {
+  const container = document.getElementById('workExperienceList');
+  const id = workExpCounter++;
+  
+  const div = document.createElement('div');
+  div.className = 'dynamic-item work-exp-item';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <h4>Project ${id + 1}</h4>
+    <div class="form-group">
+      <label>Category</label>
+      <select name="workCategory_${id}" required>
+        <option value="">Select category...</option>
+        <option value="Web Development">Web Development</option>
+        <option value="Mobile Development">Mobile Development</option>
+        <option value="Data Science">Data Science</option>
+        <option value="Machine Learning">Machine Learning</option>
+        <option value="DevOps">DevOps</option>
+        <option value="UI/UX Design">UI/UX Design</option>
+        <option value="Digital Marketing">Digital Marketing</option>
+        <option value="Content Creation">Content Creation</option>
+        <option value="Photography">Photography</option>
+        <option value="Videography">Videography</option>
+        <option value="Graphic Design">Graphic Design</option>
+        <option value="Writing & Editing">Writing & Editing</option>
+        <option value="Consulting">Consulting</option>
+        <option value="Project Management">Project Management</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" name="workTitle_${id}" placeholder="Project title" required>
+    </div>
+    <div class="form-group">
+      <label>Description (max 200 chars)</label>
+      <textarea name="workDescription_${id}" rows="2" maxlength="200" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>Details/Demo URL</label>
+      <input type="url" name="workDetailsUrl_${id}" placeholder="https://..." required>
+    </div>
+    <button type="button" class="btn-remove" onclick="removeWorkExperience(${id})">
+      <i class="fas fa-trash"></i> Remove Project
+    </button>
+  `;
+  container.appendChild(div);
+}
+
+function removeWorkExperience(id) {
+  const item = document.querySelector(`[data-id="${id}"]`);
+  if (item) item.remove();
+}
+
+// ========== Step 7: Experience Timeline ==========
+let expCounter = 0;
+
+function addExperience() {
+  const container = document.getElementById('experienceList');
+  const id = expCounter++;
+  
+  const div = document.createElement('div');
+  div.className = 'dynamic-item exp-timeline-item';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <h4>Experience ${id + 1}</h4>
+    <div class="form-group">
+      <label>Date Range</label>
+      <input type="text" name="expDateRange_${id}" placeholder="e.g., 2020 - Present" required>
+    </div>
+    <div class="form-group">
+      <label>Role Title</label>
+      <input type="text" name="expRoleTitle_${id}" placeholder="e.g., Senior Developer" required>
+    </div>
+    <div class="form-group">
+      <label>Organization</label>
+      <input type="text" name="expOrganization_${id}" placeholder="e.g., Tech Corp Inc." required>
+    </div>
+    <div class="form-group">
+      <label>Description (max 500 chars)</label>
+      <textarea name="expDescription_${id}" rows="3" maxlength="500" required></textarea>
+    </div>
+    <button type="button" class="btn-remove" onclick="removeExperience(${id})">
+      <i class="fas fa-trash"></i> Remove Experience
+    </button>
+  `;
+  container.appendChild(div);
+}
+
+function removeExperience(id) {
+  const item = document.querySelector(`[data-id="${id}"]`);
+  if (item) item.remove();
+}
+
+// ========== Image Previews ==========
+function setupImagePreviews() {
+  const heroImage = document.getElementById('heroImage');
+  const aboutImage = document.getElementById('aboutImage');
+  const galleryImages = document.getElementById('galleryImages');
+  
+  if (heroImage) {
+    heroImage.addEventListener('change', (e) => {
+      previewImage(e.target.files[0], 'heroImagePreview');
+    });
+  }
+  
+  if (aboutImage) {
+    aboutImage.addEventListener('change', (e) => {
+      previewImage(e.target.files[0], 'aboutImagePreview');
+    });
+  }
+  
+  if (galleryImages) {
+    galleryImages.addEventListener('change', (e) => {
+      previewGalleryImages(e.target.files);
+    });
+  }
+}
+
+function previewImage(file, previewId) {
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewGalleryImages(files) {
+  const preview = document.getElementById('galleryPreview');
+  preview.innerHTML = '';
+  
+  Array.from(files).forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const div = document.createElement('div');
+      div.className = 'gallery-thumb';
+      div.innerHTML = `
+        <img src="${e.target.result}" alt="Gallery ${idx + 1}">
+        <button type="button" onclick="removeGalleryThumb(this)" class="btn-remove-thumb">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      preview.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeGalleryThumb(btn) {
+  btn.parentElement.remove();
+}
+
+// ========== Character Counters ==========
+function setupCharCounters() {
+  const textareas = document.querySelectorAll('textarea[maxlength]');
+  textareas.forEach(textarea => {
+    const counter = textarea.nextElementSibling;
+    if (counter && counter.classList.contains('char-count')) {
+      textarea.addEventListener('input', () => {
+        counter.textContent = `${textarea.value.length}/${textarea.maxLength}`;
+      });
     }
   });
+}
 
-})();
+// ========== Validation ==========
+function validateCurrentStep() {
+  const currentFieldset = document.querySelector(`.wizard-step[data-step="${currentStep}"]`);
+  const inputs = currentFieldset.querySelectorAll('input[required], textarea[required], select[required]');
+  
+  let isValid = true;
+  inputs.forEach(input => {
+    if (!input.value.trim()) {
+      input.classList.add('error');
+      isValid = false;
+    } else {
+      input.classList.remove('error');
+    }
+  });
+  
+  if (!isValid) {
+    showNotification('Please fill in all required fields', 'error');
+  }
+  
+  return isValid;
+}
+
+function setupFormValidation() {
+  const form = document.getElementById('portfolioWizardForm');
+  form.addEventListener('input', (e) => {
+    if (e.target.classList.contains('error')) {
+      e.target.classList.remove('error');
+    }
+  });
+}
+
+// ========== Review Generation ==========
+function generateReview() {
+  const reviewDiv = document.getElementById('reviewContent');
+  const formData = new FormData(document.getElementById('portfolioWizardForm'));
+  
+  let html = '<div class="review-section">';
+  
+  // Design & Profile
+  html += `<h3>Design & Profile</h3>`;
+  html += `<p><strong>Design ID:</strong> ${selectedDesignId}</p>`;
+  html += `<p><strong>Profile ID:</strong> ${selectedProfileId}</p>`;
+  
+  // Hero Section
+  html += `<h3>Hero Section</h3>`;
+  html += `<p><strong>Name:</strong> ${formData.get('name')}</p>`;
+  html += `<p><strong>Profession:</strong> ${formData.get('profession')}</p>`;
+  html += `<p><strong>Brief Intro:</strong> ${formData.get('briefIntro')}</p>`;
+  
+  // Skills
+  html += `<h3>Skills (${selectedSkills.length})</h3>`;
+  html += `<ul>${selectedSkills.map(s => `<li>${s.name}</li>`).join('')}</ul>`;
+  
+  // Work Experience
+  const workItems = document.querySelectorAll('#workExperienceList .dynamic-item');
+  html += `<h3>Work Experience (${workItems.length} projects)</h3>`;
+  
+  // Experience Timeline
+  const expItems = document.querySelectorAll('#experienceList .dynamic-item');
+  html += `<h3>Timeline (${expItems.length} entries)</h3>`;
+  
+  html += '</div>';
+  reviewDiv.innerHTML = html;
+}
+
+// ========== Form Submission ==========
+async function handleSubmit(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const formData = new FormData(form);
+  
+  // Add selected skills as JSON
+  formData.append('skills', JSON.stringify(selectedSkills.map(s => s.id)));
+  
+  // Get CSRF token
+  const csrf = document.getElementById('_csrf');
+  if (csrf) {
+    formData.append('_csrf', csrf.value);
+  }
+  
+  try {
+    showNotification('Creating portfolio...', 'info');
+    
+    const response = await fetch('/portfolio/create', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showNotification('Portfolio created successfully!', 'success');
+      setTimeout(() => {
+        window.location.href = `/portfolio/${data.slug}`;
+      }, 1500);
+    } else {
+      showNotification(data.message || 'Error creating portfolio', 'error');
+    }
+  } catch (err) {
+    console.error('Submission error:', err);
+    showNotification('Network error. Please try again.', 'error');
+  }
+}
+
+// ========== Notification System ==========
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
