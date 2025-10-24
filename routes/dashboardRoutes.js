@@ -10,27 +10,6 @@ const userController = require('../controllers/userController');
 const profileController = require('../controllers/profileController');
 const portfolioController = require('../controllers/portfolioController');
 
-// Route for /:slug/portfolios to view all portfolios
-router.get('/:slug/portfolios', isLoggedIn, portfolioController.listPortfolios);
-
-// Route for /:slug/portfolios/new (render form)
-router.get('/:slug/portfolios/new', isLoggedIn, portfolioController.renderNewForm);
-
-// Route for /:slug/portfolios/new (handle POST)
-router.post('/:slug/portfolios/new', isLoggedIn, upload.single('portfolioImage'), csrfProtection, portfolioController.createPortfolio);
-
-// Route for /:slug/portfolios/:id (show portfolio details)
-router.get('/:slug/portfolios/:id', isLoggedIn, portfolioController.showPortfolio);
-
-// Route for /:slug/portfolios/:id/edit (render form)
-router.get('/:slug/portfolios/:id/edit', isLoggedIn, portfolioController.renderEditForm);
-
-// Route for /:slug/portfolios/:id/edit (handle POST)
-router.post('/:slug/portfolios/:id/edit', isLoggedIn, upload.single('portfolioImage'), csrfProtection, portfolioController.updatePortfolio);
-
-// Route for /:slug/portfolios/:id/delete (handle POST)
-router.post('/:slug/portfolios/:id/delete', isLoggedIn, csrfProtection, portfolioController.deletePortfolio);
-
 // Route: dashboard home (protected)
 router.get('/', isLoggedIn, (req, res) => {
   res.render('dashboard', { layout: 'layouts-boilerplate' });

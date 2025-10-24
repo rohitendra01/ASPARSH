@@ -8,8 +8,8 @@ const loginOtpController = require('../controllers/loginOtpController');
 const authController = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-router.get('/register', csrfProtection, authController.getRegisterPage);
-router.post('/register', csrfProtection, authController.registerUser);
+// router.get('/register', csrfProtection, authController.getRegisterPage);
+// router.post('/register', csrfProtection, authController.registerUser);
 
 
 router.use(authMiddleware.storeReturnTo);

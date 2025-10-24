@@ -154,7 +154,7 @@ router.get('/hotel/:hotelSlug', hotelController.showHotelPage);
 router.get('/visiting-card/:profileSlug', visitingCardController.showByProfile);
 
 // Portfolio show page
-router.get('/portfolio/:profileSlug', portfolioController.showPortfolio);
+router.get('/portfolio/:slug', portfolioController.showPortfolio);
 
 
 

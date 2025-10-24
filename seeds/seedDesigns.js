@@ -7,24 +7,30 @@ require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 const designs = [
   {
     name: 'Basic Portfolio',
+    category: 'basic',
     slug: 'basic',
-    templatePath: 'basic-portfolios/show.ejs',
+    templatePath: 'portfolios/basic-portfolios/show',
     previewImage: '/images/designs/basic-preview.png',
-    description: 'Clean and minimal portfolio design'
+    description: 'Clean and minimal portfolio design',
+    isActive: true
   },
   {
-    name: 'Modern Portfolio',
-    slug: 'modern',
-    templatePath: 'custom-portfolios/modern.ejs',
-    previewImage: '/images/designs/modern-preview.png',
-    description: 'Contemporary design with animations'
+    name: 'Advocate Portfolio',
+    category: 'custom',
+    slug: 'advocate',
+    templatePath: 'portfolios/custom-portfolios/advocate',
+    previewImage: '/images/designs/advocate-preview.png',
+    description: 'Contemporary design with animations',
+    isActive: true
   },
   {
-    name: 'Creative Portfolio',
-    slug: 'creative',
-    templatePath: 'custom-portfolios/creative.ejs',
-    previewImage: '/images/designs/creative-preview.png',
-    description: 'Bold and artistic layout'
+    name: 'Professor Portfolio',
+    category: 'custom',
+    slug: 'professor',
+    templatePath: 'portfolios/custom-portfolios/professor',
+    previewImage: '/images/designs/professor-preview.png',
+    description: 'Bold and artistic layout',
+    isActive: true
   }
 ];
 

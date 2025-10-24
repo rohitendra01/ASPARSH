@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dr. Sarah Johnson - Professor of Computer Science</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+  />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Georgia", serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(145deg, #f5f3ec 0%, #d2cdb9 30%, #92a378 90%);
+      color: white;
+      padding: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+      opacity: 0.1;
+    }
+    .hero-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-content { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2rem; }
+    .profile-section { display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; justify-content: center; }
+    .profile-img-container { position: relative; }
+    .profile-img {
+      width: 250px; height: 250px; border-radius: 25%;
+      background: url("https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400") center/cover;
+      border: 2.5px solid #48695c; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+    }
+    .profile-img:hover { transform: scale(1.05); }
+    .hero-text { max-width: 600px; }
+    .hero-text h1 { font-size: 3.5rem; margin-bottom: 1rem; color: #1a1a1a; font-weight: 600; }
+    .hero-text .subtitle { font-size: 1.7rem; color: #2f3e2f; margin-bottom: 1.5rem; font-weight: 600; }
+    .hero-text p { font-size: 1.2rem; color: #4a4226; opacity: 0.9; line-height: 1.7; }
+    .action-buttons { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+    .action-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.1); color: #3b3622;
+      border: 1.5px solid #4a4226; padding: 12px 24px; border-radius: 50px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .action-btn:hover {
+      background: #e74c3c; border-color: #e74c3c;
+      transform: translateY(-2px); box-shadow: 0 8px 25px rgba(231,76,60,0.3);
+    }
+    .action-btn i { font-size: 1.1rem; }
+    .social-links { display: flex; gap: 1.5rem; justify-content: center; }
+    .social-links a {
+      display: flex; align-items: center; justify-content: center;
+      width: 50px; height: 50px; background: rgba(255,255,255,0.1); color: #24413d;
+      border-radius: 50%; text-decoration: none; transition: all 0.3s ease;
+      backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.1);
+    }
+    .social-links a:hover { background: #e74c3c; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(231,76,60,0.3); }
+    .social-links a i { font-size: 1.2rem; }
+
+    .hero-cover {
+      position: absolute; top: 0; left: 0; width: 100%; height: 22%;
+      background-image: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1200&q=80");
+      background-size: cover; background-position: center; z-index: 1; opacity: 0.6;
+      border-bottom: 3px solid rgba(255,255,255,0.2);
+    }
+
+    /* Contact Card */
+    .contact-details-card {
+      background: rgba(255,255,255,0.9); padding: 20px; border: 1px solid rgba(184,134,11,0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin: 2rem auto; max-width: 600px;
+    }
+    .contact-details-card h3 { text-align: center; color: #1d1c1c; margin-bottom: 20px; font-size: 2.3rem; font-family: Georgia, "Times New Roman", Times, serif; position: relative; }
+    .contact-details-card h3::after { content: ""; display: block; width: 80px; height: 3px; background-color: #b8860b; margin: 10px auto 0; border-radius: 2px; }
+    .contact-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; text-decoration: none; color: inherit; transition: all 0.3s; }
+    .contact-item:hover { background: rgba(184,134,11,0.1); cursor: pointer; }
+    .contact-icon { width: 40px; height: 40px; background: linear-gradient(135deg,#b8860b,#daa520); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+    .contact-info { flex: 1; }
+    .contact-label { font-size: 0.85rem; color: #1a1a1a; margin-bottom: 3px; font-family: "Segoe UI", sans-serif; }
+    .contact-value { font-size: 0.95rem; color: #3b3622; font-family: "Segoe UI", sans-serif; word-break: break-word; }
+
+    /* Footer */
+    footer { background: linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%); color: black; text-align: center; padding: 2rem 0; }
+    footer a { text-decoration: none; font-weight: bold; color: inherit; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .profile-section { flex-direction: column; text-align: center; gap: 2rem; }
+      .profile-img { width: 200px; height: 200px; }
+      .hero-text h1 { font-size: 2.5rem; }
+      .hero-text .subtitle { font-size: 1.2rem; }
+      .hero-text p { font-size: 1rem; }
+      .action-btn { width: 200px; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .hero-text h1 { font-size: 2rem; }
+      .hero-text .subtitle { font-size: 1rem; }
+      .profile-img { width: 150px; height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-cover"></div>
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="profile-section">
+          <div class="profile-img-container">
+            <div class="profile-img"></div>
+          </div>
+          <div class="hero-text">
+            <h1>Dr. Irfan Shah</h1>
+            <div class="subtitle">Professor of Computer Science</div>
+            <p>
+              Specializing in Artificial Intelligence, Machine Learning, and Human-Computer Interaction.
+            </p>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="action-btn" onclick="saveContact()">
+            <i class="fas fa-address-card"></i> Save Contact
+          </button>
+          <button class="action-btn" onclick="takeScreenshot()">
+            <i class="fas fa-camera"></i> Screenshot
+          </button>
+        </div>
+
+        <div class="social-links">
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fas fa-envelope"></i></a>
+          <a href="#"><i class="fas fa-phone"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Details Card -->
+  <div class="contact-details-card">
+    <h3>Contact</h3>
+    <a href="tel:+919876543210" class="contact-item">
+      <div class="contact-icon"><i class="fas fa-phone"></i></div>
+      <div class="contact-info">
+        <div class="contact-label">Phone Number</div>
+        <div class="contact-value">+91 98765 43210</div>
+      </div>
+    </a>
+    <a href="mailto:advocate.kumar@legalfirm.com" class="contact-item">
+      <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+      <div class="contact-info">
+        <div class="contact-label">Email Address</div>
+        <div class="contact-value">advocate.kumar@legalfirm.com</div>
+      </div>
+    </a>
+    <a href="https://www.google.com/maps/search/?api=1&query=Chamber+No.+45,+District+Court+Complex,+Delhi+110001" target="_blank" class="contact-item">
+      <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+      <div class="contact-info">
+        <div class="contact-label">Office Address</div>
+        <div class="contact-value">Chamber No. 45, District Court Complex, Delhi - 110001, India</div>
+      </div>
+    </a>
+    <a href="/contact" class="contact-item">
+      <div class="contact-icon"><i class="fas fa-clock"></i></div>
+      <div class="contact-info">
+        <div class="contact-label">Office Hours</div>
+        <div class="contact-value">Mon - Sat: 10:00 AM - 6:00 PM</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p> Powered by <a href="https://your-url.com" target="_blank">ASPARSH</a> </p>
+    <p>&copy; 2025 | All rights reserved</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function saveContact() {
+      const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:Dr. Sarah Johnson
+ORG:University Computer Science Department
+TITLE:Professor of Computer Science
+EMAIL:sarah.johnson@university.edu
+TEL:+1 (555) 123-4567
+ADR:;;Computer Science Building, Room 314;University Campus;State;12345;
+URL:https://university.edu/faculty/sarah-johnson
+NOTE:Specializing in Artificial Intelligence, Machine Learning, and Human-Computer Interaction
+END:VCARD`;
+      const blob = new Blob([vCardData], { type: "text/vcard" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Dr_Sarah_Johnson.vcf";
+      link.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    function takeScreenshot() {
+      html2canvas(document.body).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Dr_Sarah_Johnson_Profile.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>

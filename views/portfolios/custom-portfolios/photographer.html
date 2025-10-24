@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethan Carter - Photography Portfolio</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Epilogue", sans-serif;
+    background-color: #211c11;
+    color: #f8f7f6;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  
+  /* Hero Section */
+  .hero {
+    position: relative;
+    height: 100vh;
+    background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA2wS_ohCHtZUMjNdbJU_1s2EeYU21WBVsWXc9Spz05DzjUT-MxNW6hekKj93g6UARVxm1vThcoVLqHvuYt2QhQWW7qHp5hfS4Hwre5sZuNDDAcM1gPC9XYmnDwd-LRatjDP7AWegByx3doJQiW4Mf5DKLgyS-_3H_uBXzATGhHIMBjxJrAZMjC_Sa7DlQCE5HPipVbKPdY9itnszVsVlFw4_xh9vefD22UTYwlrNdtGB0iu1ihTbjlLwb2rejW70RL-IFasqPsj4");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(33, 28, 17, 0.8), transparent);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+  
+  .hero p {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    color: #ffffff;
+  }
+  
+  .btn-primary {
+    background-color: #e6a819;
+    color: #211c11;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(230, 168, 25, 0.2);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .btn-primary:hover {
+    background-color: rgba(230, 168, 25, 0.9);
+    box-shadow: 0 15px 35px rgba(230, 168, 25, 0.4);
+    transform: translateY(-2px);
+  }
+  
+  /* About Section */
+  .about-section {
+    padding: 4rem 1.5rem;
+    background-color: #211c11;
+  }
+  
+  .about-content {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid #e6a819;
+    margin: 0 auto 2rem;
+    display: block;
+    object-fit: cover;
+  }
+  
+  .about-content h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+  }
+  
+  .about-subtitle {
+    font-size: 1.125rem;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+  }
+  
+  .about-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 2px;
+    background-color: #e6a819;
+  }
+  
+  .about-content p {
+    color: #d1d5db;
+    line-height: 1.8;
+    margin-top: 2rem;
+  }
+  
+  /* Portfolio Section */
+  .portfolio-section {
+    padding: 4rem 1.5rem;
+    background-color: #1a1610;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .section-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+  
+  .section-header p {
+    color: #9ca3af;
+    font-size: 0.95rem;
+  }
+  
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .portfolio-item {
+    position: relative;
+    height: 250px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .portfolio-item-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .portfolio-item:hover .portfolio-item-bg {
+    transform: scale(1.05);
+  }
+  
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+  
+  .portfolio-item h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  
+  /* Gallery Section */
+  .gallery-section {
+    padding: 4rem 1.5rem;
+    background-color: #211c11;
+  }
+  
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    aspect-ratio: 1;
+  }
+  
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+  
+  .gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+  }
+  
+  .gallery-item:hover .gallery-overlay {
+    opacity: 1;
+  }
+  
+  .gallery-overlay h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  
+  /* Testimonials Section */
+  .testimonials-section {
+    padding: 4rem 0;
+    background-color: #1a1610;
+    position: relative;
+  }
+  
+  .testimonials-bg {
+    height: 300px;
+    background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCmlpjTfWdEXLlryoGpqHtXcgjhFbm7RMl4OGD9_mLa67oq_jgMK1X0D_rgfFB1AwaAQd0YRlG5GSQFNIXjqtaQbhixZdmR6bqZC364U8Tx3gvwbFwm6pDt56wex7ArjTS73WlIt19dVUw1Zu-ppHK48w4JHrubm8SdJeKuuPQn50Fp6VDjCw_YDXWilTveUGcq-W26GXb_8ij6DjcLD5OatwKTlnql82fpFetaPaaXc_-4NbI3vZIn0iul7suimYMhr9EklJGz6tg");
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 3rem;
+  }
+  
+  .testimonials-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 1.5rem;
+    padding: 0 1.5rem 2rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .testimonials-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .testimonial-card {
+    min-width: 320px;
+    background-color: rgba(248, 247, 246, 0.05);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
+  
+  .testimonial-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    object-fit: cover;
+  }
+  
+  .testimonial-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #f8f7f6;
+    margin-bottom: 1.5rem;
+  }
+  
+  .testimonial-author {
+    font-size: 0.875rem;
+    color: #e6a819;
+    font-style: normal;
+  }
+  
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 3rem 0 2rem;
+  }
+  
+  .social-links a {
+    color: rgba(248, 247, 246, 0.7);
+    transition: color 0.3s ease;
+  }
+  
+  .social-links a:hover {
+    color: #e6a819;
+  }
+  
+  .social-links svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .copyright {
+    text-align: center;
+    font-size: 0.875rem;
+    color: rgba(248, 247, 246, 0.5);
+    padding: 0 1.5rem;
+  }
+  
+  /* Contact Section */
+  .contact-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .contact-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDA-0IqdfwUONYGZ05RpdIPLzZtqCrsfRCW-oEuMrzz2oq-0liEV_xV_ksU4EbzRiG1OzHWQUFMTks6_UYw-HkkBxR-fHAxjcicQnYwU4Gz3WOWaZ2ngIEdLSoanDvjfrBEhb5jNZjgAfRcQ6xRBcdTd2892NR7Q7nOHdVCYi5ULnYcYiGf_6iJtW38BIMFzv4KKFk4CL4UVA_p_2AP7BJ4ymblkDaS6fk2YLYW0loUyhg49jWE6Bb7Fp1kIDfgXInkJ24DdLHjlmQ");
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .contact-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #211c11, rgba(33, 28, 17, 0.7), transparent);
+  }
+  
+  .contact-content {
+    position: relative;
+    z-index: 10;
+    margin-top: auto;
+    background-color: #211c11;
+    border-radius: 1rem 1rem 0 0;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .contact-handle {
+    width: 50px;
+    height: 6px;
+    background-color: rgba(248, 247, 246, 0.3);
+    border-radius: 3px;
+    margin: 0 auto 2rem;
+  }
+  
+  .contact-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .contact-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+  }
+  
+  .contact-header p {
+    color: #9ca3af;
+  }
+  
+  .contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #d1d5db;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background-color: rgba(248, 247, 246, 0.05);
+    border: 1px solid rgba(248, 247, 246, 0.1);
+    border-radius: 0.5rem;
+    color: #f8f7f6;
+    font-family: "Epilogue", sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #e6a819;
+    background-color: rgba(248, 247, 246, 0.08);
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: rgba(248, 247, 246, 0.4);
+  }
+  
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background-color: #e6a819;
+    color: #211c11;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-submit:hover {
+    background-color: rgba(230, 168, 25, 0.9);
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive */
+  @media (min-width: 768px) {
+    .hero h1 {
+      font-size: 3.5rem;
+    }
+    
+    .portfolio-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .gallery-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .testimonial-card {
+      min-width: 400px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .gallery-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Capturing Life Through My Lens</h1>
+    <p>Ethan Carter</p>
+    <a href="#portfolio" class="btn-primary">View Portfolio</a>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+  <div class="about-content">
+    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3ycyIO1s_Axb3jVSt5VrBB77pBrzvsH5IBBuuZppfnoRWb861MYzc4RVavSdRP5DVMVU74Y-uA6tC379IhZa7Gj8VxfxFN0bD69R37i68uZrafqL5z3wQQdzQjrB8x3HzHdslTe0ypmxE6bqyzvs9QeGyLy3eQffabOzBfQHr6GIUjVyiUThWpa42xteprbqFck26AMPwHCu9_Xu7wdUbHNG8yXQn69rESk3Oit_hrC48x5-_E304PL1fwI_s8-_5g-p6SY-OYCc" alt="Sophia Carter" class="profile-image">
+    <h2>Sophia Carter</h2>
+    <div class="about-subtitle">Photographer • New York, NY</div>
+    <p>Sophia Carter is a professional photographer based in New York, specializing in cinematic photography. Her work captures the essence of moments with a touch of elegance and luxury.</p>
+  </div>
+</section>
+
+<!-- Portfolio Section -->
+<section class="portfolio-section" id="portfolio">
+  <div class="section-header">
+    <h2>Photography</h2>
+    <p>Explore my portfolio showcasing a diverse range of photography, from intimate portraits to grand landscapes.</p>
+  </div>
+  
+  <div class="portfolio-grid">
+    <div class="portfolio-item">
+      <div class="portfolio-item-bg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuABSTu1reNbkU2bVTsToKQC971Y9_tw-v2DhxalGPDsNkOSxRU17a7isY8cAPtp-jH5gzsZuVIrOhweXCeEhq8y8Ld0F88FAbTVYH25yBO58BcXYgBx_pi95lKL70xYMLbrQsrKBPtBQxNUT8LNY1e3f4iKx8KFfSg8-KVrUnd7gQH-xo4grjv5wmHLLOANneLtgHCGV61tpGpeGhQkNo0ZaAF1qsgTdr5r7b2Jw6qGOs0IKFDUlM5lUibYDUChEbeVDfhDLR4NQ3M");'></div>
+      <div class="portfolio-overlay">
+        <h3>Wedding</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-bg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAXuWrqC4Gl_8uS9BwgvsZUSVzZeQ3JhHIdAwpa3XAeik5Eow6o19ZgOOcKxqJm9YWGy98xaw1z-MJXpx97el9HnjDJVAgLNbs8mFdvFFWuINZkbbWhEnaHcoBDreh03Z81NBuY09zb-A4TYbWZBvQfLUdb1U3aB4rq7oDTigYiVhGs2GDnmYC1XlGay4k_atcDfbiAzbJ2eFP2rYfKSaM_3jUeZQFOb68L7LxODN9QnebO0VCy1veCbf9BMtzsEBcqbLdiQ3KqTho");'></div>
+      <div class="portfolio-overlay">
+        <h3>Portrait</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-bg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBwCv_gnPIL8wvgNbm1cvIVl1vvnQqKOf0NX7Sh8rFm7rvrop5Ob4LbVyNFqXKtAsPubMdPgfXBR_9v6A0rHE4M1CigS7x0VdxKrvLaBgQCcMzurlBX6jCm5dKY99tyZhUbcg_MLZYhXSaK2xpztwhLHATRiNU-vC7QVQoj364Ho6oLR9A1Y9a3FT1Vufaq75imY3LYoYm41k9booWVJYjhLVPat_uOQhSI8gn-mGHTBBnu3ziNUs0tsdOObdUxVRf3bElqfWw5wIw");'></div>
+      <div class="portfolio-overlay">
+        <h3>Product</h3>
+      </div>
+    </div>
+    
+    <div class="portfolio-item">
+      <div class="portfolio-item-bg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAepPrcXYfu3RBPOnZEJ14CsFWDKXTKlzfbgDf-Iu6Whnf28IXhfdwoFTmBhAiDlqKdDu9N0RDru44Yx1gF30qa91gRQyXIo9U_lUiIx1PYq8Swj4NrTWyso8kkZDxcrjloaQOX8VQfMpyLl7JaKtuPp2KGWLI1VAVHr97avGUkYTYel1ZvMLS4gvvTTqZqLkNK_HQOLZgBNX9Ebjda6Xn_LORDQ3da_I71Z2WPEZ13sNjgyN9y3mWItIygaPoGw-Hj3g0JTWGVBto");'></div>
+      <div class="portfolio-overlay">
+        <h3>Travel</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="gallery-section" id="gallery">
+  <div class="section-header">
+    <h2>Gallery</h2>
+  </div>
+  
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA51qntM6FR87ey02jOiPg05dUYSq2QSwWM0eIJDJEkIgtKHRX6eHc0IXmKU2M_A2UqvmLsJZ7ebIEViTDufx59DwXILF3VCzRb9TIV5YnlZgCOiH8nmSCv5nfmvMjoXs87iE5UMoakYR71_lon-7i-jHXUaNVuvFrWBwhOmWNibFkXUwObYrHHtkAj8RtU9BFqFdr4_Fuh2V07XWgJaumMUxBhfria1K6kwUdYlkewCt7O68PEuTj3WheA1W6BAa5KMGg2YNfPn-w" alt="Golden Hour">
+      <div class="gallery-overlay">
+        <h4>Golden Hour</h4>
+      </div>
+    </div>
+    
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhMT1PzwyLVZtjwChf3nc9XqHNJ5bDyxm_Cv7KCc8qPhrHarxjg5p_upwqzszbWMjWXryb6Xzyi3T-FUTmTzA0Qhb4dU6JdlJjkYziqdC73CgG6vxAIfdtnoUA4aRWer484U0GWs4QWKq1n74DoIeratV4EakElznJyB42X6pUdig73LzTlkEKbVpQbZNsgxjllP42TWPMn6P_F8XAdkcFjIUghIJ5kZEqFN36xGA4QXsporGg1OmKE2Fl-S6KXKTM5Yq1R8_Cc30" alt="Urban Lines">
+      <div class="gallery-overlay">
+        <h4>Urban Lines</h4>
+      </div>
+    </div>
+    
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmDE1GTeUIUtcE2A3pTI0-tChaj5VAIdMuMp12WhxTQfnIQtNr_ZGNTGwNkfuuE-lqkr2F6_zeMd-thXX9QjBKoXwID8DV9kikWd_ZAAdgxkkVtvDhKaJ6Sg6rNG6hENqq_Ym_dC1GOnplClZSlP3mNMuEUiM9l6CfZjZB2EUjxAo6601PAZY7nflxFKsZc9ZJE3ftDk9-eq-E99nycCBGYJjst91IKJQQCg2xe-2tB-sEMTahwPeE8MPtS1MBYiQ4GgojbgOJqVI" alt="Coastal Serenity">
+      <div class="gallery-overlay">
+        <h4>Coastal Serenity</h4>
+      </div>
+    </div>
+    
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ9t7D3Od6JUcAje1w5p3T4-Y0qF5YgyWxtpv4KnWPhMGkg1UtFzYFvdWXgfMylbRqPdTccn-tWtcg5vLggl_LRqWyjyGpBQxIJDsVirlG6-VDZVyIpwUllcetJl5mng8w7rG-MSDRbnxE3SbKC7JHKRT9-e5rvvuVPaxxw2vIdnyHpJKCyVS0aY0GGGQxzJqAcdoFMDGPKI9IYmO5lIuk2jPhdqGynmzJYHRmG8bMql0ILZ9QhYs-EVfk4j-PTxJvuquZCh-vzu8" alt="Forest Light">
+      <div class="gallery-overlay">
+        <h4>Forest Light</h4>
+      </div>
+    </div>
+    
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8wjBerVvYcUf1k4Xo69x4tQ0IjVZhThkiJfluwZ7FRrG_Afb3bnSQsOohUtO7Pmqo5KC4tuA9_oLwjeWo4drpGtvywrA-6UTjUXjz7YvCXCpNwczSaFthytkNjzMLeIbzC02yjpQXer0qF6qPyT2-Q13YKGUr2G2NcBisWMCqMy9N-2G6EQrz3RilbKu-iCHgGq1kKAneR9V37sU16-NWVUq6QuAG6u0kSE3HcIh1ijcT0XKzx5tuRtBFKFtG_3V1CAmGds81I-g" alt="Desert Expanse">
+      <div class="gallery-overlay">
+        <h4>Desert Expanse</h4>
+      </div>
+    </div>
+    
+    <div class="gallery-item">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAAV84TjKQf3LlI4NhwbAarBCRdqL4dw93tGdwuZJSOaNYNj1aoYRbbRVgSKf5DAuc_YnDUi5GKyL517FtfHX8Ay-RkxacRR167B6pmEpHGwyr0r3wDtqMo4cHaTX4JO9CyI2MLyyk8_HVEfNFnm6eaRgSB3HtVSEpySSAjDFVxNuF-wydzVSPislGETEu_Zs2ZQeXn-VSDWR4WDxjFHJds-Tr2tlthKJCFN8p8S0-hYrWsM7B4ibWAxJjmhzcjgB1c2mKwM58liE" alt="Mountain Majesty">
+      <div class="gallery-overlay">
+        <h4>Mountain Majesty</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section" id="testimonials">
+  <div class="testimonials-bg"></div>
+  
+  <div class="section-header">
+    <h2>What Clients Say</h2>
+  </div>
+  
+  <div class="testimonials-container">
+    <div class="testimonial-card">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWCLeKi7v-ez6rmyIRFZYuD7F2T-TjoaFyV2N1jwlHHd76eeE6oh1PiALW3pCbs1WDlF8rU2s6CJUcah33QsNVnRHWnyuXe1OBLKiz_tZxlZWmRAcUg98X9VykUsGdr1GdZssDzP5tRcnNOpLQy3uVdVndA2XPPfvHsnmn8VTdwRsvBLdiwgBrVHCbUK2cy_4C9TH3hsFkapdBg8nxQ-uFiFNhfdZzXK64QEdpMKnj6jq5vZ9lXYR-khnBNQyRveaHW7nfshF8y88" alt="Sophia Bennett" class="testimonial-image">
+      <p class="testimonial-text">"Working with Ethan was an absolute pleasure. His professionalism and creativity exceeded our expectations."</p>
+      <cite class="testimonial-author">Sophia Bennett, Marketing Director</cite>
+    </div>
+    
+    <div class="testimonial-card">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTdJhaCbNfhU0r11MNcpuE19_9cQ-7bptn-mpbGjm5MU0vgAvsYMYxgrnCPa6WspVzRXlUIF5Una_mS9TSP7La8Z2hv3CRAEx92UGz1PMQSPGKbCCOWN1pwZcAyWgFRUluiWbudyYS6RBSNpzzd0ylc4CVA_CrkzfBRsSE1AW8_6a8d_RSJV7tvBWk9JNM_dz7YjeknYTMS_8EKBRHlVbMv-UyEBjGnfuCEE71RNiUCCTjyoranCU61z-95ghvKJGN1VQf0B3ZXGs" alt="Liam Carter" class="testimonial-image">
+      <p class="testimonial-text">"Ethan's ability to capture the essence of our brand was truly remarkable. We're thrilled with the results."</p>
+      <cite class="testimonial-author">Liam Carter, Creative Lead</cite>
+    </div>
+    
+    <div class="testimonial-card">
+      <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSzPdVdLCDU2W1q7cn8KTcQi47EwxlPWNA6-q-rP8LTle6tqoTF1BxCH9xTBUg5TTcOQ2ZO_-vbXiLh_SUXmyaolokGdA1s0axKbb0KbwN5YSDbhZLXqPnW5OAp2XjtmFM-1JC-yQLQP1DUD907fqAiYBf_k1saGXzwrQVN6FxLI3dGNt6_O8ePKpILzsqpLbCnX4RnxTL19cjG-C_F63wKiVxFm8qM1ZaWsU1nC4zvuAX8tnR5Jvyn6CAoL-uGwkmLmAvHq40wds" alt="Ava Harper" class="testimonial-image">
+      <p class="testimonial-text">"The photos Ethan took for our campaign were stunning. His attention to detail and artistic vision are exceptional."</p>
+      <cite class="testimonial-author">Ava Harper, Brand Manager</cite>
+    </div>
+  </div>
+  
+  <div class="social-links">
+    <a href="#" aria-label="Instagram">
+      <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"></path>
+      </svg>
+    </a>
+    <a href="#" aria-label="Twitter">
+      <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M247.39,68.94A8,8,0,0,0,240,64H209.57A48.66,48.66,0,0,0,168.1,40a46.91,46.91,0,0,0-33.75,13.7A47.9,47.9,0,0,0,120,88v6.09C79.74,83.47,46.81,50.72,46.46,50.37a8,8,0,0,0-13.65,4.92c-4.31,47.79,9.57,79.77,22,98.18a110.93,110.93,0,0,0,21.88,24.2c-15.23,17.53-39.21,26.74-39.47,26.84a8,8,0,0,0-3.85,11.93c.75,1.12,3.75,5.05,11.08,8.72C53.51,229.7,65.48,232,80,232c70.67,0,129.72-54.42,135.75-124.44l29.91-29.9A8,8,0,0,0,247.39,68.94Zm-45,29.41a8,8,0,0,0-2.32,5.14C196,166.58,143.28,216,80,216c-10.56,0-18-1.4-23.22-3.08,11.51-6.25,27.56-17,37.88-32.48A8,8,0,0,0,92,169.08c-.47-.27-43.91-26.34-44-96,16,13,45.25,33.17,78.67,38.79A8,8,0,0,0,136,104V88a32,32,0,0,1,9.6-22.92A30.94,30.94,0,0,1,167.9,56c12.66.16,24.49,7.88,29.44,19.21A8,8,0,0,0,204.67,80h16Z"></path>
+      </svg>
+    </a>
+    <a href="#" aria-label="Facebook">
+      <svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm8,191.63V152h24a8,8,0,0,0,0-16H136V112a16,16,0,0,1,16-16h16a8,8,0,0,0,0-16H152a32,32,0,0,0-32,32v24H96a8,8,0,0,0,0,16h24v63.63a88,88,0,1,1,16,0Z"></path>
+      </svg>
+    </a>
+  </div>
+  
+  <p class="copyright">© 2024 Ethan Carter Photography</p>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section" id="contact">
+  <div class="contact-bg"></div>
+  
+  <div class="contact-content">
+    <div class="contact-handle"></div>
+    
+    <div class="contact-header">
+      <h2>Contact Me</h2>
+      <p>Let's create something beautiful together.</p>
+    </div>
+    
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your Name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Tell me about your project..." required></textarea>
+      </div>
+      
+      <button type="submit" class="btn-submit">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<script>
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+  
+  // Form submission handler
+  function handleSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const message = document.getElementById('message').value;
+    
+    alert(`Thank you for your message, ${name}! We'll get back to you at ${email} soon.`);
+    event.target.reset();
+  }
+</script>
+
+</body>
+</html>

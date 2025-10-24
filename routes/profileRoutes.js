@@ -12,9 +12,6 @@ router.get('/', isLoggedIn, profileController.listProfiles);
 // Render new profile form
 router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
 
-// Create profile (parse file + fields first, then validate CSRF)
-router.post('/', isLoggedIn, upload.single('image'), csrfProtection, profileController.createProfile);
-
 // Show profile (public under dashboard)
 router.get('/:profileSlug', profileController.showProfile);
 

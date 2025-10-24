@@ -567,11 +567,68 @@ function generateReview() {
 async function handleSubmit(e) {
   e.preventDefault();
   
+  // Validate required fields
+  if (!selectedProfileId || !selectedDesignId) {
+    showNotification('Please select a profile and design', 'error');
+    return;
+  }
+  
   const form = e.target;
   const formData = new FormData(form);
   
+  // Ensure core IDs are included
+  formData.set('profileId', selectedProfileId);
+  formData.set('designId', selectedDesignId);
+  
   // Add selected skills as JSON
-  formData.append('skills', JSON.stringify(selectedSkills.map(s => s.id)));
+  formData.append('skills', JSON.stringify(selectedSkills));
+  
+  // Gather social links
+  const socialLinks = [];
+  document.querySelectorAll('#socialLinksList .dynamic-item').forEach(item => {
+    const id = item.dataset.id;
+    const platform = form.querySelector(`[name="socialPlatform_${id}"]`).value;
+    const url = form.querySelector(`[name="socialUrl_${id}"]`).value;
+    if (platform && url) {
+      socialLinks.push({ 
+  platform: platform.toLowerCase(), 
+  url: url 
+});
+    }
+  });
+  formData.append('socialLinks', JSON.stringify(socialLinks));
+  
+  // Gather work experience
+  const workExperience = [];
+  document.querySelectorAll('#workExperienceList .dynamic-item').forEach(item => {
+    const id = item.dataset.id;
+    const exp = {
+      category: form.querySelector(`[name="workCategory_${id}"]`).value,
+      title: form.querySelector(`[name="workTitle_${id}"]`).value,
+      description: form.querySelector(`[name="workDescription_${id}"]`).value,
+      detailsUrl: form.querySelector(`[name="workDetailsUrl_${id}"]`).value
+    };
+    if (exp.title && exp.description) {
+      workExperience.push(exp);
+    }
+  });
+  formData.append('workExperience', JSON.stringify(workExperience));
+  
+  // Gather experience timeline
+  const experienceTimeline = [];
+  document.querySelectorAll('#experienceList .dynamic-item').forEach(item => {
+    const id = item.dataset.id;
+    const exp = {
+      dateRange: form.querySelector(`[name="expDateRange_${id}"]`).value,
+      roleTitle: form.querySelector(`[name="expRoleTitle_${id}"]`).value,
+      organization: form.querySelector(`[name="expOrganization_${id}"]`).value,
+      description: form.querySelector(`[name="expDescription_${id}"]`).value
+    };
+    if (exp.roleTitle && exp.organization) {
+      experienceTimeline.push(exp);
+    }
+  });
+  formData.append('experienceTimeline', JSON.stringify(experienceTimeline));
   
   // Get CSRF token
   const csrf = document.getElementById('_csrf');
@@ -581,21 +638,57 @@ async function handleSubmit(e) {
   
   try {
     showNotification('Creating portfolio...', 'info');
-    
-    const response = await fetch('/portfolio/create', {
+
+    // POST to the current page (the form is served at /dashboard/:slug/portfolios/new)
+    const postUrl = (form.action && form.action.trim()) ? form.action : window.location.pathname;
+
+    // Attach CSRF token as a header as some csurf configs accept header tokens
+    const headers = { 'Accept': 'application/json' };
+    const csrfInput = document.getElementById('_csrf');
+    if (csrfInput && csrfInput.value) {
+      headers['X-CSRF-Token'] = csrfInput.value;
+      // also include common alternate header
+      headers['X-XSRF-TOKEN'] = csrfInput.value;
+    }
+
+    const response = await fetch(postUrl, {
       method: 'POST',
+      headers,
+      credentials: 'same-origin',
       body: formData
     });
-    
+
+    // If the server redirected (non-AJAX flow) follow the redirect in the browser
+    if (response.redirected) {
+      window.location.href = response.url;
+      return;
+    }
+
+    // Try to parse JSON; if response is not JSON, treat as error
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok) {
+      let errorData = null;
+      if (contentType.includes('application/json')) {
+        errorData = await response.json().catch(() => null);
+      }
+      const serverMsg = (errorData && (errorData.message || errorData.error)) || response.statusText || `HTTP ${response.status}`;
+      throw new Error(serverMsg);
+    }
+
+    if (!contentType.includes('application/json')) {
+      // Unexpected non-JSON response
+      throw new Error('Unexpected server response');
+    }
+
     const data = await response.json();
-    
-    if (data.success) {
+
+    if (data && data.success) {
       showNotification('Portfolio created successfully!', 'success');
       setTimeout(() => {
         window.location.href = `/portfolio/${data.slug}`;
       }, 1500);
     } else {
-      showNotification(data.message || 'Error creating portfolio', 'error');
+      showNotification((data && data.message) || 'Error creating portfolio', 'error');
     }
   } catch (err) {
     console.error('Submission error:', err);

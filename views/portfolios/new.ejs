@@ -1,285 +1,382 @@
 <!-- views/portfolio/new.ejs -->
 <% layout('layouts/dashboard-boilerplate') %>
 <% block('styles').append('<link rel="stylesheet" href="/css/portfolio/new.css" />') %>
+  <div class="container">
 
-<div class="user-wizard-root">
-  <h1>Create New Portfolio</h1>
+    <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+      <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
+    <% } %>
 
-  <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
-    <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
-    <script>window.__CSRF = '<%= csrfToken %>';</script>
-  <% } %>
+    <!-- Progress Navigation -->
+    <nav class="wizard-progress" aria-label="Portfolio creation steps">
+      <button data-step="0" class="step-btn active" type="button">
+        <span class="step-number">1</span>
+        <span class="step-label">Design & Profile</span>
+      </button>
+      <button data-step="1" class="step-btn" type="button">
+        <span class="step-number">2</span>
+        <span class="step-label">Hero Section</span>
+      </button>
+      <button data-step="2" class="step-btn" type="button">
+        <span class="step-number">3</span>
+        <span class="step-label">Social Links</span>
+      </button>
+      <button data-step="3" class="step-btn" type="button">
+        <span class="step-number">4</span>
+        <span class="step-label">About</span>
+      </button>
+      <button data-step="4" class="step-btn" type="button">
+        <span class="step-number">5</span>
+        <span class="step-label">Gallery</span>
+      </button>
+      <button data-step="5" class="step-btn" type="button">
+        <span class="step-number">6</span>
+        <span class="step-label">Skills</span>
+      </button>
+      <button data-step="6" class="step-btn" type="button">
+        <span class="step-number">7</span>
+        <span class="step-label">Work</span>
+      </button>
+      <button data-step="7" class="step-btn" type="button">
+        <span class="step-number">8</span>
+        <span class="step-label">Experience</span>
+      </button>
+      <button data-step="8" class="step-btn" type="button">
+        <span class="step-number">9</span>
+        <span class="step-label">Review</span>
+      </button>
+    </nav>
 
-  <nav class="wizard-progress" aria-label="Portfolio creation steps">
-    <button data-step="0" class="step-btn active" type="button">1. Design & Profile</button>
-    <button data-step="1" class="step-btn" type="button">2. Hero Section</button>
-    <button data-step="2" class="step-btn" type="button">3. Social Links</button>
-    <button data-step="3" class="step-btn" type="button">4. About</button>
-    <button data-step="4" class="step-btn" type="button">5. Gallery</button>
-    <button data-step="5" class="step-btn" type="button">6. Skills</button>
-    <button data-step="6" class="step-btn" type="button">7. Work Experience</button>
-    <button data-step="7" class="step-btn" type="button">8. Timeline</button>
-    <button data-step="8" class="step-btn" type="button">9. Review</button>
-  </nav>
-
-  <form id="portfolioWizardForm" class="wizard-form" novalidate enctype="multipart/form-data">
-    
-    <!-- Hidden tracking fields -->
-    <input type="hidden" id="profileId" name="profileId">
-    <input type="hidden" id="designId" name="designId">
-    
-    <div id="autosaveStatus" style="margin:0.5rem 0; font-size:0.9rem; color:#666;"></div>
-
-    <!-- ========== STEP 0: Design Selection & Profile Link ========== -->
-    <fieldset class="wizard-step active" data-step="0">
-      <h2>Select Design & Link Profile</h2>
+    <!-- Main Form -->
+    <form id="portfolioWizardForm" class="wizard-form" novalidate enctype="multipart/form-data">
       
-      <!-- Design Selection -->
-      <div class="design-selection-area">
-        <h3>Choose Portfolio Design</h3>
-        <div id="designGrid" class="design-grid">
+      <!-- Hidden Fields -->
+      <input type="hidden" id="profileId" name="profileId">
+      <input type="hidden" id="designId" name="designId">
+
+      <!-- ============================================ -->
+      <!-- STEP 0: Design & Profile Selection -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step active" data-step="0">
+        <h2><i class="fas fa-palette"></i> Select Design & Link Profile</h2>
+        
+        <!-- Design Selection -->
+        <div class="form-section">
+          <h3>Choose Portfolio Design</h3>
+          <div id="designGrid" class="design-grid">
+            <div class="loading">Loading designs...</div>
+          </div>
         </div>
-      </div>
 
-      <hr style="margin: 2rem 0;">
+        <hr class="section-divider">
 
-      <!-- Profile Search -->
-      <div class="profile-selection-area">
-        <h3>Link to User Profile</h3>
-        <label for="profileSearch">Search Profile (by name, email, or mobile)</label>
-        <input 
-          type="text" 
-          id="profileSearch" 
-          name="profileSearch" 
-          placeholder="Type to search..." 
-          autocomplete="off" 
-        />
-        <div id="profileSearchResults" class="search-results"></div>
-        <div id="selectedProfileCard" class="selected-card" style="display:none;"></div>
-      </div>
+        <!-- Profile Search -->
+        <div class="form-section">
+          <h3>Link to User Profile</h3>
+          <div class="form-group">
+            <label for="profileSearch">
+              <i class="fas fa-search"></i> Search Profile
+            </label>
+            <input 
+              type="text" 
+              id="profileSearch" 
+              placeholder="Type name, email, or mobile..." 
+              autocomplete="off"
+            />
+            <small class="help-text">Start typing to search for a profile</small>
+          </div>
+          <div id="profileSearchResults" class="search-results"></div>
+          <div id="selectedProfileCard" class="selected-card" style="display:none;"></div>
+        </div>
 
-      <div class="step-actions">
-        <button type="button" data-action="next" disabled id="step0NextBtn">Next</button>
-      </div>
-    </fieldset>
+        <div class="step-actions">
+          <button type="button" data-action="next" disabled id="step0NextBtn" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
 
-    <!-- ========== STEP 1: Hero Section ========== -->
-    <fieldset class="wizard-step" data-step="1">
-      <h2>Hero Section</h2>
-      
-      <div class="form-group">
-        <label for="heroImage">Hero Image *</label>
-        <input 
-          type="file" 
-          id="heroImage" 
-          name="heroImage" 
-          accept="image/*"
-          required
-        />
-        <div id="heroImagePreview" class="image-preview"></div>
-      </div>
+      <!-- ============================================ -->
+      <!-- STEP 1: Hero Section -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="1">
+        <h2><i class="fas fa-image"></i> Hero Section</h2>
+        
+        <div class="form-group">
+          <label for="heroImage">
+            <i class="fas fa-portrait"></i> Hero Image *
+          </label>
+          <input 
+            type="file" 
+            id="heroImage" 
+            name="heroImage" 
+            accept="image/*"
+            class="file-input"
+          />
+          <div id="heroImagePreview" class="image-preview"></div>
+          <small class="help-text">Upload a professional photo (recommended: 320x320px)</small>
+        </div>
 
-      <div class="form-group">
-        <label for="name">Your Name *</label>
-        <input 
-          type="text" 
-          id="name" 
-          name="name" 
-          placeholder="e.g., Rohitendra Singh"
-          required
-        />
-      </div>
+        <div class="form-group">
+          <label for="name">
+            <i class="fas fa-user"></i> Your Name *
+          </label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            placeholder="e.g., John Doe"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="profession">Profession *</label>
-        <input 
-          type="text" 
-          id="profession" 
-          name="profession" 
-          placeholder="e.g., Full Stack Developer"
-          required
-        />
-      </div>
+        <div class="form-group">
+          <label for="profession">
+            <i class="fas fa-briefcase"></i> Profession *
+          </label>
+          <input 
+            type="text" 
+            id="profession" 
+            name="profession" 
+            placeholder="e.g., Full Stack Developer"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="briefIntro">Brief Introduction * (max 300 characters)</label>
-        <textarea 
-          id="briefIntro" 
-          name="briefIntro" 
-          rows="3" 
-          maxlength="300"
-          placeholder="Write a short introduction about yourself..."
-          required
-        ></textarea>
-        <small class="char-count">0/300</small>
-      </div>
+        <div class="form-group">
+          <label for="briefIntro">
+            <i class="fas fa-align-left"></i> Brief Introduction * (max 300 characters)
+          </label>
+          <textarea 
+            id="briefIntro" 
+            name="briefIntro" 
+            rows="4" 
+            maxlength="300"
+            placeholder="Write a short introduction about yourself..."
+            required
+          ></textarea>
+          <small class="char-count">0/300</small>
+        </div>
 
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
 
-    <!-- ========== STEP 2: Social Links ========== -->
-    <fieldset class="wizard-step" data-step="2">
-      <h2>Social Links</h2>
-      <p>Add your social media profiles and website links</p>
+      <!-- ============================================ -->
+      <!-- STEP 2: Social Links -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="2">
+        <h2><i class="fas fa-share-alt"></i> Social Links</h2>
+        <p class="step-description">Add your social media profiles and website links</p>
 
-      <div id="socialLinksList" class="dynamic-list">
-        <!-- Social links will be added dynamically -->
-      </div>
+        <div id="socialLinksList" class="dynamic-list"></div>
 
-      <button type="button" class="btn-add" onclick="addSocialLink()">
-        <i class="fas fa-plus"></i> Add Social Link
-      </button>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 3: About Section ========== -->
-    <fieldset class="wizard-step" data-step="3">
-      <h2>About Section</h2>
-
-      <div class="form-group">
-        <label for="aboutImage">About Section Image</label>
-        <input 
-          type="file" 
-          id="aboutImage" 
-          name="aboutImage" 
-          accept="image/*"
-        />
-        <div id="aboutImagePreview" class="image-preview"></div>
-      </div>
-
-      <div class="form-group">
-        <label for="aboutDescription">About Description (max 1000 characters)</label>
-        <textarea 
-          id="aboutDescription" 
-          name="aboutDescription" 
-          rows="6"
-          maxlength="1000"
-          placeholder="Tell your story, background, achievements..."
-        ></textarea>
-        <small class="char-count">0/1000</small>
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 4: Gallery ========== -->
-    <fieldset class="wizard-step" data-step="4">
-      <h2>Gallery Images</h2>
-      <p>Upload images to showcase in your portfolio gallery</p>
-
-      <div class="form-group">
-        <label for="galleryImages">Upload Gallery Images</label>
-        <input 
-          type="file" 
-          id="galleryImages" 
-          name="galleryImages" 
-          accept="image/*"
-          multiple
-        />
-      </div>
-
-      <div id="galleryPreview" class="gallery-preview">
-        <!-- Gallery thumbnails will appear here -->
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 5: Skills ========== -->
-    <fieldset class="wizard-step" data-step="5">
-      <h2>Skills</h2>
-      <p>Select skills from the database to display on your portfolio</p>
-
-      <div class="form-group">
-        <label for="skillSearch">Search & Add Skills</label>
-        <input 
-          type="text" 
-          id="skillSearch" 
-          placeholder="Type to search skills..."
-          autocomplete="off"
-        />
-        <div id="skillSearchResults" class="search-results"></div>
-      </div>
-
-      <div id="selectedSkillsList" class="selected-items-list">
-        <!-- Selected skills will appear here -->
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 6: Work Experience (Portfolio Projects) ========== -->
-    <fieldset class="wizard-step" data-step="6">
-      <h2>Work Experience / Portfolio Projects</h2>
-      <p>Add your featured work and projects</p>
-
-      <div id="workExperienceList" class="dynamic-list">
-        <!-- Work experience items will be added here -->
-      </div>
-
-      <button type="button" class="btn-add" onclick="addWorkExperience()">
-        <i class="fas fa-plus"></i> Add Project
-      </button>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 7: Experience Timeline ========== -->
-    <fieldset class="wizard-step" data-step="7">
-      <h2>Experience Timeline</h2>
-      <p>Add your professional experience and education history</p>
-
-      <div id="experienceList" class="dynamic-list">
-        <!-- Experience timeline items will be added here -->
-      </div>
-
-      <button type="button" class="btn-add" onclick="addExperience()">
-        <i class="fas fa-plus"></i> Add Experience
-      </button>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="button" data-action="next">Next</button>
-      </div>
-    </fieldset>
-
-    <!-- ========== STEP 8: Review & Submit ========== -->
-    <fieldset class="wizard-step" data-step="8">
-      <h2>Review & Submit</h2>
-      <p>Please review all information before creating your portfolio</p>
-
-      <div id="reviewContent" class="review-content">
-        <!-- Review summary will be generated here -->
-      </div>
-
-      <div class="step-actions">
-        <button type="button" data-action="prev">Back</button>
-        <button type="submit" class="btn-primary btn-submit">
-          <i class="fas fa-check"></i> Create Portfolio
+        <button type="button" class="btn btn-add" onclick="addSocialLink()">
+          <i class="fas fa-plus"></i> Add Social Link
         </button>
-      </div>
-    </fieldset>
 
-  </form>
-</div>
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 3: About Section -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="3">
+        <h2><i class="fas fa-info-circle"></i> About Section</h2>
+
+        <div class="form-group">
+          <label for="aboutImage">
+            <i class="fas fa-image"></i> About Section Image
+          </label>
+          <input 
+            type="file" 
+            id="aboutImage" 
+            name="aboutImage" 
+            accept="image/*"
+            class="file-input"
+          />
+          <div id="aboutImagePreview" class="image-preview"></div>
+          <small class="help-text">Upload an image for the about section (recommended: 600x400px)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="aboutDescription">
+            <i class="fas fa-file-alt"></i> About Description (max 1000 characters)
+          </label>
+          <textarea 
+            id="aboutDescription" 
+            name="aboutDescription" 
+            rows="8"
+            maxlength="1000"
+            placeholder="Tell your story, background, achievements, and what makes you unique..."
+          ></textarea>
+          <small class="char-count">0/1000</small>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 4: Gallery -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="4">
+        <h2><i class="fas fa-images"></i> Gallery Images</h2>
+        <p class="step-description">Upload images to showcase in your portfolio gallery</p>
+
+        <div class="form-group">
+          <label for="galleryImages">
+            <i class="fas fa-upload"></i> Upload Gallery Images
+          </label>
+          <input 
+            type="file" 
+            id="galleryImages" 
+            name="galleryImages" 
+            accept="image/*"
+            multiple
+            class="file-input"
+          />
+          <small class="help-text">You can select multiple images at once</small>
+        </div>
+
+        <div id="galleryPreview" class="gallery-preview"></div>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 5: Skills -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="5">
+        <h2><i class="fas fa-tools"></i> Skills</h2>
+        <p class="step-description">Search and add skills to display on your portfolio</p>
+
+        <div class="form-group">
+          <label for="skillSearch">
+            <i class="fas fa-search"></i> Search & Add Skills
+          </label>
+          <input 
+            type="text" 
+            id="skillSearch" 
+            placeholder="Type to search skills (e.g., JavaScript, React)..."
+            autocomplete="off"
+          />
+        </div>
+        
+        <div id="skillSearchResults" class="search-results"></div>
+        <div id="selectedSkillsList" class="selected-items-list"></div>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 6: Work Experience -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="6">
+        <h2><i class="fas fa-project-diagram"></i> Work Experience / Projects</h2>
+        <p class="step-description">Add your featured work and projects</p>
+
+        <div id="workExperienceList" class="dynamic-list"></div>
+
+        <button type="button" class="btn btn-add" onclick="addWorkExperience()">
+          <i class="fas fa-plus"></i> Add Project
+        </button>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 7: Experience Timeline -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="7">
+        <h2><i class="fas fa-clock"></i> Experience Timeline</h2>
+        <p class="step-description">Add your professional experience and education history</p>
+
+        <div id="experienceList" class="dynamic-list"></div>
+
+        <button type="button" class="btn btn-add" onclick="addExperience()">
+          <i class="fas fa-plus"></i> Add Experience
+        </button>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="button" data-action="next" class="btn btn-primary">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </fieldset>
+
+      <!-- ============================================ -->
+      <!-- STEP 8: Review & Submit -->
+      <!-- ============================================ -->
+      <fieldset class="wizard-step" data-step="8">
+        <h2><i class="fas fa-check-circle"></i> Review & Submit</h2>
+        <p class="step-description">Please review all information before creating your portfolio</p>
+
+        <div id="reviewContent" class="review-content">
+          <div class="loading">Generating review...</div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" data-action="prev" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+          <button type="submit" class="btn btn-success btn-submit">
+            <i class="fas fa-check"></i> Create Portfolio
+          </button>
+        </div>
+      </fieldset>
+
+    </form>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+      <div class="spinner"></div>
+      <p>Creating your portfolio...</p>
+    </div>
+  </div>
+
 
 <script src="/js/portfolio-wizard.js"></script>
