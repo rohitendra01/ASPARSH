@@ -1,1 +1,52 @@
-{\n  "name": "asparsh",\n  "version": "1.0.0",\n  "description": "This is a journey of new begining",\n  "main": "index.js",\n  "scripts": {\n    "start": "node server.js",\n    "test": "jest --runInBand"\n  },\n  "keywords": [\n    "asparsh"\n  ],\n  "author": "R__",\n  "license": "ISC",\n  "dependencies": {\n    "apicache": "^1.6.3",\n    "axios": "^1.11.0",\n    "axios-cookiejar-support": "^6.0.4",\n    "bcryptjs": "^3.0.2",\n    "bootstrap": "^5.3.7",\n    "cloudinary": "^2.7.0",\n    "connect-flash": "^0.1.1",\n    "connect-mongo": "^5.1.0",\n    "cookie-parser": "^1.4.7",\n    "csurf": "^1.11.0",\n    "dotenv": "^17.0.1",\n    "ejs": "^3.1.10",\n    "ejs-mate": "^4.0.0",\n    "express": "^5.1.0",\n    "express-ejs-layouts": "^2.5.1",\n    "express-session": "^1.18.1",\n    "fetch-cookie": "^3.1.0",\n    "hbs": "^4.2.0",\n    "ipconfig": "^1.0.0",\n    "jsonwebtoken": "^9.0.2",\n    "mongoose": "^8.16.1",\n    "multer": "^2.0.2",\n    "node-fetch": "^2.7.0",\n    "nodemailer": "^7.0.5",\n    "passport": "^0.7.0",\n    "passport-local": "^1.0.0",\n    "silent": "^0.2.3",\n    "streamifier": "^0.1.1",\n    "swiper": "^11.2.10",\n    "tough-cookie": "^6.0.0",\n    "validator": "^13.15.15"\n  },\n  "devDependencies": {\n    "jest": "^29.0.0",\n    "supertest": "^6.3.3"\n  }\n}
+{
+  "name": "asparsh",
+  "version": "1.0.0",
+  "description": "This is a journey of new begining",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest --runInBand"
+  },
+  "keywords": [
+    "asparsh"
+  ],
+  "author": "R__",
+  "license": "ISC",
+  "dependencies": {
+    "apicache": "^1.6.3",
+    "axios": "^1.11.0",
+    "axios-cookiejar-support": "^6.0.4",
+    "bcryptjs": "^3.0.2",
+    "bootstrap": "^5.3.7",
+    "cloudinary": "^2.7.0",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "csurf": "^1.11.0",
+    "dotenv": "^17.0.1",
+    "ejs": "^3.1.10",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "fetch-cookie": "^3.1.0",
+    "hbs": "^4.2.0",
+    "ipconfig": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.1",
+    "multer": "^2.0.2",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.5",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "silent": "^0.2.3",
+    "streamifier": "^0.1.1",
+    "swiper": "^11.2.10",
+    "tough-cookie": "^6.0.0",
+    "validator": "^13.15.15"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "supertest": "^6.3.3"
+  }
+}
