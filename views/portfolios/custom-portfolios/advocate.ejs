@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advocate Rajesh Kumar - Legal Professional</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title><%= (portfolio && portfolio.name) ?
+(portfolio.name + ' - ' + (portfolio.profession || 'Legal Professional')) : 'Advocate - Legal Professional' %></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
-            padding: 0;
+padding: 0;
             box-sizing: border-box;
         }
 
         body {
              font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0a0a0a;
+background-color: #0a0a0a;
             color: #ffffff;
             line-height: 1.6;
             position: relative;
@@ -23,74 +24,75 @@
         /* Decorative Background Elements */
         body::before {
             content: '';
-            position: fixed;
+position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+background-image: 
                 repeating-linear-gradient(90deg, rgba(184, 134, 11, 0.03) 0px, transparent 1px, transparent 50px, rgba(184, 134, 11, 0.03) 51px),
                 repeating-linear-gradient(0deg, rgba(184, 134, 11, 0.03) 0px, transparent 1px, transparent 50px, rgba(184, 134, 11, 0.03) 51px);
-            pointer-events: none;
+pointer-events: none;
             z-index: 0;
         }
 
         /* Hero Section - Mobile First */
         .hero {
             min-height: 100vh;
-            display: flex;
+display: flex;
             align-items: center;
             padding: 40px 20px;
             background: 
                 linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.9)),
                 url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600') center/cover;
-            position: relative;
+position: relative;
             z-index: 1;
         }
 
         .hero::before {
             content: '';
-            position: absolute;
+position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(184, 134, 11, 0.1), transparent 50%);
+background: radial-gradient(circle at 20% 50%, rgba(184, 134, 11, 0.1), transparent 50%);
             pointer-events: none;
-        }
+}
 
         .hero-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
             position: relative;
             z-index: 1;
         }
 
         .hero-content {
             text-align: center;
-        }
+}
 
         .profile-section {
             margin-bottom: 30px;
-        }
+}
 
         .profile-img-container {
             position: relative;
-            display: inline-block;
+display: inline-block;
             margin-bottom: 20px;
         }
 
         .profile-img-container::before {
             content: '';
-            position: absolute;
+position: absolute;
             top: -15px;
             left: -15px;
             right: -15px;
             bottom: -15px;
-            /* border: 2px solid rgba(184, 134, 11, 0.3); */
+            /* border: 2px solid rgba(184, 134, 11, 0.3);
+*/
             border-radius: 50%;
             z-index: -1;
-        }
+}
 .profile-img {
   position: relative;
   width: 200px;
@@ -98,7 +100,8 @@
   border-radius: 50%;
   background: url('https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400') center/cover;
   object-fit: cover;
-  overflow: hidden; /* important for clean edges */
+  overflow: hidden;
+/* important for clean edges */
 }
 
 /* Circular gradient border */
@@ -107,25 +110,25 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  padding: 3px; /* border thickness */
+padding: 3px; /* border thickness */
   background: conic-gradient(
     #ca940c,
     #ffd700,
     #ca940c
   );
-  -webkit-mask: 
+-webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  pointer-events: none;
+pointer-events: none;
 }
 
 
 
         .hero-text h1 {
             font-size: 2.2rem;
-            margin-bottom: 10px;
+margin-bottom: 10px;
             line-height: 1.2;
             font-weight: 700;
             color: #b8860b;
@@ -133,41 +136,43 @@
 
        .hero-text .subtitle {
   font-size: 1rem;
-  color: white;
+color: white;
   font-weight: 350;
   margin-bottom: 15px;
 
   /* ✨ Glass effect properties */
-  background: rgba(255, 255, 255, 0.1); /* transparent white layer */
+  background: rgba(255, 255, 255, 0.1);
+/* transparent white layer */
   backdrop-filter: blur(8px) saturate(150%);
   -webkit-backdrop-filter: blur(8px) saturate(150%);
   border: 2px solid rgba(255, 255, 255, 0.25);
-   border-image: linear-gradient(to bottom, #ca940c, transparent) 1;
+border-image: linear-gradient(to bottom, #ca940c, transparent) 1;
   /* border-radius: 10px; */
   padding: 6px 12px;
-  display: inline-block; /* so glass fits text size */
+  display: inline-block;
+/* so glass fits text size */
 }
 
 
         .hero-text p {
             font-size: 0.95rem;
-            margin-bottom: 25px;
+margin-bottom: 25px;
             color: #b0b0b0;
             line-height: 1.7;
             font-family: 'Segoe UI', sans-serif;
             padding: 0 10px;
-        }
+}
 
         .action-buttons {
             display: flex;
-            gap: 12px;
+gap: 12px;
             justify-content: center;
             margin-bottom: 25px;
         }
 
         .action-btn {
             flex: 1;
-            max-width: 180px;
+max-width: 180px;
             background: linear-gradient(135deg, #b8860b, #daa520);
             color: white;
             padding: 13px 20px;
@@ -175,41 +180,41 @@
             border-radius: 8px;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s;
+transition: all 0.3s;
             font-weight: 600;
             letter-spacing: 0.3px;
             box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
             display: flex;
             align-items: center;
-            justify-content: center;
+justify-content: center;
             gap: 8px;
             text-decoration: none;
         }
 
         .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
         }
 
         .action-btn i {
             font-size: 1rem;
-        }
+}
 
         .social-links {
             display: flex;
-            justify-content: center;
+justify-content: center;
             gap: 12px;
         }
 
         .social-links a {
             color: #fff;
-            font-size: 1rem;
+font-size: 1rem;
             width: 42px;
             height: 42px;
             background: rgba(184, 134, 11, 0.2);
             border: 1px solid rgba(184, 134, 11, 0.4);
             border-radius: 8px;
-            display: flex;
+display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
@@ -217,63 +222,63 @@
 
         .social-links a:hover {
             background: linear-gradient(135deg, #b8860b, #daa520);
-            transform: translateY(-3px);
+transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(184, 134, 11, 0.3);
-        }
+}
 
         /* Stats Section */
         .stats {
             padding: 50px 20px;
-            background: #0f0f0f;
+background: #0f0f0f;
             position: relative;
             z-index: 1;
         }
 
         .stats-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
         }
 
         .section-title {
             text-align: left;
-            font-size: 1.6rem;
+font-size: 1.6rem;
             margin-bottom: 15px;
             color: whitesmoke;
         }
 
         .section-subtitle {
             text-align: left;
-            color: #b0b0b0;
+color: #b0b0b0;
             margin-bottom: 40px;
             font-size: 0.95rem;
             font-family: 'Segoe UI', sans-serif;
-        }
+}
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 10px;
         }
 
         .stat-card {
             background: linear-gradient(135deg, rgba(20, 20, 20, 0.8), rgba(30, 30, 30, 0.6));
-            padding: 25px 20px;
+padding: 25px 20px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid rgba(184, 134, 11, 0.2);
             transition: all 0.3s;
-        }
+}
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(212, 235, 9, 0.2);
+box-shadow: 0 10px 30px rgba(212, 235, 9, 0.2);
             border-color: #b8860b;
-        }
+}
 
         .stat-icon {
             width: 50px;
-            height: 50px;
+height: 50px;
             background: linear-gradient(135deg, #b8860b, #daa520);
             border-radius: 10px;
             display: flex;
@@ -281,26 +286,26 @@
             justify-content: center;
             margin: 0 auto 15px;
             font-size: 1.3rem;
-            color: white;
+color: white;
             box-shadow: 0 6px 15px rgba(184, 134, 11, 0.3);
-        }
+}
 
         .stat-number {
             font-size: 2rem;
-            font-weight: bold;
+font-weight: bold;
             color: #b8860b;
             margin-bottom: 5px;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            color: #c0c0c0;
+color: #c0c0c0;
             font-family: 'Segoe UI', sans-serif;
         }
 
       .contact-details-card {
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
-    padding: 20px 20px;
+padding: 20px 20px;
     border-radius: 12px;
     border: 1px solid rgba(184, 134, 11, 0.3);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -319,19 +324,21 @@
     align-items: center;
     gap: 15px;
     margin-bottom: 15px;
-    padding: 15px;
+padding: 15px;
     background: rgba(10, 10, 10, 0.5);
     border-radius: 8px;
     border: 1.5px solid rgba(184, 134, 11, 0.2);
     transition: all 0.3s;
-    text-decoration: none;   /* Remove underline for links */
-    color: inherit;          /* Keep text color */
+text-decoration: none;   /* Remove underline for links */
+    color: inherit;
+/* Keep text color */
 }
 
 .contact-item:hover {
     background: rgba(184, 134, 11, 0.1);
     border-color: #b8860b;
-    cursor: pointer;         /* Show pointer on hover */
+    cursor: pointer;
+/* Show pointer on hover */
 }
 
 .contact-icon {
@@ -339,7 +346,7 @@
     height: 40px;
     background: linear-gradient(135deg, #b8860b, #daa520);
     border-radius: 8px;
-    display: flex;
+display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
@@ -369,63 +376,63 @@
         /* Services Section */
         .services {
             padding: 30px 7px;
-            background: #0a0a0a;
+background: #0a0a0a;
             position: relative;
             z-index: 1;
         }
 
         .services-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
         }
 
         .services-grid {
             display: grid;
-            grid-template-columns: 1fr;
+grid-template-columns: 1fr;
             gap: 20px;
         }
 
         .service-card {
             background: linear-gradient(135deg, rgba(20, 20, 20, 0.8), rgba(30, 30, 30, 0.6));
-            padding: 30px 25px;
+padding: 30px 25px;
             border-radius: 12px;
             border: 1px solid rgba(184, 134, 11, 0.2);
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
-        }
+}
 
         .service-card::before {
             content: '';
-            position: absolute;
+position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.1), transparent);
-            transition: left 0.5s;
+transition: left 0.5s;
         }
 
         .service-card:hover::before {
             left: 100%;
-        }
+}
 
         .service-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(184, 134, 11, 0.2);
+box-shadow: 0 15px 40px rgba(184, 134, 11, 0.2);
             border-color: #b8860b;
-        }
+}
 
         .service-header {
             display: flex;
-            align-items: center;
+align-items: center;
             gap: 15px;
             margin-bottom: 15px;
         }
 
         .service-icon {
             width: 55px;
-            height: 55px;
+height: 55px;
             background: linear-gradient(135deg, #b8860b, #daa520);
             border-radius: 10px;
             display: flex;
@@ -433,18 +440,18 @@
             justify-content: center;
             font-size: 1.5rem;
             color: white;
-            box-shadow: 0 6px 15px rgba(184, 134, 11, 0.3);
+box-shadow: 0 6px 15px rgba(184, 134, 11, 0.3);
             flex-shrink: 0;
-        }
+}
 
         .service-card h3 {
             font-size: 1.2rem;
-            color: #e0e0e0;
+color: #e0e0e0;
         }
 
         .service-card p {
             color: #a0a0a0;
-            line-height: 1.6;
+line-height: 1.6;
             font-family: 'Segoe UI', sans-serif;
             font-size: 0.95rem;
         }
@@ -452,19 +459,19 @@
         /* Cases Section */
         .cases {
             padding: 20px 15px;
-            background: #0f0f0f;
+background: #0f0f0f;
             position: relative;
             z-index: 1;
         }
 
         .cases-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
         }
 
         .case-filters {
             display: flex;
-            gap: 10px;
+gap: 10px;
             margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: left;
@@ -472,69 +479,69 @@
 
         .filter-btn {
             background: transparent;
-            color: #e0e0e0;
+color: #e0e0e0;
             border: 1px solid rgba(184, 134, 11, 0.4);
             padding: 8px 18px;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: 'Georgia', serif;
+font-family: 'Georgia', serif;
             font-size: 0.85rem;
         }
 
         .filter-btn.active,
         .filter-btn:hover {
             background: linear-gradient(135deg, #b8860b, #daa520);
-            border-color: #b8860b;
+border-color: #b8860b;
             color: white;
         }
 
         .cases-grid {
             display: grid;
-            grid-template-columns: 1fr;
+grid-template-columns: 1fr;
             gap: 20px;
         }
 
         .case-card {
             background: rgba(20, 20, 20, 0.8);
-            border-radius: 12px;
+border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s;
             border: 1px solid rgba(184, 134, 11, 0.2);
-        }
+}
 
         .case-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(184, 134, 11, 0.2);
+box-shadow: 0 15px 40px rgba(184, 134, 11, 0.2);
         }
 
         .case-image {
             height: 180px;
-            background: #1a1a1a;
+background: #1a1a1a;
             position: relative;
             overflow: hidden;
         }
 
         .case-image img {
             width: 100%;
-            height: 100%;
+height: 100%;
             object-fit: cover;
             transition: transform 0.4s;
         }
 
         .case-card:hover .case-image img {
             transform: scale(1.1);
-        }
+}
 
         .case-overlay {
             position: absolute;
-            top: 0;
+top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: linear-gradient(135deg, rgba(184, 134, 11, 0.9), rgba(218, 165, 32, 0.9));
             display: flex;
-            align-items: center;
+align-items: center;
             justify-content: center;
             opacity: 0;
             transition: opacity 0.3s;
@@ -542,219 +549,219 @@
 
         .case-card:hover .case-overlay {
             opacity: 1;
-        }
+}
 
         .case-info {
             padding: 20px;
-        }
+}
 
         .case-info h3 {
             margin-bottom: 8px;
-            color: #e0e0e0;
+color: #e0e0e0;
             font-size: 1.1rem;
         }
 
         .case-category {
             color: #b8860b;
-            font-size: 0.85rem;
+font-size: 0.85rem;
             font-weight: 600;
         }
 
         /* Testimonials Section */
         .testimonials {
             padding: 30px 15px;
-            background: #0a0a0a;
+background: #0a0a0a;
             position: relative;
             z-index: 1;
         }
 
         .testimonials-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
         }
 
         .testimonial {
             background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
-            padding: 20px 25px;
+padding: 20px 25px;
             border-radius: 12px;
             margin-bottom: 20px;
             border: 1px solid rgba(184, 134, 11, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .testimonial-text {
             font-size: 0.95rem;
-            margin-bottom: 20px;
+margin-bottom: 20px;
             color: #b0b0b0;
             font-style: italic;
             line-height: 1.7;
             font-family: 'Georgia', serif;
-        }
+}
 
         .testimonial-author {
             display: flex;
-            align-items: center;
+align-items: center;
             gap: 15px;
         }
 
         .author-image {
             width: 50px;
-            height: 50px;
+height: 50px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #b8860b;
             background: url('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100') center/cover;
             flex-shrink: 0;
-        }
+}
 
         .author-info h4 {
             margin-bottom: 3px;
-            color: #e0e0e0;
+color: #e0e0e0;
             font-size: 1rem;
         }
 
         .author-info span {
             color: #b8860b;
-            font-size: 0.85rem;
+font-size: 0.85rem;
         }
 
         .slider-dots {
             display: flex;
-            justify-content: center;
+justify-content: center;
             gap: 10px;
             margin-top: 25px;
         }
 
         .dot {
             width: 10px;
-            height: 10px;
+height: 10px;
             border-radius: 50%;
             background: rgba(184, 134, 11, 0.3);
             cursor: pointer;
             transition: all 0.3s;
-        }
+}
 
         .dot.active {
             background: #b8860b;
-            transform: scale(1.2);
+transform: scale(1.2);
         }
 
         /* Google Action Buttons */
         .google-action-btn {
             flex: 1;
-            min-width: 140px;
+min-width: 140px;
             padding: 12px 20px;
             background: linear-gradient(135deg, #4285f4, #34a853);
             color: white;
             text-decoration: none;
             border-radius: 8px;
             font-size: 0.9rem;
-            font-family: 'Segoe UI', sans-serif;
+font-family: 'Segoe UI', sans-serif;
             font-weight: 600;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
             border: none;
             cursor: pointer;
-        }
+}
 
         .google-action-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
         }
 
         .google-action-btn-secondary {
             background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(52, 168, 83, 0.2));
-            border: 1px solid rgba(66, 133, 244, 0.4);
+border: 1px solid rgba(66, 133, 244, 0.4);
         }
 
         .google-action-btn-secondary:hover {
             background: linear-gradient(135deg, rgba(66, 133, 244, 0.3), rgba(52, 168, 83, 0.3));
-            border-color: #4285f4;
+border-color: #4285f4;
         }
 
         /* Ratings Section */
         .ratings {
             padding: 15px 15px;
-            background: #0f0f0f;
+background: #0f0f0f;
             position: relative;
             z-index: 1;
         }
 
         .ratings-container {
             max-width: 500px;
-            margin: 0 auto;
+margin: 0 auto;
         }
 
         .overall-rating {
             text-align: center;
-            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
+background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.7));
             padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 30px;
-            border: 1px solid rgba(184, 134, 11, 0.3);
+border: 1px solid rgba(184, 134, 11, 0.3);
         }
 
         .rating-number {
             font-size: 4rem;
-            font-weight: bold;
+font-weight: bold;
             color: #b8860b;
             margin-bottom: 10px;
         }
 
         .rating-stars {
             font-size: 1.8rem;
-            color: #b8860b;
+color: #b8860b;
             margin-bottom: 8px;
         }
 
         .rating-text {
             color: #b0b0b0;
-            font-size: 0.95rem;
+font-size: 0.95rem;
             font-family: 'Segoe UI', sans-serif;
         }
 
         .rating-breakdown {
             display: flex;
-            flex-direction: column;
+flex-direction: column;
             gap: 15px;
         }
 
         .rating-item {
             display: flex;
-            align-items: center;
+align-items: center;
             gap: 15px;
         }
 
         .rating-label {
             width: 120px;
-            font-size: 0.9rem;
+font-size: 0.9rem;
             color: #e0e0e0;
             font-family: 'Segoe UI', sans-serif;
         }
 
         .rating-bar-container {
             flex: 1;
-            height: 8px;
+height: 8px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
-        }
+}
 
         .rating-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #b8860b, #daa520);
+background: linear-gradient(90deg, #b8860b, #daa520);
             border-radius: 4px;
             transition: width 1s ease-in-out;
             box-shadow: 0 0 8px rgba(184, 134, 11, 0.5);
-        }
+}
 
         .rating-value {
             width: 35px;
-            text-align: right;
+text-align: right;
             font-size: 0.9rem;
             color: #b8860b;
             font-weight: 600;
@@ -763,26 +770,26 @@
         /* Footer */
         .footer {
             background: #0a0a0a;
-            padding: 25px 20px;
+padding: 25px 20px;
             text-align: center;
             border-top: 1px solid rgba(184, 134, 11, 0.2);
-        }
+}
 
         .footer p {
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+font-family: 'Segoe UI', sans-serif;
             font-size: 0.85rem;
         }
 
         .footer h5 {
              color: #e0e0e0;
-            font-weight: 500;
+font-weight: 500;
         }
 
         /* Scroll to top button */
         .scroll-top {
             position: fixed;
-            bottom: 30px;
+bottom: 30px;
             right: 20px;
             width: 50px;
             height: 50px;
@@ -791,372 +798,622 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+cursor: pointer;
             box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s;
             z-index: 1000;
-        }
+}
 
         .scroll-top.visible {
             opacity: 1;
-            visibility: visible;
+visibility: visible;
         }
 
         .scroll-top:hover {
             transform: translateY(-5px);
-        }
+}
 
         .scroll-top i {
             color: white;
-            font-size: 1.2rem;
+font-size: 1.2rem;
         }
 
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-container">
             <div class="hero-content">
                 <div class="profile-section">
                     <div class="profile-img-container">
-                        <div class="profile-img"></div>
+                      
+  <div class="profile-img"
+                             style="background-image: url('<%= portfolio && portfolio.heroImage ? portfolio.heroImage : (portfolio && portfolio.aboutImage ? portfolio.aboutImage : '/assets/default-profile.jpg') %>');">
+                
+        </div>
                     </div>
                     <div class="hero-text">
-                        <h1>Advocate Rajesh Kumar</h1>
-                        <div class="subtitle">Senior Legal Counsel</div>
-                        <p>With over 15 years of distinguished practice in civil, criminal, and corporate law, providing comprehensive legal solutions with commitment to justice and client success.</p>
+                        <h1><%= portfolio && portfolio.name ?
+portfolio.name : 'Advocate Rajesh Kumar' %></h1>
+
+                        <div class="subtitle"><%= portfolio && portfolio.profession ?
+portfolio.profession : 'Senior Legal Counsel' %></div>
+
+                        <p>
+                            <%= portfolio && portfolio.briefIntro ?
+portfolio.briefIntro : 
+                                'With over 15 years of distinguished practice in civil, criminal, and corporate law, providing comprehensive legal solutions with commitment to justice and client success.'
+%>
+                        </p>
                     </div>
                 </div>
 
                 <div class="action-buttons">
                     <button class="action-btn" onclick="saveContact()">
-                        <i class="fas fa-address-card"></i>
+ 
+                       <i class="fas fa-address-card"></i>
                         Save Contact
                     </button>
                     <button class="action-btn" onclick="takeScreenshot()">
-                        <i class="fas fa-camera"></i>
+        
+                <i class="fas fa-camera"></i>
                         Screenshot
                     </button>
                 </div>
 
                 <div class="social-links">
-                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fas fa-envelope"></i></a>
-                    <a href="#"><i class="fas fa-phone"></i></a>
+     
+               <% if (portfolio && Array.isArray(portfolio.socialLinks) && portfolio.socialLinks.length) { %>
+                        <% portfolio.socialLinks.forEach(function(s) { %>
+                            <% if (s && s.url) { %>
+                
+                <a href="<%= s.url %>" target="_blank" rel="noopener noreferrer" aria-label="<%= s.platform || 'social' %>">
+                                    <% // try to map platform to icon if platform known %>
+                          
+          <% if (s.platform && s.platform.toLowerCase().includes('linkedin')) { %>
+                                        <i class="fab fa-linkedin-in"></i>
+                                    <% } else if (s.platform && 
+s.platform.toLowerCase().includes('twitter')) { %>
+                                        <i class="fab fa-twitter"></i>
+                                    <% } else { %>
+                
+                        <i class="fas fa-link"></i>
+                                    <% } %>
+                                </a>
+    
+                        <% } %>
+                        <% }) %>
+                    <% } else { %>
+                        
+<a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+           
+             <a href="#"><i class="fas fa-phone"></i></a>
+                    <% } %>
                 </div>
             </div>
         </div>
     </section>
 
-       <!-- Contact Details Card -->
-<div class="contact-details-card">
-    <h3>Contact </h3>
-    
-    <a href="tel:+919876543210" class="contact-item">
-        <div class="contact-icon">
-            <i class="fas fa-phone"></i>
-        </div>
-        <div class="contact-info">
-            <div class="contact-label">Phone Number</div>
-            <div class="contact-value">+91 98765 43210</div>
-        </div>
-    </a>
+    <div class="contact-details-card">
+        <h3>Contact 
+</h3>
 
-    <a href="mailto:advocate.kumar@legalfirm.com" class="contact-item">
-        <div class="contact-icon">
-            <i class="fas fa-envelope"></i>
-        </div>
-        <div class="contact-info">
-            <div class="contact-label">Email Address</div>
-            <div class="contact-value">advocate.kumar@legalfirm.com</div>
-        </div>
-    </a>
+        <% /* Phone */ %>
+        <% if (portfolio && portfolio.contact && portfolio.contact.phone) { %>
+        <a href="tel:<%= portfolio.contact.phone %>" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-phone"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Phone Number</div>
+              
+  <div class="contact-value"><%= portfolio.contact.phone %></div>
+            </div>
+        </a>
+        <% } else { %>
+        <a class="contact-item" href="tel:+919876543210">
+            <div class="contact-icon"><i class="fas fa-phone"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Phone Number</div>
+       
+         <div class="contact-value">+91 98765 43210</div>
+            </div>
+        </a>
+        <% } %>
 
-    <a href="https://www.google.com/maps/search/?api=1&query=Chamber+No.+45,+District+Court+Complex,+Delhi+110001" target="_blank" class="contact-item">
-        <div class="contact-icon">
-            <i class="fas fa-map-marker-alt"></i>
-        </div>
-        <div class="contact-info">
-            <div class="contact-label">Office Address</div>
-            <div class="contact-value">Chamber No. 45, District Court Complex, Delhi - 110001, India</div>
-        </div>
-    </a>
+        <% /* Email */ %>
+        <% if (portfolio && portfolio.contact && portfolio.contact.email) { %>
+        <a href="mailto:<%= portfolio.contact.email %>" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+   
+         <div class="contact-info">
+                <div class="contact-label">Email Address</div>
+                <div class="contact-value"><%= portfolio.contact.email %></div>
+            </div>
+        </a>
+        <% } else { %>
+        <a href="mailto:advocate.kumar@legalfirm.com" class="contact-item">
+           
+ <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Email Address</div>
+                <div class="contact-value">advocate.kumar@legalfirm.com</div>
+            </div>
+        </a>
+        <% } %>
 
-    <a href="/contact" class="contact-item">
-        <div class="contact-icon">
-            <i class="fas fa-clock"></i>
-        </div>
-        <div class="contact-info">
-            <div class="contact-label">Office Hours</div>
-            <div class="contact-value">Mon - Sat: 10:00 AM - 6:00 PM</div>
-        </div>
-    </a>
-</div>
+        <% /* Address */ %>
+      
+  <% if (portfolio && portfolio.contact && portfolio.contact.address) { %>
+        <a href="<%= portfolio.contact.addressMapUrl ||
+('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(portfolio.contact.address)) %>" target="_blank" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Office Address</div>
+                <div class="contact-value"><%= portfolio.contact.address %></div>
+            </div>
+        </a>
+        <% } 
+else { %>
+        <a href="https://www.google.com/maps/search/?api=1&query=Chamber+No.+45,+District+Court+Complex,+Delhi+110001" target="_blank" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Office Address</div>
+                <div class="contact-value">Chamber No. 45, District Court Complex, Delhi - 110001, India</div>
+            </div>
+   
+     </a>
+        <% } %>
 
+        <% /* Office hours */ %>
+        <% if (portfolio && portfolio.contact && portfolio.contact.officeHours) { %>
+        <a href="/contact" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-clock"></i></div>
+            <div class="contact-info">
+                <div class="contact-label">Office 
+Hours</div>
+                <div class="contact-value"><%= portfolio.contact.officeHours %></div>
+            </div>
+        </a>
+        <% } else { %>
+        <a href="/contact" class="contact-item">
+            <div class="contact-icon"><i class="fas fa-clock"></i></div>
+            <div class="contact-info">
+           
+     <div class="contact-label">Office Hours</div>
+                <div class="contact-value">Mon - Sat: 10:00 AM - 6:00 PM</div>
+            </div>
+        </a>
+        <% } %>
+    </div>
 
-
-    <!-- Stats Section -->
     <section class="stats">
         <div class="stats-container">
-            <h2 class="section-title">  Achievements</h2>
-            <p class="section-subtitle">Track record of excellence in legal practice</p>
+            <h2 class="section-title"> 
+ Achievements</h2>
+            <p class="section-subtitle"><%= portfolio && portfolio.stats && portfolio.stats.subtitle ?
+portfolio.stats.subtitle : 'Track record of excellence in legal practice' %></p>
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <div class="stat-number">15+</div>
+                    <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+                    <div class="stat-number"><%= portfolio && portfolio.stats && portfolio.stats.yearsExperience ?
+portfolio.stats.yearsExperience : '15+' %></div>
                     <div class="stat-label">Years Experience</div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-gavel"></i>
-                    </div>
-                    <div class="stat-number">500+</div>
+                    <div class="stat-icon"><i class="fas fa-gavel"></i></div>
+                   
+ <div class="stat-number"><%= portfolio && portfolio.stats && portfolio.stats.casesHandled ? portfolio.stats.casesHandled : '500+' %></div>
                     <div class="stat-label">Cases Handled</div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <div class="stat-number">450+</div>
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+          
+          <div class="stat-number"><%= portfolio && portfolio.stats && portfolio.stats.casesWon ?
+portfolio.stats.casesWon : '450+' %></div>
                     <div class="stat-label">Cases Won</div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-number">98%</div>
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                   
+ <div class="stat-number"><%= portfolio && portfolio.stats && portfolio.stats.clientSatisfaction ? portfolio.stats.clientSatisfaction : '98%' %></div>
                     <div class="stat-label">Client Satisfaction</div>
-                </div>
-            </div>
-
-        
-
-    <!-- Services Section -->
-    <section class="services">
-        <div class="services-container">
-            <h2 class="section-title">Practice Areas</h2>
-            <p class="section-subtitle">Comprehensive legal services across diverse domains</p>
-
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-balance-scale"></i>
-                        </div>
-                        <h3>Civil Litigation</h3>
-                    </div>
-                    <p>Expert representation in property disputes, contract enforcement, tort claims, and civil rights matters.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-gavel"></i>
-                        </div>
-                        <h3>Criminal Defense</h3>
-                    </div>
-                    <p>Aggressive defense strategies for criminal charges, bail applications, and appeals with meticulous preparation.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <h3>Corporate Law</h3>
-                    </div>
-                    <p>Comprehensive corporate services including mergers, compliance, contract drafting, and dispute resolution.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Family Law</h3>
-                    </div>
-                    <p>Sensitive handling of matrimonial disputes, custody matters, divorce proceedings, and settlements.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-landmark"></i>
-                        </div>
-                        <h3>Constitutional Law</h3>
-                    </div>
-                    <p>Protection of fundamental rights through public interest litigation and constitutional challenges.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-file-contract"></i>
-                        </div>
-                        <h3>Legal Advisory</h3>
-                    </div>
-                    <p>Strategic legal consultation, risk assessment, compliance review, and preventive counsel.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Cases Section -->
+    <section class="stats" style="padding-top: 30px; background: #0a0a0a;"> <div class="stats-container">
+            <h2 class="section-title">About Me</h2>
+            <p class="section-subtitle" style="text-align: left; line-height: 1.7; margin-bottom: 20px;">
+                <% if (portfolio && portfolio.aboutDescription) { %>
+                    <%- portfolio.aboutDescription.replace(/\n/g, '<br>') %>
+                <% } else { %>
+                    A detailed description about my practice, philosophy, and approach to law.
+                <% } %>
+            </p>
+            
+            <% if (portfolio && portfolio.aboutImage && portfolio.aboutImage !== (portfolio.heroImage || '/assets/default-profile.jpg')) { %>
+                <img src="<%= portfolio.aboutImage %>" alt="About Me" style="width: 100%; border-radius: 12px; margin-top: 10px;">
+            <% } %>
+        </div>
+    </section>
+
+    <section class="services">
+        <div class="services-container">
+     
+       <h2 class="section-title">Practice Areas</h2>
+            <p class="section-subtitle"><%= portfolio && portfolio.servicesSubtitle ?
+portfolio.servicesSubtitle : 'Comprehensive legal services across diverse domains' %></p>
+
+            <div class="services-grid">
+                <% if (portfolio && Array.isArray(portfolio.workExperience) && portfolio.workExperience.length) { %>
+                    <% portfolio.workExperience.forEach(function(w) { %>
+                        <div class="service-card">
+       
+                     <div class="service-header">
+                                <div class="service-icon">
+                                    <% /* choose an icon from category if possible 
+*/ %>
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                             
+   <h3><%= w.title %></h3>
+                            </div>
+                            <p><%= w.description %></p>
+                        </div>
+             
+       <% }) %>
+                <% } else { %>
+                    <div class="service-card">
+                        
+<div class="service-header">
+                            <div class="service-icon"><i class="fas fa-balance-scale"></i></div>
+                            <h3>Civil Litigation</h3>
+                        </div>
+               
+         <p>Expert representation in property disputes, contract enforcement, tort claims, and civil rights matters.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-header">
+             
+               <div class="service-icon"><i class="fas fa-gavel"></i></div>
+                            <h3>Criminal Defense</h3>
+                        </div>
+                        <p>Aggressive defense strategies for criminal 
+charges, bail applications, and appeals with meticulous preparation.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-header">
+                           
+ <div class="service-icon"><i class="fas fa-building"></i></div>
+                            <h3>Corporate Law</h3>
+                        </div>
+                        <p>Comprehensive corporate services including mergers, compliance, contract drafting, and dispute resolution.</p>
+         
+           </div>
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon"><i class="fas fa-users"></i></div>
+            
+                <h3>Family Law</h3>
+                        </div>
+                        <p>Sensitive handling of matrimonial disputes, custody matters, divorce proceedings, and settlements.</p>
+                    </div>
+     
+               <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon"><i class="fas fa-landmark"></i></div>
+                            
+<h3>Constitutional Law</h3>
+                        </div>
+                        <p>Protection of fundamental rights through public interest litigation and constitutional challenges.</p>
+                    </div>
+                    <div 
+class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon"><i class="fas fa-file-contract"></i></div>
+                            <h3>Legal Advisory</h3>
+               
+         </div>
+                        <p>Strategic legal consultation, risk assessment, compliance review, and preventive counsel.</p>
+                    </div>
+                <% } %>
+            </div>
+        
+</div>
+    </section>
+
+    <section class="services" style="background: #0f0f0f;"> <div class="services-container">
+            <h2 class="section-title">Core Skills</h2>
+            <p class="section-subtitle">Key competencies and technical skills.</p>
+
+            <div class="services-grid">
+                <% if (portfolio && Array.isArray(portfolio.skills) && portfolio.skills.length) { %>
+                    <% portfolio.skills.forEach(function(skill) { %>
+                        <div class="service-card">
+                            <div class="service-header">
+                                <div class="service-icon">
+                                    <i class="<%= skill.iconClass && skill.iconClass.trim() !== '' ? skill.iconClass : 'fas fa-check' %>"></i>
+                                </div>
+                                <h3><%= skill.name %></h3>
+                            </div>
+                            <p><%= skill.description %></p>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon"><i class="fas fa-gavel"></i></div>
+                            <h3>Litigation Strategy</h3>
+                        </div>
+                        <p>Extensive courtroom and arbitration experience.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-header">
+                            <div class="service-icon"><i class="fas fa-handshake"></i></div>
+                            <h3>Client Negotiation</h3>
+                        </div>
+                        <p>Securing favorable settlements and agreements for clients.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
     <section class="cases">
         <div class="cases-container">
             <h2 class="section-title">Notable Cases</h2>
-            <p class="section-subtitle">Significant cases demonstrating successful outcomes</p>
+            <p class="section-subtitle"><%= portfolio && portfolio.casesSubtitle ?
+portfolio.casesSubtitle : 'Significant cases demonstrating successful outcomes' %></p>
 
             <div class="case-filters">
                 <button class="filter-btn active">All</button>
                 <button class="filter-btn">Civil</button>
                 <button class="filter-btn">Criminal</button>
                 <button class="filter-btn">Corporate</button>
-            </div>
+           
+ </div>
 
             <div class="cases-grid">
-                <div class="case-card">
-                    <div class="case-image">
-                        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400" alt="Property Dispute">
-                        <div class="case-overlay">
-                            <i class="fas fa-file-alt" style="font-size: 2rem; color: white;"></i>
-                        </div>
-                    </div>
-                    <div class="case-info">
-                        <h3>Commercial Property Dispute</h3>
-                        <p class="case-category">Civil Litigation</p>
-                    </div>
-                </div>
+                <% /* use portfolio.experience or workExperience as case items if provided */ %>
+                <% const casesSource = (portfolio && Array.isArray(portfolio.experience) && portfolio.experience.length) ?
+portfolio.experience : (portfolio && Array.isArray(portfolio.workExperience) ? portfolio.workExperience : []); %>
 
-                <div class="case-card">
-                    <div class="case-image">
-                        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400" alt="Corporate Merger">
-                        <div class="case-overlay">
-                            <i class="fas fa-file-alt" style="font-size: 2rem; color: white;"></i>
-                        </div>
-                    </div>
+                <% if (casesSource.length) { %>
+                    <% casesSource.forEach(function(c, idx) { %>
+                        <div class="case-card">
+                      
+      <div class="case-image">
+                                <img src="<%= (portfolio.galleryImages && portfolio.galleryImages[idx]) ? portfolio.galleryImages[idx] : (portfolio.aboutImage || '/assets/case-default.jpg') %>" alt="<%= c.title || c.roleTitle || 'Case' %>">
+                                <div class="case-overlay">
+          
+                          <i class="fas fa-file-alt" style="font-size: 2rem; color: white;"></i>
+                                </div>
+                            </div>
+        
                     <div class="case-info">
-                        <h3>Corporate Merger Advisory</h3>
-                        <p class="case-category">Corporate Law</p>
-                    </div>
-                </div>
-
-                <div class="case-card">
-                    <div class="case-image">
-                        <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=400" alt="Constitutional Case">
-                        <div class="case-overlay">
-                            <i class="fas fa-file-alt" style="font-size: 2rem; color: white;"></i>
+                                <h3><%= c.title || c.roleTitle || 'Case Title' %></h3>
+                                <p class="case-category"><%= c.category || c.organization || (c.type ? 
+c.type : 'General') %></p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="case-info">
-                        <h3>Public Interest Writ Petition</h3>
-                        <p class="case-category">Constitutional Law</p>
-                    </div>
-                </div>
-
-                <div class="case-card">
-                    <div class="case-image">
-                        <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=400" alt="Criminal Defense">
-                        <div class="case-overlay">
-                            <i class="fas fa-file-alt" style="font-size: 2rem; color: white;"></i>
+                    <% }) %>
+                <% } else { %>
+   
+                 <div class="case-card">
+                        <div class="case-image">
+                            <img 
+src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400" alt="Property Dispute">
+                            <div class="case-overlay"><i class="fas fa-file-alt" style="font-size:2rem;color:white;"></i></div>
                         </div>
+                        <div class="case-info"><h3>Commercial Property Dispute</h3><p class="case-category">Civil Litigation</p></div>
+             
+       </div>
+                    <div class="case-card">
+                        <div class="case-image">
+                            <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400" alt="Corporate Merger">
+                
+            <div class="case-overlay"><i class="fas fa-file-alt" style="font-size:2rem;color:white;"></i></div>
+                        </div>
+                        <div class="case-info"><h3>Corporate Merger Advisory</h3><p class="case-category">Corporate Law</p></div>
                     </div>
-                    <div class="case-info">
-                        <h3>High-Profile Criminal Defense</h3>
-                        <p class="case-category">Criminal Defense</p>
+           
+         <div class="case-card">
+                        <div class="case-image">
+                            <img src="https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=400" alt="Constitutional Case">
+                            <div class="case-overlay"><i class="fas fa-file-alt" style="font-size:2rem;color:white;"></i></div>
+  
+                      </div>
+                        <div class="case-info"><h3>Public Interest Writ Petition</h3><p class="case-category">Constitutional Law</p></div>
                     </div>
-                </div>
+                    <div class="case-card">
+       
+                 <div class="case-image">
+                            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=400" alt="Criminal Defense">
+                            <div class="case-overlay"><i class="fas fa-file-alt" style="font-size:2rem;color:white;"></i></div>
+                   
+     </div>
+                        <div class="case-info"><h3>High-Profile Criminal Defense</h3><p class="case-category">Criminal Defense</p></div>
+                    </div>
+                <% } %>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
+    
+<section class="testimonials">
         <div class="testimonials-container">
             <h2 class="section-title">  Testimonials</h2>
-            <p class="section-subtitle">Trusted by clients for exceptional representation</p>
+            <p class="section-subtitle"><%= portfolio && portfolio.testimonialsSubtitle ?
+portfolio.testimonialsSubtitle : 'Trusted by clients for exceptional representation' %></p>
 
             <div class="testimonial active">
-                <p class="testimonial-text">"Advocate Kumar's exceptional legal acumen and strategic approach were instrumental in resolving our complex corporate dispute. His thorough preparation and persuasive arguments led to a favorable verdict. Highly recommended for business litigation."</p>
+                <p class="testimonial-text">
+                    <% if (portfolio && Array.isArray(portfolio.testimonials) && portfolio.testimonials.length) { %>
+         
+               <%= portfolio.testimonials[0].text %>
+                    <% } else { %>
+                        "Advocate Kumar's exceptional legal acumen and strategic approach were instrumental in resolving our complex corporate dispute. His thorough preparation and persuasive arguments led to a favorable verdict. Highly recommended for business litigation."
+<% } %>
+                </p>
+
                 <div class="testimonial-author">
-                    <div class="author-image"></div>
+                    <div class="author-image" style="background-image: url('<%= (portfolio && portfolio.testimonials && portfolio.testimonials[0] && portfolio.testimonials[0].avatar) ? portfolio.testimonials[0].avatar : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' %>');"></div>
                     <div class="author-info">
-                        <h4>Amit Sharma</h4>
-                        <span>CEO, TechVentures</span>
+         
+               <h4><%= (portfolio && portfolio.testimonials && portfolio.testimonials[0] && portfolio.testimonials[0].name) ?
+portfolio.testimonials[0].name : 'Amit Sharma' %></h4>
+                        <span><%= (portfolio && portfolio.testimonials && portfolio.testimonials[0] && portfolio.testimonials[0].role) ?
+portfolio.testimonials[0].role : 'CEO, TechVentures' %></span>
                     </div>
                 </div>
             </div>
 
             <div class="slider-dots">
-                <span class="dot active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+                <% const tCount = (portfolio && Array.isArray(portfolio.testimonials) && portfolio.testimonials.length) ?
+portfolio.testimonials.length : 4; %>
+                <% for (let i = 0; i < tCount; i++) { %>
+                    <span class="dot <%= i === 0 ? 'active' : '' %>"></span>
+                <% } %>
             </div>
         </div>
-    </section>
+  
+  </section>
 
-    <!-- Ratings Section -->
     <section class="ratings">
         <div class="ratings-container">
             <h2 class="section-title"> Ratings</h2>
-            <p class="section-subtitle">Excellence recognized by satisfied clients</p>
+            <p class="section-subtitle"><%= portfolio && portfolio.rating && portfolio.rating.subtitle ?
+portfolio.rating.subtitle : 'Excellence recognized by satisfied clients' %></p>
 
-            <!-- Google Rating Card -->
             <div class="overall-rating">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" style="height: 25px;">
-                    <span style="color: #b0b0b0; font-size: 0.9rem;">Business Profile</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:15px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" style="height:25px;">
+                    <span style="color:#b0b0b0;font-size:0.9rem;">Business Profile</span>
                 </div>
-                <div class="rating-number" id="googleRating">4.9</div>
+
+  
+              <div class="rating-number" id="googleRating"><%= portfolio && portfolio.rating && portfolio.rating.value ?
+portfolio.rating.value.toFixed(1) : 4.9 %></div>
+
                 <div class="rating-stars" id="googleStars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
+                    <% /* JS will update icons if API used;
+keep fallback stars here */ %>
+                    <% const r = (portfolio && portfolio.rating && typeof portfolio.rating.value === 'number') ?
+portfolio.rating.value : 4.9; %>
+                    <% const fullStars = Math.floor(r);
+const half = r % 1 >= 0.5; %>
+                    <% for (let i=0;i<fullStars;i++){ %><i class="fas fa-star"></i><% } %>
+                    <% if (half) { %><i class="fas fa-star-half-alt"></i><% } %>
+                    <% for (let i=fullStars + (half ? 1 : 0); i<5; i++){ %><i class="far fa-star"></i><% } 
+%>
                 </div>
-                
-                <!-- Google Action Buttons -->
-                <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: center;">
+
+                <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;justify-content:center;">
                     <a href="#" id="writeReviewBtn" class="google-action-btn" onclick="openGoogleReview(); return false;">
                         <i class="fas fa-edit"></i> Write Review
-                    </a>
+             
+       </a>
                     <a href="#" id="viewAllReviewsBtn" class="google-action-btn google-action-btn-secondary" onclick="openGoogleProfile(); return false;">
                         <i class="fas fa-star"></i> View All Reviews
                     </a>
                 </div>
-            </div>  
+ 
+           </div>
+        </div>
+    </section>
 
-    <!-- Footer -->
     <footer class="footer">
-    <p> Powered by 
-        <a href="https://your-url.com" target="_blank" style="text-decoration: none; font-weight: bold; color: inherit;">
-            ASPARSH
-        </a> 
-        <h5>&copy; 2025 | All rights reserved</h6>
-        
-    </p>
-</footer>
+        <p> Powered by 
+            <a href="https://your-url.com" target="_blank" style="text-decoration: none;
+font-weight: bold; color: inherit;">
+                ASPARSH
+            </a> 
+            <h5>© 2025 | All rights reserved</h5>
+        </p>
+    </footer>
 
-
-    <!-- Scroll to Top Button -->
     <div class="scroll-top" onclick="scrollToTop()">
         <i class="fas fa-arrow-up"></i>
     </div>
 
     <script>
-        // Save Contact as VCF
+      
+  const testimonials = <%- JSON.stringify(portfolio && portfolio.testimonials ? portfolio.testimonials : [
+            {
+                text: "Advocate Kumar's exceptional legal acumen ...",
+                name: "Amit Sharma",
+                position: "CEO, TechVentures",
+                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100"
+ 
+           },
+            {
+                text: "I was facing a challenging criminal case ...",
+                name: "Priya Mehta",
+                position: "Business Owner",
+                avatar: 
+""
+            },
+            {
+                text: "Our company's merger was successfully completed ...",
+                name: "Rajiv Verma",
+                position: "Managing Director",
+                avatar: 
+""
+            },
+            {
+                text: "Advocate Kumar handled my property dispute ...",
+                name: "Sneha Patel",
+                position: "Real Estate Developer",
+                
+avatar: ""
+            }
+        ]) %>;
+(function initTestimonials() {
+            // same logic you already have, but use `testimonials` from server
+            const dots = document.querySelectorAll('.dot');
+            const testimonialText = document.querySelector('.testimonial-text');
+            const authorName = document.querySelector('.author-info h4');
+            const authorPosition = document.querySelector('.author-info span');
+
+            let current 
+= 0;
+            function update(i) {
+                const t = testimonials[i];
+                if (!t) return;
+                testimonialText.textContent = t.text;
+                authorName.textContent = t.name || '';
+          
+      authorPosition.textContent = t.position || t.role || '';
+                const authorImg = document.querySelector('.author-image');
+                if (authorImg && t.avatar) authorImg.style.backgroundImage = 'url(' + t.avatar + ')';
+            }
+
+            dots.forEach((dot, idx) => {
+                
+dot.addEventListener('click', () => {
+                    dots.forEach(d => d.classList.remove('active'));
+dot.classList.add('active');
+                    current = idx;
+                    update(idx);
+                });
+            });
+
+            setInterval(() => {
+                dots[current].classList.remove('active');
+                current = (current + 1) % dots.length;
+                dots[current].classList.add('active');
+                update(current);
+            }, 6000);
+})();
+
         function saveContact() {
             const vcard = `BEGIN:VCARD
 VERSION:3.0
@@ -1168,28 +1425,27 @@ ADR;TYPE=WORK:;;Chamber No. 45, District Court Complex;Delhi;;110001;India
 NOTE:15+ Years Experience in Civil, Criminal, and Corporate Law
 URL:https://advocatekumar.com
 END:VCARD`;
-
-            const blob = new Blob([vcard], { type: 'text/vcard' });
+const blob = new Blob([vcard], { type: 'text/vcard' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'Advocate_Rajesh_Kumar.vcf';
+link.download = 'Advocate_Rajesh_Kumar.vcf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
             alert('Contact saved! Check your downloads folder.');
-        }
+}
 
         // Screenshot functionality
         function takeScreenshot() {
             alert('To take a screenshot:\n\n📱 Mobile:\n• Android: Press Power + Volume Down\n• iPhone: Press Side + Volume Up\n\n💻 Desktop:\n• Windows: Press Windows + Shift + S\n• Mac: Press Cmd + Shift + 4');
-        }
+}
 
         // Case filter functionality
         const filterButtons = document.querySelectorAll('.filter-btn');
-        const caseCards = document.querySelectorAll('.case-card');
+const caseCards = document.querySelectorAll('.case-card');
 
         filterButtons.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1197,168 +1453,98 @@ END:VCARD`;
                 btn.classList.add('active');
                 
                 const filterValue = btn.textContent.toLowerCase();
-                
+          
+      
                 caseCards.forEach(card => {
                     if (filterValue === 'all') {
                         card.style.display = 'block';
                     } else {
-                        const category = card.querySelector('.case-category').textContent.toLowerCase();
+    
+                    const category = card.querySelector('.case-category').textContent.toLowerCase();
                         if (category.includes(filterValue)) {
                             card.style.display = 'block';
-                        } else {
+                     
+   } else {
                             card.style.display = 'none';
                         }
                     }
                 });
-            });
+     
+       });
         });
-
-        // Testimonial slider
-        const dots = document.querySelectorAll('.dot');
-        const testimonials = [
-            {
-                text: "Advocate Kumar's exceptional legal acumen and strategic approach were instrumental in resolving our complex corporate dispute. His thorough preparation and persuasive arguments led to a favorable verdict. Highly recommended for business litigation.",
-                name: "Amit Sharma",
-                position: "CEO, TechVentures"
-            },
-            {
-                text: "I was facing a challenging criminal case and Advocate Kumar's expert defense strategy and unwavering support throughout the trial were remarkable. His deep knowledge secured my acquittal. Forever grateful for his dedication.",
-                name: "Priya Mehta",
-                position: "Business Owner"
-            },
-            {
-                text: "Our company's merger was successfully completed thanks to Advocate Kumar's meticulous legal guidance. His attention to detail in contract negotiations and compliance was exemplary. A true professional.",
-                name: "Rajiv Verma",
-                position: "Managing Director"
-            },
-            {
-                text: "Advocate Kumar handled my property dispute with exceptional skill and determination. His thorough understanding of civil law and strategic litigation resulted in a favorable settlement. Highly recommended.",
-                name: "Sneha Patel",
-                position: "Real Estate Developer"
-            }
-        ];
-
-        let currentTestimonial = 0;
-
-        const updateTestimonial = (index) => {
-            const testimonialText = document.querySelector('.testimonial-text');
-            const authorName = document.querySelector('.author-info h4');
-            const authorPosition = document.querySelector('.author-info span');
-            
-            testimonialText.textContent = `"${testimonials[index].text}"`;
-            authorName.textContent = testimonials[index].name;
-            authorPosition.textContent = testimonials[index].position;
-        };
-
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                dots.forEach(d => d.classList.remove('active'));
-                dot.classList.add('active');
-                currentTestimonial = index;
-                updateTestimonial(index);
-            });
-        });
-
-        // Auto-rotate testimonials
-        setInterval(() => {
-            dots[currentTestimonial].classList.remove('active');
-            currentTestimonial = (currentTestimonial + 1) % dots.length;
-            dots[currentTestimonial].classList.add('active');
-            updateTestimonial(currentTestimonial);
-        }, 6000);
-
-        // Scroll to top functionality
+// Scroll to top functionality
         const scrollTopBtn = document.querySelector('.scroll-top');
-
-        window.addEventListener('scroll', () => {
+window.addEventListener('scroll', () => {
             if (window.pageYOffset > 300) {
                 scrollTopBtn.classList.add('visible');
             } else {
                 scrollTopBtn.classList.remove('visible');
             }
         });
-
-        function scrollToTop() {
+function scrollToTop() {
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
-        }
+}
 
         // Animate rating bars on scroll
         const ratingBars = document.querySelectorAll('.rating-bar-fill');
-        const ratingsSection = document.querySelector('.ratings');
+const ratingsSection = document.querySelector('.ratings');
 
         const animateRatings = () => {
             const ratingsRect = ratingsSection.getBoundingClientRect();
-            if (ratingsRect.top < window.innerHeight && ratingsRect.bottom > 0) {
+if (ratingsRect.top < window.innerHeight && ratingsRect.bottom > 0) {
                 ratingBars.forEach(bar => {
                     const width = bar.style.width;
                     bar.style.width = '0%';
                     setTimeout(() => {
-                        bar.style.width = width;
+       
+                 bar.style.width = width;
                     }, 200);
                 });
-                window.removeEventListener('scroll', animateRatings);
+window.removeEventListener('scroll', animateRatings);
             }
         };
 
         window.addEventListener('scroll', animateRatings);
 
-        // ===== GOOGLE REVIEW INTEGRATION - AUTOMATIC FALLBACK METHOD =====
-        // This method works without API keys or Place IDs
-        // Just update your business name and location below
-
-        // CUSTOMIZE THESE VALUES FOR YOUR BUSINESS
         const BUSINESS_NAME = 'Advocate Rajesh Kumar';
-        const BUSINESS_LOCATION = 'Delhi'; // City name
+const BUSINESS_LOCATION = 'Delhi'; // City name
         const BUSINESS_ADDRESS = 'Chamber No. 45, District Court Complex, Delhi';
-        
-        // Full search query for Google
-        const FULL_BUSINESS_QUERY = `${BUSINESS_NAME} ${BUSINESS_LOCATION}`;
+const FULL_BUSINESS_QUERY = `${BUSINESS_NAME} ${BUSINESS_LOCATION}`;
 
-        // Function to open Google review page (Write Review)
         function openGoogleReview() {
-            // Open Google search with business name
             const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(FULL_BUSINESS_QUERY)}`;
-            window.open(searchUrl, '_blank');
+window.open(searchUrl, '_blank');
             
-            // Show helpful instruction
             setTimeout(() => {
                 alert('📝 On the Google page:\n\n1. Find "' + BUSINESS_NAME + '" in search results\n2. Click on the business listing\n3. Click "Write a review" button\n4. Rate and share your experience!\n\nThank you for your feedback! 🙏');
             }, 500);
-        }
+}
 
-        // Function to open Google profile (View All Reviews)
         function openGoogleProfile() {
-            // Open Google search with business name
             const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(FULL_BUSINESS_QUERY)}`;
-            window.open(searchUrl, '_blank');
+window.open(searchUrl, '_blank');
             
-            // Show helpful instruction
             setTimeout(() => {
                 alert('👀 On the Google page:\n\n1. Find "' + BUSINESS_NAME + '" in search results\n2. Click on the business listing\n3. Scroll down to see all reviews\n4. Read what clients are saying!\n\nYou can also click on "See all reviews" for more! ⭐');
             }, 500);
-        }
+}
 
-        // Function to open in Google Maps
         function openInGoogleMaps() {
-            // Method 1: Try to open in Google Maps app/web with search
             const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(FULL_BUSINESS_QUERY)}`;
-            window.open(mapsUrl, '_blank');
+window.open(mapsUrl, '_blank');
             
-            // Show helpful instruction
             setTimeout(() => {
                 alert('🗺️ Google Maps is opening!\n\nYou can:\n• View location and get directions\n• See business hours\n• Read reviews\n• View photos\n• Contact directly\n\nSelect "' + BUSINESS_NAME + '" from the search results! 📍');
             }, 500);
-        }
+}
 
-        // Function to fetch Google ratings
         async function fetchGoogleRating() {
-            // Check if API key and Place ID are configured
             if (GOOGLE_API_KEY === 'YOUR_API_KEY_HERE' || PLACE_ID === 'YOUR_PLACE_ID_HERE') {
                 console.log('Google API not configured. Using default values.');
-                return;
+return;
             }
 
             try {
@@ -1366,93 +1552,76 @@ END:VCARD`;
                     `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=rating,user_ratings_total,reviews&key=${GOOGLE_API_KEY}`,
                     {
                         method: 'GET',
-                        headers: {
+ 
+                       headers: {
                             'Content-Type': 'application/json',
                         }
                     }
-                );
+   
+             );
 
                 const data = await response.json();
-
-                if (data.status === 'OK' && data.result) {
+if (data.status === 'OK' && data.result) {
                     const rating = data.result.rating;
-                    const totalReviews = data.result.user_ratings_total;
+const totalReviews = data.result.user_ratings_total;
 
                     // Update rating number
                     document.getElementById('googleRating').textContent = rating.toFixed(1);
-
-                    // Update review count
+// Update review count
                     document.getElementById('googleReviewCount').textContent = 
                         `Based on ${totalReviews}+ Google reviews`;
-
-                    // Update stars display
+// Update stars display
                     updateStarsDisplay(rating);
-
-                    console.log('Google rating fetched successfully:', rating);
+console.log('Google rating fetched successfully:', rating);
                 } else {
                     console.error('Error fetching Google rating:', data.status);
-                }
+}
             } catch (error) {
                 console.error('Error fetching Google rating:', error);
-            }
+}
         }
 
         // Function to update stars based on rating
         function updateStarsDisplay(rating) {
             const starsContainer = document.getElementById('googleStars');
-            const fullStars = Math.floor(rating);
+const fullStars = Math.floor(rating);
             const hasHalfStar = rating % 1 >= 0.5;
             
             let starsHTML = '';
-            
-            // Add full stars
+// Add full stars
             for (let i = 0; i < fullStars; i++) {
                 starsHTML += '<i class="fas fa-star"></i>';
-            }
+}
             
             // Add half star if needed
             if (hasHalfStar && fullStars < 5) {
                 starsHTML += '<i class="fas fa-star-half-alt"></i>';
-            }
+}
             
             // Add empty stars
             const remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            for (let i = 0; i < remainingStars; i++) {
+for (let i = 0; i < remainingStars; i++) {
                 starsHTML += '<i class="far fa-star"></i>';
-            }
+}
             
             starsContainer.innerHTML = starsHTML;
-        }
+}
 
-        // Fetch Google rating on page load
-        // Uncomment the line below after adding your API key and Place ID
-        // fetchGoogleRating();
-
-        // ===== ALTERNATIVE: Google Reviews Widget Embed =====
-        // If you don't want to use API, you can use this method:
         function loadGoogleReviewsWidget() {
-            // This creates an iframe with Google reviews
-            // You need to get the embed code from Google My Business
             const widgetContainer = document.createElement('div');
-            widgetContainer.innerHTML = `
-                <!-- Replace with your actual Google Reviews embed code -->
+widgetContainer.innerHTML = `
                 <iframe 
                     src="https://www.google.com/maps/embed?pb=YOUR_EMBED_CODE" 
                     width="100%" 
-                    height="300" 
-                    style="border:0; border-radius: 12px; margin-top: 20px;" 
-                    allowfullscreen="" 
+              
+      height="300" 
+                    style="border:0; border-radius: 12px; margin-top: 20px;"
+allowfullscreen="" 
                     loading="lazy">
                 </iframe>
             `;
-            // Uncomment to append widget
-            // document.querySelector('.ratings-container').appendChild(widgetContainer);
-        }
+}
     </script>
-
-    <!-- OPTIONAL: Load Google Places API Library -->
-    <!-- Uncomment and add your API key to use Places API directly -->
-    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script> -->
 
 </body>
 </html>

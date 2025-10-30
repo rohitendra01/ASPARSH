@@ -8,70 +8,52 @@ exports.renderNewProfileForm = (req, res) => {
 };
 
 // Handle profile creation
+// In your profileController.js
+
 exports.createProfile = async (req, res) => {
-  const data = req.body;
-  try {
-    let imageUrl = '';
-    if (req.file) {
-      try {
-        imageUrl = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream({
-            folder: 'asparsh/profiles',
-            resource_type: 'image',
-            public_id: `profile_${Date.now()}`,
-            overwrite: true
-          }, (error, result) => {
-            if (error) {
-              console.error('Cloudinary upload error:', error);
-              reject(error);
-            } else {
-              resolve(result.secure_url);
-            }
-          });
-          streamifier.createReadStream(req.file.buffer).pipe(stream);
-        });
-      } catch (cloudErr) {
-        console.error('Image upload failed:', cloudErr);
-        req.flash('error_msg', 'Image upload failed. Please try again.');
-        return res.redirect(`/dashboard/${req.params.slug}/profiles/new`);
-      }
-    }
+  const data = req.body;
+  try {
+    // Build address object from form fields
+    const address = {
+      addressLine: data.addressLine || '',
+      city: data.city || '',
+      state: data.state || '',
+      country: data.country || '',
+      postcode: data.postcode || ''
+    };
 
-    
+    // Build the base profile data
+    const profileData = {
+      ...data,
+      createdBy: req.user._id,
+      address,
+      socialLinks: data.socialLinks || [],
+      occupation: data.occupation || '',
+      category: data.category || '',
+      experience: data.experience ? Number(data.experience) : 0,
+      subcategory: data.subcategory || ''
+    };
 
-    
-    // Build address object from form fields
-    const address = {
-      addressLine: data.addressLine || '',
-      city: data.city || '',
-      state: data.state || '',
-      country: data.country || '',
-      postcode: data.postcode || ''
-    };
-    
-    const newProfile = new Profile({
-      ...data,
-      createdBy: req.user._id,
-      image: imageUrl || '',
-      address,
-      socialLinks: data.socialLinks || [],
-      occupation: data.occupation || '',
-      category: data.category || '',
-      experience: data.experience ? Number(data.experience) : 0,
-      subcategory: data.subcategory || ''
-    });
-    
-    await newProfile.save();
-    req.flash('success_msg', 'Profile created successfully!');
-    // Redirect to the newly created profile
-    return res.redirect(`/dashboard/${req.params.slug}/profiles`);
-  } catch (err) {
-    console.error('Error creating profile:', err);
-    req.flash('error_msg', 'Error creating profile. Please try again.');
-    res.redirect(`/dashboard/${req.params.slug}/profiles`);
-  }
+    // ** THIS IS THE KEY CHANGE **
+    // The middleware already uploaded the file. 
+    // We just get the URL from req.file.path (this is set by multer-storage-cloudinary)
+    if (req.file) {
+      profileData.image = req.file.path;
+    }
+
+    // Create the new profile
+    const newProfile = new Profile(profileData);
+    
+    await newProfile.save();
+    req.flash('success_msg', 'Profile created successfully!');
+    return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+
+  } catch (err) {
+    console.error('Error creating profile:', err);
+    req.flash('error_msg', 'Error creating profile. Please try again.');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  }
 };
-
 // List all profiles for the current user
 exports.listProfiles = async (req, res) => {
   try {

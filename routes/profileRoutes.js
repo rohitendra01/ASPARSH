@@ -4,13 +4,21 @@ const profileController = require('../controllers/profileController');
 const { isLoggedIn } = require('../middleware/authMiddleware');
 const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
-const upload = require('../middleware/uploadMiddleware');
+const { upload } = require('../middleware/uploadMiddleware');
 
 // List profiles
 router.get('/', isLoggedIn, profileController.listProfiles);
 
 // Render new profile form
 router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
+
+// Create new profile (handles form submission from /new)
+router.post('/', 
+  isLoggedIn,
+  upload.single('image'),
+  csrfProtection,
+  profileController.createProfile
+);
 
 // Show profile (public under dashboard)
 router.get('/:profileSlug', profileController.showProfile);
