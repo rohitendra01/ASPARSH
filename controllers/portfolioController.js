@@ -1,10 +1,10 @@
-// controllers/portfolioController.js (COMPLETE - UPDATED with dynamic routing)
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const path = require('path');
 const { Portfolio } = require('../models/Portfolio');
 const Profile = require('../models/Profile');
 const Design = require('../models/Design');
+const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 
 // ========== 1. LIST ALL PORTFOLIOS ==========
 exports.listPortfolios = async (req, res) => {
@@ -20,7 +20,6 @@ exports.listPortfolios = async (req, res) => {
       layout: 'layouts/dashboard-boilerplate'
     });
   } catch (err) {
-    console.error('[portfolioController] Error listing portfolios:', err);
     res.status(500).send('Error retrieving portfolios');
   }
 };
@@ -50,18 +49,14 @@ exports.showCreateForm = async (req, res) => {
       csrfToken
     });
   } catch (err) {
-    console.error('[portfolioController] Error rendering create form:', err && err.stack ? err.stack : err);
     res.status(500).send('Error rendering form');
   }
 };
 
-// ========== 3. CREATE NEW PORTFOLIO ==========
+// ========== 3. CREATE PORTFOLIO ==========
 exports.createPortfolio = async (req, res) => {
   try {
     const payload = req.body || {};
-    
-    console.log('📦 Received payload:', Object.keys(payload));
-    console.log('📁 Received files:', req.files ? Object.keys(req.files) : 'No files');
     
     // ========== 3.1. Validate Profile ==========
     const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug;
@@ -80,8 +75,6 @@ exports.createPortfolio = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Profile not found' });
     }
 
-    console.log('✅ Profile found:', profile.name);
-
     // ========== 3.2. Validate Design ==========
     const designId = payload.designId;
     if (!designId || !mongoose.Types.ObjectId.isValid(designId)) {
@@ -92,9 +85,6 @@ exports.createPortfolio = async (req, res) => {
     if (!design) {
       return res.status(400).json({ success: false, message: 'Design not found' });
     }
-
-    console.log('✅ Design selected:', design.name);
-    console.log('🎨 Template path:', design.templatePath);
 
     // ========== 3.3. Generate Unique Slug ==========
     const slugify = (s = '') => String(s).toLowerCase()
@@ -113,31 +103,49 @@ exports.createPortfolio = async (req, res) => {
     const uniqueId = crypto.randomBytes(5).toString('hex');
     const finalSlug = `${baseSlug}-${uniqueId}`;
 
-    console.log('✅ Generated slug:', finalSlug);
+    // ========== 3.4. Process Uploaded Images (NEW - With uploadToCloudinary) ==========
+    let heroImage = 'https://placehold.co/160x160';
+    let aboutImage = 'https://placehold.co/600x400';
+    let galleryImages = [];
 
-    // ========== 3.4. Process Uploaded Images ==========
-let heroImage = 'https://placehold.co/160x160';
-let aboutImage = 'https://placehold.co/600x400';
-let galleryImages = [];
+    try {
+      // Upload heroImage
+      if (req.files?.heroImage?.[0]) { // Corrected syntax here
+        const heroFile = req.files.heroImage[0]; // Access the first file in the array
+        const heroResult = await uploadToCloudinary(
+          heroFile.buffer,
+          'heroImage',
+          heroFile.mimetype
+        );
+        heroImage = heroResult.secure_url;
+      }
 
-if (req.files) {
-  // uploaded files contain Cloudinary URLs
-  if (req.files.heroImage && req.files.heroImage[0]) {
-    heroImage = req.files.heroImage[0].path; // Cloudinary returns a secure URL under .path
-    console.log('✅ Hero image uploaded:', heroImage);
-  }
+      // Upload aboutImage
+      if (req.files?.aboutImage?.[0]) { // Corrected syntax here
+        const aboutFile = req.files.aboutImage[0]; // Access the first file in the array
+        const aboutResult = await uploadToCloudinary(
+          aboutFile.buffer,
+          'aboutImage',
+          aboutFile.mimetype
+        );
+        aboutImage = aboutResult.secure_url;
+      }
 
-  if (req.files.aboutImage && req.files.aboutImage[0]) {
-    aboutImage = req.files.aboutImage[0].path;
-    console.log('✅ About image uploaded:', aboutImage);
-  }
-
-  if (req.files.galleryImages && req.files.galleryImages.length > 0) {
-    galleryImages = req.files.galleryImages.map(file => file.path);
-    console.log(`✅ Uploaded ${galleryImages.length} gallery images`);
-  }
-}
-
+      // Upload galleryImages
+      if (req.files?.galleryImages?.length > 0) {
+        const galleryResults = await Promise.all(
+          req.files.galleryImages.map(file =>
+            uploadToCloudinary(file.buffer, 'galleryImages', file.mimetype)
+          )
+        );
+        galleryImages = galleryResults.map(result => result.secure_url);
+      }
+    } catch (uploadErr) {
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to upload images: ' + uploadErr.message
+      });
+    }
 
     // ========== 3.5. Process Social Links ==========
     let socialLinks = [];
@@ -148,10 +156,9 @@ if (req.files) {
           : payload.socialLinks;
       }
     } catch (e) {
-      console.error('Error parsing socialLinks:', e);
     }
 
-    // ========== 3.6. Process Skills (CRITICAL FIX) ==========
+    // ========== 3.6. Process Skills ==========
     let skills = [];
     try {
       if (payload.skills) {
@@ -161,10 +168,8 @@ if (req.files) {
         
         // Extract only ObjectIds
         skills = skillsData.map(skill => skill.id || skill._id || skill);
-        console.log(`✅ Processed ${skills.length} skills`);
       }
     } catch (e) {
-      console.error('Error parsing skills:', e);
     }
 
     // ========== 3.7. Process Work Experience ==========
@@ -174,10 +179,8 @@ if (req.files) {
         workExperience = typeof payload.workExperience === 'string' 
           ? JSON.parse(payload.workExperience) 
           : payload.workExperience;
-        console.log(`✅ Processed ${workExperience.length} work items`);
       }
     } catch (e) {
-      console.error('Error parsing workExperience:', e);
     }
 
     // ========== 3.8. Process Experience Timeline ==========
@@ -187,10 +190,8 @@ if (req.files) {
         experience = typeof payload.experienceTimeline === 'string' 
           ? JSON.parse(payload.experienceTimeline) 
           : payload.experienceTimeline;
-        console.log(`✅ Processed ${experience.length} experience items`);
       }
     } catch (e) {
-      console.error('Error parsing experienceTimeline:', e);
     }
 
     // ========== 3.9. Validate createdBy ==========
@@ -218,25 +219,19 @@ if (req.files) {
       skills,
       workExperience,
       experience,
-      design: design._id,  // Store design ObjectId
+      design: design._id,
       createdBy: createdById
     });
-
-    console.log('📝 Portfolio document prepared');
 
     // ========== 3.11. Save Portfolio ==========
     try {
       await portfolio.save();
-      console.log('✅ Portfolio saved successfully');
     } catch (saveErr) {
       if (saveErr && saveErr.code === 11000 && saveErr.keyPattern && saveErr.keyPattern.slug) {
-        console.log('⚠️  Duplicate slug detected, generating new one');
         const newUniqueId = crypto.randomBytes(5).toString('hex');
         portfolio.slug = `${baseSlug}-${newUniqueId}`;
         await portfolio.save();
-        console.log('✅ Portfolio saved with new slug');
       } else {
-        console.error('❌ Portfolio save error:', saveErr);
         throw saveErr;
       }
     }
@@ -246,7 +241,6 @@ if (req.files) {
       profile._id,
       { $push: { portfolio: portfolio._id } }
     );
-    console.log('✅ Profile updated with portfolio reference');
 
     // ========== 3.13. Send Response ==========
     const accept = (req.headers['accept'] || '').toLowerCase();
@@ -262,8 +256,6 @@ if (req.files) {
     res.redirect(`/portfolio/${portfolio.slug}`);
 
   } catch (err) {
-    console.error('[portfolioController] Error creating portfolio:', err);
-    console.error('Stack trace:', err.stack);
     
     const accept = (req.headers['accept'] || '').toLowerCase();
     if (req.xhr || accept.includes('application/json') || req.is('json')) {
@@ -281,7 +273,6 @@ if (req.files) {
 // ========== 4. GET PORTFOLIO BY SLUG (JSON API) ==========
 exports.getPortfolioBySlug = async (req, res) => {
   try {
-    console.log(`\n🎯 API: Getting portfolio: ${req.params.slug}`);
 
     const portfolio = await Portfolio.findOne({ slug: req.params.slug })
       .populate('skills', 'name iconClass description')
@@ -290,21 +281,18 @@ exports.getPortfolioBySlug = async (req, res) => {
       .lean();
 
     if (!portfolio) {
-      console.log('❌ Portfolio not found:', req.params.slug);
       return res.status(404).json({ 
         success: false, 
         message: 'Portfolio not found' 
       });
     }
 
-    console.log('✅ Portfolio found:', portfolio.name);
 
     res.json({
       success: true,
       portfolio
     });
   } catch (error) {
-    console.error('❌ Error fetching portfolio:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Server error',
@@ -320,7 +308,6 @@ exports.getPortfolioBySlug = async (req, res) => {
  */
 exports.showPortfolio = async (req, res) => {
   try {
-    console.log(`\n🎯 VIEW: Getting portfolio: ${req.params.slug}`);
 
     // Fetch portfolio with design
     const portfolio = await Portfolio.findOne({ slug: req.params.slug })
@@ -330,7 +317,6 @@ exports.showPortfolio = async (req, res) => {
       .lean();
 
     if (!portfolio) {
-      console.log('❌ Portfolio not found:', req.params.slug);
       return res.status(404).render('error', {
         title: 'Portfolio Not Found',
         message: 'The portfolio you are looking for does not exist.',
@@ -338,11 +324,9 @@ exports.showPortfolio = async (req, res) => {
       });
     }
 
-    console.log('✅ Portfolio found:', portfolio.name);
 
     // Check design exists
     if (!portfolio.design) {
-      console.error('❌ Design not found for portfolio');
       return res.status(404).render('error', {
         title: 'Design Not Found',
         message: 'The design for this portfolio is not available.',
@@ -351,11 +335,7 @@ exports.showPortfolio = async (req, res) => {
     }
 
     const designTemplatePath = portfolio.design.templatePath;
-    console.log(`🎨 Using template: ${designTemplatePath}`);
 
-    // DYNAMIC ROUTING: Render using design's template path
-    // Template path from DB: 'portfolios/basic-portfolios/basic1'
-    // Maps to: views/portfolios/basic-portfolios/basic1.ejs
     res.render(designTemplatePath, {
       title: `${portfolio.name} - Portfolio`,
       portfolio: portfolio
