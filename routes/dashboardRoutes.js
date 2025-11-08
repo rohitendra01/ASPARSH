@@ -9,6 +9,9 @@ const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 const userController = require('../controllers/userController');
 const profileController = require('../controllers/profileController');
 const portfolioController = require('../controllers/portfolioController');
+const reviewRoutes = require('../routes/reviewRoutes');
+
+
 
 // Route: dashboard home (protected)
 router.get('/', isLoggedIn, (req, res) => {
@@ -38,5 +41,8 @@ router.post('/profiles/:profileSlug/edit', isLoggedIn, upload.single('image'), c
 
 // Route for /:slug/profiles/:profileSlug/delete (handle POST)
 router.post('/profiles/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);
+
+router.use('/profiles/:profileSlug/reviews', reviewRoutes);
+
 
 module.exports = router;

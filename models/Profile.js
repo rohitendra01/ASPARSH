@@ -94,6 +94,11 @@ const profileSchema = new Schema({
     ref:  'Portfolio'
   }],
 
+  reviewLinks: [{
+    type: Schema.Types.ObjectId,
+    ref:  'ReviewLink'
+  }],
+
   metadata: {
     type: Schema.Types.Mixed
   }

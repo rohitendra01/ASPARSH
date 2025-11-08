@@ -173,6 +173,7 @@ const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 // Use routes
 app.use('/', indexRoutes);
@@ -184,7 +185,9 @@ app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
 app.use('/dashboard/:slug/profiles', profileRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
+app.use('/dashboard/:slug/reviews', reviewRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
+app.use('/reviews', reviewRoutes); //
 app.use('/api', apiRoutes);
 
 app.use((err, req, res, next) => {

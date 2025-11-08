@@ -168,12 +168,10 @@ exports.showByProfile = async (req, res) => {
 // List visiting cards for dashboard (by profile or user)
 exports.list = async (req, res) => {
   try {
-    // Build filters as an array and combine with $and so we don't overwrite clauses
     const filters = [];
     if (req.params && req.params.slug) {
       const profile = await Profile.findOne({ slug: req.params.slug });
       if (profile) {
-        // show cards linked to this profileSlug OR cards created by the logged-in user
         if (req.user && req.user._id) {
           filters.push({ $or: [ { profileSlug: profile.slug }, { user: req.user._id } ] });
         } else {
@@ -187,11 +185,8 @@ exports.list = async (req, res) => {
       const searchRegex = new RegExp(req.query.search, 'i');
       filters.push({ $or: [ { name: searchRegex }, { slug: searchRegex } ] });
     }
-    // assemble final query
     const query = (filters.length > 0) ? { $and: filters } : {};
-    // include profile summary where possible to allow view to render profile data
     const cards = await VisitingCard.find(query).lean();
-    // attach profile summary fields for each card to avoid extra lookups in the view
     const profileSlugs = cards.filter(c => c.profileSlug).map(c => String(c.profileSlug));
     let profilesMap = {};
     if (profileSlugs.length) {
@@ -207,7 +202,6 @@ exports.list = async (req, res) => {
       }
     });
     const slug = (req.params && req.params.slug) || (req.user && req.user.slug) || '';
-    // render the visiting-cards index view so sidebar opens the correct page
     res.render('visiting-cards/index', { cards, layout: 'layouts/dashboard-boilerplate', slug });
   } catch (err) {
     console.error('Error listing visiting cards', err);

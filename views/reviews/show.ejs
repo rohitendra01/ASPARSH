@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review - <%= business.name %></title>
+    <link rel="stylesheet" href="/css/review/show.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📝 <%= link.title %></h1>
+        <p class="subtitle">Review for <%= business.name %></p>
+        <p class="category-badge">📂 <%= business.category %> • <%= business.subcategory || 'General' %></p>
+        
+        <div id="reviewBox" class="review-box loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="button-group">
+            <button id="regenerateBtn" class="btn-regenerate" onclick="generateReview()">
+                🔄 Refresh Review
+            </button>
+            <button id="copyBtn" class="btn-copy" onclick="copyToClipboard()">
+                📋 Copy
+            </button>
+            <button id="submitBtn" class="btn-submit" onclick="submitReview()">
+                ⭐ Post Review
+            </button>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        const LINK_SLUG = '<%= link.slug %>';
+        const LINK_TYPE = '<%= link.type %>';
+        const GOOGLE_PLACE_ID = '<%= link.googlePlaceId || "" %>';
+        const CUSTOM_FORM_URL = '<%= link.customFormUrl || "" %>';
+        const GOOGLE_REVIEW_URL = GOOGLE_PLACE_ID ? 
+            `https://search.google.com/local/writereview?placeid=${GOOGLE_PLACE_ID}` : 
+            null;
+        
+        let currentReviewText = '';
+        
+        async function generateReview() {
+            const reviewBox = document.getElementById('reviewBox');
+            const regenerateBtn = document.getElementById('regenerateBtn');
+            
+            reviewBox.className = 'review-box loading';
+            reviewBox.innerHTML = '<div class="spinner"></div>';
+            regenerateBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`/reviews/<%= link.slug %>/api/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.reviewText) {
+                    currentReviewText = data.reviewText;
+                    reviewBox.className = 'review-box';
+                    reviewBox.textContent = currentReviewText;
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                reviewBox.className = 'review-box';
+                reviewBox.textContent = 'Error generating review. Please try again.';
+                showNotification('Error: ' + error.message, 'error');
+            } finally {
+                regenerateBtn.disabled = false;
+            }
+        }
+        
+        function copyToClipboard() {
+            if (!currentReviewText) {
+                showNotification('Please generate a review first!', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(currentReviewText).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.classList.add('copied');
+                showNotification('Review copied to clipboard!', 'success');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                showNotification('Failed to copy text', 'error');
+            });
+        }
+                   
+        function submitReview() {
+    if (!currentReviewText) {
+        showNotification('Please generate a review first!', 'error');
+        return;
+    }
+
+    let targetUrl;
+
+    if (LINK_TYPE === 'google_review') {
+        targetUrl = GOOGLE_REVIEW_URL || '<%= link.googleReviewUrl || "" %>';
+    } else if (LINK_TYPE === 'custom_form') {
+        targetUrl = CUSTOM_FORM_URL;
+    }
+
+    if (!targetUrl) {
+        showNotification('Destination not configured', 'error');
+        return;
+    }
+
+    showNotification('Opening review page...', 'success');
+
+    fetch(`/reviews/<%= link.slug %>/api/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: LINK_SLUG, reviewText: currentReviewText })
+    }).catch(err => console.error('Tracking error:', err));
+
+    setTimeout(() => {
+        window.open(targetUrl, '_blank');
+    }, 500);
+}
+
+    showNotification('Opening review page...', 'success');
+            
+
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.background = type === 'success' ? '#48bb78' : '#f56565';
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        window.addEventListener('load', generateReview);
+    </script>
+</body>
+</html>
