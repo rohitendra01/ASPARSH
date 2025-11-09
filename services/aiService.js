@@ -10,20 +10,23 @@ try {
         });
     }
 } catch (error) {
-    console.error('[AI Service] Failed to initialize Gemini:', error.message);
+    console.error('[AI Init] 🔴 CRITICAL: Failed to initialize Gemini:', error.message);
 }
 
 async function generateReviewText(systemPrompt, userPrompt) {
     try {
         if (!ai || !process.env.GOOGLE_API_KEY) {
+            console.error('[GenerateReview] 🔴 ERROR: AI service not available.');
             return generateFallbackReview();
         }
 
+        const model = 'gemini-2.5-flash';
+
 
         const message = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: model,
             contents: [
-                { role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }
+                { role: 'user', parts: [{ text: userPrompt }] }
             ],
             config: {
                 systemInstruction: systemPrompt,
@@ -31,7 +34,8 @@ async function generateReviewText(systemPrompt, userPrompt) {
             }
         });
 
-        const reviewText = message.text.trim();
+
+const reviewText = message.candidates[0].content.parts[0].text.trim();
         if (!reviewText) {
             throw new Error('Empty response from Gemini');
         }
@@ -39,12 +43,11 @@ async function generateReviewText(systemPrompt, userPrompt) {
         return reviewText;
 
     } catch (error) {
-        console.error('[GenerateReview] Error:', error.message);
+        console.error('[GenerateReview] 🔴 ERROR:', error.message);
         console.log('[GenerateReview] Using fallback template');
         return generateFallbackReview();
     }
 }
-
 
 function generateFallbackReview() {
     const templates = [

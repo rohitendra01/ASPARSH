@@ -24,7 +24,7 @@ const adminUserSchema = new mongoose.Schema({
         minlength: [6, 'Password must be at least 6 characters']
     },
     image: {
-        type: String, // Cloudinary image URL
+        type: String, 
         default: ''
     },
     currentSessionId: {
@@ -40,7 +40,7 @@ const adminUserSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Slug generation middleware (ensures uniqueness)
+// Slug generation middleware
 adminUserSchema.pre('save', async function(next) {
     if (this.isModified('username')) {
         let baseSlug = this.username

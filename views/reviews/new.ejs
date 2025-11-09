@@ -15,19 +15,14 @@
     --radius: 12px;
     --transition: 180ms ease;
   }
-
-  /* Page */
   body {
     background: var(--bg);
     color: #111827;
   }
-
   .page-container {
     padding: 2rem 0;
     background: linear-gradient(180deg, var(--bg), #ffffff);
   }
-
-  /* Card styling */
   .card, .panel-card {
     border-radius: var(--radius);
     background: var(--card);
@@ -35,20 +30,15 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     transition: box-shadow var(--transition);
   }
-
   .card:hover, .panel-card:hover {
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   }
-
-  /* Headings */
   h2.section-title, h5 {
     font-weight: 700;
     background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-
-  /* Inputs */
   .form-control {
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -56,14 +46,11 @@
     height: 44px;
     transition: border var(--transition), box-shadow var(--transition);
   }
-
   .form-control:focus {
     border-color: var(--accent-start);
     box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
     outline: none;
   }
-
-  /* Buttons */
   .btn-primary, .btn-accent {
     background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
     border: none;
@@ -73,39 +60,31 @@
     box-shadow: 0 4px 15px rgba(99,102,241,0.3);
     transition: transform var(--transition), box-shadow var(--transition);
   }
-
   .btn-primary:hover, .btn-accent:hover {
     transform: translateY(-1px);
     box-shadow: 0 8px 22px rgba(99,102,241,0.35);
   }
-
   .btn-outline-muted {
     border: 1px solid var(--border);
     color: #111827;
     background: transparent;
     border-radius: 10px;
   }
-
   .btn-outline-muted:hover {
     background: #f9fafb;
   }
-
   .btn-outline-danger {
     border: 1px solid rgba(239,68,68,0.15);
     color: var(--danger);
     background: transparent;
   }
-
   .btn-outline-danger:hover {
     background: rgba(239,68,68,0.05);
   }
-
-  /* Profile search dropdown */
   .input-group {
     position: relative;
   }
-
-  #searchResults {
+  .profile-suggestions {
     position: absolute;
     top: calc(100% + 5px);
     left: 0;
@@ -115,20 +94,18 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    display: none;
+    display: none; 
     max-height: 300px;
     overflow-y: auto;
   }
-
-  #searchResults::-webkit-scrollbar {
+  .profile-suggestions::-webkit-scrollbar {
     width: 6px;
   }
-  #searchResults::-webkit-scrollbar-thumb {
+  .profile-suggestions::-webkit-scrollbar-thumb {
     background: rgba(156,163,175,0.4);
     border-radius: 4px;
   }
-
-  .list-group-item {
+  .suggestion-item {
     display: block;
     padding: 10px 14px;
     border: none;
@@ -137,30 +114,24 @@
     cursor: pointer;
     transition: background var(--transition), transform var(--transition);
   }
-
-  .list-group-item:last-child {
+  .suggestion-item:last-child {
     border-bottom: none;
   }
-
-  .list-group-item:hover {
+  .suggestion-item:hover {
     background: linear-gradient(90deg, rgba(99,102,241,0.08), rgba(139,92,246,0.06));
     transform: translateX(2px);
   }
-
-  .list-group-item strong {
+  .suggestion-item strong {
     display: block;
     font-size: 1rem;
     color: #111827;
   }
-
-  .list-group-item small {
+  .suggestion-item small {
     display: block;
     color: var(--muted);
     font-size: 0.85rem;
   }
-
-  /* Selected profile info */
-  .selected-profile, #selectedProfileDisplay {
+  .selected-profile, #profileDisplay .alert {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -169,19 +140,14 @@
     border-radius: 10px;
     padding: 10px 14px;
   }
-
   .selected-profile strong {
     font-weight: 700;
   }
-
-  /* Alerts */
   .alert {
     border-radius: 10px;
     border: none;
     box-shadow: 0 4px 18px rgba(0,0,0,0.05);
   }
-
-  /* Responsive adjustments */
   @media (max-width: 576px) {
     .form-control { font-size: 0.95rem; }
     .btn { padding: 8px 12px; font-size: 0.95rem; }
@@ -194,72 +160,75 @@
     <div class="col-md-8">
       <h2 class="section-title mb-4">Create Review Link</h2>
       
-      <form id="reviewLinkForm" method="POST" action="/reviews" class="needs-validation panel-card" novalidate>
+      <div id="alert-container"></div>
+      
+      <form id="reviewLinkForm" method="POST" action="/reviews" class="needs-validation panel-card p-4 p-md-5" novalidate>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
         <input type="hidden" id="profileSlugField" name="profileSlug" value="">
-
         
         <div class="mb-4">
           <h5 class="mb-3">1. Select or Search Profile</h5>
-
-          <div id="profileSearchSection" class="suggestions-container d-block">
+          <div id="profileSearchSection" class="input-group d-block">
             <label for="profile-search" class="form-label">Search Profile</label>
             <input id="profile-search" type="search" class="form-control" placeholder="Search profile by name, email or slug..." autocomplete="off">
-            <div id="profile-suggestions" class="suggestions"></div>
+            <div id="profile-suggestions" class="profile-suggestions"></div>
           </div>
           
           <div id="profileDisplay" class="d-none">
-  <div class="alert alert-info d-flex justify-content-between align-items-center">
-    <div>
-      <strong id="selectedProfileName"></strong><br>
-      <small class="text-muted" id="selectedProfileDetails"></small>
-    </div>
-    <button type="button" class="btn btn-sm btn-outline-secondary" id="changeProfileBtn">
-      Change Profile
-    </button>
-  </div>
-</div>
-
-
+            <div class="alert d-flex justify-content-between align-items-center">
+              <div>
+                <strong id="selectedProfileName"></strong><br>
+                <small class="text-muted" id="selectedProfileDetails"></small>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-muted" id="changeProfileBtn">Change</button>
+            </div>
+          </div>
         </div>
 
         <div class="mb-4">
-          <h5 class="mb-3">2. Choose Link Destination</h5>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="linkType" id="linkTypeGoogle" value="google_review" checked>
-            <label class="form-check-label" for="linkTypeGoogle">
-              Google Review (Direct Link)
-            </label>
-          </div>
-          <div id="googleUrlField" class="mt-2">
-            <label for="googleReviewUrl" class="form-label">Google Review URL / Place ID</label>
-            <input type="text" class="form-control" id="googleReviewUrl" name="googleReviewUrl" placeholder="https://g.page/your-place/review" required>
-            <div class="form-text text-muted">Paste the direct Google review link or the Google Place ID.</div>
-          </div>
-
-          <div class="form-check mt-3">
-            <input class="form-check-input" type="radio" name="linkType" id="linkTypeCustom" value="custom_form">
-            <label class="form-check-label" for="linkTypeCustom">
-              Custom Form (External URL)
-            </label>
-          </div>
-          <div id="customUrlField" class="mt-2" style="display: none;">
-            <label for="customFormUrl" class="form-label">External Form URL</label>
-            <input type="url" class="form-control" id="customFormUrl" name="customFormUrl" placeholder="https://forms.gle/yourform">
-            <div class="form-text text-muted">Direct customers to an external form (e.g., Google Forms).</div>
+          <h5 class="mb-3">2. Link Destination</h5>
+          <div>
+            <label for="targetUrl" class="form-label">Destination URL</label>
+            <input type="text" class="form-control" id="targetUrl" name="targetUrl" placeholder="https://g.page/your-place/review" required>
+            <div class="form-text text-muted">Paste the direct link (e.g., Google Review, custom form, etc.).</div>
+            <div class="invalid-feedback">A destination URL is required.</div>
           </div>
         </div>
         
         <div class="mb-4">
-          <h5 class="mb-3">3. Link Details</h5>
-          <label for="reviewTitle" class="form-label">Review Title</label>
-          <input type="text" class="form-control" id="reviewTitle" name="reviewTitle" placeholder="Share Your Experience">
-          <div class="form-text text-muted">This is the public title on the review page.</div>
+          <h5 class="mb-3">3. Business Details</h5>
+          
+          <div class="mb-3">
+            <label for="businessName" class="form-label">Business Name</label>
+            <input type="text" class="form-control" id="businessName" name="businessName" placeholder="e.g., The Grand Hotel" required>
+            <div class="invalid-feedback">Business Name is required.</div>
+          </div>
+  
+          <div class="mb-3">
+            <label for="businessSubheader" class="form-label">Business Subheader (Optional)</label>
+            <input type="text" class="form-control" id="businessSubheader" name="businessSubheader" placeholder="e.g., Italian Cuisine & Bar">
+          </div>
+
+          <div class="mb-3">
+            <label for="businessCategory" class="form-label">Category</label>
+            <input type="text" class="form-control" id="businessCategory" name="businessCategory" placeholder="e.g., Restaurant, Plumber, Real Estate" required>
+            <div class="form-text text-muted">Be specific. This is sent directly to the AI.</div>
+            <div class="invalid-feedback">Category is required.</div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <h5 class="mb-3">4. Link Details</h5>
+          
+          <div class="mb-3">
+            <label for="reviewTitle" class="form-label">Review Title (Optional)</label>
+            <input type="text" class="form-control" id="reviewTitle" name="reviewTitle" placeholder="Share Your Experience">
+            <div class="form-text text-muted">This is the public title on the review page.</div>
+          </div>
         </div>
         
         <div class="d-grid mt-4">
-          <button type="submit" class="btn btn-primary" id="submitBtn">Create Review Link</button>
+           <button type="submit" class="btn btn-primary" id="submitBtn">Create Review Link</button>
         </div>
       </form>
     </div>
@@ -267,9 +236,7 @@
 </div>
 
 <script>
-  // ==========================================================
   // 1. PROFILE SELECTION LOGIC
-  // ==========================================================
   ;(function() {
     const searchInput = document.getElementById('profile-search');
     const suggestionsContainer = document.getElementById('profile-suggestions');
@@ -281,113 +248,72 @@
     const changeProfileBtn = document.getElementById('changeProfileBtn');
     
     let timeout = null;
-
     function selectProfile(profile) {
       profileSlugField.value = profile.slug;
-      
-      // Update display
       selectedProfileName.textContent = profile.name;
       selectedProfileDetails.innerHTML = profile.category 
         ? profile.category + (profile.subcategory ? ' - ' + profile.subcategory : '')
         : '';
-
       profileSearchSection.classList.add('d-none');
+      profileSearchSection.classList.remove('d-block');
       profileDisplay.classList.remove('d-none');
-      
-      // Clear input and suggestions
+      profileDisplay.classList.add('d-block');
       searchInput.value = '';
       suggestionsContainer.innerHTML = '';
+      suggestionsContainer.style.display = 'none';
     }
-
     
-    // Event listener for changing profile
     changeProfileBtn.addEventListener('click', () => {
         profileSlugField.value = '';
         profileDisplay.classList.add('d-none');
+        profileDisplay.classList.remove('d-block');
         profileSearchSection.classList.remove('d-none');
+        profileSearchSection.classList.add('d-block');
         searchInput.focus();
     });
 
-    // Event listener for search input
     searchInput.addEventListener('input', () => {
       clearTimeout(timeout);
       const q = searchInput.value.trim();
       
       if (!q || q.length < 2) {
         suggestionsContainer.innerHTML = '';
+        suggestionsContainer.style.display = 'none';
         return;
       }
-
       timeout = setTimeout(async () => {
         try {
-          // Use the correct mounted route for the search controller
           const res = await fetch('/reviews/search-profiles?q=' + encodeURIComponent(q));
           if (!res.ok) throw new Error('Failed to fetch profiles');
           
           const result = await res.json();
           const profiles = result.profiles || [];
-
           suggestionsContainer.innerHTML = '';
           
           if (profiles.length === 0) {
-            suggestionsContainer.innerHTML = '<div class="suggestion-item text-muted">No profiles found.</div>';
+            suggestionsContainer.innerHTML = '<div class="suggestion-item text-muted p-3 text-center">No profiles found.</div>';
+            suggestionsContainer.style.display = 'block';
             return;
           }
-
           profiles.forEach(p => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
             div.innerHTML = `<strong>${p.name}</strong> <small class="text-muted">(${p.slug})</small>`;
             div.dataset.slug = p.slug;
-            
             div.addEventListener('click', () => selectProfile(p));
-            
             suggestionsContainer.appendChild(div);
           });
+          suggestionsContainer.style.display = 'block';
         } catch (err) {
           console.error('Profile search error', err);
-          suggestionsContainer.innerHTML = '<div class="suggestion-item text-danger">Error searching.</div>';
+          suggestionsContainer.innerHTML = '<div class="suggestion-item text-danger p-3 text-center">Error searching.</div>';
+          suggestionsContainer.style.display = 'block';
         }
-      }, 300); // Debounce search
+      }, 300);
     });
   })();
 
-  // ==========================================================
-  // 2. LINK TYPE TOGGLE LOGIC
-  // ==========================================================
-  ;(function() {
-    const googleRadio = document.getElementById('linkTypeGoogle');
-    const customRadio = document.getElementById('linkTypeCustom');
-    const googleField = document.getElementById('googleReviewUrl');
-    const customField = document.getElementById('customFormUrl');
-    const googleUrlField = document.getElementById('googleUrlField');
-    const customUrlField = document.getElementById('customUrlField');
-
-    function toggleFields() {
-      if (googleRadio.checked) {
-        googleUrlField.style.display = 'block';
-        customUrlField.style.display = 'none';
-        googleField.setAttribute('required', 'required');
-        customField.removeAttribute('required');
-      } else {
-        googleUrlField.style.display = 'none';
-        customUrlField.style.display = 'block';
-        googleField.removeAttribute('required');
-        customField.setAttribute('required', 'required');
-      }
-    }
-
-    googleRadio.addEventListener('change', toggleFields);
-    customRadio.addEventListener('change', toggleFields);
-
-    // Initial run
-    toggleFields();
-  })();
-
-
-  // ==========================================================
-  // 3. AJAX SUBMISSION LOGIC
-  // ==========================================================
+  // 2. AJAX SUBMISSION LOGIC
   ;(function() {
     const form = document.getElementById('reviewLinkForm');
     const submitBtn = document.getElementById('submitBtn');
@@ -395,7 +321,6 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      // Manual validation check for required fields
       if (!form.checkValidity()) {
         form.classList.add('was-validated');
         return;
@@ -412,15 +337,15 @@
       submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
 
       const formData = new FormData(form);
+
       const payload = {
         _csrf: formData.get('_csrf'),
         profileSlug: formData.get('profileSlug'),
-        linkType: formData.get('linkType'),
+        targetUrl: formData.get('targetUrl'),
         reviewTitle: formData.get('reviewTitle') || 'Share Your Experience',
-        googleReviewUrl: formData.get('linkType') === 'google_review' ?
-            formData.get('googleReviewUrl') : undefined,
-        customFormUrl: formData.get('linkType') === 'custom_form' ?
-            formData.get('customFormUrl') : undefined,
+        businessName: formData.get('businessName'),
+        businessSubheader: formData.get('businessSubheader'),
+        businessCategory: formData.get('businessCategory')
       };
 
       fetch(form.action, {
@@ -433,7 +358,6 @@
       })
       .then(function(res) {
         if (!res.ok) {
-          // If response is not ok, parse the error and throw
           return res.json().then(function(err) {
             throw err;
           });
@@ -443,13 +367,10 @@
       .then(function(result) {
         if (result && result.ok) {
           showAlert('success', 'Review link created successfully!');
-          // redirect to reviews list for that profile using the slug returned from the controller
           setTimeout(function() {
-            // Use payload.profileSlug for navigation
             window.location.href = '/dashboard/' + encodeURIComponent(payload.profileSlug) + '/reviews';
           }, 900);
         } else {
-          // This catches errors where res.ok was true but the result structure was wrong
           throw new Error(result.error || 'Unexpected error');
         }
       })
@@ -463,22 +384,19 @@
     });
   })();
 
-
   function showAlert(type, message) {
     var wrapper = document.createElement('div');
     wrapper.className = 'alert alert-' + (type === 'success' ? 'success' : 'danger') + ' alert-dismissible fade show';
     wrapper.role = 'alert';
     wrapper.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
     
-    var container = document.querySelector('.container.page-container');
+    var container = document.getElementById('alert-container');
     var existingAlert = container.querySelector('.alert');
     if (existingAlert) {
       existingAlert.remove();
     }
     
-    // Insert new alert before the form
-    var form = document.getElementById('reviewLinkForm');
-    container.insertBefore(wrapper, form);
-    wrapper.scrollIntoView({ behavior: 'smooth' });
+    container.insertBefore(wrapper, container.firstChild);
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 </script>

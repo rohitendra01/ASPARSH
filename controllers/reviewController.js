@@ -1,6 +1,5 @@
 const ReviewLink = require('../models/ReviewLink');
 const Profile = require('../models/Profile');
-const { getPromptTemplate } = require('../services/categoryPrompts');
 const { generateReviewText } = require('../services/aiService');
 
 // Helper to extract CSRF token
@@ -109,45 +108,42 @@ exports.create = async (req, res) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const { profileSlug, linkType, googleReviewUrl, customFormUrl, reviewTitle } = req.body;
+    const { 
+      profileSlug, 
+      targetUrl, 
+      reviewTitle, 
+      businessName,
+      businessSubheader,
+      businessCategory 
+    } = req.body; 
 
-    if (!profileSlug || !linkType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!profileSlug || !targetUrl || !businessName || !businessCategory) {
+      return res.status(400).json({ error: 'Missing required fields: profileSlug, targetUrl, businessName, and businessCategory' });
     }
 
-    const profile = await Profile.findOne({ slug: profileSlug });
+    const profile = await Profile.findOne({ slug: profileSlug }).select('_id slug').lean(); 
     if (!profile) {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
     const slug = await generateUniqueSlug(profileSlug);
     
-    const reviewLink = new ReviewLink({
-      createdBy: req.user._id,
+    const reviewLinkData = {
       profileSlug: profile.slug,
       profileId: profile._id,
       slug,
-      linkType,
-      googleReviewUrl: linkType === 'google_review' ? googleReviewUrl : null,
-      customFormUrl: linkType === 'custom_form' ? customFormUrl : null,
+      targetUrl,
       reviewTitle: reviewTitle || 'Share Your Experience',
-      isActive: true,
-      profileDetails: {
-        name: profile.name,
-        category: profile.category,
-        subcategory: profile.subcategory,
-        occupation: profile.occupation
-      }
-    });
+      isActive: true, 
+      createdBy: req.user._id,
 
-    if (linkType === 'google_review' && googleReviewUrl) {
-      const placeIdMatch = googleReviewUrl.match(/placeid=([^&]+)/);
-      if (placeIdMatch) {
-        reviewLink.googlePlaceId = placeIdMatch[1];
-      }
-    }
+      businessName: businessName,
+      businessSubheader: businessSubheader,
+      businessCategory: businessCategory
+    };
 
-    await reviewLink.save();
+    const reviewLink = new ReviewLink(reviewLinkData);
+    await reviewLink.save(); 
 
     const publicUrl = req.protocol + '://' + req.get('host') + '/reviews/' + slug;
 
@@ -165,25 +161,16 @@ exports.create = async (req, res) => {
 // List review links for a profile
 exports.list = async (req, res) => {
   try {
-    const profileSlug = req.params.slug;
-
-    if (!profileSlug) {
-      return res.status(400).send('Missing profile slug');
-    }
-
-    const profile = await Profile.findOne({ slug: profileSlug }).lean();
-    if (!profile) {
-      return res.status(404).send('Profile not found');
-    }
-
-    const reviewLinks = await ReviewLink.find({ profileSlug })
+    const reviewLinks = await ReviewLink.find({})
       .sort({ createdAt: -1 })
       .lean();
+      
+    const slug = req.params.slug || (req.user ? req.user.slug : '');
 
     res.render('reviews/index', {
-      profile,
-      reviewLinks,
-      slug: profileSlug,
+      profile: null,
+      reviewLinks, 
+      slug: slug,
       csrfToken: getCsrfToken(req, res),
       layout: 'layouts/dashboard-boilerplate'
     });
@@ -210,29 +197,27 @@ exports.show = async (req, res) => {
       });
     }
 
-
-    // Increment view count
+    const profile = await Profile.findOne({ _id: reviewLink.profileId }).lean();
+    if (!profile) {
+        return res.status(500).render('error', { message: 'Linked profile not found' });
+    }
+    
+    const city = profile.address?.city; //
+    
     await ReviewLink.findByIdAndUpdate(reviewLink._id, { $inc: { viewCount: 1 } });
-
-    const promptTemplate = getPromptTemplate(
-      reviewLink.profileDetails.category,
-      reviewLink.profileDetails.subcategory
-    );
-
+    
     res.render('reviews/show', {
       link: {
-        slug,
+        slug: reviewLink.slug,
         title: reviewLink.reviewTitle,
-        type: reviewLink.linkType,
-        googlePlaceId: reviewLink.googlePlaceId,
-        customFormUrl: reviewLink.customFormUrl
+        targetUrl: reviewLink.targetUrl
       },
       business: {
-        name: reviewLink.profileDetails.name,
-        category: reviewLink.profileDetails.category,
-        subcategory: reviewLink.profileDetails.subcategory
+        name: reviewLink.businessName,
+        category: reviewLink.businessCategory,
+        subcategory: null,
+        city: city
       },
-      promptTemplate,
       layout: 'layouts/boilerplate'
     });
   } catch (err) {
@@ -241,35 +226,105 @@ exports.show = async (req, res) => {
   }
 };
 
-// Generate review (AJAX) - THIS IS WHERE THE 404 ERROR COMES FROM
+// Generate review 
 exports.generate = async (req, res) => {
   try {
     const slug = req.params.slug;
 
-    const reviewLink = await ReviewLink.findOne({ slug, isActive: true });
+    const reviewLink = await ReviewLink.findOneAndUpdate(
+      { slug, isActive: true }, 
+      { $inc: { generationCount: 1 } },
+      { new: true }
+    ).lean(); 
     
     if (!reviewLink) {
       return res.status(404).json({ error: 'Link not found' });
     }
 
-    const promptTemplate = getPromptTemplate(
-      reviewLink.profileDetails.category,
-      reviewLink.profileDetails.subcategory
-    );
-
-    const systemPrompt = reviewLink.customPromptTemplate || promptTemplate.system;
-    const userPrompt = promptTemplate.template;
+    const profile = await Profile.findOne({ _id: reviewLink.profileId }).select('address.city').lean();
+    if (!profile) {
+        return res.status(500).json({ error: 'Linked profile not found for location data' });
+    }
     
-    const reviewText = await generateReviewText(systemPrompt, userPrompt);
+    const city = profile.address?.city || 'this area';
+    const businessName = reviewLink.businessName;
+    const category = reviewLink.businessCategory;
+    const subheader = reviewLink.businessSubheader;
+
+    const promptStyles = [
+        {
+            // Style 1: The "Low Effort"
+            system: `You are a customer writing a 3-7 word review for ${businessName} in ${city}. Your review is extremely short, positive, and to the point. **Do not use any markdown, bolding, or special formatting.**`,
+            user: `Generate a 3-7 word positive review (e.g., "Good service.", "Best in ${city}.", "Loved it."). **Plain text only, no markdown.**`
+        },
+        {
+            // Style 2: The Professional
+            system: `You are a professional critic reviewing ${businessName} (a ${category}) in ${city}. Your review is articulate and sophisticated. **You must not use any markdown, bolding, or asterisks.**`,
+            user: `Generate a 10-30 word professional review. Focus on the unique aspects and why it's a "must-visit" in ${city}. **Write in plain text only.**`
+        },
+        {
+            // Style 3: The "Smart Local" (Hinglish/Spanglish etc.)
+            system: `You are a local resident of ${city}. You are writing a casual review for ${businessName}. You MUST mix in 2-3 common slang words from the local language of ${city} (e.g., for an Indian city, use Hinglish like 'mast' or 'badiya'). The review should be mostly English, but with clear local flavor. **Crucially, do NOT use any markdown, bolding, or asterisks.**`,
+            user: `Generate a 2-10 word review that is mostly English but has 2-3 local slang words for ${city} mixed in. **Write in plain text only. Do not use formatting like **.**`
+        },
+        {
+            // Style 4: The Enthusiast
+            system: `You are an enthusiastic friend recommending ${businessName} in ${city}. Your tone is excited and informal. You can use exclamation points and one word in ALL-CAPS, but **no markdown, bolding, or asterisks.**`,
+            user: `Generate a 15-30 word ENTHUSIASTIC review for ${businessName}. Use at least one exclamation mark! **Write in plain text only.**`
+        },
+        {
+            // Style 5: The "Quick Typo"
+            system: `You are a regular person reviewing ${businessName} in ${city} quickly on your phone. You are positive, but make one or two small, believable typos (e.g., "teh", "realy"). Keep it subtle. **Do not use any markdown or special formatting.**`,
+            user: `Generate a 10-30 word positive review. Write it as if you are typing quickly and make a small, natural typo. **Plain text only, no markdown.**`
+        },
+        {
+            // Style 6: The Skeptic
+            system: `You are a customer reviewing ${businessName} in ${city}. You were skeptical at first but were won over. Your review should sound pleasantly surprised. **Do not use any markdown, bolding, or asterisks.**`,
+            user: `Generate a 10-20 word review for ${businessName} that starts slightly skeptical but ends very positively. **Plain text only.**`
+        },
+        {
+            // Style 7: The "Full Local"
+            system: `You are a local resident of ${city}. You are writing an informal review for ${businessName} almost ENTIRELY in the local mixed language (e.g., for ${city}, India, write in Hinglish). Do not use much proper English.Use writing in local languae also. **You must not use any markdown, bolding, or formatting.**`,
+            user: `Generate a 10-25 word review in this very casual, local mixed-language style (like Hinglish). Be specific to ${businessName}. **Do not use any formatting like **.**`
+        },
+        {
+            // Style 8: The "Short Local"
+            system: `You are a local resident of ${city}. You are writing a VERY short review for ${businessName}, almost entirely in the local slang (e.g., "Bahut badhiya!", "Mast service hai bhai", "Paisa vasool!").Use writing in local languae also. **No markdown or formatting allowed.**`,
+            user: `Generate a 3-7 word review for ${businessName} in the local mixed-language of ${city} (like Hinglish). **Plain text only.**`
+        },
+        {
+            // Style 9: The "Excited Newcomer"
+            system: `You are new to ${city} and just visited ${businessName}. You are excited about your experience and want to share it. Use writing in local languae also. **Do not use any markdown or asterisks.**`,
+            user: `Generate a 15-30 word review for ${businessName} that conveys excitement about discovering it in ${city}. **Plain text only.**`
+        },
+        {
+            // Style 10: The "True Local"
+            system: `You are a true local of ${city}. Your review for ${businessName} is deeply rooted in the local culture and language.Use writing in local languae also. **You must not use any markdown, bolding, or formatting.**`,
+            user: `Generate a 10-25 word review for ${businessName} that showcases your deep local knowledge. **Plain text only, no markdown.**`
+        }
+    ];
+
+    const selectedStyle = promptStyles[Math.floor(Math.random() * promptStyles.length)];
+    
+    let systemPrompt = reviewLink.customPromptTemplate 
+        ? reviewLink.customPromptTemplate 
+        : selectedStyle.system;            
+
+    const userPrompt = selectedStyle.user;
+    
+    if (subheader) {
+        systemPrompt = `The business, ${businessName}, also specializes in ${subheader}. ${systemPrompt}`;
+    }
+
+    const reviewText = await generateReviewText(systemPrompt, userPrompt); 
 
     await ReviewLink.findByIdAndUpdate(
       reviewLink._id,
       {
-        $inc: { generationCount: 1 },
         $push: {
           generatedReviews: {
             text: reviewText,
-            category: reviewLink.profileDetails.category,
+            category: reviewLink.businessCategory,
             generatedAt: new Date()
           }
         },
@@ -280,7 +335,7 @@ exports.generate = async (req, res) => {
     res.json({
       success: true,
       reviewText,
-      category: reviewLink.profileDetails.category
+      category: reviewLink.businessCategory
     });
   } catch (err) {
     console.error('Error generating review:', err);
@@ -288,7 +343,7 @@ exports.generate = async (req, res) => {
   }
 };
 
-// Submit review (AJAX tracking)
+// Submit review
 exports.submit = async (req, res) => {
   try {
     const slug = req.params.slug;
