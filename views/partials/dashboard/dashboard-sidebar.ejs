@@ -1,60 +1,70 @@
 <aside class="dashboard-sidebar">
   <nav class="sidebar-nav">
     <div class="sidebar-title">
-  <% const currentUserSlugSegment = (currentUser && currentUser.slug) ? '/' + encodeURIComponent(currentUser.slug) : ''; %>
-  <a href="/dashboard<%= currentUserSlugSegment %>" class="sidebar-title-link">Dashboard</a>
+      <% const currentUserSlugSegment=(currentUser && currentUser.slug) ? '/' + encodeURIComponent(currentUser.slug)
+        : '' ; %>
+        <a href="/dashboard<%= currentUserSlugSegment %>" class="sidebar-title-link">Dashboard</a>
     </div>
     <ul class="sidebar-links">
-  <li><a href="/dashboard<%= currentUserSlugSegment %>/user" class="sidebar-link-user">
-        <span class="sidebar-icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="7" r="4" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-            <ellipse cx="11" cy="16" rx="7" ry="4" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-          </svg>
-        </span> User</a></li>
-  <li><a href="/dashboard<%= currentUserSlugSegment %>/hotels">
-        <span class="sidebar-icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="8" width="16" height="9" rx="2" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-            <rect x="7" y="4" width="8" height="4" rx="1.5" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-            <rect x="6" y="13" width="2" height="4" rx="1" fill="#38cfa7"/>
-            <rect x="14" y="13" width="2" height="4" rx="1" fill="#4f8cff"/>
-          </svg>
-        </span> Hotels</a></li>
-      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/profiles">
-        <span class="sidebar-icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="7" r="4" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-            <ellipse cx="11" cy="16" rx="7" ry="4" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-          </svg>
-        </span> Profiles</a></li>
-      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/portfolios">
-        <span class="sidebar-icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-            <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-            <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff"/>
-            <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7"/>
-          </svg>
-        </span> Portfolios</a></li>
-  <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/visiting-cards">
-        <span class="sidebar-icon">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-            <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-            <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff"/>
-            <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7"/>
-          </svg>
-        </span> Visiting Card</a></li>
-        <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/reviews">
+      <li><a href="/dashboard<%= currentUserSlugSegment %>/user" class="sidebar-link-user">
           <span class="sidebar-icon">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6"/>
-              <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff"/>
-              <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff"/>
-              <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7"/>
+              <circle cx="11" cy="7" r="4" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <ellipse cx="11" cy="16" rx="7" ry="4" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+            </svg>
+          </span> User</a></li>
+      <li><a href="/dashboard<%= currentUserSlugSegment %>/hotels">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="8" width="16" height="9" rx="2" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+              <rect x="7" y="4" width="8" height="4" rx="1.5" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <rect x="6" y="13" width="2" height="4" rx="1" fill="#38cfa7" />
+              <rect x="14" y="13" width="2" height="4" rx="1" fill="#4f8cff" />
+            </svg>
+          </span> Hotels</a></li>
+      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/profiles">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="7" r="4" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <ellipse cx="11" cy="16" rx="7" ry="4" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+            </svg>
+          </span> Profiles</a></li>
+      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/portfolios">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+              <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff" />
+              <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7" />
+            </svg>
+          </span> Portfolios</a></li>
+      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/visiting-cards">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+              <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff" />
+              <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7" />
+            </svg>
+          </span> Visiting Card</a></li>
+      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/reviews">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+              <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff" />
+              <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7" />
             </svg>
           </span> Google Reviews</a></li>
+      <li><a href="/dashboard/<%= (currentUser && currentUser.slug) ? currentUser.slug : '' %>/dynamic-links">
+          <span class="sidebar-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="14" height="12" rx="2" stroke="#38cfa7" stroke-width="2" fill="#eafaf6" />
+              <rect x="7" y="3" width="8" height="3" rx="1.5" stroke="#4f8cff" stroke-width="2" fill="#f0f6ff" />
+              <rect x="7" y="10" width="8" height="2" rx="1" fill="#4f8cff" />
+              <rect x="7" y="13" width="5" height="2" rx="1" fill="#38cfa7" />
+            </svg>
+          </span> Dynamic QR Code</a></li>
     </ul>
   </nav>
 </aside>

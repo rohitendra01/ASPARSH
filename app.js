@@ -60,7 +60,7 @@ if (MongoStore && process.env.NODE_ENV !== 'test') {
         const mongoose = require('mongoose');
         sessionOptions.store = MongoStore.create({
             mongoUrl: process.env.MONGO_URI || (mongoose.connection && mongoose.connection.client && mongoose.connection.client.s.url) || undefined,
-            ttl: 10 * 60 
+            ttl: 10 * 60
         });
     } catch (e) {
         console.warn('connect-mongo could not be initialized, falling back to default session store');
@@ -94,10 +94,10 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
         const emailLower = email.toLowerCase();
         const user = await adminUser.findOne({ email: emailLower });
         if (!user) return done(null, false, { message: 'Incorrect email.' });
-        
+
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
-        
+
         return done(null, user);
     } catch (err) {
         return done(err);
@@ -174,12 +174,15 @@ const profileRoutes = require('./routes/profileRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const dynamicLinkRoutes = require('./routes/dynamicLinkRoutes');
+const dynamicLinkController = require('./controllers/dynamicLinkController');
 
 // Use routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/', productRoutes);
 app.use('/', newsletterRoutes);
+app.use('/dashboard/:slug/dynamic-links', dynamicLinkRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
 app.use('/dashboard/:slug/profiles', profileRoutes);
@@ -187,17 +190,21 @@ app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
 app.use('/dashboard/:slug/reviews', reviewRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
+
+// Dynamic Link Redirection
+app.use('/q/:slug', dynamicLinkController.redirectLink);
+
 app.use('/reviews', reviewRoutes); //
 app.use('/api', apiRoutes);
 
 app.use((err, req, res, next) => {
-  if (!err) return next();
-  if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
-    const accept = (req.headers['accept'] || '').toLowerCase();
-    if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });
-    return res.status(403).send('Invalid CSRF token');
-  }
-  return next(err);
+    if (!err) return next();
+    if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
+        const accept = (req.headers['accept'] || '').toLowerCase();
+        if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });
+        return res.status(403).send('Invalid CSRF token');
+    }
+    return next(err);
 });
 
 

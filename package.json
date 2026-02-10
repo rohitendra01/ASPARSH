@@ -41,6 +41,7 @@
     "nodemailer": "^7.0.5",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "qrcode": "^1.5.4",
     "silent": "^0.2.3",
     "streamifier": "^0.1.1",
     "swiper": "^11.2.10",

@@ -1,0 +1,43 @@
+<% layout('layouts/dashboard-boilerplate') -%>
+    <% block('styles').append(`<link rel="stylesheet" href="/css/dynamic-links/new.css" />`) %>
+
+    <div class="param-container">
+        <div class="param-header">
+            <h1 class="param-title">Edit Dynamic Link</h1>
+            <a href="/dashboard/<%= currentUser.slug %>/dynamic-links" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <div class="form-card">
+                    <form action="/dashboard/<%= currentUser.slug %>/dynamic-links/<%= link._id %>/edit" method="POST">
+                        <input type="hidden" name="_csrf"
+                            value="<%= (typeof csrfToken !== 'undefined') ? csrfToken : '' %>">
+
+                        <div class="form-group">
+                            <label for="name" class="form-label">Link Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required
+                                value="<%= (typeof link !== 'undefined') ? link.name : '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="destinationUrl" class="form-label">Destination URL</label>
+                            <input type="url" class="form-control" id="destinationUrl" name="destinationUrl" required
+                                value="<%= (typeof link !== 'undefined') ? link.destinationUrl : '' %>">
+                            <div class="form-text">Changing this URL will instantly update where the QR code points to.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" style="background-color: #ffc107; color: #000;">
+                            <i class="bi bi-check-lg"></i> Update Link
+                        </button>
+                    </form>
+                </div>
+    </div>

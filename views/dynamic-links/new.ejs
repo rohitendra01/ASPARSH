@@ -1,0 +1,46 @@
+<% layout('layouts/dashboard-boilerplate') -%>
+    <% block('styles').append(`<link rel="stylesheet" href="/css/dynamic-links/new.css" />`) %>
+
+    <div class="param-container">
+        <div class="param-header">
+            <h1 class="param-title">Create Dynamic Link</h1>
+            <a href="/dashboard/<%= currentUser.slug %>/dynamic-links" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+        <% if (typeof error !=='undefined' && error) { %>
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <div class="form-card">
+                    <form action="/dashboard/<%= currentUser.slug %>/dynamic-links/new" method="POST">
+                        <input type="hidden" name="_csrf"
+                            value="<%= (typeof csrfToken !== 'undefined') ? csrfToken : '' %>">
+
+                        <div class="form-group">
+                            <label for="name" class="form-label">Link Name</label>
+                            <input type="text" class="form-control" id="name" name="name"
+                                placeholder="e.g. My Portfolio QR" required
+                                value="<%= (typeof formData !== 'undefined' && formData.name) ? formData.name : '' %>">
+                            <div class="form-text">Give your link a recognizable name so you can find it easily later.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="destinationUrl" class="form-label">Destination URL</label>
+                            <input type="url" class="form-control" id="destinationUrl" name="destinationUrl"
+                                placeholder="https://example.com" required
+                                value="<%= (typeof formData !== 'undefined' && formData.destinationUrl) ? formData.destinationUrl : '' %>">
+                            <div class="form-text">Paste the full URL where you want the QR code to redirect.</div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <i class="bi bi-qr-code"></i> Generate Dynamic Link
+                        </button>
+                    </form>
+                </div>
+    </div>
