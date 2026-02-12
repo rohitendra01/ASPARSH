@@ -1,71 +1,82 @@
 <% layout('layouts/dashboard-boilerplate') -%>
-<% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
+  <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
 
-<%
-  const list = (typeof visitingCards !== 'undefined') ? visitingCards : (typeof cards !== 'undefined' ? cards : []);
-  const userSlug = (typeof user !== 'undefined') ? user.slug : (typeof slug !== 'undefined' ? slug : '');
-%>
+    <% const list=(typeof visitingCards !=='undefined' ) ? visitingCards : (typeof cards !=='undefined' ? cards : []);
+      const userSlug=(typeof user !=='undefined' ) ? user.slug : (typeof slug !=='undefined' ? slug : '' ); %>
 
 
-<div class="dashboard-header-row">
-  <form class="search-form" onsubmit="return filterCards(event)">
-    <input type="text" id="cardSlugSearch" name="cardSlug" placeholder="Enter Card Slug" required>
-    <button type="submit">Search</button>
-  </form>
-  <% const userSlugSegment = (typeof userSlug !== 'undefined' && userSlug) ? '/' + encodeURIComponent(userSlug) : ''; %>
-  <a href="/dashboard<%= userSlugSegment %>/visiting-cards/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Visiting Card</a>
-</div>
+      <div class="dashboard-header-row">
+        <form class="search-form" onsubmit="return filterCards(event)">
+          <input type="text" id="cardSlugSearch" name="cardSlug" placeholder="Enter Card Slug" required>
+          <button type="submit">Search</button>
+        </form>
+        <% const userSlugSegment=(typeof userSlug !=='undefined' && userSlug) ? '/' + encodeURIComponent(userSlug) : ''
+          ; %>
+          <a href="/dashboard<%= userSlugSegment %>/visiting-cards/new"
+            class="create-visiting-card-btn create-visiting-card-btn-fixed">+ Create New Visiting Card</a>
+      </div>
 
-<div class="hotel-list-container visiting-card-list-container">
-  <% if (list && list.length) { %>
-    <div class="visiting-card-cards-grid">
-    <% list.forEach(card => { %>
-  <div class="visiting-card" data-card-id="<%= card._id %>" data-card-slug="<%= (card.profileSlug || card.slug || '') %>">
-          <img src="<%= card.profileImage || '/assets/feature1.jpg' %>" alt="<%= (card.title || card.profileName || 'Visiting Card') %>" class="visiting-card-logo">
-          <div class="visiting-card-body">
-            <div class="visiting-card-heading">
-              <h2 class="visiting-card-title"><%= card.title || card.profileName || 'Untitled' %></h2>
-              <% if (card.company) { %>
-                <p class="visiting-card-company"><%= card.company %></p>
-              <% } %>
-            </div>
-            <div class="visiting-card-others">
-              <% if (card.profileName) { %>
-                <p class="visiting-card-address"><%= card.profileName %></p>
-              <% } %>              
-            </div>
-              <div class="visiting-card-links">
-              <% const viewSlug = card.profileSlug ? encodeURIComponent(card.profileSlug) : (card.slug ? encodeURIComponent(card.slug) : null); %>
-                <a href="/visiting-card/<%= viewSlug %>" class="visiting-card-link">View Final</a>
-              <% const editTarget = card.profileSlug ? `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.profileSlug)}/edit` : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
-              <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
-            </div>
+      <div class="hotel-list-container visiting-card-list-container">
+        <% if (list && list.length) { %>
+          <div class="visiting-card-cards-grid">
+            <% list.forEach(card=> { %>
+              <div class="visiting-card" data-card-id="<%= card._id %>"
+                data-card-slug="<%= (card.profileSlug || card.slug || '') %>">
+                <img src="<%= card.profileImage || '/assets/feature1.jpg' %>"
+                  alt="<%= (card.title || card.profileName || 'Visiting Card') %>" class="visiting-card-logo">
+                <div class="visiting-card-body">
+                  <div class="visiting-card-heading">
+                    <h2 class="visiting-card-title">
+                      <%= card.title || card.profileName || 'Untitled' %>
+                    </h2>
+                    <% if (card.company) { %>
+                      <p class="visiting-card-company">
+                        <%= card.company %>
+                      </p>
+                      <% } %>
+                  </div>
+                  <div class="visiting-card-others">
+                    <% if (card.profileName) { %>
+                      <p class="visiting-card-address">
+                        <%= card.profileName %>
+                      </p>
+                      <% } %>
+                  </div>
+                  <div class="visiting-card-links">
+                    <% const viewSlug=card.profileSlug ? encodeURIComponent(card.profileSlug) : (card.slug ?
+                      encodeURIComponent(card.slug) : null); %>
+                      <a href="/visiting-card/<%= viewSlug %>" class="visiting-card-link">View Final</a>
+                      <% const editTarget=card.profileSlug ?
+                        `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.profileSlug)}/edit`
+                        : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
+                        <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
+                  </div>
+                </div>
+              </div>
+              <% }) %>
           </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <p>No visiting cards found.</p>
-  <% } %>
-</div>
+          <% } else { %>
+            <p>No visiting cards found.</p>
+            <% } %>
+      </div>
 
-<script>
-  function filterCards(event) {
-    event.preventDefault();
-    const input = document.getElementById('cardSlugSearch').value.trim().toLowerCase();
-    const cards = document.querySelectorAll('.visiting-card');
-    if (!input) {
-      cards.forEach(card => card.style.display = '');
-      return false;
-    }
-    cards.forEach(card => {
-      const slug = card.getAttribute('data-card-slug') || '';
-      if (slug.toLowerCase().includes(input)) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-    return false;
-  }
-</script>
+      <script>
+        function filterCards(event) {
+          event.preventDefault();
+          const input = document.getElementById('cardSlugSearch').value.trim().toLowerCase();
+          const cards = document.querySelectorAll('.visiting-card');
+          if (!input) {
+            cards.forEach(card => card.style.display = '');
+            return false;
+          }
+          cards.forEach(card => {
+            const slug = card.getAttribute('data-card-slug') || '';
+            if (slug.toLowerCase().includes(input)) {
+              card.style.display = '';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+          return false;
+        }
+      </script>

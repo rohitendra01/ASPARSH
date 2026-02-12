@@ -32,17 +32,9 @@
 
                             <div class="link-card-links">
                                 <a href="/dashboard/<%= currentUser.slug %>/dynamic-links/<%= link._id %>/edit"
-                                    class="link-card-btn edit-btn">
-                                    <i class="bi bi-pencil"></i> Edit
+                                    class="link-card-btn edit-btn" title="Edit Link">
+                                    <i class="bi bi-pencil">Edit</i>
                                 </a>
-
-                                <form action="/dashboard/<%= currentUser.slug %>/dynamic-links/<%= link._id %>/delete"
-                                    method="POST" class="d-inline" onsubmit="return confirm('Are you sure?')">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button type="submit" class="link-card-btn delete-btn">
-                                        <i class="bi bi-trash">Delete</i>
-                                    </button>
-                                </form>
 
                                 <button class="link-card-btn copy-btn"
                                     data-clipboard-text="<%= req.protocol %>://<%= req.get('host') %>/q/<%= link.slug %>"

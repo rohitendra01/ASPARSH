@@ -1,96 +1,165 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* Global Variables */
+:root {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent-start: #6366f1;
+    --accent-end: #8b5cf6;
+    --border: #e5e7eb;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fa;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.header {
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+/* Header row for search and create button */
+.dashboard-header-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
 }
 
-.header h1 {
-    color: #333;
+.create-review-btn-fixed {
+    margin-right: 1rem;
 }
 
-.btn-back {
-    padding: 10px 20px;
-    background: #667eea;
-    color: white;
-    text-decoration: none;
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-form input[type="text"] {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.search-form button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    background: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.create-review-btn-fixed {
+    position: fixed;
+    top: 130px;
+    right: 40px;
+    z-index: 100;
+    box-shadow: 0 4px 16px #007bff33;
+    opacity: 0.97;
+}
+
+.create-review-btn {
+    background-color: var(--text-dark, #333);
+    color: var(--text-light, #fff);
+    border: none;
+    padding: 0.7rem 1.6rem;
     border-radius: 8px;
-    transition: all 0.3s;
+    font-size: 1.08rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 8px #007bff22;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin-bottom: 1rem;
+    display: inline-block;
 }
 
-.btn-back:hover {
-    background: #5568d3;
+.create-review-btn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 16px #007bff33;
+    color: #fff;
 }
 
 .links-container {
     display: grid;
-    gap: 20px;
+    gap: 25px;
+    /* Increased gap */
 }
 
 .link-card {
     background: white;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    /* Softer shadow */
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    /* Align to top */
     gap: 20px;
+    flex-wrap: wrap;
+    transition: all 0.2s ease-in-out;
+}
+
+.link-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+    transform: translateY(-2px);
 }
 
 .link-info {
     flex: 1;
+    min-width: 300px;
 }
 
 .link-info h3 {
-    color: #333;
-    font-size: 18px;
-    margin-bottom: 8px;
+    color: #1a202c;
+    /* Darker for contrast */
+    font-size: 20px;
+    /* Larger */
+    font-weight: 700;
+    /* Bolder */
+    margin-bottom: 10px;
 }
 
 .link-url {
     background: #f8f9fa;
-    padding: 10px;
+    padding: 10px 12px;
     border-radius: 8px;
     font-family: monospace;
-    font-size: 13px;
-    color: #666;
+    font-size: 14px;
+    color: #4a5568;
     word-break: break-all;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #eef0f2;
 }
 
-.link-stats {
-    display: flex;
-    gap: 20px;
+/* --- NEW: Stat Grid --- */
+.link-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
     font-size: 13px;
-    color: #999;
+    color: #718096;
 }
 
+.stat-item {
+    background: #fdfdff;
+    border: 1px solid #f0f2f5;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.stat-item span {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* --- End Stat Grid --- */
 .link-actions {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    align-items: flex-start;
+    min-width: 150px;
+    /* Ensure buttons don't wrap weirdly */
+    justify-content: flex-end;
 }
 
 .action-btn {
@@ -132,24 +201,30 @@ body {
     background: #3182ce;
 }
 
+/* --- UPDATED: More distinct buttons --- */
 .btn-delete {
-    background: #f56565;
-    color: white;
+    background: #fff;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
 }
 
 .btn-delete:hover {
-    background: #e53e3e;
+    background: #fff5f5;
+    border-color: #e53e3e;
 }
 
 .btn-toggle {
-    background: #ed8936;
-    color: white;
+    background: #fff;
+    color: #dd6b20;
+    border: 1px solid #feebc8;
 }
 
 .btn-toggle:hover {
-    background: #dd6b20;
+    background: #fffaf0;
+    border-color: #dd6b20;
 }
 
+/* --- End Updated Buttons --- */
 .empty-state {
     text-align: center;
     padding: 80px 20px;

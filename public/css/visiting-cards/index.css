@@ -7,15 +7,15 @@
   border-bottom: 2px solid #e0e0e0;
   margin-bottom: 1rem;
 }
+
 .dashboard-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
-  width: 100%;
 }
 
-.create-hotel-btn-fixed {
+.create-visiting-card-btn-fixed {
   margin-right: 1rem;
 }
 
@@ -41,7 +41,8 @@
   cursor: pointer;
 }
 
-.hotel-list-container, .visiting-card-list-container {
+.hotel-list-container,
+.visiting-card-list-container {
   margin-top: 0;
 }
 
@@ -51,10 +52,18 @@
   gap: 2rem;
 }
 
-.create-hotel-btn,
-.create-card-btn {
-  background-color: var(--text-dark, #111);
-  color: var(--text-light, #fff);
+.create-visiting-card-btn-fixed {
+  position: fixed;
+  top: 130px;
+  right: 40px;
+  z-index: 100;
+  box-shadow: 0 4px 16px #007bff33;
+  opacity: 0.97;
+}
+
+.create-visiting-card-btn {
+  background-color: var(--text-dark);
+  color: var(--text-light);
   border: none;
   padding: 0.7rem 1.6rem;
   border-radius: 8px;
@@ -64,19 +73,18 @@
   box-shadow: 0 2px 8px #007bff22;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
+  margin-bottom: 1rem;
 }
 
-.create-hotel-btn:hover {
-  background: var(--text-light);
-  color: var(--text-dark);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
-  transition: box-shadow 0.2s;
+.create-visiting-card-btn:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 16px #007bff33;
 }
 
 .visiting-card {
   background: var(--text-light);
   border-radius: 14px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.10);
   padding: .5rem;
   width: 240px;
   display: flex;
@@ -94,7 +102,14 @@
   border-radius: 12px;
 }
 
-.visiting-card-body { width: 100%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.visiting-card-body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .visiting-card-title {
   font-size: 1.1rem;
   font-weight: 700;
@@ -150,15 +165,23 @@
   outline: 2px solid #0056b3;
   outline-offset: 2px;
 }
+
 @media (max-width: 720px) {
-  .visiting-card { width: calc(50% - 1rem); }
+  .visiting-card {
+    width: calc(50% - 1rem);
+  }
 }
+
 @media (max-width: 420px) {
-  .visiting-card { width: 100%; }
+  .visiting-card {
+    width: 100%;
+  }
 }
 
 /* simple search form spacing */
-.search-form input[type="text"] { min-width: 220px; }
+.search-form input[type="text"] {
+  min-width: 220px;
+}
 
 .btn-outline-primary {
   margin-top: 1.2rem;
@@ -170,10 +193,12 @@
   font-weight: 600;
   transition: background 0.2s, color 0.2s;
 }
+
 .btn-outline-primary:hover {
   background: #4f8cff;
   color: #fff;
 }
+
 .no-cards {
   text-align: center;
   color: #888;

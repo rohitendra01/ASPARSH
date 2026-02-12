@@ -1,282 +1,135 @@
 <% layout('layouts/dashboard-boilerplate') %>
 
-<style>
-    /* ... (All styles from our previous conversation) ... */
-    :root {
-        --bg: #f5f7fa;
-        --card: #ffffff;
-        --muted: #6b7280;
-        --accent-start: #6366f1;
-        --accent-end: #8b5cf6;
-        --border: #e5e7eb;
-    }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f5f7fa;
-        padding: 20px;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .header {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .header h1 {
-        color: #333;
-    }
-    .links-container {
-        display: grid;
-        gap: 25px; /* Increased gap */
-    }
-    .link-card {
-        background: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Softer shadow */
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start; /* Align to top */
-        gap: 20px;
-        flex-wrap: wrap;
-        transition: all 0.2s ease-in-out;
-    }
-    .link-card:hover {
-        box-shadow: 0 8px 25px rgba(0,0,0,0.07);
-        transform: translateY(-2px);
-    }
-    .link-info {
-        flex: 1;
-        min-width: 300px;
-    }
-    .link-info h3 {
-        color: #1a202c; /* Darker for contrast */
-        font-size: 20px; /* Larger */
-        font-weight: 700; /* Bolder */
-        margin-bottom: 10px;
-    }
-    .link-url {
-        background: #f8f9fa;
-        padding: 10px 12px;
-        border-radius: 8px;
-        font-family: monospace;
-        font-size: 14px;
-        color: #4a5568;
-        word-break: break-all;
-        margin-bottom: 15px;
-        border: 1px solid #eef0f2;
-    }
-    /* --- NEW: Stat Grid --- */
-    .link-stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 15px;
-        font-size: 13px;
-        color: #718096;
-    }
-    .stat-item {
-        background: #fdfdff;
-        border: 1px solid #f0f2f5;
-        padding: 8px 10px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 500;
-    }
-    .stat-item span {
-        font-weight: 600;
-        color: #2d3748;
-    }
-    /* --- End Stat Grid --- */
-    .link-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        min-width: 150px; /* Ensure buttons don't wrap weirdly */
-        justify-content: flex-end;
-    }
-    .action-btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-decoration: none;
-        display: inline-block;
-    }
-    .btn-visit {
-        background: #667eea;
-        color: white;
-    }
-    .btn-visit:hover {
-        background: #5568d3;
-    }
-    .btn-copy {
-        background: #48bb78;
-        color: white;
-    }
-    .btn-copy:hover {
-        background: #38a169;
-    }
-    .btn-edit {
-        background: #4299e1;
-        color: white;
-    }
-    .btn-edit:hover {
-        background: #3182ce;
-    }
-    /* --- UPDATED: More distinct buttons --- */
-    .btn-delete {
-        background: #fff;
-        color: #e53e3e;
-        border: 1px solid #fed7d7;
-    }
-    .btn-delete:hover {
-        background: #fff5f5;
-        border-color: #e53e3e;
-    }
-    .btn-toggle {
-        background: #fff;
-        color: #dd6b20;
-        border: 1px solid #feebc8;
-    }
-    .btn-toggle:hover {
-        background: #fffaf0;
-        border-color: #dd6b20;
-    }
-    /* --- End Updated Buttons --- */
-    .empty-state {
-        text-align: center;
-        padding: 80px 20px;
-        background: white;
-        border-radius: 15px;
-        color: #999;
-    }
-    .empty-state-icon {
-        font-size: 64px;
-        margin-bottom: 20px;
-    }
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-active {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-    .badge-inactive {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-</style>
+    <% block('styles').append('<link rel="stylesheet" href="/css/review/index.css">') %>
 
-    <div class="header">
-        <h1>Review Links</h1>
-        <a href="/dashboard/<%= slug %>/reviews/new" class="action-btn btn-visit">
-            ➕ Create New Link
-        </a>
-    </div>
-
-    <% if (reviewLinks && reviewLinks.length > 0) { %>
-        <div class="links-container">
-            <% reviewLinks.forEach(link => { %>
-                <div class="link-card">
-                    <div class="link-info">
-                        <h3>
-                            <% if (!link.isActive) { %>
-                                <span title="Inactive" style="color: #a0aec0;">[PAUSED]</span>
-                            <% } %>
-                            <%= link.reviewTitle %>
-                        </h3>
-                        
-                        <div class="link-url">
-                            <b><%= link.businessCategory %></b> / <%= link.slug %>
-                        </div>
-              
-                        <div class="link-stats-grid">
-                            <div class="stat-item">
-                                👁️ <span><%= link.viewCount %></span> views
-                            </div>
-                            <div class="stat-item">
-                                ✨ <span><%= link.generationCount %></span> gens
-                            </div>
-                            <div class="stat-item">
-                                📤 <span><%= link.submissionCount %></span> posts
-                            </div>
-                            <div class="stat-item">
-                                <span class="badge <%= link.isActive ? 'badge-active' : 'badge-inactive' %>">
-                                    <%= link.isActive ? 'Active' : 'Inactive' %>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="link-actions">
-                        <a href="/reviews/<%= link.slug %>" class="action-btn btn-visit" target="_blank" title="Visit public page">
-                            Visit
-                        </a>
-                        
-                        <button class="action-btn btn-copy" 
-                                onclick="copyToClipboard('/reviews/<%= link.slug %>', this)" 
-                                title="Copy link">
-                            Copy
-                        </button>
-
-                        <a href="/dashboard/<%= link.profileSlug %>/reviews/<%= link._id %>/edit" class="action-btn btn-edit" title="Edit link">
-                            Edit
-                        </a>
-                 
-                        <form method="POST" action="/dashboard/<%= link.profileSlug %>/reviews/<%= link._id %>/delete" style="display: inline;">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button type="submit" 
-                                    class="action-btn btn-delete" 
-                                    onclick="return confirm('Delete this review link?')"
-                                    title="Delete">
-                                Delete
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            <% }); %>
-        </div>
-    <% } else { %>
-        <div class="empty-state">
-            <div class="empty-state-icon">🔗</div>
-            <h3>No review links created yet.</h3>
-            <a href="/dashboard/<%= slug %>/reviews/new" class="action-btn btn-visit mt-3">
-                ➕ Create Your Link
+        <div class="dashboard-header-row">
+            <form class="search-form" onsubmit="return filterReviews(event)">
+                <input type="text" id="reviewSearch" name="reviewSearch" placeholder="Search Reviews" required>
+                <button type="submit">Search</button>
+            </form>
+            <a href="/dashboard/<%= slug %>/reviews/new" class="create-review-btn create-review-btn-fixed">
+                + Create New Link
             </a>
         </div>
-    <% } %>
 
-<script>
-    function copyToClipboard(text, button) {
-        const fullUrl = window.location.origin + text;
-        navigator.clipboard.writeText(fullUrl).then(() => {
-            const originalText = button.innerHTML;
-            button.innerHTML = '✅ Copied!';
-            button.disabled = true;
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 2000);
-        }).catch(err => {
-            console.error('Copy failed:', err);
-            alert('Failed to copy');
-        });
-    }
-</script>
+        <% if (reviewLinks && reviewLinks.length> 0) { %>
+            <div class="links-container">
+                <% reviewLinks.forEach(link=> { %>
+                    <div class="link-card">
+                        <div class="link-info">
+                            <h3>
+                                <% if (!link.isActive) { %>
+                                    <span title="Inactive" style="color: #a0aec0;">[PAUSED]</span>
+                                    <% } %>
+                                        <%= link.reviewTitle %>
+                            </h3>
+
+                            <div class="link-url">
+                                <b>
+                                    <%= link.businessCategory %>
+                                </b> / <%= link.slug %>
+                            </div>
+
+                            <div class="link-stats-grid">
+                                <div class="stat-item">
+                                    👁️ <span>
+                                        <%= link.viewCount %>
+                                    </span> views
+                                </div>
+                                <div class="stat-item">
+                                    ✨ <span>
+                                        <%= link.generationCount %>
+                                    </span> gens
+                                </div>
+                                <div class="stat-item">
+                                    📤 <span>
+                                        <%= link.submissionCount %>
+                                    </span> posts
+                                </div>
+                                <div class="stat-item">
+                                    <span class="badge <%= link.isActive ? 'badge-active' : 'badge-inactive' %>">
+                                        <%= link.isActive ? 'Active' : 'Inactive' %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="link-actions">
+                            <a href="/reviews/<%= link.slug %>" class="action-btn btn-visit" target="_blank"
+                                title="Visit public page">
+                                Visit
+                            </a>
+
+                            <button class="action-btn btn-copy"
+                                onclick="copyToClipboard('/reviews/<%= link.slug %>', this)" title="Copy link">
+                                Copy
+                            </button>
+
+                            <a href="/dashboard/<%= link.profileSlug %>/reviews/<%= link._id %>/edit"
+                                class="action-btn btn-edit" title="Edit link">
+                                Edit
+                            </a>
+
+                            <form method="POST"
+                                action="/dashboard/<%= link.profileSlug %>/reviews/<%= link._id %>/delete"
+                                style="display: inline;">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="action-btn btn-delete"
+                                    onclick="return confirm('Delete this review link?')" title="Delete">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <% }); %>
+            </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔗</div>
+                    <h3>No review links created yet.</h3>
+                    <a href="/dashboard/<%= slug %>/reviews/new" class="action-btn btn-visit mt-3">
+                        ➕ Create Your Link
+                    </a>
+                </div>
+                <% } %>
+
+                    <script>
+                        function filterReviews(event) {
+                            event.preventDefault();
+                            const input = document.getElementById('reviewSearch').value.trim().toLowerCase();
+                            const cards = document.querySelectorAll('.link-card');
+
+                            if (!input) {
+                                cards.forEach(card => card.style.display = '');
+                                return false;
+                            }
+
+                            cards.forEach(card => {
+                                const title = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
+                                const slug = card.querySelector('.link-url') ? card.querySelector('.link-url').textContent.toLowerCase() : '';
+
+                                if (title.includes(input) || slug.includes(input)) {
+                                    card.style.display = '';
+                                } else {
+                                    card.style.display = 'none';
+                                }
+                            });
+                            return false;
+                        }
+
+                        function copyToClipboard(text, button) {
+                            const fullUrl = window.location.origin + text;
+                            navigator.clipboard.writeText(fullUrl).then(() => {
+                                const originalText = button.innerHTML;
+                                button.innerHTML = '✅ Copied!';
+                                button.disabled = true;
+                                setTimeout(() => {
+                                    button.innerHTML = originalText;
+                                    button.disabled = false;
+                                }, 2000);
+                            }).catch(err => {
+                                console.error('Copy failed:', err);
+                                alert('Failed to copy');
+                            });
+                        }
+                    </script>
