@@ -1,0 +1,267 @@
+<%- layout('layouts/dashboard-boilerplate') %>
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary border-0 shadow-lg overflow-hidden">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h2 class="text-white font-weight-bolder mb-2">Streamlined Portfolio Creation</h2>
+                            <p class="text-white opacity-8 mb-0">Create, link, and deploy your portfolios in minutes with our premium wizard.</p>
+                        </div>
+                        <div class="col-lg-4 text-end d-none d-lg-block">
+                            <i class="fas fa-magic text-white opacity-3 fa-5x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wizard Steps -->
+    <div id="creation-wizard">
+        <div class="row flex-nowrap overflow-auto pb-4 mb-4" id="step-nav">
+            <div class="col-auto">
+                <div class="step-item active" data-step="1">
+                    <span class="step-number shadow-sm">1</span>
+                    <span class="step-label">Profile</span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="step-item" data-step="2">
+                    <span class="step-number shadow-sm">2</span>
+                    <span class="step-label">Design</span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="step-item" data-step="3">
+                    <span class="step-number shadow-sm">3</span>
+                    <span class="step-label">QR Link</span>
+                </div>
+            </div>
+        </div>
+
+        <form id="portfolio-wizard-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            
+            <!-- Step 1: Profile Selection -->
+            <div class="wizard-step active" id="step-1">
+                <div class="row">
+                    <% profiles.forEach(profile => { %>
+                        <div class="col-md-4 col-xl-3 mb-4">
+                            <div class="card profile-card h-100 border-0 shadow-sm" data-id="<%= profile._id %>">
+                                <div class="card-body text-center">
+                                    <div class="avatar avatar-xl rounded-circle mb-3 shadow-sm mx-auto">
+                                        <img src="<%= profile.image || '/assets/img/default-avatar.png' %>" alt="<%= profile.name %>" class="border-radius-lg shadow">
+                                    </div>
+                                    <h6 class="mb-0"><%= profile.name %></h6>
+                                    <p class="text-xs text-secondary mb-0">@<%= profile.slug %></p>
+                                    <input type="radio" name="profileId" value="<%= profile._id %>" class="d-none">
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-primary px-5 next-step">Continue to Designs <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 2: Design Selection -->
+            <div class="wizard-step d-none" id="step-2">
+                <div class="row">
+                    <% designs.forEach(design => { %>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card design-card h-100 border-0 shadow-sm" data-id="<%= design._id %>">
+                                <div class="card-header p-0 mx-3 mt-3 position-relative z-index-1">
+                                    <div class="d-block blur-shadow-image">
+                                        <img src="<%= design.previewImage %>" alt="<%= design.name %>" class="img-fluid border-radius-lg shadow-sm">
+                                    </div>
+                                </div>
+                                <div class="card-body pt-3">
+                                    <span class="text-gradient text-primary text-uppercase text-xs font-weight-bold my-2"><%= design.category %></span>
+                                    <h5 class="card-title d-block text-darker font-weight-bolder">
+                                        <%= design.name %>
+                                    </h5>
+                                    <p class="card-description text-sm mb-3">
+                                        <%= design.description %>
+                                    </p>
+                                    <input type="radio" name="designId" value="<%= design._id %>" class="d-none">
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-primary prev-step"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                    <button type="button" class="btn btn-primary px-5 next-step">Continue to QR Link <i class="fas fa-arrow-right ms-2"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3: QR Link -->
+            <div class="wizard-step d-none" id="step-3">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-lg p-4">
+                            <h4 class="font-weight-bolder text-center mb-4">Link Your QR Code</h4>
+                            <div class="form-group mb-4">
+                                <label class="form-label font-weight-bold">Select Pre-printed QR Code Slug</label>
+                                <select name="qrSlug" class="form-select form-select-lg border-radius-lg">
+                                    <option value="">-- No QR Link (Generate New) --</option>
+                                    <% unassignedQrs.forEach(qr => { %>
+                                        <option value="<%= qr.shortId %>"><%= qr.shortId %></option>
+                                    <% }) %>
+                                </select>
+                                <small class="text-secondary mt-2 d-block">Choose a slug from your pre-printed stickers.</small>
+                            </div>
+                            <div class="text-center mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 shadow-primary">Create Portfolio & Activate QR <i class="fas fa-rocket ms-2"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-outline-primary prev-step"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 100px;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+    .step-item.active {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        color: #344767;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-bottom: 8px;
+        border: 2px solid #344767;
+    }
+    .step-item.active .step-number {
+        background: linear-gradient(310deg, #7928CA 0%, #FF0080 100%);
+        color: #fff;
+        border-color: transparent;
+    }
+    .profile-card, .design-card {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent !important;
+    }
+    .profile-card:hover, .design-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .profile-card.selected, .design-card.selected {
+        border-color: #7928ca !important;
+        background-color: rgba(121, 40, 202, 0.02) !important;
+    }
+    .card-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('portfolio-wizard-form');
+    let currentStep = 1;
+
+    // Card selection logic
+    document.querySelectorAll('.profile-card, .design-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const container = this.closest('.row');
+            container.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+
+    // Step navigation logic
+    document.querySelectorAll('.next-step').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Basic validation for current step
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            const selected = currentStepEl.querySelector('input[type="radio"]:checked');
+            
+            if (currentStep < 3 && !selected) {
+                 alert('Please select an option to continue.');
+                 return;
+            }
+
+            document.getElementById(`step-${currentStep}`).classList.add('d-none');
+            currentStep++;
+            document.getElementById(`step-${currentStep}`).classList.remove('d-none');
+            updateStepIndicators();
+        });
+    });
+
+    document.querySelectorAll('.prev-step').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById(`step-${currentStep}`).classList.add('d-none');
+            currentStep--;
+            document.getElementById(`step-${currentStep}`).classList.remove('d-none');
+            updateStepIndicators();
+        });
+    });
+
+    function updateStepIndicators() {
+        document.querySelectorAll('.step-item').forEach(item => {
+            if (parseInt(item.dataset.step) <= currentStep) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Form submission
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        try {
+            const response = await fetch('/dashboard/<%= user.slug %>/streamline/quick-create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': data._csrf
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                window.location.href = `/dashboard/<%= user.slug %>/portfolios`;
+            } else {
+                alert(result.message || 'Error creating portfolio');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error. Please try again.');
+        }
+    });
+});
+</script>

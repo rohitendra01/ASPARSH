@@ -1,48 +1,58 @@
 <% layout('layouts/boilerplate') -%>
-<% block('styles').append('<link rel="stylesheet" href="/css/asparsh/contact.css" />') %>
-<main class="contact-main">
-    <section class="contact-hero">
-        <h1>Get in Touch with Us</h1>
-        <p>We are here to help you with any questions or feedback you may have. Reach out to us anytime!</p>
-    </section>
-    <section class="contact-form-section">
-        <div class="contact-form-container">
-            <form action="/submit-contact" method="POST" class="contact-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required placeholder="Your Name">
+    <% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/contact.css" />`) %>
+    <main class="contact-main">
+        <section class="contact-hero">
+            <h1>Get in Touch with Us</h1>
+            <p>We are here to help you with any questions or feedback you may have. Reach out to us anytime!</p>
+        </section>
+        <section class="contact-form-section">
+            <% if (locals.success && locals.success.length) { %>
+                <div class="flash-success">
+                    <%= success %>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="5" required placeholder="Type your message here..."></textarea>
-                </div>
-                <button type="submit" class="contact-submit-btn">Send Message</button>
-            </form>
-        </div>
-        <div class="contact-form-img">
-            <img src="/assets/contact.jpg" alt="Contact Us">
-        </div>
-    </section>
-    <section class="contact-info">
-        <h2>Contact Information</h2>
-        <p>If you prefer to reach us directly, here are our contact details:</p>
-        <ul>
-            <li>Email: <a href="mailto:info@asparsh.com">info@asparsh.com</a></li>
-            <li>Phone: <a href="tel:+1234567890">+1 (234) 567-890</a></li>
-        </ul>
-    </section>
-    <section class="contact-follow">
-        <h2>Follow Us</h2>
-        <p>Stay updated with our latest news and offerings by following us on social media:</p>
-        <ul class="social-links">
-            <li><a href="https://twitter.com/asparsh" target="_blank">Twitter</a></li>
-            <li><a href="https://facebook.com/asparsh" target="_blank">Facebook</a></li>
-            <li><a href="https://instagram.com/asparsh" target="_blank">Instagram</a></li>
-        </ul>
-    </section>
-</section>
-</main>
+                <% } %>
+                    <div class="contact-form-container">
+                        <form action="/submit-contact" method="POST" class="contact-form">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" required placeholder="Your Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone (optional)</label>
+                                <input type="tel" id="phone" name="phone" pattern="[0-9]{10,}"
+                                    placeholder="Ex: 9876543210">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="5" required
+                                    placeholder="Type your message here..."></textarea>
+                            </div>
+                            <button type="submit" class="contact-submit-btn">Send Message</button>
+                        </form>
+                    </div>
+                    <div class="contact-form-img">
+                        <img src="/assets/contact.jpg" alt="Contact Us">
+                    </div>
+        </section>
+        <section class="contact-info">
+            <h2>Contact Information</h2>
+            <p>If you prefer to reach us directly, here are our contact details:</p>
+            <ul>
+                <li>Email: <a href="mailto:info@asparsh.com">info@asparsh.com</a></li>
+                <li>Phone: <a href="tel:+1234567890">+1 (234) 567-890</a></li>
+            </ul>
+        </section>
+        <section class="contact-follow">
+            <h2>Follow Us</h2>
+            <p>Stay updated with our latest news and offerings by following us on social media:</p>
+            <ul class="social-links">
+                <li><a href="https://twitter.com/asparsh" target="_blank">Twitter</a></li>
+                <li><a href="https://facebook.com/asparsh" target="_blank">Facebook</a></li>
+                <li><a href="https://instagram.com/asparsh" target="_blank">Instagram</a></li>
+            </ul>
+        </section>
+    </main>

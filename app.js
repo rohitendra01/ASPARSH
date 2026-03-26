@@ -30,7 +30,8 @@ app.set("views", path.join(__dirname, "views"));
 app.set('trust proxy', true);
 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(express.static(path.join(__dirname, "assets")));
+app.use('/assets', express.static(path.join(__dirname, "public", "assets")));
+app.use('/assets', express.static(path.join(__dirname, "assets")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -174,27 +175,28 @@ const profileRoutes = require('./routes/profileRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
-const dynamicLinkRoutes = require('./routes/dynamicLinkRoutes');
-const dynamicLinkController = require('./controllers/dynamicLinkController');
+const streamlineRoutes = require('./routes/streamlineRoutes');
+const qrRoutes = require('./routes/qrRoutes');
+const qrController = require('./controllers/qrController');
 
 // Use routes
 app.use('/', indexRoutes);
 app.use('/', authRoutes);
 app.use('/', productRoutes);
 app.use('/', newsletterRoutes);
-app.use('/dashboard/:slug/dynamic-links', dynamicLinkRoutes);
 app.use('/dashboard/:slug/portfolios', portfolioRoutes);
 app.use('/dashboard/:slug/visiting-cards', visitingCardRoutes);
 app.use('/dashboard/:slug/profiles', profileRoutes);
 app.use('/dashboard/:slug/hotels', hotelRoutes);
 app.use('/dashboard/:slug/user', userRoutes);
 app.use('/dashboard/:slug/reviews', reviewRoutes);
+app.use('/dashboard/:slug/streamline', streamlineRoutes);
+app.use('/dashboard/:slug/qr-codes', qrRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
 
-// Dynamic Link Redirection
-app.use('/q/:slug', dynamicLinkController.redirectLink);
+app.get('/q/:shortId', qrController.redirect);
 
-app.use('/reviews', reviewRoutes); //
+app.use('/reviews', reviewRoutes);
 app.use('/api', apiRoutes);
 
 app.use((err, req, res, next) => {

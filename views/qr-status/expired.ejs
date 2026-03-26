@@ -1,0 +1,17 @@
+<%- layout('layouts/boilerplate') %>
+<style>
+  .qr-status-page { min-height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
+  .qr-status-icon { font-size: 5rem; margin-bottom: 1.5rem; }
+  .qr-status-heading { font-size: 2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.75rem; }
+  .qr-status-sub { color: #6b7280; font-size: 1.1rem; max-width: 400px; margin: 0 auto 2rem; }
+  .qr-status-badge { display: inline-block; padding: 0.4rem 1.2rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: #fff7ed; color: #c2410c; }
+</style>
+
+<div class="qr-status-page">
+  <div>
+    <div class="qr-status-icon">⏰</div>
+    <h1 class="qr-status-heading">This QR Has Expired</h1>
+    <p class="qr-status-sub">The validity period of this QR code has passed. It has been automatically deactivated.</p>
+    <span class="qr-status-badge">Status: Expired</span>
+  </div>
+</div>

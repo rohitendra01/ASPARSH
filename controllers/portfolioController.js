@@ -13,7 +13,7 @@ exports.listPortfolios = async (req, res) => {
       .populate('profileId', 'name slug image')
       .populate('design', 'name templatePath category')
       .lean();
-    
+
     res.render('portfolios/index', {
       user: req.user || null,
       portfolios,
@@ -34,9 +34,9 @@ exports.showCreateForm = async (req, res) => {
 
     // Obtain CSRF token if available
     let csrfToken;
-    try { 
-      if (typeof req.csrfToken === 'function') csrfToken = req.csrfToken(); 
-    } catch (e) {}
+    try {
+      if (typeof req.csrfToken === 'function') csrfToken = req.csrfToken();
+    } catch (e) { }
     if (!csrfToken && res && res.locals && res.locals.csrfToken) {
       csrfToken = res.locals.csrfToken;
     }
@@ -57,7 +57,7 @@ exports.showCreateForm = async (req, res) => {
 exports.createPortfolio = async (req, res) => {
   try {
     const payload = req.body || {};
-    
+
     // ========== 3.1. Validate Profile ==========
     const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug;
     if (!profileIdentifier) {
@@ -84,6 +84,17 @@ exports.createPortfolio = async (req, res) => {
     const design = await Design.findById(designId);
     if (!design) {
       return res.status(400).json({ success: false, message: 'Design not found' });
+    }
+
+    // Fetch distinct categories for the wizard
+    const professions = await Design.find({ isActive: true }).distinct('category');
+
+    // ========== 3.2.1. Process QR Link ==========
+    const qrSlug = payload.qrSlug || payload.qrCode;
+    let dynamicLinkDoc = null;
+    if (qrSlug) {
+      const { QR } = require('../models/QR');
+      dynamicLinkDoc = await QR.findOne({ shortId: qrSlug });
     }
 
     // ========== 3.3. Generate Unique Slug ==========
@@ -151,8 +162,8 @@ exports.createPortfolio = async (req, res) => {
     let socialLinks = [];
     try {
       if (payload.socialLinks) {
-        socialLinks = typeof payload.socialLinks === 'string' 
-          ? JSON.parse(payload.socialLinks) 
+        socialLinks = typeof payload.socialLinks === 'string'
+          ? JSON.parse(payload.socialLinks)
           : payload.socialLinks;
       }
     } catch (e) {
@@ -162,10 +173,10 @@ exports.createPortfolio = async (req, res) => {
     let skills = [];
     try {
       if (payload.skills) {
-        const skillsData = typeof payload.skills === 'string' 
-          ? JSON.parse(payload.skills) 
+        const skillsData = typeof payload.skills === 'string'
+          ? JSON.parse(payload.skills)
           : payload.skills;
-        
+
         // Extract only ObjectIds
         skills = skillsData.map(skill => skill.id || skill._id || skill);
       }
@@ -176,8 +187,8 @@ exports.createPortfolio = async (req, res) => {
     let workExperience = [];
     try {
       if (payload.workExperience) {
-        workExperience = typeof payload.workExperience === 'string' 
-          ? JSON.parse(payload.workExperience) 
+        workExperience = typeof payload.workExperience === 'string'
+          ? JSON.parse(payload.workExperience)
           : payload.workExperience;
       }
     } catch (e) {
@@ -187,8 +198,8 @@ exports.createPortfolio = async (req, res) => {
     let experience = [];
     try {
       if (payload.experienceTimeline) {
-        experience = typeof payload.experienceTimeline === 'string' 
-          ? JSON.parse(payload.experienceTimeline) 
+        experience = typeof payload.experienceTimeline === 'string'
+          ? JSON.parse(payload.experienceTimeline)
           : payload.experienceTimeline;
       }
     } catch (e) {
@@ -196,11 +207,11 @@ exports.createPortfolio = async (req, res) => {
 
     // ========== 3.9. Validate createdBy ==========
     const createdById = req.user?._id || profile.createdBy || profile._id;
-    
+
     if (!createdById) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Unable to determine portfolio creator' 
+      return res.status(400).json({
+        success: false,
+        message: 'Unable to determine portfolio creator'
       });
     }
 
@@ -220,12 +231,21 @@ exports.createPortfolio = async (req, res) => {
       workExperience,
       experience,
       design: design._id,
+      qrCode: dynamicLinkDoc ? dynamicLinkDoc._id : undefined,
       createdBy: createdById
     });
 
     // ========== 3.11. Save Portfolio ==========
     try {
       await portfolio.save();
+
+      // ========== 3.11.1. Update QR Link ==========
+      if (dynamicLinkDoc) {
+        dynamicLinkDoc.status = 'LIVE';
+        // Note: keeping portfolioId tracking would require adding portfolio ref to QR, but for now we just link destUrl
+        dynamicLinkDoc.destinationUrl = `${req.protocol}://${req.get('host')}/portfolio/${portfolio.slug}`;
+        await dynamicLinkDoc.save();
+      }
     } catch (saveErr) {
       if (saveErr && saveErr.code === 11000 && saveErr.keyPattern && saveErr.keyPattern.slug) {
         const newUniqueId = crypto.randomBytes(5).toString('hex');
@@ -245,8 +265,8 @@ exports.createPortfolio = async (req, res) => {
     // ========== 3.13. Send Response ==========
     const accept = (req.headers['accept'] || '').toLowerCase();
     if (req.xhr || accept.includes('application/json') || req.is('json')) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         portfolio: portfolio,
         slug: portfolio.slug,
         message: 'Portfolio created successfully'
@@ -256,16 +276,16 @@ exports.createPortfolio = async (req, res) => {
     res.redirect(`/portfolio/${portfolio.slug}`);
 
   } catch (err) {
-    
+
     const accept = (req.headers['accept'] || '').toLowerCase();
     if (req.xhr || accept.includes('application/json') || req.is('json')) {
-      return res.status(500).json({ 
-        success: false, 
+      return res.status(500).json({
+        success: false,
         message: 'Error creating portfolio',
-        error: err.message 
+        error: err.message
       });
     }
-    
+
     res.status(500).send('Error creating portfolio: ' + err.message);
   }
 };
@@ -281,9 +301,9 @@ exports.getPortfolioBySlug = async (req, res) => {
       .lean();
 
     if (!portfolio) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Portfolio not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Portfolio not found'
       });
     }
 
@@ -293,8 +313,8 @@ exports.getPortfolioBySlug = async (req, res) => {
       portfolio
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Server error',
       error: error.message
     });
@@ -356,11 +376,11 @@ exports.showPortfolio = async (req, res) => {
 exports.deletePortfolio = async (req, res) => {
   try {
     const portfolio = await Portfolio.findByIdAndDelete(req.params.id);
-    
+
     if (!portfolio) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Portfolio not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Portfolio not found'
       });
     }
 
@@ -372,14 +392,14 @@ exports.deletePortfolio = async (req, res) => {
 
     console.log('✅ Portfolio deleted:', portfolio.slug);
 
-    res.json({ 
-      success: true, 
-      message: 'Portfolio deleted successfully' 
+    res.json({
+      success: true,
+      message: 'Portfolio deleted successfully'
     });
   } catch (error) {
     console.error('Error deleting portfolio:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Error deleting portfolio',
       error: error.message
     });
@@ -399,23 +419,23 @@ exports.updatePortfolio = async (req, res) => {
     ).populate('skills').populate('design').lean();
 
     if (!portfolio) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Portfolio not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Portfolio not found'
       });
     }
 
     console.log('✅ Portfolio updated:', portfolio.slug);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       portfolio,
-      message: 'Portfolio updated successfully' 
+      message: 'Portfolio updated successfully'
     });
   } catch (error) {
     console.error('Error updating portfolio:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Error updating portfolio',
       error: error.message
     });
@@ -441,8 +461,8 @@ exports.listUserPortfolios = async (req, res) => {
     });
   } catch (error) {
     console.error('Error listing portfolios:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Error listing portfolios',
       error: error.message
     });

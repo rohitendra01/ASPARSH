@@ -1,121 +1,235 @@
 <% layout('layouts/boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/home.css" />`) %>
-<main>
-    <section class="home-container1">
-        <h1>Build NFC Experienc That Works For You</h1>
-        <p>From custom tag design to real-time analytics, we handle every step so you can focus on growth.
-            Start your journey with us today and unlock the full potential of NFC technology.</p>
-        </p>
-        <div class="home-contact-me">
-            <p>Enter your details and we will reach to you shortly.</p>
-            <form action="/contact" method="POST" class="contact-form">
-                <div class="wave-group">
-                  <input required type="text" name="name" class="input" />
-                  <span class="bar"></span>
-                  <label class="label">
-                    <span class="label-char" style="--index: 0">N</span>
-                    <span class="label-char" style="--index: 1">a</span>
-                    <span class="label-char" style="--index: 2">m</span>
-                    <span class="label-char" style="--index: 3">e</span>
-                  </label>
-                </div>
-                <div class="wave-group">
-                  <input required type="tel" name="number" class="input" pattern="[0-9]{10,}" />
-                  <span class="bar"></span>
-                  <label class="label">
-                    <span class="label-char" style="--index: 0">N</span>
-                    <span class="label-char" style="--index: 1">u</span>
-                    <span class="label-char" style="--index: 2">m</span>
-                    <span class="label-char" style="--index: 3">b</span>
-                    <span class="label-char" style="--index: 4">e</span>
-                    <span class="label-char" style="--index: 5">r</span>
-                  </label>
-                </div>
-                <div class="wave-group" style="position: relative;">
-                    <input required type="email" name="email" class="input" 
-                        oninput="this.nextElementSibling.nextElementSibling.nextElementSibling.style.display = this.value ? 'none' : 'inline';" />
-                    <span class="bar"></span>
-                    <label class="label">
-                        <span class="label-char" style="--index: 0">E</span>
-                        <span class="label-char" style="--index: 1">m</span>
-                        <span class="label-char" style="--index: 2">a</span>
-                        <span class="label-char" style="--index: 3">i</span>
-                        <span class="label-char" style="--index: 4">l</span>
-                    </label>
-                    <span style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 0.9em; pointer-events: none; z-index: 0; opacity: 0.6;">
-                        (optional)
-                    </span>
-                </div>
-                <button type="submit">Submit</button>
-            </form>
-            <p id="or-text">OR</p>
-            <p id="secondary-text">Get your own choice of NFC product tailored to your needs.</p>
-            <a href="/contact" class="button">Contact Us</a>
-        </div>
-    </section>
-    <section class="home-container2">
-        <h1>Our Features</h1>
-        <p>Discover the unique advantages of our NFC solutions:</p>
-        <div class="container2-feature-cards">
-            <div class="feature-card" >
-                <img src="/assets/feature1.jpg" alt="Person holding an NFC-enabled card and tapping it on a smartphone in a modern office setting, demonstrating seamless contactless technology with a positive and innovative atmosphere" srcset="">
-                    <h3>Seamless Integration</h3>
-                    <p>Effortlessly integrate NFC technology into your existing systems for a smooth user experience.</p>
+    <% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/home.css" />
+    <style>
+        .home-contact-me,
+        .feature-card,
+        .mission-card {
+            background-color: var(--bg-secondary, #f8f9fa) !important;
+            color: var(--text-primary, #111) !important;
+        }
+
+        .home-contact-me p,
+        .home-contact-me #or-text,
+        .home-contact-me #secondary-text {
+            color: var(--text-primary, #111) !important;
+        }
+
+        .mission-card h4,
+        .mission-card p,
+        .feature-card h3,
+        .feature-card p {
+            color: var(--text-primary, #111) !important;
+        }
+
+        .home-container1 h1,
+        .home-container2 h1,
+        .home-container3 h2,
+        .home-container3 h3,
+        .home-container4 h1 {
+            color: var(--text-primary, #111) !important;
+        }
+
+        .home-container1 p,
+        .home-container2 p,
+        .home-container3 p,
+        .home-container4 p {
+            color: var(--text-secondary, #444) !important;
+        }
+
+        input.input {
+            color: var(--text-primary, #111) !important;
+        }
+
+        .feature-card {
+            padding: 0 !important;
+            overflow: hidden !important;
+            align-items: stretch !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+            border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1)) !important;
+            border-radius: var(--radius-xl, 18px) !important;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.1)) !important;
+        }
+
+        .feature-card img {
+            width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 1024 / 1536 !important;
+            border-radius: 0 !important;
+            object-fit: cover !important;
+            padding: 0 !important;
+            display: block;
+        }
+
+        .feature-card-content {
+            padding: 1.5rem !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .feature-card h3 {
+            padding: 0 !important;
+            margin: 0 0 0.5rem 0 !important;
+        }
+
+        .feature-card p {
+            padding: 0 !important;
+        }
+    </style>`) %>
+    <main>
+        <section class="home-container1">
+            <h1>Build NFC Experience That Works For You</h1>
+            <p>From custom tag design to real-time analytics, we handle every step so you can focus on growth.
+                Start your journey with us today and unlock the full potential of NFC technology.</p>
+            </p>
+            <div class="home-contact-me">
+                <p>Enter your details and we will reach to you shortly.</p>
+                <form action="/contact" method="POST" class="contact-form">
+                    <div class="wave-group">
+                        <input required type="text" name="name" class="input" />
+                        <span class="bar"></span>
+                        <label class="label">
+                            <span class="label-char" style="--index: 0">N</span>
+                            <span class="label-char" style="--index: 1">a</span>
+                            <span class="label-char" style="--index: 2">m</span>
+                            <span class="label-char" style="--index: 3">e</span>
+                        </label>
+                    </div>
+                    <div class="wave-group">
+                        <input required type="tel" name="number" class="input" pattern="[0-9]{10,}" />
+                        <span class="bar"></span>
+                        <label class="label">
+                            <span class="label-char" style="--index: 0">N</span>
+                            <span class="label-char" style="--index: 1">u</span>
+                            <span class="label-char" style="--index: 2">m</span>
+                            <span class="label-char" style="--index: 3">b</span>
+                            <span class="label-char" style="--index: 4">e</span>
+                            <span class="label-char" style="--index: 5">r</span>
+                        </label>
+                        <span
+                            style="font-size: 0.8em; color: #888; position: absolute; right: 5px; top: 15px; pointer-events: none;">(Ex:
+                            9876543210)</span>
+                    </div>
+                    <div class="wave-group" style="position: relative;">
+                        <input required type="email" name="email" class="input"
+                            oninput="this.nextElementSibling.nextElementSibling.nextElementSibling.style.display = this.value ? 'none' : 'inline';" />
+                        <span class="bar"></span>
+                        <label class="label">
+                            <span class="label-char" style="--index: 0">E</span>
+                            <span class="label-char" style="--index: 1">m</span>
+                            <span class="label-char" style="--index: 2">a</span>
+                            <span class="label-char" style="--index: 3">i</span>
+                            <span class="label-char" style="--index: 4">l</span>
+                        </label>
+                        <span
+                            style="position: absolute; left: 50px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 0.9em; pointer-events: none; z-index: 0; opacity: 0.6;">
+                            (optional)
+                        </span>
+                    </div>
+                    <button type="submit">Submit</button>
+                </form>
+                <p id="or-text">OR</p>
+                <p id="secondary-text">Get your own choice of NFC product tailored to your needs.</p>
+                <a href="/contact" class="button">Contact Us</a>
             </div>
-            <div class="feature-card">
-                <img src="/assets/feature2.jpg" alt="A close-up of an NFC-enabled device being used in a retail environment, showcasing its convenience and efficiency" srcset="">
-                    <h3>Enhanced Security</h3>
-                    <p>Utilize advanced encryption and authentication methods to protect sensitive data during transactions.</p>
-            </div>
-            <div class="feature-card">
-                <img src="/assets/feature3.jpg" alt="A diverse group of people using NFC technology in various settings, highlighting its versatility and ease of use" srcset="">
-                    <h3>Versatile Applications</h3>
-                    <p>Unlock new possibilities with NFC—enable smart access, interactive marketing, and seamless payments in any environment.</p>
-            </div>
-        </div>
-    </section>
-    <section class="home-container3">
-        <h3>We believe in</h3>
-        <h2>Your Connection, Our Commitment</h2>
-    <p>At Asparsh, we are dedicated to revolutionizing the way businesses connect with their customers through NFC technology. Our mission is to provide innovative solutions that enhance user experiences and drive growth.</p>
-    <div class="container3-mission">
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/pencil-square.svg" alt="Tailored Solutions icon" />
-            <h4>Tailored Solutions</h4>
-            <p>We work closely with each client to design NFC products (business cards, wristbands, menus) that reflect their unique brand identity.Our design team ensures every product is customized to your specifications for maximum impact.</p>
-        </div>
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/shield-check.svg" alt="High‑Quality Components icon" />
-            <h4>High‑Quality Components</h4>
-            <p>We source premium NTAG chips and durable card materials to ensure reliable performance and long‑term use.Each component is rigorously tested to meet industry standards for quality and durability.</p>
-        </div>
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/rocket-launch.svg" alt="Seamless Onboarding icon" />
-            <h4>Seamless Onboarding</h4>
-            <p>Our streamlined onboarding process ensures you can start leveraging NFC technology quickly and efficiently.We provide step-by-step guidance and support throughout your integration journey.</p>
-        </div>
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/clock.svg" alt="Time is Money icon" />
-            <h4>Time is Money</h4>
-            <p>We value your time by delivering fast turnaround and responsive support at every stage of your project.Our team is committed to meeting deadlines and resolving queries promptly.</p>
-        </div>
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/server-stack.svg" alt="Scalable Infrastructure icon" />
-            <h4>Scalable Infrastructure</h4>
-            <p>Our solutions are built to grow with your business, supporting increased demand and new use cases effortlessly.Flexible architecture allows easy expansion as your requirements evolve.</p>
-        </div>
-        <div class="mission-card">
-            <img src="https://unpkg.com/heroicons@2.0.13/24/outline/globe-alt.svg" alt="Global Business icon" />
-            <h4>Global Business</h4>
-            <p>We empower clients worldwide with NFC products and services tailored to diverse markets and regulations.Our global network ensures reliable delivery and compliance wherever you operate.</p>
-        </div>
-    </div>
-    </section>
-    <section class="home-container4">
-        <h1>Come Join Us</h1>
-        <p>Be a part of our journey to transform the way businesses connect with their customers. Together, we can create innovative NFC solutions that drive engagement and growth.</p>
-        <div class="home-image">
-            <img src="/assets/join-us.png" alt="Join Us">
-        </div>
         </section>
-</main>
+        <section class="home-container2">
+            <h1>Our Features</h1>
+            <p>Discover the unique advantages of our NFC solutions:</p>
+            <div class="container2-feature-cards">
+                <div class="feature-card">
+                    <img src="/assets/feature1.jpg"
+                        alt="Person holding an NFC-enabled card and tapping it on a smartphone in a modern office setting, demonstrating seamless contactless technology with a positive and innovative atmosphere"
+                        srcset="">
+                    <div class="feature-card-content">
+                        <h3>Seamless Integration</h3>
+                        <p>Effortlessly integrate NFC technology into your existing systems for a smooth user
+                            experience.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <img src="/assets/feature2.jpg"
+                        alt="A close-up of an NFC-enabled device being used in a retail environment, showcasing its convenience and efficiency"
+                        srcset="">
+                    <div class="feature-card-content">
+                        <h3>Enhanced Security</h3>
+                        <p>Utilize advanced encryption and authentication methods to protect sensitive data during
+                            transactions.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <img src="/assets/feature3.jpg"
+                        alt="A diverse group of people using NFC technology in various settings, highlighting its versatility and ease of use"
+                        srcset="">
+                    <div class="feature-card-content">
+                        <h3>Versatile Applications</h3>
+                        <p>Unlock new possibilities with NFC—enable smart access, interactive marketing, and seamless
+                            payments in any environment.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="home-container3">
+            <h3>We believe in</h3>
+            <h2>Your Connection, Our Commitment</h2>
+            <p>At Asparsh, we are dedicated to revolutionizing the way businesses connect with their customers through
+                NFC technology. Our mission is to provide innovative solutions that enhance user experiences and drive
+                growth.</p>
+            <div class="container3-mission">
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/pencil-square.svg"
+                        alt="Tailored Solutions icon" />
+                    <h4>Tailored Solutions</h4>
+                    <p>We work closely with each client to design NFC products (business cards, wristbands, menus) that
+                        reflect their unique brand identity.Our design team ensures every product is customized to your
+                        specifications for maximum impact.</p>
+                </div>
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/shield-check.svg"
+                        alt="High‑Quality Components icon" />
+                    <h4>High‑Quality Components</h4>
+                    <p>We source premium NTAG chips and durable card materials to ensure reliable performance and
+                        long‑term use.Each component is rigorously tested to meet industry standards for quality and
+                        durability.</p>
+                </div>
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/rocket-launch.svg"
+                        alt="Seamless Onboarding icon" />
+                    <h4>Seamless Onboarding</h4>
+                    <p>Our streamlined onboarding process ensures you can start leveraging NFC technology quickly and
+                        efficiently.We provide step-by-step guidance and support throughout your integration journey.
+                    </p>
+                </div>
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/clock.svg" alt="Time is Money icon" />
+                    <h4>Time is Money</h4>
+                    <p>We value your time by delivering fast turnaround and responsive support at every stage of your
+                        project.Our team is committed to meeting deadlines and resolving queries promptly.</p>
+                </div>
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/server-stack.svg"
+                        alt="Scalable Infrastructure icon" />
+                    <h4>Scalable Infrastructure</h4>
+                    <p>Our solutions are built to grow with your business, supporting increased demand and new use cases
+                        effortlessly.Flexible architecture allows easy expansion as your requirements evolve.</p>
+                </div>
+                <div class="mission-card">
+                    <img src="https://unpkg.com/heroicons@2.0.13/24/outline/globe-alt.svg" alt="Global Business icon" />
+                    <h4>Global Business</h4>
+                    <p>We empower clients worldwide with NFC products and services tailored to diverse markets and
+                        regulations.Our global network ensures reliable delivery and compliance wherever you operate.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <section class="home-container4">
+            <h1>Come Join Us</h1>
+            <p>Be a part of our journey to transform the way businesses connect with their customers. Together, we can
+                create innovative NFC solutions that drive engagement and growth.</p>
+        </section>
+    </main>

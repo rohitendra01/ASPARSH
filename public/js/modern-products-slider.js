@@ -62,9 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     btn.style.transform = 'scale(1)';
+                    window.location.href = `/contact?product=${productId}`;
                 }, 150);
-
-                showNotification('Added to cart!', 'success');
             });
         });
 
@@ -76,10 +75,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     btn.style.transform = 'scale(1)';
+                    window.location.href = `/home#product-${productId}`;
                 }, 150);
-
-                console.log(`Explore More clicked for product ${productId}`);
             });
+        });
+
+        // Tab Switching Logic
+        const tabHeaders = document.querySelectorAll('.tab-header');
+        tabHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const container = this.closest('.index-product-description-container');
+                const targetId = this.getAttribute('data-tab');
+                
+                // Remove active class from all headers and panes in this container
+                container.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
+                container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                
+                // Add active class to clicked header and corresponding pane
+                this.classList.add('active');
+                container.querySelector(`#${targetId}`).classList.add('active');
+                
+                // Move underline
+                const underline = container.querySelector('.tab-underline');
+                if (underline) {
+                    underline.style.width = this.offsetWidth + 'px';
+                    underline.style.left = this.offsetLeft + 'px';
+                }
+            });
+        });
+        
+        // Initialize underlines
+        document.querySelectorAll('.index-product-description-container').forEach(container => {
+            const activeHeader = container.querySelector('.tab-header.active');
+            const underline = container.querySelector('.tab-underline');
+            if (activeHeader && underline) {
+                underline.style.width = activeHeader.offsetWidth + 'px';
+                underline.style.left = activeHeader.offsetLeft + 'px';
+            }
         });
     }
 
@@ -248,6 +280,41 @@ function initTestimonialCarousel() {
             const isVisible = index >= slideStart && index < slideEnd;
             card.setAttribute('aria-hidden', !isVisible);
         });
+        
+        updateDots();
+    }
+    
+    function createDots() {
+        const dotsContainer = document.getElementById('testimonialDots');
+        if (!dotsContainer) return;
+        
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('span');
+            if (i === currentSlide) dot.classList.add('active');
+            
+            dot.addEventListener('click', () => {
+                stopAutoSlide();
+                goToSlide(i);
+                startAutoSlide();
+            });
+            
+            dotsContainer.appendChild(dot);
+        }
+    }
+    
+    function updateDots() {
+        const dotsContainer = document.getElementById('testimonialDots');
+        if (!dotsContainer) return;
+        
+        const dots = dotsContainer.querySelectorAll('span');
+        dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
     }
     
     function startAutoSlide() {
@@ -270,7 +337,7 @@ function initTestimonialCarousel() {
     }
     function init() {
         updateCardsPerSlide();
-        
+        createDots();
         startAutoSlide();
         
         carousel.addEventListener('mouseenter', () => {
@@ -287,6 +354,7 @@ function initTestimonialCarousel() {
             resizeTimeout = setTimeout(() => {
                 stopAutoSlide();
                 updateCardsPerSlide();
+                createDots();
                 startAutoSlide();
             }, 150);
         });

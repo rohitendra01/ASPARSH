@@ -1,5 +1,6 @@
 const http = require('http');
 const app = require('./app');
+const axios = require('axios');
 const mongoose = require("mongoose");
 require('dotenv').config();
 
@@ -18,4 +19,18 @@ mongoose.connect(process.env.MONGO_URI, {
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+
+    const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    const interval = 12 * 60 * 1000;
+
+    const reloadWebsite = async () => {
+        try {
+            await axios.get(url);
+            console.log(`Ping sent to ${url} at ${new Date().toISOString()}`);
+        } catch (error) {
+            console.error(`Ping failed: ${error.message}`);
+        }
+    };
+
+    setInterval(reloadWebsite, interval);
 });

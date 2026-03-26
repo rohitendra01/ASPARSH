@@ -1,3 +1,4 @@
+@import url('./modern-variables.css');
 
 .contact-main {
     min-height: 80vh;
@@ -17,17 +18,17 @@
     margin-bottom: 32px;
 }
 
-.contact-hero h1{
-    color: var(--text-dark);
-    font-family: var(--head-text);
+.contact-hero h1 {
+    color: var(--text-primary);
+    font-family: var(--font-family-heading);
     font-size: 5rem;
     margin-bottom: 12px;
     font-weight: 700;
 }
 
 .contact-hero p {
-    color: var(--text-dark);
-    font-family: var(--content-text);
+    color: var(--text-primary);
+    font-family: var(--font-family-base);
     font-size: 1.2rem;
 }
 
@@ -45,13 +46,17 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    width: 70rem;
-    height: 32rem;
+    align-items: stretch;
+    width: 100%;
+    max-width: 70rem;
+    height: auto;
+    min-height: 32rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
     margin-bottom: 6rem;
 }
 
-.contact-form-container{
+.contact-form-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -78,8 +83,8 @@
 .contact-form label {
     font-size: 1.08rem;
     font-weight: 600;
-    color: var(--text-dark);
-    font-family: var(--subhead-text);
+    color: var(--text-primary);
+    font-family: var(--font-family-base);
     margin-bottom: 4px;
     letter-spacing: 0.02em;
     transition: color 0.2s;
@@ -89,6 +94,7 @@
 
 .contact-form input[type="text"],
 .contact-form input[type="email"],
+.contact-form input[type="tel"],
 .contact-form textarea {
     border: 1.5px solid #e1f6e0;
     background: #f8fafc;
@@ -97,7 +103,7 @@
     padding: 12px 6px;
     margin-bottom: 10px;
     color: #083235;
-    font-family: var(--content-text);
+    font-family: var(--font-family-base);
     transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
     box-sizing: border-box;
@@ -105,8 +111,9 @@
 
 .contact-form input[type="text"]:focus,
 .contact-form input[type="email"]:focus,
+.contact-form input[type="tel"]:focus,
 .contact-form textarea:focus {
-    border-color: var(--hea-foo);
+    border-color: var(--color-primary);
     box-shadow: 0 2px 8px #b3e5fc44;
     outline: none;
 }
@@ -117,27 +124,26 @@
 }
 
 .contact-form button[type="submit"] {
-    color: var(--text-dark);
-    border: 1px solid var(--hea-foo);
-    background-color: var(--text-light);
+    color: var(--text-inverse);
+    border: none;
+    background: var(--primary-gradient);
     font-weight: 600;
     font-size: 1.1rem;
     border-radius: 8px;
     padding: 12px 0;
     margin-top: 8px;
     cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.1s;
     width: 200px;
     height: 50px;
     align-self: center;
-    font-family: var(--head-text);
+    font-family: var(--font-family-heading);
 }
 
 .contact-form button[type="submit"]:hover,
 .contact-form button[type="submit"]:focus {
-    background: var(--text-dark);
-    color: var(--text-light);
-    box-shadow: 0 4px 16px #e1f6e0;
+    opacity: 0.9;
+    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
     transform: translateY(-2px) scale(1.03);
     outline: none;
 }
@@ -146,7 +152,7 @@
     transform: translateY(-1px) scale(0.99);
 }
 
-.contact-form-img{
+.contact-form-img {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,7 +164,7 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.contact-form-img img{
+.contact-form-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -174,27 +180,30 @@
 
 
 
-.contact-info{
+.contact-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 50%;
-    height: 10rem;
+    width: 100%;
+    max-width: 50%;
+    height: auto;
     padding: 1rem;
     margin-top: 2rem;
+    box-sizing: border-box;
+    text-align: center;
+    color: black;
 }
 
-.contact-info h2{
-    color: var(--text-dark);
-    font-family: var(--subhead-text);
+.contact-info h2 {
+    color: black;
+    font-family: var(--font-family-base);
     font-size: 3rem;
     margin-bottom: 8px;
 }
 
 .contact-info p {
-    color: var(--text-dark);
-    font-family: var(--content-text);
+    font-family: var(--font-family-base);
     font-size: 1.2rem;
     margin-bottom: 16px;
 }
@@ -206,18 +215,17 @@
 }
 
 .contact-info li {
-    font-family: var(--head-text);
-    color: var(--text-dark);
-    background-color: var(--text-light);
+    font-family: var(--font-family-heading);
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
     font-weight: 600;
     margin-bottom: 6px;
-    border: 1px solid var(--hea-foo);
+    border: 1px solid var(--color-primary);
     border-radius: 10px;
     padding: 1rem;
 }
 
 .contact-info a {
-    color: var(--hea-foo);
     text-decoration: none;
     font-weight: 500;
     padding: 0 0.5rem;
@@ -230,7 +238,7 @@
 
 
 .contact-follow h2 {
-    color: var(--primary-color);
+    color: var(--color-primary);
     font-size: 1.5rem;
     margin-bottom: 8px;
 }
@@ -243,8 +251,8 @@
 }
 
 .social-links a {
-    color: var(--primary-color);
-    background: var(--secondary-color);
+    color: var(--text-primary);
+    background: var(--bg-secondary);
     padding: 6px 16px;
     border-radius: 20px;
     text-decoration: none;
@@ -253,8 +261,8 @@
 }
 
 .social-links a:hover {
-    background: var(--accent-color);
-    color: var(--heading-color);
+    background: var(--color-accent);
+    color: var(--text-inverse);
 }
 
 
@@ -277,6 +285,36 @@
 
 
 
-.contact-follow{
+.contact-follow {
     margin-top: 5rem;
+}
+
+@media (max-width: 1024px) {
+    .contact-form-section {
+        flex-direction: column;
+    }
+
+    .contact-form-container,
+    .contact-form-img {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .contact-form-img {
+        min-height: 300px;
+    }
+
+    .contact-info {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-hero h1 {
+        font-size: 3rem;
+    }
+
+    .contact-info {
+        max-width: 100%;
+    }
 }

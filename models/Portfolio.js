@@ -190,6 +190,10 @@ const PortfolioSchema = new Schema({
     ref: 'Design',
     required: true
   },
+  qrCode: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'QR'
+  },
   createdBy:{
     type:     Schema.Types.ObjectId,
     ref:      'adminUser',

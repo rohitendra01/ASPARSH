@@ -1,0 +1,1009 @@
+<%- layout('layouts/dashboard-boilerplate') %>
+
+  <style>
+    .qr-page-wrapper {
+      padding: 1.5rem;
+      position: relative;
+      min-height: calc(100vh - 80px);
+      overflow: hidden;
+    }
+
+    /* Header Row */
+    .qr-header-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+
+    .qr-search-input {
+      flex: 1;
+      min-width: 180px;
+      height: 42px;
+      padding: 0 1rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .qr-search-input:focus {
+      border-color: #7928CA;
+    }
+
+    .qr-search-btn {
+      height: 42px;
+      padding: 0 1.2rem;
+      background: #7928CA;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .qr-search-btn:hover {
+      background: #5e20a8;
+    }
+
+    /* Status Filter */
+    .status-filter-group {
+      display: flex;
+      gap: 0.4rem;
+      background: #f3f4f6;
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .status-filter-btn {
+      border: none;
+      background: transparent;
+      padding: 0.35rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .status-filter-btn.active {
+      background: #fff;
+      color: #111827;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    .status-filter-btn[data-status="LIVE"].active {
+      color: #059669;
+    }
+
+    .status-filter-btn[data-status="INACTIVE"].active {
+      color: #dc2626;
+    }
+
+    .status-filter-btn[data-status="EMPTY"].active {
+      color: #6b7280;
+    }
+
+    /* Create Button */
+    .qr-create-btn {
+      height: 42px;
+      padding: 0 1.2rem;
+      background: linear-gradient(135deg, #7928CA 0%, #FF0080 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      margin-left: auto;
+    }
+
+    .qr-create-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* QR Cards Grid */
+    .qr-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Individual QR Card */
+    .qr-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 2px solid #f1f5f9;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-card:hover {
+      border-color: #7928CA;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(121, 40, 202, 0.12);
+    }
+
+    .qr-card-status-dot {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .status-dot-LIVE {
+      background: #10b981;
+    }
+
+    .status-dot-INACTIVE {
+      background: #ef4444;
+    }
+
+    .status-dot-EMPTY {
+      background: #9ca3af;
+    }
+
+    .qr-card-img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f9fafb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.9rem;
+    }
+
+    .qr-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .qr-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #111827;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.25rem;
+    }
+
+    .qr-card-shortid {
+      font-size: 0.78rem;
+      color: #7928CA;
+      font-family: monospace;
+      margin-bottom: 0.5rem;
+    }
+
+    .qr-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.6rem;
+    }
+
+    .qr-card-scans {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .qr-status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-LIVE {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-INACTIVE {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-EMPTY {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    /* Empty State */
+    .qr-empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: #9ca3af;
+    }
+
+    .qr-empty-state .empty-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .qr-empty-state p {
+      font-size: 1.05rem;
+    }
+
+    /* ===== MODAL ===== */
+    .qr-modal-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-modal-overlay.open {
+      display: flex;
+    }
+
+    .qr-modal {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      animation: modalSlideIn 0.25s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .qr-modal h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .qr-modal label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .qr-modal input {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 0.35rem;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .qr-modal input:focus {
+      border-color: #7928CA;
+    }
+
+    .qr-modal-submit {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #7928CA 0%, #FF0080 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .qr-modal-submit:hover {
+      opacity: 0.9;
+    }
+
+    .qr-modal-cancel {
+      width: 100%;
+      margin-top: 0.6rem;
+      padding: 0.65rem;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    /* ===== SIDE PANEL ===== */
+    .qr-side-panel-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 8500;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .qr-side-panel-overlay.open {
+      display: block;
+    }
+
+    .qr-side-panel {
+      position: absolute;
+      top: 0;
+      right: -540px;
+      width: 100%;
+      max-width: 520px;
+      height: 100%;
+      background: #fff;
+      z-index: 8600;
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .qr-side-panel.open {
+      right: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    .panel-close-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: #f3f4f6;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      transition: background 0.2s;
+    }
+
+    .panel-close-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .panel-shortid {
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #7928CA;
+      font-weight: 700;
+    }
+
+    /* Panel Tabs */
+    .panel-tabs {
+      display: flex;
+      border-bottom: 1px solid #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 0.9rem;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #9ca3af;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .panel-tab.active {
+      color: #7928CA;
+      border-bottom-color: #7928CA;
+    }
+
+    /* Panel Content */
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .panel-section {
+      display: none;
+    }
+
+    .panel-section.active {
+      display: block;
+    }
+
+    /* QR image in panel */
+    .panel-qr-img-wrap {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-qr-img {
+      width: 160px;
+      height: 160px;
+      border-radius: 12px;
+      border: 1px solid #f1f5f9;
+    }
+
+    /* Form fields in panel */
+    .panel-field {
+      margin-bottom: 1.1rem;
+    }
+
+    .panel-field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    .panel-field input,
+    .panel-field select {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #fff;
+    }
+
+    .panel-field input:focus,
+    .panel-field select:focus {
+      border-color: #7928CA;
+    }
+
+    .panel-save-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, #7928CA 0%, #FF0080 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .panel-save-btn:hover {
+      opacity: 0.9;
+    }
+
+    .panel-download-btn {
+      width: 100%;
+      padding: 0.65rem;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+      margin-top: 0.6rem;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+
+    /* Analytics */
+    .analytics-stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .analytics-stat {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .analytics-stat .stat-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #7928CA;
+    }
+
+    .analytics-stat .stat-label {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-top: 0.2rem;
+    }
+
+    .analytics-history-list {
+      margin-top: 0.5rem;
+    }
+
+    .analytics-history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.82rem;
+    }
+
+    .analytics-history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-time {
+      color: #6b7280;
+    }
+
+    .history-ip {
+      font-family: monospace;
+      color: #374151;
+    }
+
+    /* Delete btn */
+    .panel-delete-btn {
+      width: 100%;
+      padding: 0.65rem;
+      background: #fee2e2;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #dc2626;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    .panel-delete-btn:hover {
+      background: #fecaca;
+    }
+
+    .panel-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+  </style>
+
+  <div class="qr-page-wrapper">
+    <!-- Header Row -->
+    <div class="qr-header-row">
+      <input type="text" id="qrSearch" class="qr-search-input" placeholder="Search by title or ID…">
+      <button class="qr-search-btn" onclick="filterCards()">Search</button>
+      <div class="status-filter-group" id="statusFilter">
+        <button class="status-filter-btn active" data-status="ALL">All</button>
+        <button class="status-filter-btn" data-status="LIVE">🟢 Live</button>
+        <button class="status-filter-btn" data-status="INACTIVE">🔴 Inactive</button>
+        <button class="status-filter-btn" data-status="EMPTY">⚪ Empty</button>
+      </div>
+      <button class="qr-create-btn" id="openBulkModalBtn">+ Generate QRs</button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="qr-cards-grid" id="qrGrid">
+      <% if (qrCodes && qrCodes.length> 0) { %>
+        <% qrCodes.forEach(qr=> { %>
+          <div class="qr-card" data-id="<%= qr._id %>" data-status="<%= qr.status %>"
+            data-title="<%= (qr.batchName || qr.shortId).toLowerCase() %>" onclick="openPanel('<%= qr._id %>')">
+            <div class="qr-card-status-dot status-dot-<%= qr.status %>"></div>
+            <div class="qr-card-img-wrap">
+              <img class="qr-card-img qr-thumb" src="https://placehold.co/200x200/f3f4f6/9ca3af?text=QR"
+                data-id="<%= qr._id %>" alt="QR Code">
+            </div>
+            <div class="qr-card-title">
+              <%= qr.batchName || qr.shortId %>
+            </div>
+            <div class="qr-card-shortid">/q/<%= qr.shortId %>
+            </div>
+            <div class="qr-card-footer">
+              <span class="qr-card-scans">📊 <%= qr.scanCount %> scans</span>
+              <span class="qr-status-badge badge-<%= qr.status %>">
+                <%= qr.status %>
+              </span>
+            </div>
+          </div>
+          <% }) %>
+            <% } else { %>
+              <div class="qr-empty-state" style="grid-column:1/-1">
+                <div class="empty-icon">📭</div>
+                <p>No QR codes yet. Generate your first batch!</p>
+              </div>
+              <% } %>
+    </div>
+  </div>
+
+  <!-- ===== BULK GENERATE MODAL ===== -->
+  <div class="qr-modal-overlay" id="bulkModal">
+    <div class="qr-modal">
+      <h3>⚡ Bulk Generate QR Codes</h3>
+      <label for="genCount">Number of QR Codes</label>
+      <input type="number" id="genCount" value="10" min="1" max="100" placeholder="e.g. 25">
+      <label for="genBatchName">Batch Name / Title <span
+          style="font-weight:400; color:#9ca3af;">(optional)</span></label>
+      <input type="text" id="genBatchName" placeholder="e.g. Exhibition 2025 / Shelf A">
+      <button class="qr-modal-submit" onclick="submitBulkGenerate()">Generate QR Codes 🚀</button>
+      <button class="qr-modal-cancel" onclick="closeBulkModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===== SIDE PANEL ===== -->
+  <div class="qr-side-panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+  <div class="qr-side-panel" id="sidePanel">
+    <div class="panel-header">
+      <div>
+        <div style="font-size:0.75rem;color:#9ca3af;font-weight:600;letter-spacing:1px;text-transform:uppercase;">QR
+          Code</div>
+        <div class="panel-shortid" id="panelShortId">—</div>
+      </div>
+      <button class="panel-close-btn" onclick="closePanel()">✕</button>
+    </div>
+
+    <div class="panel-tabs">
+      <button class="panel-tab active" onclick="switchTab('manage', this)">Manage</button>
+      <button class="panel-tab" onclick="switchTab('analytics', this)">Analytics</button>
+    </div>
+
+    <div class="panel-body" id="panelBody">
+      <div class="panel-loading" id="panelLoader">Loading…</div>
+
+      <!-- Manage Section -->
+      <div class="panel-section" id="panelManage">
+        <div class="panel-qr-img-wrap">
+          <img id="panelQrImg" class="panel-qr-img" src="" alt="QR Code">
+        </div>
+
+        <input type="hidden" id="panelQrId">
+        <input type="hidden" id="panelCsrf" value="<%= csrfToken %>">
+
+        <div class="panel-field">
+          <label>Destination URL</label>
+          <input type="url" id="panelDestUrl" placeholder="https://example.com">
+        </div>
+        <div class="panel-field">
+          <label>Title / Batch Name</label>
+          <input type="text" id="panelBatchName" placeholder="e.g. Product Stand B">
+        </div>
+        <div class="panel-field">
+          <label>Status</label>
+          <select id="panelStatus">
+            <option value="EMPTY">⚪ Empty</option>
+            <option value="LIVE">🟢 Live</option>
+            <option value="INACTIVE">🔴 Inactive</option>
+          </select>
+        </div>
+        <div class="panel-field">
+          <label>Expiry Date <span style="font-weight:400;color:#9ca3af;">(optional)</span></label>
+          <input type="datetime-local" id="panelExpiry">
+        </div>
+
+        <button class="panel-save-btn" onclick="saveQr()">Save Changes</button>
+        <a id="panelDownloadBtn" class="panel-download-btn" href="#" download="qr-code.png">⬇ Download QR Image</a>
+        <button class="panel-delete-btn" onclick="deleteQr()">🗑 Delete QR Code</button>
+      </div>
+
+      <!-- Analytics Section -->
+      <div class="panel-section" id="panelAnalytics">
+        <div class="analytics-stat-row">
+          <div class="analytics-stat">
+            <div class="stat-val" id="statScans">0</div>
+            <div class="stat-label">Total Scans</div>
+          </div>
+          <div class="analytics-stat">
+            <div class="stat-val" id="statLastScan">—</div>
+            <div class="stat-label">Last Scanned</div>
+          </div>
+        </div>
+
+        <div style="font-size:0.85rem;font-weight:700;color:#374151;margin-bottom:0.75rem;">Scan History</div>
+        <div class="analytics-history-list" id="historyList">
+          <div style="text-align:center;color:#9ca3af;padding:2rem 0;">No scans recorded yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DASHBOARD_SLUG = '<%= user.slug %>';
+    let currentQrId = null;
+    let loadedQrData = null;
+
+    // ===== Filter / Search =====
+    document.querySelectorAll('.status-filter-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.status-filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        filterCards();
+      });
+    });
+
+    document.getElementById('qrSearch').addEventListener('input', filterCards);
+
+    function filterCards() {
+      const query = document.getElementById('qrSearch').value.toLowerCase().trim();
+      const statusBtn = document.querySelector('.status-filter-btn.active');
+      const status = statusBtn ? statusBtn.dataset.status : 'ALL';
+
+      document.querySelectorAll('.qr-card').forEach(card => {
+        const matchStatus = status === 'ALL' || card.dataset.status === status;
+        const matchSearch = !query || card.dataset.title.includes(query) || card.dataset.id.includes(query);
+        card.style.display = (matchStatus && matchSearch) ? '' : 'none';
+      });
+    }
+
+    // ===== Bulk Generate Modal =====
+    document.getElementById('openBulkModalBtn').addEventListener('click', () => {
+      document.getElementById('bulkModal').classList.add('open');
+    });
+    function closeBulkModal() {
+      document.getElementById('bulkModal').classList.remove('open');
+    }
+    document.getElementById('bulkModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('bulkModal')) closeBulkModal();
+    });
+
+    async function submitBulkGenerate() {
+      const count = parseInt(document.getElementById('genCount').value, 10) || 1;
+      const batchName = document.getElementById('genBatchName').value.trim();
+      const csrf = document.querySelector('input[name="_csrf"]') ?
+        document.querySelector('input[name="_csrf"]').value :
+        document.getElementById('panelCsrf').value;
+
+      try {
+        const res = await fetch(`/dashboard/${DASHBOARD_SLUG}/qr-codes/bulk-generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+          body: JSON.stringify({ count, batchName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeBulkModal();
+          window.location.reload();
+        } else {
+          alert('Error: ' + (data.message || 'Unknown error'));
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Server error. Please try again.');
+      }
+    }
+
+    // ===== Side Panel =====
+    function openPanel(id) {
+      currentQrId = id;
+      document.getElementById('panelBody').style.opacity = '0.3';
+      document.getElementById('panelLoader').style.display = 'flex';
+      document.getElementById('panelManage').classList.remove('active');
+      document.getElementById('panelAnalytics').classList.remove('active');
+
+      document.getElementById('panelOverlay').classList.add('open');
+      document.getElementById('sidePanel').classList.add('open');
+
+      // Reset to manage tab
+      document.querySelectorAll('.panel-tab').forEach((t, i) => {
+        t.classList.toggle('active', i === 0);
+      });
+      activateSection('manage');
+
+      fetchQrData(id);
+    }
+
+    function closePanel() {
+      document.getElementById('panelOverlay').classList.remove('open');
+      document.getElementById('sidePanel').classList.remove('open');
+      currentQrId = null;
+      loadedQrData = null;
+    }
+
+    async function fetchQrData(id) {
+      try {
+        const res = await fetch(`/dashboard/${DASHBOARD_SLUG}/qr-codes/${id}`);
+        const data = await res.json();
+        if (!data.success) { alert('Failed to load QR'); return; }
+
+        loadedQrData = data;
+        populatePanel(data);
+      } catch (e) {
+        console.error(e);
+        alert('Error loading QR data');
+      }
+    }
+
+    function populatePanel(data) {
+      const { qr, qrCodeImage, history } = data;
+      document.getElementById('panelLoader').style.display = 'none';
+      document.getElementById('panelBody').style.opacity = '1';
+      document.getElementById('panelManage').classList.add('active');
+
+      document.getElementById('panelShortId').textContent = '/q/' + qr.shortId;
+      document.getElementById('panelQrId').value = qr._id;
+      document.getElementById('panelQrImg').src = qrCodeImage;
+      document.getElementById('panelDestUrl').value = qr.destinationUrl || '';
+      document.getElementById('panelBatchName').value = qr.batchName || '';
+      document.getElementById('panelStatus').value = qr.status;
+
+      if (qr.expiresAt) {
+        // Format for datetime-local
+        const d = new Date(qr.expiresAt);
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('panelExpiry').value =
+          `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      } else {
+        document.getElementById('panelExpiry').value = '';
+      }
+
+      // Download button
+      const dlBtn = document.getElementById('panelDownloadBtn');
+      dlBtn.href = qrCodeImage;
+      dlBtn.download = `qr-${qr.shortId}.png`;
+
+      // Analytics
+      document.getElementById('statScans').textContent = qr.scanCount || 0;
+      document.getElementById('statLastScan').textContent = qr.lastScannedAt
+        ? new Date(qr.lastScannedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+        : '—';
+
+      // History list
+      const list = document.getElementById('historyList');
+      if (history && history.length > 0) {
+        list.innerHTML = history.map(h => `
+      <div class="analytics-history-item">
+        <span class="history-time">${new Date(h.scannedAt).toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        })}</span>
+        <span class="history-ip">${h.ip || 'Unknown IP'}</span>
+      </div>
+    `).join('');
+      } else {
+        list.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:2rem 0;">No scans recorded yet</div>';
+      }
+
+      // Lazy load card thumbnail if not loaded
+      const thumb = document.querySelector(`.qr-thumb[data-id="${qr._id}"]`);
+      if (thumb && thumb.src.includes('placehold')) {
+        thumb.src = qrCodeImage;
+      }
+    }
+
+    function switchTab(section, btn) {
+      document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      activateSection(section);
+    }
+
+    function activateSection(name) {
+      document.getElementById('panelManage').classList.toggle('active', name === 'manage');
+      document.getElementById('panelAnalytics').classList.toggle('active', name === 'analytics');
+    }
+
+    async function saveQr() {
+      const id = document.getElementById('panelQrId').value;
+      const csrf = document.getElementById('panelCsrf').value;
+      const body = {
+        destinationUrl: document.getElementById('panelDestUrl').value,
+        batchName: document.getElementById('panelBatchName').value,
+        status: document.getElementById('panelStatus').value,
+        expiresAt: document.getElementById('panelExpiry').value
+      };
+
+      try {
+        const res = await fetch(`/dashboard/${DASHBOARD_SLUG}/qr-codes/${id}/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Update card in grid
+          const card = document.querySelector(`.qr-card[data-id="${id}"]`);
+          if (card) {
+            card.dataset.status = data.qr.status;
+            card.querySelector('.qr-card-status-dot').className = `qr-card-status-dot status-dot-${data.qr.status}`;
+            card.querySelector('.qr-status-badge').className = `qr-status-badge badge-${data.qr.status}`;
+            card.querySelector('.qr-status-badge').textContent = data.qr.status;
+            card.querySelector('.qr-card-title').textContent = data.qr.batchName || data.qr.shortId;
+            card.dataset.title = (data.qr.batchName || data.qr.shortId).toLowerCase();
+          }
+          // Flash visual feedback
+          const btn = document.querySelector('.panel-save-btn');
+          btn.textContent = '✓ Saved!';
+          setTimeout(() => btn.textContent = 'Save Changes', 2000);
+        } else {
+          alert('Error: ' + (data.message || 'Unknown'));
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Server error.');
+      }
+    }
+
+    async function deleteQr() {
+      if (!confirm('Are you sure you want to delete this QR code? This cannot be undone.')) return;
+      const id = document.getElementById('panelQrId').value;
+      const csrf = document.getElementById('panelCsrf').value;
+      try {
+        const res = await fetch(`/dashboard/${DASHBOARD_SLUG}/qr-codes/${id}/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        if (data.success) {
+          closePanel();
+          const card = document.querySelector(`.qr-card[data-id="${id}"]`);
+          if (card) card.remove();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      } catch (e) {
+        alert('Server error.');
+      }
+    }
+
+    // Lazy load visible QR thumbs
+    document.addEventListener('DOMContentLoaded', () => {
+      const thumbs = document.querySelectorAll('.qr-thumb');
+      if (!thumbs.length) return;
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const id = img.dataset.id;
+            obs.unobserve(img);
+
+            fetch(`/dashboard/${DASHBOARD_SLUG}/qr-codes/${id}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.success && data.qrCodeImage) {
+                  img.src = data.qrCodeImage;
+                }
+              })
+              .catch(e => console.error('Error loading QR image', e));
+          }
+        });
+      }, { rootMargin: '50px' });
+
+      thumbs.forEach(thumb => observer.observe(thumb));
+    });
+  </script>

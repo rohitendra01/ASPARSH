@@ -1,11 +1,75 @@
 <% layout('layouts/boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/pricing.css" />`) %>
+<% block('styles').append(`<link rel="stylesheet" href="/css/asparsh/pricing.css" />
+<style>
+    /* Fix for white text on white background */
+    .pricing-card { 
+        background-color: var(--bg-primary, #ffffff) !important; 
+        color: var(--text-primary, #111) !important; 
+    }
+    .pricing-card h2, .pricing-card.placeholder .features-list li {
+        color: var(--text-primary, #111) !important;
+    }
+    .pricing-notify { 
+        background-color: var(--bg-secondary, #f8f9fa) !important; 
+        color: var(--text-primary, #111) !important; 
+    }
+    .notify-form input { 
+        background-color: var(--bg-primary, #ffffff) !important; 
+        color: var(--text-primary, #111) !important; 
+    }
+    .pricing-hero h1, .pricing-hero p, .pricing-notify h3, .pricing-notify p {
+        color: var(--text-primary, #111) !important;
+    }
+</style>`) %>
 <main class="pricing-container">
-    <section class="pricing-message">
-        <h1>Pricing Plans Coming Soon</h1>
-        <p>We're working hard to finalize our pricing plans and will integrate them with our existing services very soon.<br>
-        Please stay tuned for updates!</p>
-        <p>If you have any questions or want to discuss your requirements, feel free to reach out.</p>
-        <a href="/contact" class="pricing-contact-btn">Contact Us</a>
+    <section class="pricing-hero">
+        <h1>Simple, Transparent Pricing</h1>
+        <p>We're fine-tuning our packages to give you the best value. Here is a sneak peek of what's coming soon.</p>
+    </section>
+    
+    <section class="pricing-cards">
+        <div class="pricing-card placeholder">
+            <div class="coming-soon-badge">Coming Soon</div>
+            <h2>Starter</h2>
+            <div class="price">???</div>
+            <ul class="features-list">
+                <li>Basic NFC Card</li>
+                <li>Standard Profile</li>
+                <li>Basic Analytics</li>
+            </ul>
+        </div>
+        
+        <div class="pricing-card placeholder popular">
+            <div class="coming-soon-badge">Coming Soon</div>
+            <h2>Professional</h2>
+            <div class="price">???</div>
+            <ul class="features-list">
+                <li>Custom NFC Products</li>
+                <li>Advanced Profile Links</li>
+                <li>Detailed Analytics</li>
+                <li>Priority Support</li>
+            </ul>
+        </div>
+        
+        <div class="pricing-card placeholder">
+            <div class="coming-soon-badge">Coming Soon</div>
+            <h2>Enterprise</h2>
+            <div class="price">???</div>
+            <ul class="features-list">
+                <li>Bulk NFC Deployments</li>
+                <li>Team Admin Dashboard</li>
+                <li>API Integration</li>
+                <li>Dedicated Manager</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="pricing-notify">
+        <h3>Be the first to know when we launch</h3>
+        <p>Drop your email below and we'll send you an exclusive early-bird offer when our plans go live.</p>
+        <form action="/notify" method="POST" class="notify-form">
+            <input type="email" name="email" placeholder="Enter your email address" required>
+            <button type="submit" class="notify-btn">Notify Me</button>
+        </form>
     </section>
 </main>

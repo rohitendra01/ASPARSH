@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Basic Portfolio",
+    "category": "basic",
+    "slug": "basic",
+    "templatePath": "portfolios/basic-portfolios/show",
+    "previewImage": "/images/designs/basic-preview.png",
+    "description": "Clean and minimal portfolio design",
+    "isActive": true
+  },
+  {
+    "name": "Advocate Portfolio",
+    "category": "custom",
+    "slug": "advocate",
+    "templatePath": "portfolios/custom-portfolios/advocate",
+    "previewImage": "/images/designs/advocate-preview.png",
+    "description": "Contemporary design with animations",
+    "isActive": true
+  },
+  {
+    "name": "Professor Portfolio",
+    "category": "custom",
+    "slug": "professor",
+    "templatePath": "portfolios/custom-portfolios/professor",
+    "previewImage": "/images/designs/professor-preview.png",
+    "description": "Bold and artistic layout",
+    "isActive": true
+  },
+  {
+    "name": "Modern Elegance",
+    "category": "modern",
+    "slug": "modern-elegance",
+    "templatePath": "portfolios/custom/modern-elegance",
+    "previewImage": "/images/designs/modern-preview.png",
+    "description": "Sleek, modern design for professionals",
+    "isActive": true
+  }
+]

@@ -1,88 +1,174 @@
 .about-hero {
     text-align: center;
-    padding: 7rem 1rem 4rem 1rem;
+    padding: 9rem 1rem 5rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: var(--primary-gradient);
+    border-bottom: 1px solid var(--border-color);
 }
 .about-tagline {
-    font-size: 3rem;
-    color: var(--text-dark);
-    font-family: var(--head-text);
-    margin-bottom: 18px;
+    font-size: 3.5rem;
+    color: var(--text-inverse);
+    font-family: var(--font-family-heading);
+    margin-bottom: 24px;
     letter-spacing: 1px;
+    font-weight: 800;
 }
 
 .about-intro {
     font-size: 1.5rem;
-    width: 70rem;
-    color: var(--text-dark);
-    font-family: var(--content-text);
+    width: 100%;
+    max-width: 70rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--font-family-base);
+    line-height: 1.6;
+}
+
+/* Our Story Section */
+.about-story {
+    padding: var(--space-2xl) var(--space-md);
+    text-align: center;
+    background: var(--bg-primary);
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+}
+
+.about-story h2 {
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    font-family: var(--font-family-heading);
+    margin-bottom: var(--space-xl);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-xl);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    background: var(--bg-secondary);
+    padding: var(--space-xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-normal);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-light);
+}
+
+.stat-card h3 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-card p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-family: var(--font-family-base);
+    font-weight: 600;
+    margin: 0;
 }
 
 .about-founders {
     border-radius: 24px 24px 0 0;
-    box-shadow: 0 8px 32px #00bcd422;
-    padding: 2rem 1 rem;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.05);
+    padding: 4rem 1rem;
     margin-top: -24px;
     text-align: center;
+    background: var(--bg-secondary);
+    position: relative;
+    z-index: 2;
 }
 .about-founders-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 32px;
-    font-family: inherit;
-    font-family: var(--subhead-text);
-    /* text-shadow removed */
+    color: var(--text-primary);
+    margin-bottom: 3rem;
+    font-family: var(--font-family-heading);
 }
 .about-founders-cards {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 48px;
-    color: var(--text-dark);
-    font-family: var(--subhead-text);
+    color: var(--text-primary);
+    font-family: var(--font-family-base);
 }
 .about-founder-card {
-    background: #f0f7fa;
+    background: var(--bg-primary);
     border-radius: 18px;
-    box-shadow: 0 4px 16px #00bcd422;
-    padding: 32px 24px;
-    max-width: 340px;
+    box-shadow: var(--shadow-md);
+    padding: 40px 32px;
+    max-width: 400px;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-normal);
+}
+.about-founder-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
 }
 .about-founder-image {
     width: 180px;
     height: 180px;
     object-fit: cover;
     border-radius: 50%;
-    box-shadow: 0 4px 24px var(--text-light);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
     margin-bottom: 24px;
-    background: var(--hea-foo);
+    background: var(--bg-secondary);
+    border: 4px solid var(--bg-primary);
 }
 .about-founder-message h3 {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #0097a7;
+    color: var(--color-primary-dark);
     margin-bottom: 12px;
-    font-family: inherit;
+    font-family: var(--font-family-heading);
 }
 .about-founder-message p {
-    font-size: 1.05rem;
-    color: #333;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
     margin-bottom: 0;
+    line-height: 1.6;
+    font-style: italic;
 }
 @media (max-width: 900px) {
     .about-founders-cards {
-        flex-direction: column;
         gap: 32px;
     }
     .about-founder-card {
-        max-width: 100%;
+        padding: 32px 24px;
+    }
+}
+@media (max-width: 768px) {
+    .about-hero {
+        padding-top: 7rem;
+    }
+    .about-tagline {
+        font-size: 2.5rem;
+    }
+    .about-intro {
+        font-size: 1.2rem;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }

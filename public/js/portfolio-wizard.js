@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initWizard() {
   const stepButtons = document.querySelectorAll('.step-btn');
   const navButtons = document.querySelectorAll('[data-action]');
-  
+
   stepButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const step = parseInt(btn.dataset.step);
@@ -38,7 +38,7 @@ function initWizard() {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const action = btn.dataset.action;
-      
+
       if (action === 'next') {
         if (validateCurrentStep()) {
           goToStep(currentStep + 1);
@@ -56,57 +56,89 @@ function initWizard() {
 function goToStep(stepNum) {
   const steps = document.querySelectorAll('.wizard-step');
   const stepButtons = document.querySelectorAll('.step-btn');
-  
+
   if (stepNum < 0 || stepNum >= steps.length) return;
-  
+
   // Hide current step
   steps[currentStep].classList.remove('active');
   stepButtons[currentStep].classList.remove('active');
-  
+
   // Show new step
   currentStep = stepNum;
   steps[currentStep].classList.add('active');
   stepButtons[currentStep].classList.add('active');
-  
+
   // Mark completed steps
   stepButtons.forEach((btn, idx) => {
     if (idx < currentStep) {
       btn.classList.add('completed');
     }
   });
-  
+
   // Update review if on final step
   if (currentStep === 8) {
     generateReview();
   }
-  
+
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ========== Step 0: Design & Profile Selection ==========
-async function loadDesigns() {
+
+function selectProfession(category) {
+  selectedProfession = category;
+
+  // Update hidden input (if you want to track it)
+  // document.getElementById('selectedProfession').value = category; 
+
+  // Use category to auto-fill profession input if empty
+  const professionInput = document.getElementById('profession');
+  if (professionInput && !professionInput.value) {
+    professionInput.value = category;
+  }
+
+  // Visual feedback
+  document.querySelectorAll('.profession-card').forEach(card => {
+    card.classList.remove('selected');
+    if (card.innerText.trim() === category) {
+      card.classList.add('selected');
+    }
+  });
+
+  // Enable Next button if design is also selected (but design selection depends on category?)
+  // Actually, selecting profession should filter designs.
+
+  loadDesigns(category);
+}
+
+async function loadDesigns(categoryFilter = null) {
   try {
     const response = await fetch('/api/designs');
     if (!response.ok) throw new Error('Failed to fetch designs');
-    
+
     const designs = await response.json();
     const grid = document.getElementById('designGrid');
     if (!grid) return;
-    
-    grid.innerHTML = designs.map(design => `
+
+    // Filter designs if category is selected
+    const filteredDesigns = categoryFilter
+      ? designs.filter(d => d.category === categoryFilter || d.category === 'Other')
+      : designs;
+
+    grid.innerHTML = filteredDesigns.map(design => `
       <div class="design-card" data-design-id="${design._id}" onclick="selectDesign('${design._id}', this)">
         <img src="${design.previewImage || '/assets/default-design.png'}" alt="${design.name}">
         <h4>${design.name}</h4>
-        <p>${design.description}</p>
+        <p>${design.description || ''}</p>
         <div class="design-overlay">
           <i class="fas fa-check-circle"></i>
         </div>
       </div>
     `).join('');
 
-    if (designs.length === 0) {
-      grid.innerHTML = '<div class="no-designs">No portfolio designs available.</div>';
+    if (filteredDesigns.length === 0) {
+      grid.innerHTML = '<div class="no-designs">No portfolio designs available for this category.</div>';
     }
   } catch (err) {
     console.error('Error loading designs:', err);
@@ -121,13 +153,13 @@ async function loadDesigns() {
 function selectDesign(designId, element) {
   selectedDesignId = designId;
   document.getElementById('designId').value = designId;
-  
+
   // Visual feedback
   document.querySelectorAll('.design-card').forEach(card => {
     card.classList.remove('selected');
   });
   element.classList.add('selected');
-  
+
   checkStep0Completion();
 }
 
@@ -135,23 +167,23 @@ function setupProfileSearch() {
   const searchInput = document.getElementById('profileSearch');
   const resultsDiv = document.getElementById('profileSearchResults');
   let debounceTimer;
-  
+
   searchInput.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
     const query = e.target.value.trim();
-    
+
     if (query.length < 2) {
       resultsDiv.innerHTML = '';
       return;
     }
-    
+
     debounceTimer = setTimeout(async () => {
       try {
         const response = await fetch(`/api/profiles/search?q=${encodeURIComponent(query)}`);
         if (!response.ok) throw new Error('Failed to fetch profiles');
-        
+
         const profiles = await response.json();
-        
+
         if (profiles && profiles.length > 0) {
           resultsDiv.innerHTML = profiles.map(profile => `
             <div class="search-result-item" onclick="selectProfile('${profile._id}', '${profile.name || ''}', '${profile.slug || ''}')">
@@ -182,7 +214,7 @@ function selectProfile(profileId, name, slug) {
 
   selectedProfileId = profileId;
   document.getElementById('profileId').value = profileId;
-  
+
   const cardDiv = document.getElementById('selectedProfileCard');
   cardDiv.innerHTML = `
     <div class="profile-card-selected">
@@ -194,10 +226,10 @@ function selectProfile(profileId, name, slug) {
     </div>
   `;
   cardDiv.style.display = 'block';
-  
+
   document.getElementById('profileSearchResults').innerHTML = '';
   document.getElementById('profileSearch').value = '';
-  
+
   checkStep0Completion();
 }
 
@@ -219,7 +251,7 @@ let socialLinkCounter = 0;
 function addSocialLink() {
   const container = document.getElementById('socialLinksList');
   const id = socialLinkCounter++;
-  
+
   const div = document.createElement('div');
   div.className = 'dynamic-item';
   div.dataset.id = id;
@@ -262,21 +294,21 @@ function setupSkillSearch() {
   const searchInput = document.getElementById('skillSearch');
   const resultsDiv = document.getElementById('skillSearchResults');
   let debounceTimer;
-  
+
   searchInput.addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
     const query = e.target.value.trim();
-    
+
     if (query.length < 2) {
       resultsDiv.innerHTML = '';
       return;
     }
-    
+
     debounceTimer = setTimeout(async () => {
       try {
         const response = await fetch(`/api/skills/search?q=${encodeURIComponent(query)}`);
         const data = await response.json();
-        
+
         resultsDiv.innerHTML = data.skills.map(skill => `
           <div class="skill-result-item" onclick="addSkillToPortfolio('${skill._id}', '${skill.name}', '${skill.iconClass}', '${skill.description}')">
             <i class="${skill.iconClass}"></i>
@@ -298,9 +330,9 @@ function addSkillToPortfolio(skillId, name, iconClass, description) {
     showNotification('Skill already added', 'warning');
     return;
   }
-  
+
   selectedSkills.push({ id: skillId, name, iconClass, description });
-  
+
   const container = document.getElementById('selectedSkillsList');
   const div = document.createElement('div');
   div.className = 'selected-skill-item';
@@ -316,7 +348,7 @@ function addSkillToPortfolio(skillId, name, iconClass, description) {
     </button>
   `;
   container.appendChild(div);
-  
+
   document.getElementById('skillSearch').value = '';
   document.getElementById('skillSearchResults').innerHTML = '';
 }
@@ -333,7 +365,7 @@ let workExpCounter = 0;
 function addWorkExperience() {
   const container = document.getElementById('workExperienceList');
   const id = workExpCounter++;
-  
+
   const div = document.createElement('div');
   div.className = 'dynamic-item work-exp-item';
   div.dataset.id = id;
@@ -390,7 +422,7 @@ let expCounter = 0;
 function addExperience() {
   const container = document.getElementById('experienceList');
   const id = expCounter++;
-  
+
   const div = document.createElement('div');
   div.className = 'dynamic-item exp-timeline-item';
   div.dataset.id = id;
@@ -429,19 +461,19 @@ function setupImagePreviews() {
   const heroImage = document.getElementById('heroImage');
   const aboutImage = document.getElementById('aboutImage');
   const galleryImages = document.getElementById('galleryImages');
-  
+
   if (heroImage) {
     heroImage.addEventListener('change', (e) => {
       previewImage(e.target.files[0], 'heroImagePreview');
     });
   }
-  
+
   if (aboutImage) {
     aboutImage.addEventListener('change', (e) => {
       previewImage(e.target.files[0], 'aboutImagePreview');
     });
   }
-  
+
   if (galleryImages) {
     galleryImages.addEventListener('change', (e) => {
       previewGalleryImages(e.target.files);
@@ -451,7 +483,7 @@ function setupImagePreviews() {
 
 function previewImage(file, previewId) {
   if (!file) return;
-  
+
   const reader = new FileReader();
   reader.onload = (e) => {
     const preview = document.getElementById(previewId);
@@ -463,7 +495,7 @@ function previewImage(file, previewId) {
 function previewGalleryImages(files) {
   const preview = document.getElementById('galleryPreview');
   preview.innerHTML = '';
-  
+
   Array.from(files).forEach((file, idx) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -502,7 +534,7 @@ function setupCharCounters() {
 function validateCurrentStep() {
   const currentFieldset = document.querySelector(`.wizard-step[data-step="${currentStep}"]`);
   const inputs = currentFieldset.querySelectorAll('input[required], textarea[required], select[required]');
-  
+
   let isValid = true;
   inputs.forEach(input => {
     if (!input.value.trim()) {
@@ -512,11 +544,11 @@ function validateCurrentStep() {
       input.classList.remove('error');
     }
   });
-  
+
   if (!isValid) {
     showNotification('Please fill in all required fields', 'error');
   }
-  
+
   return isValid;
 }
 
@@ -533,32 +565,32 @@ function setupFormValidation() {
 function generateReview() {
   const reviewDiv = document.getElementById('reviewContent');
   const formData = new FormData(document.getElementById('portfolioWizardForm'));
-  
+
   let html = '<div class="review-section">';
-  
+
   // Design & Profile
   html += `<h3>Design & Profile</h3>`;
   html += `<p><strong>Design ID:</strong> ${selectedDesignId}</p>`;
   html += `<p><strong>Profile ID:</strong> ${selectedProfileId}</p>`;
-  
+
   // Hero Section
   html += `<h3>Hero Section</h3>`;
   html += `<p><strong>Name:</strong> ${formData.get('name')}</p>`;
   html += `<p><strong>Profession:</strong> ${formData.get('profession')}</p>`;
   html += `<p><strong>Brief Intro:</strong> ${formData.get('briefIntro')}</p>`;
-  
+
   // Skills
   html += `<h3>Skills (${selectedSkills.length})</h3>`;
   html += `<ul>${selectedSkills.map(s => `<li>${s.name}</li>`).join('')}</ul>`;
-  
+
   // Work Experience
   const workItems = document.querySelectorAll('#workExperienceList .dynamic-item');
   html += `<h3>Work Experience (${workItems.length} projects)</h3>`;
-  
+
   // Experience Timeline
   const expItems = document.querySelectorAll('#experienceList .dynamic-item');
   html += `<h3>Timeline (${expItems.length} entries)</h3>`;
-  
+
   html += '</div>';
   reviewDiv.innerHTML = html;
 }
@@ -566,23 +598,23 @@ function generateReview() {
 // ========== Form Submission ==========
 async function handleSubmit(e) {
   e.preventDefault();
-  
+
   // Validate required fields
   if (!selectedProfileId || !selectedDesignId) {
     showNotification('Please select a profile and design', 'error');
     return;
   }
-  
+
   const form = e.target;
   const formData = new FormData(form);
-  
+
   // Ensure core IDs are included
   formData.set('profileId', selectedProfileId);
   formData.set('designId', selectedDesignId);
-  
+
   // Add selected skills as JSON
   formData.append('skills', JSON.stringify(selectedSkills));
-  
+
   // Gather social links
   const socialLinks = [];
   document.querySelectorAll('#socialLinksList .dynamic-item').forEach(item => {
@@ -590,14 +622,14 @@ async function handleSubmit(e) {
     const platform = form.querySelector(`[name="socialPlatform_${id}"]`).value;
     const url = form.querySelector(`[name="socialUrl_${id}"]`).value;
     if (platform && url) {
-      socialLinks.push({ 
-  platform: platform.toLowerCase(), 
-  url: url 
-});
+      socialLinks.push({
+        platform: platform.toLowerCase(),
+        url: url
+      });
     }
   });
   formData.append('socialLinks', JSON.stringify(socialLinks));
-  
+
   // Gather work experience
   const workExperience = [];
   document.querySelectorAll('#workExperienceList .dynamic-item').forEach(item => {
@@ -613,7 +645,7 @@ async function handleSubmit(e) {
     }
   });
   formData.append('workExperience', JSON.stringify(workExperience));
-  
+
   // Gather experience timeline
   const experienceTimeline = [];
   document.querySelectorAll('#experienceList .dynamic-item').forEach(item => {
@@ -629,13 +661,13 @@ async function handleSubmit(e) {
     }
   });
   formData.append('experienceTimeline', JSON.stringify(experienceTimeline));
-  
+
   // Get CSRF token
   const csrf = document.getElementById('_csrf');
   if (csrf) {
     formData.append('_csrf', csrf.value);
   }
-  
+
   try {
     showNotification('Creating portfolio...', 'info');
 
@@ -701,13 +733,13 @@ function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.textContent = message;
-  
+
   document.body.appendChild(notification);
-  
+
   setTimeout(() => {
     notification.classList.add('show');
   }, 10);
-  
+
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
