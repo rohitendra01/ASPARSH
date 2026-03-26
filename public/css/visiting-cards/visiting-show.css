@@ -10,8 +10,7 @@ body {
     font-family: 'Inter', sans-serif;
     color: #111;
     min-height: 100vh;
-    /* Richer, more modern gradient background */
-    background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 100%);
+    background: linear-gradient(135deg, #b7f695 0%, #78ffd6 100%);
     background-attachment: fixed;
 }
 
@@ -40,14 +39,13 @@ body {
 
 /* --- The Main Card --- */
 .card {
-    background: rgba(255, 255, 255, 0.45);
+    background: white;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
     max-width: 26rem;
-    /* Keeps it tight and mobile-proportioned on desktop */
     width: 100%;
     padding: 2.5rem 2rem;
     display: flex;

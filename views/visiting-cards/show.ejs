@@ -9,8 +9,7 @@
 </head>
 
 <body>
-    <% // Prefer visiting card values, fall back to attached profile where available const profileData=typeof profile
-        !=='undefined' ? profile : null; const getProfileSocial=(platform)=> {
+    <% const profileData=typeof profile !=='undefined' ? profile : null; const getProfileSocial=(platform)=> {
         if (!profileData || !Array.isArray(profileData.socialLinks)) return null;
         const found = profileData.socialLinks.find(s => s.platform && s.platform.toLowerCase() ===
         platform.toLowerCase());
