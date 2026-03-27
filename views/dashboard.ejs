@@ -1,105 +1,263 @@
 <% layout('layouts/dashboard-boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/dashboard/dashboard.css" />`) %>
-<style>
-  :root {
-  --clr-bg: #f5f7fa;
-  --clr-primary: #46e54b;
-  --clr-secondary: #011609;
-  --clr-text: #374151;
-  --clr-card-bg: #ffffff;
-  --clr-shadow: rgba(0, 0, 0, 0.1);
-}
+  <% block('styles').append(`<link rel="stylesheet" href="/css/dashboard/dashboard-home.css" />`) %>
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--clr-bg);
-  color: var(--clr-text);
-  line-height: 1.6;
-}
+  <div class="dashboard-home">
+    <div class="dashboard-header-text">
+      <h1>Welcome back, <%= user.username || 'Admin' %>
+      </h1>
+      <p>Here is what is happening across your Asparsh today.</p>
+    </div>
 
-.dashboard {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
+    <% if (!stats) { %>
+      <div class="list-card" style="text-align: center; padding: 3rem;">
+        <h2>No Data Available</h2>
+        <p>Please configure your first profile or QR code to see statistics.</p>
+      </div>
+      <% } else { %>
 
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 12h4l2-9 5 18 3-9h6" />
+              </svg>
+            </div>
+            <div class="kpi-details">
+              <h3>Total Scans</h3>
+              <p>
+                <%= stats.kpis.totalScans %>
+              </p>
+            </div>
+          </div>
 
-.dashboard-header h1 {
-  font-size: 2.5rem;
-  color: var(--clr-primary);
-  margin-bottom: 0.5rem;
-}
+          <div class="kpi-card">
+            <div class="kpi-icon purple">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+            </div>
+            <div class="kpi-details">
+              <h3>Active Assets</h3>
+              <p>
+                <%= stats.kpis.activeAssets %>
+              </p>
+            </div>
+          </div>
 
-.dashboard-header p {
-  font-size: 1.125rem;
-  color: var(--clr-text);
-  max-width: 700px;
-  margin: 0 auto;
-}
+          <div class="kpi-card">
+            <div class="kpi-icon green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div class="kpi-details">
+              <h3>Subscribers</h3>
+              <p>
+                <%= stats.kpis.newsletterSubscribers %>
+              </p>
+            </div>
+          </div>
 
-.dashboard-cards {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
+          <div class="kpi-card">
+            <div class="kpi-icon orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </div>
+            <div class="kpi-details">
+              <h3>AI Reviews Generated</h3>
+              <p>
+                <%= stats.funnels.reviews.generations %>
+              </p>
+            </div>
+          </div>
+        </div>
 
-.card {
-  background-color: var(--clr-card-bg);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 8px var(--clr-shadow);
-  overflow: hidden;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h2>Scan Velocity (Last 7 Days)</h2>
+            <div class="chart-container-inner">
+              <canvas id="scanVelocityChart"></canvas>
+            </div>
+          </div>
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px var(--clr-shadow);
-}
+          <div class="chart-card">
+            <h2>QR Inventory Status</h2>
+            <div class="chart-container-inner">
+              <canvas id="qrStatusChart"></canvas>
+            </div>
+          </div>
+        </div>
 
-.card img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+        <div class="action-grid">
+          <div class="list-card">
+            <h2>Review Funnel</h2>
+            <div class="list-item">
+              <div class="item-left">
+                <strong>Link Views</strong>
+                <span>Total traffic to review pages</span>
+              </div>
+              <strong>
+                <%= stats.funnels.reviews.views %>
+              </strong>
+            </div>
+            <div class="list-item">
+              <div class="item-left">
+                <strong>AI Generations</strong>
+                <span>Users engaged with AI tool</span>
+              </div>
+              <strong>
+                <%= stats.funnels.reviews.generations %>
+              </strong>
+            </div>
+            <div class="list-item">
+              <div class="item-left">
+                <strong>Submitted Reviews</strong>
+                <span>Successfully posted to Google</span>
+              </div>
+              <strong style="color: #22c55e;">
+                <%= stats.funnels.reviews.submissions %>
+              </strong>
+            </div>
+          </div>
 
-.card h2 {
-  padding: 1rem;
-  font-size: 1.25rem;
-  color: var(--clr-secondary);
-}
+          <div class="list-card">
+            <h2>Needs Attention</h2>
+            <% if (stats.actionItems.emptyQRs.length===0 && stats.actionItems.expiringQRs.length===0) { %>
+              <p style="color: #64748b; margin-top: 1rem;">All caught up! No action needed.</p>
+              <% } %>
 
-</style>
-<section class="dashboard">
-  <div class="dashboard-header">
-    <h1>Welcome to Dashboard</h1>
-    <p>
-      This dashboard provides a quick overview of your activities,
-      statistics, and recent updates. Use the tools and features below
-      to manage your account and stay informed.
-    </p>
+                <% stats.actionItems.emptyQRs.forEach(qr=> { %>
+                  <div class="list-item">
+                    <div class="item-left">
+                      <strong>Unassigned QR Code</strong>
+                      <span>
+                        <%= qr.shortId %> (<%= qr.batchName %>)
+                      </span>
+                    </div>
+                    <a href="/dashboard/<%= slug %>/qr-codes" class="badge warning"
+                      style="text-decoration: none;">Assign</a>
+                  </div>
+                  <% }) %>
+
+                    <% stats.actionItems.expiringQRs.forEach(qr=> { %>
+                      <div class="list-item">
+                        <div class="item-left">
+                          <strong>Expiring Soon</strong>
+                          <span>
+                            <%= qr.shortId %>
+                          </span>
+                        </div>
+                        <span class="badge danger">Renew</span>
+                      </div>
+                      <% }) %>
+          </div>
+
+          <div class="list-card">
+            <h2>Recent Scans</h2>
+            <% if (stats.recentActivity.scans.length===0) { %>
+              <p style="color: #64748b; margin-top: 1rem;">No recent scans.</p>
+              <% } else { %>
+                <% stats.recentActivity.scans.forEach(scan=> { %>
+                  <div class="list-item">
+                    <div class="item-left">
+                      <strong>QR Scanned: <%= scan.qr ? scan.qr.shortId : 'Unknown' %></strong>
+                      <span>
+                        <%= new Date(scan.scannedAt).toLocaleDateString() %> at <%= new
+                            Date(scan.scannedAt).toLocaleTimeString([], {hour: '2-digit' , minute:'2-digit'}) %>
+                      </span>
+                    </div>
+                    <span class="badge success">Live</span>
+                  </div>
+                  <% }) %>
+                    <% } %>
+          </div>
+        </div>
+
+        <% } %>
   </div>
 
-  <div class="dashboard-cards">
-    <div class="card">
-      <img src="/assets/overview.png" alt="Overview Illustration">
-      <h2>Overview</h2>
-    </div>
-    <div class="card">
-      <img src="/assets/updates.png" alt="Updates Illustration">
-      <h2>Updates</h2>
-    </div>
-  </div>
-</section>
+  <% if (stats) { %>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Safely parse data passed from Node.js
+        const chartData = <% - JSON.stringify(stats.charts.scanVelocity) %>;
+        const qrFunnels = <% - JSON.stringify(stats.funnels.qrLifecycle) %>;
+
+        // 1. Scan Velocity Line Chart
+        const ctxLine = document.getElementById('scanVelocityChart').getContext('2d');
+        new Chart(ctxLine, {
+          type: 'line',
+          data: {
+            labels: chartData.labels,
+            datasets: [{
+              label: 'Scans',
+              data: chartData.data,
+              borderColor: '#6366f1', // Indigo primary
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              borderWidth: 3,
+              tension: 0.4, // Smooth curves
+              fill: true,
+              pointBackgroundColor: '#ffffff',
+              pointBorderColor: '#6366f1',
+              pointBorderWidth: 2,
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#f1f5f9', drawBorder: false },
+                ticks: { stepSize: 1, color: '#94a3b8' }
+              },
+              x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: '#94a3b8' }
+              }
+            }
+          }
+        });
+
+        // 2. QR Status Doughnut Chart
+        const ctxDoughnut = document.getElementById('qrStatusChart').getContext('2d');
+        new Chart(ctxDoughnut, {
+          type: 'doughnut',
+          data: {
+            labels: ['Active/Live', 'Empty/Stock', 'Inactive'],
+            datasets: [{
+              data: [qrFunnels.live, qrFunnels.empty, qrFunnels.inactive],
+              backgroundColor: ['#22c55e', '#facc15', '#ef4444'], // Green, Yellow, Red
+              borderWidth: 0,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%', // Modern thin ring
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { padding: 20, usePointStyle: true, color: '#64748b' }
+              }
+            }
+          }
+        });
+      });
+    </script>
+    <% } %>

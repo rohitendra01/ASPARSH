@@ -5,18 +5,21 @@
       cards) ? cards : []); const userSlug=(typeof user !=='undefined' ) ? user.slug : (typeof slug !=='undefined' ?
       slug : '' ); %>
 
-      <div class="dashboard-header-row">
-        <form class="search-form" onsubmit="return filterPortfolios(event)">
-          <input type="text" id="portfolioSlugSearch" name="portfolioSlug" placeholder="Enter Portfolio Slug or Title"
-            required>
-          <button type="submit">Search</button>
-        </form>
-        <% const userSlugSegment=(typeof userSlug !=='undefined' && userSlug) ? '/' + encodeURIComponent(userSlug) : ''
-          ; %>
-          <a href="/dashboard<%= userSlugSegment %>/portfolios/new"
-            class="create-portfolio-btn create-portfolio-btn-fixed">+ Create New Portfolio</a>
-      </div>
+      <div class="page-header">
+        <h1 class="page-title">Portfolios</h1>
 
+        <div class="page-actions">
+          <form class="search-form" onsubmit="return filterPortfolios(event)">
+            <input type="text" id="portfolioSlugSearch" placeholder="Search portfolios..." />
+          </form>
+          <% const userSlugSegment=(typeof userSlug !=='undefined' && userSlug) ? '/' + encodeURIComponent(userSlug)
+            : '' ; %>
+
+            <a href="/dashboard<%= userSlugSegment %>/portfolios/new" class="btn-primary">
+              + Create Portfolio
+            </a>
+        </div>
+      </div>
       <div class="hotel-list-container portfolio-list-container">
         <% if (items && items.length) { %>
           <div class="visiting-card-cards-grid">

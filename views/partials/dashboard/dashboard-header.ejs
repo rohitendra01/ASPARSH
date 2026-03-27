@@ -1,28 +1,70 @@
-<header>
-    <div class="header-logo">
-        <a href="/">Asparsh</a>
+<header class="dashboard-header">
+  <div style="display: flex; align-items: center; gap: 1.5rem;">
+    <button class="mobile-toggle" id="mobileToggle">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <% const currentUserSlugSegment=(currentUser && currentUser.slug) ? '/' + encodeURIComponent(currentUser.slug) : ''
+      ; %>
+      <a href="/dashboard<%= currentUserSlugSegment %>" class="header-title-link">Asparsh</a>
+  </div>
+
+  <div style="flex: 1;"></div>
+
+  <div class="header-actions">
+    <div class="user-dropdown-container">
+      <div class="user-profile-trigger" id="userProfileTrigger">
+        <img src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>" alt="User">
+        <span class="user-name-text">
+          <%= currentUser && currentUser.username ? currentUser.username : 'User' %>
+        </span>
+      </div>
+
+      <div class="logout-menu" id="logoutMenu">
+        <form id="logoutForm" action="/logout" method="POST">
+          <%- include('../csrf-input') %>
+            <button type="submit" class="logout-btn">Log out</button>
+        </form>
+      </div>
     </div>
-    <div class="header-links">
-        <a href="https://caendar.google.com" class="calender"><img src="/assets/calendar-svg.svg" alt=""></a>
-        <a href="" class="messages"><img src="/assets/messages-svg.svg" alt=""></a>
-        <a href="" class="notifications"><img src="/assets/notifications-svg.svg" alt=""></a>
-        <div class="user-logo" style="position: relative;">
-            <img src="<%= currentUser && currentUser.image ? currentUser.image : '/assets/user-login.png' %>" alt="<%= currentUser && currentUser.username ? currentUser.username : 'User' %>" />
-            <p><%= currentUser && currentUser.username ? currentUser.username : 'User' %></p>
-            <form id="logoutForm" action="/logout" method="POST" class="logout-form">
-              <%- include('../csrf-input') %>
-              <button type="submit" class="logout-btn">Logout</button>
-            </form>
-        </div>
-        </div>
-        </header>
-        <script>
-          const userLogo = document.querySelector('.user-logo');
-          const logoutForm = document.getElementById('logoutForm');
-          userLogo.addEventListener('mouseenter', () => {
-            logoutForm.style.display = 'block';
-          });
-          userLogo.addEventListener('mouseleave', () => {
-            logoutForm.style.display = 'none';
-          });
-        </script>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Dropdown Logic
+    const userTrigger = document.getElementById('userProfileTrigger');
+    const logoutMenu = document.getElementById('logoutMenu');
+
+    if (userTrigger && logoutMenu) {
+      userTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        logoutMenu.classList.toggle('show');
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (logoutMenu && logoutMenu.classList.contains('show') && !userTrigger.contains(e.target)) {
+        logoutMenu.classList.remove('show');
+      }
+    });
+
+    // Mobile Sidebar Toggle Logic
+    const mobileToggle = document.getElementById('mobileToggle');
+    const sidebar = document.getElementById('dashboardSidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    function toggleMobileMenu() {
+      if (sidebar) sidebar.classList.toggle('active');
+      if (overlay) overlay.classList.toggle('active');
+    }
+
+    if (mobileToggle) mobileToggle.addEventListener('click', toggleMobileMenu);
+    if (overlay) overlay.addEventListener('click', toggleMobileMenu);
+  });
+</script>

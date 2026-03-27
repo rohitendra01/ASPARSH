@@ -6,17 +6,13 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
+
 const userController = require('../controllers/userController');
 const profileController = require('../controllers/profileController');
-const portfolioController = require('../controllers/portfolioController');
+const dashboardController = require('../controllers/dashboardController');
 const reviewRoutes = require('../routes/reviewRoutes');
 
-
-
-// Route: dashboard home (protected)
-router.get('/', isLoggedIn, (req, res) => {
-  res.render('dashboard', { layout: 'layouts-boilerplate' });
-});
+router.get('/', isLoggedIn, dashboardController.getDashboardStats);
 
 // Route for /:slug/user to view profile
 router.get('/user', isLoggedIn, userController.viewUserProfile);
@@ -42,7 +38,7 @@ router.post('/profiles/:profileSlug/edit', isLoggedIn, upload.single('image'), c
 // Route for /:slug/profiles/:profileSlug/delete (handle POST)
 router.post('/profiles/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);
 
+// Nested Review Routes
 router.use('/profiles/:profileSlug/reviews', reviewRoutes);
-
 
 module.exports = router;

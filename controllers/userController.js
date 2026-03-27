@@ -1,4 +1,9 @@
 const adminUser = require('../models/adminUser');
+const Profile = require('../models/Profile');
+const { Portfolio } = require('../models/Portfolio');
+const Hotel = require('../models/Hotel');
+const VisitingCard = require('../models/VisitingCard');
+const ReviewLink = require('../models/ReviewLink');
 
 exports.viewUserProfile = async (req, res) => {
   let user;
@@ -10,13 +15,53 @@ exports.viewUserProfile = async (req, res) => {
         user = await adminUser.findById(req.params.slug);
       }
     } catch (e) {
+      console.error(e);
     }
   } else {
     user = req.user;
   }
+
   if (!user) return res.status(404).send('Admin user not found');
-  // Pass both user and currentUser for robust sidebar/profile rendering
-  res.render('users/view', { user, currentUser: req.user, layout: 'layouts/dashboard-boilerplate' });
+
+  // --- NEW: ECOSYSTEM STATISTICS LOGIC ---
+  // 1. Find all profiles created by this admin
+  const profiles = await Profile.find({ createdBy: user._id }).lean();
+
+  // 2. Map through each profile and count its associated assets concurrently
+  const ecosystemStats = await Promise.all(profiles.map(async (profile) => {
+    const [portfolioCount, hotelCount, vcardCount, reviewCount] = await Promise.all([
+      Portfolio.countDocuments({ profileId: profile._id }),
+      Hotel.countDocuments({ createdByProfile: profile._id }),
+      VisitingCard.countDocuments({ profileSlug: profile.slug }),
+      ReviewLink.countDocuments({ profileId: profile._id })
+    ]);
+
+    return {
+      name: profile.name,
+      slug: profile.slug,
+      category: profile.category || 'Uncategorized',
+      portfolioCount,
+      hotelCount,
+      vcardCount,
+      reviewCount,
+      totalAssets: portfolioCount + hotelCount + vcardCount + reviewCount
+    };
+  }));
+
+  // 3. Sort by most active profiles first
+  ecosystemStats.sort((a, b) => b.totalAssets - a.totalAssets);
+
+  // 4. Calculate top-level totals
+  const totalManagedAssets = ecosystemStats.reduce((sum, stat) => sum + stat.totalAssets, 0);
+
+  res.render('users/view', {
+    user,
+    currentUser: req.user,
+    ecosystemStats,
+    totalProfiles: profiles.length,
+    totalManagedAssets,
+    layout: 'layouts/dashboard-boilerplate'
+  });
 };
 
 exports.renderEditUserProfile = async (req, res) => {
