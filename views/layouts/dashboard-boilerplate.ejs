@@ -56,8 +56,8 @@
             const overlay = document.getElementById('sidebarOverlay');
 
             function toggleSidebar() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+                if (sidebar) sidebar.classList.toggle('active');
+                if (overlay) overlay.classList.toggle('active');
             }
 
             if (mobileToggle) mobileToggle.addEventListener('click', toggleSidebar);

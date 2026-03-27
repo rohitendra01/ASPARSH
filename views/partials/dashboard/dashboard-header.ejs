@@ -34,37 +34,3 @@
     </div>
   </div>
 </header>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Dropdown Logic
-    const userTrigger = document.getElementById('userProfileTrigger');
-    const logoutMenu = document.getElementById('logoutMenu');
-
-    if (userTrigger && logoutMenu) {
-      userTrigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        logoutMenu.classList.toggle('show');
-      });
-    }
-
-    document.addEventListener('click', (e) => {
-      if (logoutMenu && logoutMenu.classList.contains('show') && !userTrigger.contains(e.target)) {
-        logoutMenu.classList.remove('show');
-      }
-    });
-
-    // Mobile Sidebar Toggle Logic
-    const mobileToggle = document.getElementById('mobileToggle');
-    const sidebar = document.getElementById('dashboardSidebar');
-    const overlay = document.querySelector('.sidebar-overlay');
-
-    function toggleMobileMenu() {
-      if (sidebar) sidebar.classList.toggle('active');
-      if (overlay) overlay.classList.toggle('active');
-    }
-
-    if (mobileToggle) mobileToggle.addEventListener('click', toggleMobileMenu);
-    if (overlay) overlay.addEventListener('click', toggleMobileMenu);
-  });
-</script>
