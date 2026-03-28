@@ -1,74 +1,172 @@
 <% layout('layouts/dashboard-boilerplate') -%>
   <% block('styles').append(`<link rel="stylesheet" href="/css/profiles/index.css" />`) %>
 
-  <div class="dashboard-header-row">
-    <form class="search-form" onsubmit="return filterProfiles(event)">
-      <input type="text" id="profileSlugSearch" name="profileSlug" placeholder="Enter Profile Slug" required>
-      <button type="submit">Search</button>
-    </form>
-    <% const slugSegment=(typeof slug !=='undefined' && slug) ? '/' + encodeURIComponent(slug) : '' ; %>
-      <a href="/dashboard<%= slugSegment %>/profiles/new" class="create-profile-btn create-profile-btn-fixed">+ Create
-        New Profile</a>
-  </div>
+  <% const slugSegment=(typeof slug !=='undefined' && slug) ? '/' + encodeURIComponent(slug) : '' ; %>
 
-  <div class="profiles-container">
-    <% if (profiles && profiles.length> 0) { %>
-      <div class="profiles-grid">
-        <% profiles.forEach(profile=> { %>
-          <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>">
-            <div class="profile-card" data-profile-slug="<%= profile.slug %>">
-              <div class="profile-card-description">
-                <div class="profile-image-wrapper">
-                  <img src="<%= profile.image %>" alt="<%= profile.name %>" class="profile-image" />
-                </div>
-                <div class="profile-info">
-                  <h3 class="profile-name">
-                    <%= profile.name %>
-                  </h3>
-                  <p class="profile-mobile">
-                    <%= profile.mobile %>
-                  </p>
-                  <p class="profile-location">
-                    <%= profile.address && profile.address.addressLine ? profile.address.addressLine : '' %>
-                      <%= profile.address && profile.address.city ? ', ' + profile.address.city : '' %>
-                  </p>
-                </div>
-              </div>
-              <div class="profile-card-actions">
-                <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
-                  class="edit-profile-btn">Edit</a>
-                <button class="hover-info-btn"
-                  title="Created by: <%= profile.createdBy && profile.createdBy.username || '' %>">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-info-circle" viewBox="0 0 16 16">
-                    <path
-                      d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 15a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm-.93-4.412a.5.5 0 0 1 .707-.707l.646.646V8.5a.5.5 0 0 1 1 0v2.793l.646-.646a.5.5 0 0 1 .707.707l-1.5 1.5a.5.5 0 0 1-.707 0l-1.5-1.5z" />
-                    <path d="M8 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </a>
-          <% }) %>
+    <div class="page-container">
+
+      <div class="page-header-row">
+        <div class="page-header-text">
+          <h1 class="page-title">Profiles</h1>
+          <p class="page-subtitle">Manage business identities, contact information, and occupational details.</p>
+        </div>
+
+        <div class="page-header-actions">
+          <div class="search-wrapper">
+            <input type="text" id="liveSearchInput" placeholder="Search name, phone, or occupation..."
+              onkeyup="filterProfiles()">
+          </div>
+          <a href="/dashboard<%= slugSegment %>/profiles/new" class="btn-primary">+ Create New Profile</a>
+        </div>
       </div>
-      <% } else { %>
-        <p class="no-profiles">No profiles found.</p>
-        <% } %>
-  </div>
 
-  <script>
-    function filterProfiles(event) {
-      event.preventDefault();
-      const input = document.getElementById('profileSlugSearch').value.trim().toLowerCase();
-      const cards = document.querySelectorAll('.profile-card');
-      cards.forEach(c => {
-        const container = c.closest('a') || c;
-        const slug = (c.dataset && c.dataset.profileSlug
-          ? c.dataset.profileSlug
-          : c.getAttribute('data-profile-slug') || ''
-        ).toLowerCase();
-        const match = !input || slug.includes(input);
-        container.style.display = match ? '' : 'none';
-      });
-    }
-  </script>
+      <% if (profiles && profiles.length> 0) { %>
+        <div class="quick-stats-row">
+          <div class="stat-card">
+            <span class="stat-value">
+              <%= profiles.length %>
+            </span>
+            <span class="stat-label">Total Profiles</span>
+          </div>
+        </div>
+        <% } %>
+
+          <div class="entity-list-container">
+            <% if (profiles && profiles.length> 0) { %>
+              <div class="compact-grid" id="entityGrid">
+
+                <% profiles.forEach(profile=> { %>
+                  <div class="compact-card entity-card"
+                    data-search-term="<%= profile.name.toLowerCase() %> <%= profile.mobile %> <%= (profile.occupation || '').toLowerCase() %> <%= (profile.category || '').toLowerCase() %> <%= profile.slug.toLowerCase() %>">
+
+                    <div class="card-thumbnail profile-thumbnail">
+                      <% if (profile.image) { %>
+                        <img src="<%= profile.image %>" alt="<%= profile.name %>" loading="lazy">
+                        <% } else { %>
+                          <div class="thumbnail-placeholder">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                              <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                          </div>
+                          <% } %>
+                    </div>
+
+                    <div class="card-info">
+                      <div class="info-header">
+                        <h3 class="card-title text-truncate" title="<%= profile.name %>">
+                          <%= profile.name %>
+                        </h3>
+                        <% if (profile.occupation || profile.category) { %>
+                          <span class="badge">
+                            <%= profile.occupation || profile.category %>
+                          </span>
+                          <% } %>
+                      </div>
+
+                      <div class="info-meta-grid">
+                        <% if (profile.mobile) { %>
+                          <span class="meta-item text-truncate" title="<%= profile.mobile %>">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                              </path>
+                            </svg>
+                            <%= profile.mobile %>
+                          </span>
+                          <% } %>
+
+                            <% if (profile.email) { %>
+                              <span class="meta-item text-truncate" title="<%= profile.email %>">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                  </path>
+                                  <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                                <%= profile.email %>
+                              </span>
+                              <% } %>
+
+                                <% if (profile.address && profile.address.city) { %>
+                                  <span class="meta-item text-truncate"
+                                    title="<%= profile.address.city %>, <%= profile.address.state %>">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                      <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    <%= profile.address.city %>
+                                      <%= profile.address.state ? ', ' + profile.address.state : '' %>
+                                  </span>
+                                  <% } %>
+                      </div>
+                    </div>
+
+                    <div class="card-actions">
+                      <button class="action-icon-btn info-btn"
+                        title="Created by: <%= profile.createdBy && profile.createdBy.username ? profile.createdBy.username : 'System' %>">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="16" x2="12" y2="12"></line>
+                          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                      </button>
+
+                      <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>"
+                        class="action-icon-btn" title="View Profile">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </a>
+
+                      <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
+                        class="action-icon-btn edit-btn" title="Edit Profile">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </a>
+                    </div>
+
+                  </div>
+                  <% }) %>
+
+              </div>
+
+              <% } else { %>
+
+                <div class="empty-state">
+                  <div class="empty-icon">👤</div>
+                  <h2>No profiles created yet</h2>
+                  <p>A profile is the foundation for your visiting cards, hotels, and portfolios. Let's create your
+                    first one.</p>
+                  <a href="/dashboard<%= slugSegment %>/profiles/new" class="btn-primary">+ Create Your First
+                    Profile</a>
+                </div>
+
+                <% } %>
+          </div>
+    </div>
+
+    <script>
+      function filterProfiles() {
+        const input = document.getElementById('liveSearchInput').value.trim().toLowerCase();
+        const cards = document.querySelectorAll('.entity-card');
+
+        cards.forEach(card => {
+          const searchTerm = card.getAttribute('data-search-term');
+          if (searchTerm.includes(input)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+    </script>

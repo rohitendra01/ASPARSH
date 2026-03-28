@@ -1,456 +1,243 @@
 <% layout('layouts/dashboard-boilerplate') -%>
-<% block('styles').append('<link rel="stylesheet" href="/css/profiles/show.css">') %>
-<div class="profile-details-container">
-    <div class="profile-general-details-panel">
-        <div class="profile-details">
-            <div class="profile-details-header">
-                <h2>Customer Profile</h2>
-                <div class="created-at">Joined <%= profile.createdAt.toLocaleDateString() %></div>
+  <% block('styles').append('<link rel="stylesheet" href="/css/profiles/show.css">') %>
+
+    <% const slugSegment=(typeof slug !=='undefined' && slug) ? '/' + encodeURIComponent(slug) : '' ; %>
+
+      <div class="profile-dashboard">
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon hotels-icon">🏨</div>
+            <div class="stat-info">
+              <span class="stat-value">
+                <%= typeof hotels !=='undefined' ? hotels.length : 0 %>
+              </span>
+              <span class="stat-label">Connected Hotels</span>
             </div>
-            <div class="profile-details-main">
-                <div class="profile-image-wrapper">
-                    <img src="<%= profile.image || '/assets/user-login.png' %>" alt="<%= profile.name %>" class="profile-image" />
-                </div>
-                <div class="profile-info">
-                    <h3 class="profile-name"><%= profile.name %></h3>
-                    <p class="profile-mobile"><%= profile.mobile || 'N/A' %></p>
-                </div>
-            </div>
-        </div>
-        <div class="profile-details">
-            <div class="profile-details-header">
-                <h2>Contact Information</h2>
-            </div>
-            <div class="profile-details-main">
-                <p><strong>Email:</strong> <%= profile.email %></p>
-                <p><strong>Mobile:</strong> <%= profile.mobile || 'N/A' %></p>
-            </div>
-        </div>
-        <div class="profile-details">
-          <div class="profile-details-header">
-            <h2>Address </h2>
           </div>
-          <div class="profile-details-main">
-            <div class="profile-address-info">
-              <% const addressFields = [
-                { label: 'Address', key: 'addressLine' },
-                { label: 'City', key: 'city' },
-                { label: 'State', key: 'state' },
-                { label: 'Country', key: 'country' },
-                { label: 'Zip Code', key: 'postcode' }
-              ]; %>
-              <% addressFields.forEach(function(field) { %>
-                <% if (profile.address && profile.address[field.key]) { %>
-                  <p><strong><%= field.label %>:</strong> <%= profile.address[field.key] %></p>
-                <% } %>
-              <% }) %>
+          <div class="stat-card">
+            <div class="stat-icon portfolios-icon">💼</div>
+            <div class="stat-info">
+              <span class="stat-value">
+                <%= typeof portfolios !=='undefined' ? portfolios.length : 0 %>
+              </span>
+              <span class="stat-label">Active Portfolios</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon vcard-icon">🪪</div>
+            <div class="stat-info">
+              <span class="stat-value">
+                <%= typeof visitingCards !=='undefined' ? visitingCards.length : 0 %>
+              </span>
+              <span class="stat-label">Visiting Cards</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon reviews-icon">⭐</div>
+            <div class="stat-info">
+              <span class="stat-value">
+                <%= typeof reviewLinks !=='undefined' ? reviewLinks.length : 0 %>
+              </span>
+              <span class="stat-label">Review Systems</span>
             </div>
           </div>
         </div>
-        <div class="profile-details">
-            <div class="profile-details-header">
-                <h2>Social Links</h2>
-            </div>
-            <div class="profile-details-main">
-                <ul class="social-links-list">
-                  <% const platformIcons = {
-                    facebook: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M18.896 0H5.104A5.104 5.104 0 0 0 0 5.104v13.792A5.104 5.104 0 0 0 5.104 24h7.417v-9.294H9.692v-3.622h2.829V8.413c0-2.797 1.708-4.324 4.204-4.324 1.193 0 2.436.213 2.436.213v2.675h-1.374c-1.355 0-1.776.841-1.776 1.703v2.047h3.022l-.483 3.622h-2.539V24h4.979A5.104 5.104 0 0 0 24 18.896V5.104A5.104 5.104 0 0 0 18.896 0z'/></svg>`,
-                    x: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M17.53 3.5h3.97l-7.02 8.06L22.5 20.5h-4.01l-5.13-5.89-5.13 5.89H3.5l7.02-8.06L1.5 3.5h4.01l5.13 5.89L17.53 3.5z'/></svg>`,
-                    linkedin: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11.75 20h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.25 11.268h-3v-5.604c0-1.337-.026-3.063-1.868-3.063-1.868 0-2.156 1.459-2.156 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.604v5.592z'/></svg>`,
-                    instagram: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.974.974 1.246 2.241 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.974.974-2.241 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.974-.974-1.246-2.241-1.308-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.974-.974 2.241-1.246 3.608-1.308 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.012-4.947.072-1.276.06-2.637.334-3.608 1.308-.974.974-1.246 2.241-1.308 3.608-.058 1.266-.07 1.646-.07 4.85s.012 3.584.07 4.85c.062 1.366.334 2.633 1.308 3.608.974.974 2.241 1.246 3.608 1.308 1.266.058 1.646.07 4.85.07s3.584-.012 4.85-.07c1.366-.062 2.633-.334 3.608-1.308.974-.974 1.246-2.241 1.308-3.608.058-1.266.07-1.646.07-4.85s-.012-3.584-.07-4.85c-.062-1.366-.334-2.633-1.308-3.608-.974-.974-2.241-1.246-3.608-1.308-1.266-.058-1.646-.07-4.85-.07zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z'/></svg>`,
-                    whatsapp: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 0C5.373 0 0 5.373 0 12c0 2.21.577 4.27 1.58 6.07L0 24l5.93-1.58A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm6.75 17.25c-.15.45-1.05.9-1.65.9-.3 0-.6-.15-.9-.3-1.05-.6-4.2-2.25-4.2-5.25s3-4.65 3-4.65c1.05-1.05 2.25-.75 2.7-.6s1 .45 1 .9c0 .45-.15 3-1.35 4.35l-.15-.15c-.45-.45-1.05-.6-1.65-.3s-2.25 1.35-2.25 3c0 .9 1.05 2.25 2.55 3s2 .75 2 .75c1 .15 2 .15 2 .15s1 .15 1 .6c0 .45-.15 1-.3 1z'/></svg>`,
-                    snapchat: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 0C5.373 0 0 5.373 0 12c0 4.418 3.582 8 8 8h1v2h-1c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10c0 .418-.042.828-.125 1.227l1.875-.625C23.958 11.172 24 11.084 24 11c0-6.627-5.373-12-12-12zM9.5 16c-.828 0-1.5-.672-1.5-1.5S8.672 13 9.5 13s1.5.672 1.5 1.5S10.328 16 9.5 16zm7 .5c0 .828-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5S14.172 15 15 15s1 .672 1 .5zm2-3c-.828 0-1-.672-1-1s-.672-1-1-1 .672-.672 1-.672h2c0 .828-.672 2-2 .672z'/></svg>`,
-                    youtube: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M23.498 6.186c-.27-1.01-1.06-1.8-2.07-2.07C19.4 4 12 4 12 4s-7.4 0-9.43.116c-1.01.27-1.8 1.06-2.07 2.07C0 8.6 0 12 0 12s0 3.4.116 5.43c.27 1.01 1.06 1.8 2.07 2.07C4 20 12 20 12 20s7.4 0 9.43-.116c1.01-.27 1.8-1.06 2.07-2.07C24 15.4 24 12 24 12s0-3.4-.116-5.43zM9.75 15V9l6.25 3L9.75 15z'/></svg>`,
-                    pinterest: `<svg width='24' height='24' fill='currentColor' viewBox='0 0 24 24'><path d='M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.396 7.646 11.093-.106-.942-.202-2.389.042-3.419.221-.956 1.423-6.096 1.423-6.096s-.362-.724-.362-1.797c0-1.684.976-2.942 2.188-2.942 1.032 0 1.531.775 1.531 1.704 0 1.039-.661 2.591-1.001 4.034-.285 1.207.604 2.192 1.789 2.192 2.147 0 3.797-2.266 3.797-5.537 0-2.892-2.08-4.915-5.054-4.915-3.453 0-5.482 2.588-5.482 5.263 0 1.045.403 2.168.907 2.777.101.122.115.229.084.352-.092.385-.299 1.207-.339 1.374-.053.221-.173.269-.401.163-1.497-.697-2.431-2.885-2.431-4.646 0-3.783 3.073-8.312 9.166-8.312 4.903 0 8.122 3.548 8.122 7.363 0 5.045-2.803 8.797-6.953 8.797-1.393 0-2.703-.753-3.148-1.604l-.857 3.263c-.26.991-.768 2.232-1.146 2.991.862.267 1.771.412 2.722.412 6.627 0 12-5.373 12-12S18.627 0 12 0z'/></svg>`,
-                    website: `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="10" ry="4"/><path d="M2 12h20M12 2c2.5 3.5 2.5 14 0  20M12 2C9.5 5.5 9.5 18.5 12 22"/></svg>`
-                  };
-                  let hasLinks = false;
-                  if (profile.socialLinks && profile.socialLinks.length) {
-                    profile.socialLinks.forEach(link => {
-                      const key = link.platform.toLowerCase();
-                      if (platformIcons[key] && link.url) {
-                        hasLinks = true;
-                  %>
-                        <li>
-                          <a href="<%= link.url %>" target="_blank" title="<%= link.platform %>">
-                            <%- platformIcons[key] %>
-                          </a>
-                        </li>
-                  <%   }
-                    });
-                  }
-                  if (!hasLinks) { %>
-                    <li><p>No social links available.</p></li>
+
+        <div class="profile-content-grid">
+
+          <div class="profile-sidebar">
+            <div class="identity-card">
+              <div class="identity-header">
+                <div class="profile-avatar">
+                  <img src="<%= profile.image || 'https://placehold.co/150x150?text=No+Image' %>"
+                    alt="<%= profile.name %>" />
+                </div>
+                <h2 class="profile-name">
+                  <%= profile.name %>
+                </h2>
+                <% if (profile.occupation || profile.category) { %>
+                  <div class="profile-badges">
+                    <% if (profile.occupation) { %><span class="badge badge-occupation">
+                        <%= profile.occupation %>
+                      </span>
+                      <% } %>
+                        <% if (profile.category) { %><span class="badge badge-category">
+                            <%= profile.category %>
+                          </span>
+                          <% } %>
+                  </div>
                   <% } %>
-                </ul>
-            </div>
-        </div>
-        <div class="profile-details">
-          <div class="profile-details-header">
-                <h2>Occupation</h2>
-            </div>
-            <div class="profile-details-main">
-                <% if (profile.occupation) { %>
-                      <p class="profile-occupation"><strong>Occupation:</strong> <%= profile.occupation %></p>
-                    <% } %>
-                    <% if (profile.category) { %>
-                      <p class="profile-category"><strong>Category:</strong> <%= profile.category %></p>
-                    <% } %>
-                    <% if (profile.subcategory) { %>
-                      <p class="profile-subcategory"><strong>Subcategory:</strong> <%= profile.subcategory %></p>
-                    <% } %>
-                    <p class="profile-experience"><strong>Experience:</strong> <%= (profile.experience || 0) %> year<%= (profile.experience == 1) ? '' : 's' %></p>
+                    <p class="profile-joined">Joined <%= profile.createdAt.getFullYear() %>/<%=
+                          String(profile.createdAt.getMonth() + 1).padStart(2, '0' ) %>/<%=
+                            String(profile.createdAt.getDate()).padStart(2, '0' ) %>
+                    </p>
               </div>
-        </div>
-    </div>
 
+              <div class="identity-body">
+                <div class="info-group">
+                  <label>Email</label>
+                  <p>
+                    <%= profile.email || 'N/A' %>
+                  </p>
+                </div>
+                <div class="info-group">
+                  <label>Mobile</label>
+                  <p>
+                    <%= profile.mobile || 'N/A' %>
+                  </p>
+                </div>
+                <div class="info-group">
+                  <label>Experience</label>
+                  <p>
+                    <%= profile.experience || 0 %> Years
+                  </p>
+                </div>
 
-
-
-
-
-
-
-
-
-
-    
-    <div class="profile-services-details-panel">
-      <div style="height: 0; width: 0; overflow: hidden;">
-
-        <% 
-        const services = (profile.services && profile.services.length) ? profile.services : [
-        {
-      key: 'visiting_card',
-      name: 'Visiting Card',
-      enabled: false,
-      details: 'NFC-enabled digital visiting card (design + hosting).',
-      features: ['NFC Tag', 'vCard export', 'Custom template'],
-      usageStats: { views: 124, taps: 18 },
-      pendingPayments: [
-      { id: 'inv-101', amount: 299, descr: 'Design fee', due: '2025-09-01' }
-      ],
-      subscribedPlan: null,
-      metadata: { createdAt: '2025-03-12' }
-    },
-    {
-      key: 'portfolio_student',
-      name: 'Portfolio (Student)',
-      enabled: true,
-      details: 'Public student portfolio: projects, blogs & contact.',
-      features: ['Project gallery', 'Blog', 'Contact form'],
-      usageStats: { views: 2050, contacts: 14 },
-      pendingPayments: [],
-      subscribedPlan: { name: 'Free', price: 0, billingCycle: 'monthly', expires: null },
-      metadata: { createdAt: '2024-11-20' }
-    },
-    {
-      key: 'portfolio_business',
-      name: 'Portfolio (Business)',
-      enabled: true,
-      details: 'Business portfolio with analytics and lead capture.',
-      features: ['Lead capture', 'Custom domain', 'SEO tools'],
-      usageStats: { views: 5120, leads: 32 },
-      pendingPayments: [
-      { id: 'inv-220', amount: 499, descr: 'Custom domain setup', due: '2025-08-20' }
-      ],
-      subscribedPlan: { name: 'Pro', price: 499, billingCycle: 'yearly', expires: '2026-02-15' },
-      metadata: { createdAt: '2024-02-01' }
-    },
-    {
-      key: 'hotel_menu',
-      name: 'Hotel Menu Card',
-      enabled: false,
-      details: 'Create hotel menus, item photos, and QR ordering.',
-      features: ['QR menu', 'Item photos', 'Order link'],
-      usageStats: { menuScans: 78, orders: 5 },
-      pendingPayments: [{ id: 'inv-202', amount: 749, descr: 'Setup fee', due: '2025-08-31' }],
-      subscribedPlan: null,
-      metadata: { createdAt: '2024-12-01' }
-    },
-    {
-      key: 'ecommerce_store',
-      name: 'E-commerce Store',
-      enabled: true,
-      details: 'Simple store for small businesses with checkout.',
-      features: ['Products', 'Checkout', 'Coupons', 'Inventory'],
-      usageStats: { views: 8240, orders: 62, revenue: 45230 },
-      pendingPayments: [{ id: 'inv-303', amount: 1299, descr: 'Payment gateway fee', due: '2025-09-10' }],
-      subscribedPlan: { name: 'Business', price: 1499, billingCycle: 'monthly', expires: '2025-12-31' },
-      metadata: { createdAt: '2023-08-05' }
-    },
-    {
-      key: 'analytics_dashboard',
-      name: 'Analytics Dashboard',
-      enabled: true,
-      details: 'Detailed metrics for portfolio and campaigns.',
-      features: ['Traffic', 'Conversion funnel', 'Event tracking'],
-      usageStats: { dashboards: 5, reportsDownloaded: 12 },
-      pendingPayments: [],
-      subscribedPlan: { name: 'Pro', price: 499, billingCycle: 'monthly', expires: '2025-10-01' },
-      metadata: { createdAt: '2024-06-11' }
-    },
-    {
-      key: 'seo_boost',
-      name: 'SEO Boost',
-      enabled: false,
-      details: 'Automated SEO recommendations & sitemap generation.',
-      features: ['Auto sitemap', 'Meta suggestions', 'Link audit'],
-      usageStats: { audits: 3 },
-      pendingPayments: [{ id: 'inv-404', amount: 349, descr: 'SEO audit', due: '2025-09-12' }],
-      subscribedPlan: null,
-      metadata: { createdAt: '2025-01-10' }
-    },
-    {
-      key: 'premium_support',
-      name: 'Premium Support',
-      enabled: true,
-      details: 'Priority support, dedicated manager and SLAs.',
-      features: ['Priority email', 'Monthly call', 'Account manager'],
-      usageStats: { tickets: 2 },
-      pendingPayments: [],
-      subscribedPlan: { name: 'Support Plus', price: 999, billingCycle: 'monthly', expires: '2025-11-30' },
-      metadata: { createdAt: '2023-10-22' }
-    }
-    ];
-    %>
-  <% /* make slugSegment available to the whole template (modal is outside the loop) */ %>
-  <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
-  </div>
-
-    <div class="profile-details-header">
-      <h2 id="services-subscriptions">Services & Subscriptions</h2>
-    </div>
-    <div class="hotels-list">
-        <% if (hotels && hotels.length) { %>
-          <ul class="hotel-names-list">
-            <% hotels.forEach(function(hotel) { %>
-              <li>
-                <a href="/hotel/<%= hotel.hotelSlug %>"><strong><%= hotel.hotelName %></strong></a>
-              </li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <div class="muted">No hotels created by this user.</div>
-        <% } %>
-      </div>
-
-  <div class="services-grid">
-    <% services.forEach(function(svc, idx){ %>
-      <div class="service-card" data-key="<%= svc.key %>" data-enabled="<%= svc.enabled %>" data-note="<%= svc.note || '' %>">
-        <div class="card-head">
-          <div>
-            <h4><%= svc.name %></h4>
-            <p class="muted small"><%= svc.details %></p>
-          </div>
-          <div class="card-controls">
-            <span class="badge <%= svc.enabled ? 'badge-active' : 'badge-off' %>">
-              <%= svc.enabled ? 'Active' : 'Inactive' %>
-            </span>
-            <label class="switch">
-              <input type="checkbox" class="service-toggle" <%= svc.enabled ? 'checked' : '' %> aria-label="Toggle <%= svc.name %>">
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="card-body">
-            <div class="card-row">
-            <button class="btn btn-outline configure-btn" data-idx="<%= idx %>">Configure</button>
-            <a class="btn btn-primary manage-link" href="/dashboard<%= slugSegment %>/services/<%= encodeURIComponent(svc.key) %>">Manage</a>
-            <% if (svc.subscribedPlan) { %>
-              <div class="plan-pill">
-                <small>Plan: <strong><%= svc.subscribedPlan.name %></strong></small>
-                <% if (svc.subscribedPlan.expires) { %>
-                  <small class="muted"> • Expires: <%= svc.subscribedPlan.expires %></small>
-                <% } %>
+                <div class="info-group">
+                  <label>Address</label>
+                  <% if (profile.address && (profile.address.city || profile.address.addressLine)) { %>
+                    <p>
+                      <%= profile.address.addressLine %><br>
+                        <%= profile.address.city %>
+                          <% if(profile.address.state) { %>, <%= profile.address.state %>
+                              <% } %>
+                                <%= profile.address.postcode %>
+                    </p>
+                    <% } else { %>
+                      <p class="text-muted">No address provided</p>
+                      <% } %>
+                </div>
               </div>
-            <% } else { %>
-              <button class="btn btn-ghost subscribe-btn" data-key="<%= svc.key %>">Subscribe</button>
-            <% } %>
-          </div>
 
-          <% if (svc.pendingPayments && svc.pendingPayments.length) { %>
-            <div class="pending-payments">
-              <div class="pending-header">
-                <small class="muted">Pending payments</small>
-                <small class="muted">(<span class="pending-count"><%= svc.pendingPayments.length %></span>)</small>
+              <div class="identity-actions">
+                <a href="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
+                  class="btn btn-outline-primary btn-full">Edit Profile</a>
               </div>
-              <ul class="pending-list">
-                <% svc.pendingPayments.forEach(function(inv){ %>
-                  <li data-id="<%= inv.id %>">
-                    <div>
-                      <strong>₹ <%= inv.amount %></strong> — <span class="muted"><%= inv.descr %></span>
-                      <% if (inv.due) { %> <small class="muted"> • due <%= inv.due %></small> <% } %>
-                    </div>
-                    <div class="pending-actions">
-                      <button class="btn btn-sm mark-paid-btn">Mark paid</button>
-                      <button class="btn btn-sm btn-outline">Invoice</button>
-                    </div>
-                  </li>
-                <% }) %>
-              </ul>
             </div>
-          <% } else { %>
-            <div class="no-pending small muted">No pending payments</div>
-          <% } %>
+          </div>
 
-          <% /* quick stats area (visual testing) */ %>
-          <div class="service-stats small muted" style="margin-top:.6rem;">
-            <% if (svc.usageStats) { %>
-              <% for (const k in svc.usageStats) { %>
-                <span style="margin-right: 1rem;"><strong><%= svc.usageStats[k] %></strong> <%= k %></span>
-              <% } %>
-            <% } %>
+          <div class="profile-modules">
+            <div class="module-header">
+              <h3>Active Services & Assets</h3>
+              <p class="text-muted">Manage applications and links connected to this profile.</p>
+            </div>
+
+            <div class="modules-grid">
+
+              <div class="module-card">
+                <div class="module-card-header">
+                  <h4>🏨 Hotels & Menus</h4>
+                  <a href="/dashboard<%= slugSegment %>/hotels/new" class="btn-icon-small" title="Create New">+</a>
+                </div>
+                <div class="module-card-body">
+                  <% if (typeof hotels !=='undefined' && hotels.length> 0) { %>
+                    <ul class="asset-list">
+                      <% hotels.forEach(h=> { %>
+                        <li>
+                          <div class="asset-info">
+                            <strong>
+                              <%= h.hotelName %>
+                            </strong>
+                            <span>
+                              <%= h.hotelType %>
+                            </span>
+                          </div>
+                          <a href="/hotel/<%= h.hotelSlug %>" target="_blank" class="btn btn-sm btn-secondary">View</a>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } else { %>
+                      <div class="empty-state">No hotels connected yet.</div>
+                      <% } %>
+                </div>
+              </div>
+
+              <div class="module-card">
+                <div class="module-card-header">
+                  <h4>💼 Portfolios</h4>
+                  <a href="/dashboard<%= slugSegment %>/portfolio/new" class="btn-icon-small" title="Create New">+</a>
+                </div>
+                <div class="module-card-body">
+                  <% if (typeof portfolios !=='undefined' && portfolios.length> 0) { %>
+                    <ul class="asset-list">
+                      <% portfolios.forEach(p=> { %>
+                        <li>
+                          <div class="asset-info">
+                            <strong>
+                              <%= p.name %>
+                            </strong>
+                            <span>Template: <%= p.design ? p.design.name : 'Custom' %></span>
+                          </div>
+                          <a href="/portfolio/<%= p.slug %>" target="_blank" class="btn btn-sm btn-secondary">View</a>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } else { %>
+                      <div class="empty-state">No portfolios created yet.</div>
+                      <% } %>
+                </div>
+              </div>
+
+              <div class="module-card">
+                <div class="module-card-header">
+                  <h4>🪪 Digital Visiting Cards</h4>
+                  <a href="/dashboard<%= slugSegment %>/visiting-cards/new" class="btn-icon-small"
+                    title="Create New">+</a>
+                </div>
+                <div class="module-card-body">
+                  <% if (typeof visitingCards !=='undefined' && visitingCards.length> 0) { %>
+                    <ul class="asset-list">
+                      <% visitingCards.forEach(vc=> { %>
+                        <li>
+                          <div class="asset-info">
+                            <strong>
+                              <%= vc.title %>
+                            </strong>
+                            <span class="truncate">
+                              <%= vc.description %>
+                            </span>
+                          </div>
+                          <a href="/visiting-card/<%= profile.slug %>" target="_blank"
+                            class="btn btn-sm btn-secondary">View</a>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } else { %>
+                      <div class="empty-state">No visiting cards generated.</div>
+                      <% } %>
+                </div>
+              </div>
+
+              <div class="module-card">
+                <div class="module-card-header">
+                  <h4>⭐ AI Review Generators</h4>
+                  <a href="/dashboard<%= slugSegment %>/reviews/new" class="btn-icon-small" title="Create New">+</a>
+                </div>
+                <div class="module-card-body">
+                  <% if (typeof reviewLinks !=='undefined' && reviewLinks.length> 0) { %>
+                    <ul class="asset-list">
+                      <% reviewLinks.forEach(rl=> { %>
+                        <li>
+                          <div class="asset-info">
+                            <strong>
+                              <%= rl.businessName %>
+                            </strong>
+                            <span>
+                              <%= rl.viewCount || 0 %> Views | <%= rl.generationCount || 0 %> Generated
+                            </span>
+                          </div>
+                          <a href="/reviews/<%= rl.slug %>" target="_blank" class="btn btn-sm btn-secondary">View</a>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } else { %>
+                      <div class="empty-state">No review links active.</div>
+                      <% } %>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       </div>
-    <% }) %>
-  </div>
-
-  <div class="services-summary">
-    <div class="summary-card">
-      <h4>Quick Summary</h4>
-      <p class="muted">Total services: <strong><%= services.length %></strong></p>
-      <p class="muted">Active: <strong><%= services.filter(s=>s.enabled).length %></strong></p>
-      <p class="muted">Pending payments: <strong><%= services.reduce((acc,s)=>acc + (s.pendingPayments? s.pendingPayments.length:0),0) %></strong></p>
-      <div class="summary-actions">
-        <button id="bulk-on" class="btn btn-sm">Enable all</button>
-        <button id="bulk-off" class="btn btn-sm btn-outline">Disable all</button>
-      </div>
-    </div>
-
-    <div class="summary-card plan-card">
-      <h4>Subscription Center</h4>
-      <p class="muted">Sample plans: Free • Pro • Business • Support Plus</p>
-      <div class="plan-actions">
-        <button class="btn btn-sm">Upgrade all to Pro</button>
-        <button class="btn btn-sm btn-outline">Downgrade all to Free</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Configure Modal (client-side) -->
-<div id="configureModal" class="modal" aria-hidden="true">
-  <div class="modal-inner" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modal-close" aria-label="Close">&times;</button>
-    <h3 id="modalTitle">Configure Service</h3>
-  <form id="configureForm" method="POST" action="/dashboard<%= slugSegment %>/services/configure">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <input type="hidden" name="serviceKey" id="modalServiceKey">
-      <div class="form-row">
-        <label>Feature toggle</label>
-        <label class="switch">
-          <input id="modalFeatureToggle" type="checkbox">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="form-row">
-        <label>Extra note</label>
-        <textarea id="modalNote" name="note" placeholder="Admin note or configuration..."></textarea>
-      </div>
-      <div class="form-row modal-actions">
-        <button type="button" id="saveConfig" class="btn btn-primary">Save</button>
-        <button type="button" id="cancelConfig" class="btn btn-outline">Cancel</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  (function () {
-    const services = Array.from(document.querySelectorAll('.service-card'));
-    const modal = document.getElementById('configureModal');
-    const modalKey = document.getElementById('modalServiceKey');
-    const modalNote = document.getElementById('modalNote');
-    const modalToggle = document.getElementById('modalFeatureToggle');
-
-    // toggle service enabled state (client-only)
-    document.addEventListener('click', (e) => {
-      if (e.target.matches('.service-toggle')) {
-        const card = e.target.closest('.service-card');
-        const badge = card.querySelector('.badge');
-        if (e.target.checked) {
-          badge.classList.remove('badge-off');
-          badge.classList.add('badge-active');
-          badge.textContent = 'Active';
-        } else {
-          badge.classList.remove('badge-active');
-          badge.classList.add('badge-off');
-          badge.textContent = 'Inactive';
-        }
-        // TODO: send fetch POST to API to persist change:
-        // fetch(`/api/dashboard/${encodeURIComponent('<%= slug %>')}/services/${card.dataset.key}/toggle`, {method:'POST', body:JSON.stringify({enabled:e.target.checked}), headers:{'Content-Type':'application/json'}});
-      }
-
-      // open configure modal
-      if (e.target.matches('.configure-btn')) {
-        const idx = e.target.dataset.idx;
-        const svcCard = document.querySelectorAll('.service-card')[idx];
-        modalKey.value = svcCard.dataset.key;
-        modalNote.value = svcCard.dataset.note || '';
-        modalToggle.checked = svcCard.dataset.enabled === 'true' || svcCard.querySelector('.service-toggle').checked;
-        modal.setAttribute('aria-hidden','false');
-      }
-
-      // subscribe action
-      if (e.target.matches('.subscribe-btn')) {
-        const key = e.target.dataset.key;
-        alert('Subscribe flow for ' + key + ' (implement backend).');
-      }
-
-      // manage link clicked (for demo)
-      if (e.target.matches('.manage-link')) {
-        // allow normal anchor navigation
-      }
-
-      // mark paid
-      if (e.target.matches('.mark-paid-btn')) {
-        const li = e.target.closest('li');
-        li.style.opacity = '.5';
-        e.target.textContent = 'Paid';
-        e.target.disabled = true;
-        // optionally call backend to mark invoice paid
-      }
-    });
-
-    // modal controls
-    document.querySelector('.modal-close').addEventListener('click', closeModal);
-    document.getElementById('cancelConfig').addEventListener('click', closeModal);
-    document.getElementById('saveConfig').addEventListener('click', () => {
-      // read values and update card UI (client-only)
-      const key = modalKey.value;
-      const enabled = modalToggle.checked;
-      const note = modalNote.value;
-      const card = document.querySelector(`.service-card[data-key="${key}"]`);
-      if (card) {
-        card.dataset.note = note;
-        const toggle = card.querySelector('.service-toggle');
-        toggle.checked = enabled;
-        const badge = card.querySelector('.badge');
-        badge.classList.toggle('badge-active', enabled);
-        badge.classList.toggle('badge-off', !enabled);
-        badge.textContent = enabled ? 'Active' : 'Inactive';
-      }
-      // TODO: send config to backend via fetch
-      closeModal();
-    });
-
-    function closeModal() {
-      modal.setAttribute('aria-hidden','true');
-    }
-
-    // Bulk actions
-    document.getElementById('bulk-on').addEventListener('click', () => {
-      document.querySelectorAll('.service-toggle').forEach(inp => { inp.checked = true; inp.dispatchEvent(new Event('change')); });
-      alert('All services enabled (client-side). Hook this up to your API to persist.');
-    });
-    document.getElementById('bulk-off').addEventListener('click', () => {
-      document.querySelectorAll('.service-toggle').forEach(inp => { inp.checked = false; inp.dispatchEvent(new Event('change')); });
-      alert('All services disabled (client-side). Hook this up to your API to persist.');
-    });
-  })();
-</script>
-
-</div>

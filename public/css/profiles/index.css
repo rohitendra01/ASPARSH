@@ -1,237 +1,363 @@
-/* Header row for search and create button */
-.dashboard-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding: 0 0 2rem;
-  gap: 0;
-  width: auto;
+/* ==========================================================================
+   Asparsh Dashboard Variables 
+   ========================================================================== */
+:root {
+  --shell-bg: #0f172a;
+  --shell-border: #1e293b;
+  --shell-text: #94a3b8;
+  --shell-text-hover: #f8fafc;
+  --bg-app: #f1f5f9;
+  --text-dark: #0f172a;
+
+  --pill-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --pill-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+
+  --font-head: 'Montserrat', sans-serif;
+  --font-body: 'Poppins', sans-serif;
+
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --text-muted: #64748b;
+  --radius-lg: 12px;
+  --radius-md: 8px;
 }
 
-.create-profile-btn-fixed {
-  margin-right: 1rem;
-}
-
-.search-form {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.search-form input[type="text"] {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-shadow: none;
-}
-
-.search-form button {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  border: none;
-  background: #007bff;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.create-profile-btn-fixed {
-  position: fixed;
-  top: 130px;
-  right: 40px;
-  z-index: 100;
-  box-shadow: 0 4px 16px #007bff33;
-  opacity: 0.97;
-}
-
-.create-profile-btn {
-  background-color: var(--text-dark);
-  color: var(--text-light);
-  border: none;
-  padding: 0.7rem 1.6rem;
-  border-radius: 8px;
-  font-size: 1.08rem;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 2px 8px #007bff22;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  margin-bottom: 1rem;
-}
-
-.create-profile-btn:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 16px #007bff33;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.profiles-container {
-  display: flex;
-  width: 100%;
-}
-
-/* Align action buttons with hotel styles */
-.edit-profile-btn,
-.hover-info-btn {
-  background-color: var(--text-light);
-  color: var(--text-dark);
-  border: 1px solid #e9ecef;
-}
-
-.edit-profile-btn:hover {
-  background: #0056b3;
-  color: #fff
-}
-
-.profiles-grid {
-  gap: 1rem
-}
-
-.profiles-grid {
+/* ==========================================================================
+   Page Layout & Header (Universal Pattern)
+   ========================================================================== */
+.page-container {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 1.2rem;
-  width: 100%;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.profiles-grid a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.profile-card {
+.page-header-row {
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: space-between;
-  background: var(--text-light);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px #007bff22;
-  transition: box-shadow 0.2s, transform 0.2s;
-  cursor: pointer;
-  padding: 0.5rem;
-}
-
-.profile-card-description {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
+  flex-wrap: wrap;
   gap: 1.5rem;
-  flex: 1;
 }
 
-.profile-card-actions {
+.page-title {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Search Interface */
+.search-wrapper {
+  position: relative;
+  width: 300px;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.5rem;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  background: var(--card-bg) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>') no-repeat 12px center;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-wrapper input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Quick Stats Row */
+.quick-stats-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7rem;
-  min-width: 120px;
+  gap: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.profile-image-wrapper {
+.stat-value {
+  font-family: var(--font-head);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Compact Grid & Profile Cards
+   ========================================================================== */
+.compact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  /* Slightly wider for profiles */
+  gap: 1.25rem;
+}
+
+.compact-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   display: flex;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  border-right: 1px solid #111;
-  padding: 0.5rem;
+  padding: 1.25rem;
+  gap: 1.25rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.profile-image {
-  width: 100px;
-  height: 100px;
-  border-radius: 14px;
+.compact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+/* 1. Profile Thumbnail */
+.profile-thumbnail {
+  width: 72px;
+  /* Slightly larger for profiles */
+  height: 72px;
+  border-radius: 50%;
+  /* Make profiles circular to distinguish from hotels */
+  background-color: #f8fafc;
+  border: 1px solid var(--card-border);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-thumbnail img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.profile-info {
-  padding: 0.5rem;
-  color: var(--text-dark);
+.thumbnail-placeholder {
+  color: #94a3b8;
+  display: flex;
 }
 
-.profile-name {
-  font-family: var(--subhead-text);
-  font-size: 1.25rem;
+/* 2. Center Content & Dense Meta Grid */
+.card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.card-title {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 0.3rem;
+  color: var(--text-dark);
+  margin: 0;
 }
 
-.profile-mobile {
-  font-family: var(--content-text);
-  font-size: 1.02rem;
-  margin-bottom: 0.2rem;
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.profile-location {
-  font-family: var(--content-text);
-  font-size: 0.98rem;
-}
-
-.no-profiles {
-  color: var(--text-dark), inherit;
-  font-family: var(--head-text);
-  text-align: center;
-  font-size: 2rem;
-  margin-top: 2rem;
-}
-
-
-.edit-profile-btn,
-.hover-info-btn {
-  background: #fff;
-  color: var(--text-dark, #222);
-  font-family: var(--subhead-text);
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
+.badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
   font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 8px #007bff11;
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-  margin-bottom: 0.2rem;
-  outline: none;
+  white-space: nowrap;
+  border: 1px solid #e2e8f0;
 }
 
-.edit-profile-btn:hover {
-  background: #007bff;
-  color: #fff;
-  box-shadow: 0 4px 16px #007bff33;
+/* The 2-column grid for dense contact info */
+.info-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
 }
 
-.hover-info-btn {
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.meta-item svg {
+  flex-shrink: 0;
+  color: #94a3b8;
+}
+
+/* 3. Right Actions */
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.action-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa;
-  color: #007bff;
-  border: 1px solid #e9ecef;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  font-size: 1.1rem;
-  box-shadow: 0 2px 8px #007bff11;
-  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.hover-info-btn:hover {
-  background: #007bff;
-  color: #fff;
-  box-shadow: 0 4px 16px #007bff33;
+.action-icon-btn:hover {
+  background: white;
+  color: #6366f1;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.action-icon-btn.edit-btn:hover {
+  color: #ca6c1c;
+}
+
+.action-icon-btn.info-btn:hover {
+  color: #3b82f6;
+}
+
+/* ==========================================================================
+   Buttons & Empty State
+   ========================================================================== */
+.btn-primary {
+  background: var(--pill-bg);
+  color: #ffffff;
+  border: none;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--pill-shadow);
+  transition: opacity 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: var(--card-bg);
+  border: 2px dashed var(--card-border);
+  border-radius: var(--radius-lg);
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.empty-state h2 {
+  font-family: var(--font-head);
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+  .page-header-row,
+  .page-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrapper {
+    width: 100%;
+  }
+
+  .quick-stats-row {
+    flex-direction: column;
+  }
+
+  .compact-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-actions {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+  }
 }

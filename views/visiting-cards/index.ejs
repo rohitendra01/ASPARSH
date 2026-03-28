@@ -1,82 +1,154 @@
 <% layout('layouts/dashboard-boilerplate') -%>
-  <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
+  <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css" />') %>
 
-    <% const list=(typeof visitingCards !=='undefined' ) ? visitingCards : (typeof cards !=='undefined' ? cards : []);
-      const userSlug=(typeof user !=='undefined' ) ? user.slug : (typeof slug !=='undefined' ? slug : '' ); %>
+  <% var cardList=[]; if (typeof visitingCards !=='undefined' && visitingCards) { cardList=visitingCards; } else if
+    (typeof cards !=='undefined' && cards) { cardList=cards; } var safeUserSlug='' ; if (typeof user !=='undefined' &&
+    user && user.slug) { safeUserSlug=user.slug; } else if (typeof slug !=='undefined' && slug) { safeUserSlug=slug; }
+    var safeSlugSegment='' ; if (safeUserSlug) { safeSlugSegment='/' + encodeURIComponent(safeUserSlug); } %>
 
+    <div class="page-container">
 
-      <div class="dashboard-header-row">
-        <form class="search-form" onsubmit="return filterCards(event)">
-          <input type="text" id="cardSlugSearch" name="cardSlug" placeholder="Enter Card Slug" required>
-          <button type="submit">Search</button>
-        </form>
-        <% const userSlugSegment=(typeof userSlug !=='undefined' && userSlug) ? '/' + encodeURIComponent(userSlug) : ''
-          ; %>
-          <a href="/dashboard<%= userSlugSegment %>/visiting-cards/new"
-            class="create-visiting-card-btn create-visiting-card-btn-fixed">+ Create New Visiting Card</a>
-      </div>
+      <div class="page-header-row">
+        <div class="page-header-text">
+          <h1 class="page-title">Visiting Cards</h1>
+          <p class="page-subtitle">Manage digital business cards connected to your profiles.</p>
+        </div>
 
-      <div class="hotel-list-container visiting-card-list-container">
-        <% if (list && list.length) { %>
-          <div class="visiting-card-cards-grid">
-            <% list.forEach(card=> { %>
-              <div class="visiting-card" data-card-id="<%= card._id %>"
-                data-card-slug="<%= (card.profileSlug || card.slug || '') %>">
-                <img src="<%= card.profileImage || '/assets/feature1.jpg' %>"
-                  alt="<%= (card.title || card.profileName || 'Visiting Card') %>" class="visiting-card-logo">
-                <div class="visiting-card-body">
-                  <div class="visiting-card-heading">
-                    <h2 class="visiting-card-title">
-                      <%= card.title || card.profileName || 'Untitled' %>
-                    </h2>
-                    <% if (card.company) { %>
-                      <p class="visiting-card-company">
-                        <%= card.company %>
-                      </p>
-                      <% } %>
-                  </div>
-                  <div class="visiting-card-others">
-                    <% if (card.profileName) { %>
-                      <p class="visiting-card-address">
-                        <%= card.profileName %>
-                      </p>
-                      <% } %>
-                  </div>
-                  <div class="visiting-card-links">
-                    <% const viewSlug=card.profileSlug ? encodeURIComponent(card.profileSlug) : (card.slug ?
-                      encodeURIComponent(card.slug) : null); %>
-                      <a href="/visiting-card/<%= viewSlug %>" class="visiting-card-link">View Final</a>
-                      <% const editTarget=card.profileSlug ?
-                        `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/profile/${encodeURIComponent(card.profileSlug)}/edit`
-                        : `/dashboard/${encodeURIComponent(userSlug)}/visiting-cards/${card._id}/edit`; %>
-                        <a href="<%= editTarget %>" class="visiting-card-edit">Edit</a>
-                  </div>
-                </div>
-              </div>
-              <% }) %>
+        <div class="page-header-actions">
+          <div class="search-wrapper">
+            <input type="text" id="liveSearchInput" placeholder="Search by title, company, or profile..."
+              onkeyup="filterCards()">
           </div>
-          <% } else { %>
-            <p>No visiting cards found.</p>
-            <% } %>
+          <a href="/dashboard<%= safeSlugSegment %>/visiting-cards/new" class="btn-primary">+ Create Visiting Card</a>
+        </div>
       </div>
 
-      <script>
-        function filterCards(event) {
-          event.preventDefault();
-          const input = document.getElementById('cardSlugSearch').value.trim().toLowerCase();
-          const cards = document.querySelectorAll('.visiting-card');
-          if (!input) {
-            cards.forEach(card => card.style.display = '');
-            return false;
+      <% if (cardList.length> 0) { %>
+        <div class="quick-stats-row">
+          <div class="stat-card">
+            <span class="stat-value">
+              <%= cardList.length %>
+            </span>
+            <span class="stat-label">Active Cards</span>
+          </div>
+        </div>
+        <% } %>
+
+          <div class="entity-list-container">
+            <% if (cardList.length> 0) { %>
+              <div class="compact-grid" id="entityGrid">
+
+                <% cardList.forEach(function(card) { var cTitle=card.title || card.profileName || 'Untitled Card' ; var
+                  cCompany=card.company || '' ; var cProfileName=card.profileName || 'Unlinked' ; var
+                  cSearchTerm=(cTitle + ' ' + cCompany + ' ' + cProfileName).toLowerCase(); var cViewSlug=null; if
+                  (card.profileSlug) { cViewSlug=encodeURIComponent(card.profileSlug); } else if (card.slug) {
+                  cViewSlug=encodeURIComponent(card.slug); } var cEditTarget='' ; if (card.profileSlug) {
+                  cEditTarget='/dashboard/' + encodeURIComponent(safeUserSlug) + '/visiting-cards/profile/' +
+                  encodeURIComponent(card.profileSlug) + '/edit' ; } else { cEditTarget='/dashboard/' +
+                  encodeURIComponent(safeUserSlug) + '/visiting-cards/' + card._id + '/edit' ; } %>
+
+                  <div class="compact-card entity-card" data-search-term="<%= cSearchTerm %>">
+
+                    <div class="card-thumbnail">
+                      <% if (card.profileImage) { %>
+                        <img src="<%= card.profileImage %>" alt="<%= cTitle %>" loading="lazy">
+                        <% } else { %>
+                          <div class="thumbnail-placeholder">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                          </div>
+                          <% } %>
+                    </div>
+
+                    <div class="card-info">
+                      <div class="info-header">
+                        <h3 class="card-title text-truncate" title="<%= cTitle %>">
+                          <%= cTitle %>
+                        </h3>
+                        <% if (cCompany) { %>
+                          <span class="badge">
+                            <%= cCompany %>
+                          </span>
+                          <% } %>
+                      </div>
+
+                      <div class="info-meta-grid">
+                        <span class="meta-item text-truncate" title="Profile: <%= cProfileName %>">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                          <%= cProfileName %>
+                        </span>
+
+                        <span class="meta-item text-truncate">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                          </svg>
+                          Ready to Share
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="card-actions">
+                      <% if (cViewSlug) { %>
+                        <a href="/visiting-card/<%= cViewSlug %>" target="_blank" class="action-icon-btn info-btn"
+                          title="View Live Card">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                          </svg>
+                        </a>
+                        <% } %>
+
+                          <a href="<%= cEditTarget %>" class="action-icon-btn edit-btn" title="Edit Visiting Card">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                          </a>
+                    </div>
+
+                  </div>
+                  <% }); %>
+              </div>
+
+              <% } else { %>
+
+                <div class="empty-state">
+                  <div class="empty-icon">🪪</div>
+                  <h2>No visiting cards found</h2>
+                  <p>Create digital business cards connected to your profiles so you can share your contact info
+                    effortlessly.</p>
+                  <a href="/dashboard<%= safeSlugSegment %>/visiting-cards/new" class="btn-primary">+ Create Your First
+                    Card</a>
+                </div>
+
+                <% } %>
+          </div>
+    </div>
+
+    <script>
+      function filterCards() {
+        var input = document.getElementById('liveSearchInput').value.trim().toLowerCase();
+        var cards = document.querySelectorAll('.entity-card');
+
+        cards.forEach(function (card) {
+          var searchTerm = card.getAttribute('data-search-term') || '';
+          if (searchTerm.includes(input)) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
           }
-          cards.forEach(card => {
-            const slug = card.getAttribute('data-card-slug') || '';
-            if (slug.toLowerCase().includes(input)) {
-              card.style.display = '';
-            } else {
-              card.style.display = 'none';
-            }
-          });
-          return false;
-        }
-      </script>
+        });
+      }
+    </script>

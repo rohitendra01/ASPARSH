@@ -7,53 +7,7 @@ exports.renderNewProfileForm = (req, res) => {
   res.render('profiles/new', { userSlug: req.params.slug });
 };
 
-// Handle profile creation
-// In your profileController.js
 
-exports.createProfile = async (req, res) => {
-  const data = req.body;
-  try {
-    // Build address object from form fields
-    const address = {
-      addressLine: data.addressLine || '',
-      city: data.city || '',
-      state: data.state || '',
-      country: data.country || '',
-      postcode: data.postcode || ''
-    };
-
-    // Build the base profile data
-    const profileData = {
-      ...data,
-      createdBy: req.user._id,
-      address,
-      socialLinks: data.socialLinks || [],
-      occupation: data.occupation || '',
-      category: data.category || '',
-      experience: data.experience ? Number(data.experience) : 0,
-      subcategory: data.subcategory || ''
-    };
-
-    // ** THIS IS THE KEY CHANGE **
-    // The middleware already uploaded the file. 
-    // We just get the URL from req.file.path (this is set by multer-storage-cloudinary)
-    if (req.file) {
-      profileData.image = req.file.path;
-    }
-
-    // Create the new profile
-    const newProfile = new Profile(profileData);
-    
-    await newProfile.save();
-    req.flash('success_msg', 'Profile created successfully!');
-    return res.redirect(`/dashboard/${req.params.slug}/profiles`);
-
-  } catch (err) {
-    console.error('Error creating profile:', err);
-    req.flash('error_msg', 'Error creating profile. Please try again.');
-    res.redirect(`/dashboard/${req.params.slug}/profiles`);
-  }
-};
 // List all profiles for the current user
 exports.listProfiles = async (req, res) => {
   try {
@@ -71,25 +25,44 @@ exports.listProfiles = async (req, res) => {
   }
 };
 
-// Render profile details
+// Render profile details (Updated to fetch real stats from all modules)
 exports.showProfile = async (req, res) => {
   try {
-    // Find profile by slug (public for dashboard)
     const profile = await Profile.findOne({ slug: req.params.profileSlug });
     if (!profile) {
       req.flash('error_msg', 'Profile not found.');
       return res.redirect(`/dashboard/${req.user.slug}/profiles`);
     }
-    // Fetch hotels created by this profile
+
+    // Dynamically require models to prevent circular dependencies
     const Hotel = require('../models/Hotel');
-    const hotels = await Hotel.find({ createdByProfile: profile._id });
+    const { Portfolio } = require('../models/Portfolio'); // Destructured based on your controller
+    const VisitingCard = require('../models/VisitingCard');
+    const ReviewLink = require('../models/ReviewLink');
+
+    // Fetch real statistics in parallel for maximum performance
+    const [hotels, portfolios, visitingCards, reviewLinks] = await Promise.all([
+      Hotel.find({ createdByProfile: profile._id }).lean(),
+      Portfolio.find({ profileId: profile._id }).populate('design', 'name').lean(),
+      VisitingCard.find({ profileSlug: profile.slug }).lean(),
+      ReviewLink.find({ profileId: profile._id }).lean()
+    ]);
+
     // Pass currentUser with image for header
     let currentUser = req.user;
     if (currentUser && !currentUser.image) {
-      // Fallback to cloudinaryImageUrl if available
       currentUser.image = currentUser.cloudinaryImageUrl || '';
     }
-    res.render('profiles/show', { profile, slug: req.user.slug, hotels, currentUser });
+
+    res.render('profiles/show', {
+      profile,
+      slug: req.user.slug,
+      hotels,
+      portfolios,
+      visitingCards,
+      reviewLinks,
+      currentUser
+    });
   } catch (err) {
     console.error('Error loading profile:', err);
     req.flash('error_msg', 'Error loading profile. Please try again.');
@@ -119,6 +92,67 @@ exports.renderEditProfileForm = async (req, res) => {
   }
 };
 
+// Handle profile creation
+exports.createProfile = async (req, res) => {
+  const data = req.body;
+  try {
+    const address = {
+      addressLine: data.addressLine || '',
+      city: data.city || '',
+      state: data.state || '',
+      country: data.country || '',
+      postcode: data.postcode || ''
+    };
+
+    // Build the base profile data
+    const profileData = {
+      ...data,
+      createdBy: req.user._id,
+      address,
+      socialLinks: data.socialLinks || [],
+      occupation: data.occupation || '',
+      category: data.category || '',
+      experience: data.experience ? Number(data.experience) : 0,
+      subcategory: data.subcategory || ''
+    };
+
+    // FIXED: Correct Cloudinary streamifier upload for Creation
+    if (req.file) {
+      try {
+        const imageUrl = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({
+            folder: 'asparsh/profiles',
+            resource_type: 'image',
+            quality: 'auto',       // Let Cloudinary optimize the file size
+            fetch_format: 'auto',  // Deliver in WebP/AVIF if supported
+            public_id: `profile_${Date.now()}`
+          }, (error, result) => {
+            if (error) reject(error);
+            else resolve(result.secure_url);
+          });
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+        profileData.image = imageUrl;
+      } catch (err) {
+        console.error('Image upload failed during creation:', err);
+        req.flash('error_msg', 'Image upload failed. Please try again.');
+        return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+      }
+    }
+
+    // Create the new profile
+    const newProfile = new Profile(profileData);
+    await newProfile.save();
+    req.flash('success_msg', 'Profile created successfully!');
+    return res.redirect(`/dashboard/${req.params.slug}/profiles`);
+
+  } catch (err) {
+    console.error('Error creating profile:', err);
+    req.flash('error_msg', 'Error creating profile. Please try again.');
+    res.redirect(`/dashboard/${req.params.slug}/profiles`);
+  }
+};
+
 // Handle profile update
 exports.updateProfile = async (req, res) => {
   try {
@@ -127,7 +161,7 @@ exports.updateProfile = async (req, res) => {
       req.flash('error_msg', 'Profile not found.');
       return res.redirect(`/dashboard/${req.params.slug}/profiles`);
     }
-    
+
     // Update fields
     profile.name = req.body.name;
     profile.email = req.body.email;
@@ -140,25 +174,25 @@ exports.updateProfile = async (req, res) => {
       postcode: req.body.postcode || ''
     };
     profile.socialLinks = req.body.socialLinks || [];
-  profile.occupation = req.body.occupation || '';
-  profile.category = req.body.category || '';
-  profile.experience = req.body.experience ? Number(req.body.experience) : 0;
-  profile.subcategory = req.body.subcategory || '';
+    profile.occupation = req.body.occupation || '';
+    profile.category = req.body.category || '';
+    profile.experience = req.body.experience ? Number(req.body.experience) : 0;
+    profile.subcategory = req.body.subcategory || '';
 
-    // Handle image deletion
-    if (req.body.deleteImage && profile.image) {
+    // Handle image deletion / replacement
+    if ((req.body.deleteImage || req.file) && profile.image) {
       try {
-        // Extract public_id from URL
         const publicIdMatch = profile.image.match(/\/([^\/]+)$/);
         if (publicIdMatch) {
-          await cloudinary.uploader.destroy('asparsh/profiles/' + publicIdMatch[1]);
+          const publicId = publicIdMatch[1].split('.')[0];
+          await cloudinary.uploader.destroy('asparsh/profiles/' + publicId);
         }
       } catch (err) {
         console.error('Cloudinary image delete error:', err);
       }
-      profile.image = '';
+      if (req.body.deleteImage) profile.image = '';
     }
-    
+
     // Handle new image upload
     if (req.file) {
       try {
@@ -166,6 +200,8 @@ exports.updateProfile = async (req, res) => {
           const stream = cloudinary.uploader.upload_stream({
             folder: 'asparsh/profiles',
             resource_type: 'image',
+            quality: 'auto',       // Added optimization
+            fetch_format: 'auto',  // Added optimization
             public_id: `profile_${Date.now()}`,
             overwrite: true
           }, (error, result) => {
@@ -180,7 +216,7 @@ exports.updateProfile = async (req, res) => {
         req.flash('error_msg', 'Image upload failed. Please try again.');
       }
     }
-    
+
     await profile.save();
     req.flash('success_msg', 'Profile updated successfully!');
     res.redirect(`/dashboard/${req.params.slug}/profiles`);
@@ -204,7 +240,8 @@ exports.deleteProfile = async (req, res) => {
       try {
         const publicIdMatch = profile.image.match(/\/([^\/]+)$/);
         if (publicIdMatch) {
-          await cloudinary.uploader.destroy('asparsh/profiles/' + publicIdMatch[1]);
+          const publicId = publicIdMatch[1].split('.')[0];
+          await cloudinary.uploader.destroy('asparsh/profiles/' + publicId);
         }
       } catch (err) {
         console.error('Cloudinary image delete error:', err);

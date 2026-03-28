@@ -1,118 +1,410 @@
-/* Modern Edit Profile Styles */
-.profile-form-container {
-  max-width: 520px;
-  margin: 2.5rem auto;
-  background: #f8f9fa;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-  padding: 2.5rem 2rem 2rem 2rem;
-  transition: box-shadow 0.2s;
+/* /css/profiles/new.css */
+
+/* --- Page Header Animations & Styling --- */
+.page-header {
+  margin-bottom: 2.5rem;
+  animation: fadeInDown 0.5s ease-out;
 }
-.profile-form-container:hover {
-  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-}
-.profile-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-.form-title {
-  text-align: center;
+
+.page-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  color: var(--text-dark);
   font-size: 2rem;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 2rem;
-  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
 }
-.form-group {
-  margin-bottom: 0.8rem;
-}
-.form-group-inline {
-  margin-left: 1rem;
-}
-.form-control {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1.05rem;
-  background: #fff;
-  transition: border-color 0.2s;
-}
-.form-control:focus {
-  border-color: #007bff;
-  outline: none;
-}
-.profile-image-preview {
-  max-width: 120px;
-  max-height: 120px;
-  margin-bottom: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  border: 2px solid #e0e0e0;
-}
-.btn-primary {
-  background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1.08rem;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,123,255,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.btn-primary:hover {
-  background: linear-gradient(90deg, #0056b3 0%, #007bff 100%);
-  box-shadow: 0 4px 16px rgba(0,123,255,0.13);
-}
-.btn-danger {
-  background: linear-gradient(90deg, #dc3545 0%, #b71c1c 100%);
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1.08rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-left: 0.5rem;
-  box-shadow: 0 2px 8px rgba(220,53,69,0.08);
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.btn-danger:hover {
-  background: linear-gradient(90deg, #b71c1c 0%, #dc3545 100%);
-  box-shadow: 0 4px 16px rgba(220,53,69,0.13);
-}
-.btn-secondary {
-  background: linear-gradient(90deg, #6c757d 0%, #343a40 100%);
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
+
+.page-subtitle {
+  font-family: var(--font-body);
+  color: var(--shell-text);
   font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
 }
-.btn-secondary:hover {
-  background: linear-gradient(90deg, #343a40 0%, #6c757d 100%);
+
+/* --- Main Form Container --- */
+.profile-form-container {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  padding: 3rem;
+  max-width: 950px;
+  margin-bottom: 4rem;
+  animation: fadeInUp 0.6s ease-out;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
-.form-row {
+
+/* --- Form Sections --- */
+.form-section {
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
-  margin-bottom: 0.7rem;
+}
+
+/* Adds a subtle purple accent line next to section titles */
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: var(--pill-bg);
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Grids & Spacing --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Labels & Inputs (The Core UX) --- */
+.form-group label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.text-danger {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+.form-control {
+  font-family: var(--font-body);
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Modern Focus Ring */
+.form-control:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  transform: translateY(-1px);
+}
+
+/* --- Edit Form Image Preview (Fixed Boundaries) --- */
+.current-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem 1rem;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+
+  /* UX FIX: Prevents boundary breaking */
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.profile-image-thumbnail {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  /* Prevents image from shrinking weirdly */
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.delete-image-check {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  flex: 1;
+  /* Allows text to take remaining space */
+  min-width: 150px;
+  /* Forces wrap if too tight */
 }
-.remove-social-link-btn {
-  margin-left: 0.5rem;
-  font-size: 1.3rem;
-  color: #dc3545;
-  background: none;
-  border: none;
+
+.delete-image-check label {
+  margin-bottom: 0;
+  color: #ef4444;
   cursor: pointer;
-  transition: color 0.2s;
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: normal;
 }
-.remove-social-link-btn:hover {
-  color: #b71c1c;
+
+/* --- File Input specific styling (Fixed Boundaries & Better UX) --- */
+.file-input {
+  padding: 0.5rem;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  cursor: pointer;
+
+  /* UX FIX: Prevents long file names from breaking the container */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-input:hover {
+  border-color: #6366f1;
+  background: #f8fafc;
+}
+
+.file-input::file-selector-button {
+  background: #e2e8f0;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  color: #334155;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-input::file-selector-button:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
+/* File Input specific styling */
+.file-input {
+  padding: 0.7rem 1rem;
+  background: #ffffff;
+  border: 1px dashed #94a3b8;
+  cursor: pointer;
+}
+
+.file-input:hover {
+  border-color: #6366f1;
+  background: #f8fafc;
+}
+
+/* --- Dividers --- */
+.divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 3rem 0;
+}
+
+/* --- Social Links (Card-style rows) --- */
+#social-links-section {
+  background: #f8fafc;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.social-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  background: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.social-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+.social-row .form-group {
+  margin-bottom: 0;
+}
+
+.social-row .form-group label {
+  display: none;
+  /* Hide labels inside the row for cleaner look */
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.btn-icon {
+  background: #fee2e2;
+  border: none;
+  color: #ef4444;
+  height: 36px;
+  width: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+/* --- Buttons & Actions --- */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+  font-family: var(--font-head);
+  padding: 0.85rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.btn-sm {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+/* Primary Gradient Button */
+.btn-primary {
+  background: var(--pill-bg);
+  color: white;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Secondary/Cancel Button */
+.btn-secondary {
+  background: #ffffff;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* Outline Button */
+.btn-outline-primary {
+  background: transparent;
+  color: #6366f1;
+  border: 2px solid #6366f1;
+}
+
+.btn-outline-primary:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Utilities */
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+/* --- Keyframes --- */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+  .profile-form-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .social-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-icon {
+    align-self: flex-end;
+  }
 }

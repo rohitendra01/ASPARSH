@@ -1,258 +1,404 @@
 <% layout('layouts/dashboard-boilerplate') -%>
-<% block('styles').append('<link rel="stylesheet" href="/css/profiles/edit.css">') %>
-<div class="profile-form-container">
-<form class="profile-form"
-      method="POST"
-  <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
-  action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
-      enctype="multipart/form-data"
-      onsubmit="reindexSocialLinks()">
-    <h2 class="form-title">Edit Profile</h2>
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" required value="<%= profile.name %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required value="<%= profile.email %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="mobile">Mobile</label>
-      <input type="text" id="mobile" name="mobile" required value="<%= profile.mobile %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="occupation">Occupation</label>
-      <input type="text" id="occupation" name="occupation" value="<%= profile.occupation || '' %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="categorySelect">Category</label>
-      <input type="text" id="categorySearch" placeholder="Search or type category" class="form-control" autocomplete="off" />
-      <select id="categorySelect" name="category" class="form-control" style="margin-top:.5rem;">
-        <option value="">-- choose category --</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="subcategorySelect">Subcategory</label>
-      <select id="subcategorySelect" name="subcategory" class="form-control">
-        <option value="">-- choose subcategory --</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="experience">Experience (years)</label>
-      <input type="number" id="experience" name="experience" min="0" step="1" value="<%= profile.experience || 0 %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="image">Profile Image</label>
-      <% if (profile.image) { %>
-        <img src="<%= profile.image %>" alt="Current Image" class="profile-image-preview" />
-        <div>
-          <input type="checkbox" id="deleteImage" name="deleteImage" value="true" />
-          <label for="deleteImage">Delete current image</label>
-        </div>
-      <% } %>
-      <input type="file" id="image" name="image" accept="image/*" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="addressLine">Address</label>
-      <input type="text" id="addressLine" name="addressLine" value="<%= profile.address && profile.address.addressLine %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="city">City</label>
-      <input type="text" id="city" name="city" value="<%= profile.address && profile.address.city %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="state">State</label>
-      <input type="text" id="state" name="state" value="<%= profile.address && profile.address.state %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="country">Country</label>
-      <input type="text" id="country" name="country" value="<%= profile.address && profile.address.country %>" class="form-control" />
-    </div>
-    <div class="form-group">
-      <label for="postcode">Postcode</label>
-      <input type="text" id="postcode" name="postcode" value="<%= profile.address && profile.address.postcode %>" class="form-control" />
-    </div>
-    <div id="social-links-section" class="form-group">
-      <label>Social Links</label>
-      <div id="social-links-list">
-        <% if (profile.socialLinks && profile.socialLinks.length) { %>
-          <% profile.socialLinks.forEach(function(link, i) { %>
-            <div class="form-row">
+  <% block('styles').append('<link rel="stylesheet" href="/css/profiles/edit.css">') %>
+
+    <% const slugSegment=(typeof slug !=='undefined' && slug) ? '/' + encodeURIComponent(slug) : '' ; %>
+
+      <div class="page-header">
+        <h1 class="page-title">Edit Profile</h1>
+        <p class="page-subtitle">Update your business identity or personal portfolio details.</p>
+      </div>
+
+      <div class="profile-form-container">
+        <form id="editProfileForm" class="profile-form" method="POST"
+          action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/edit"
+          enctype="multipart/form-data" onsubmit="reindexSocialLinks()">
+
+          <div class="form-section">
+            <h3 class="section-title">Basic Information</h3>
+            <div class="form-grid">
               <div class="form-group">
-                <input type="text" name="socialLinks[<%= i %>][platform]" class="form-control" value="<%= link.platform %>" placeholder="Platform (e.g. Facebook)" required />
+                <label for="name">Full Name <span class="text-danger">*</span></label>
+                <input type="text" id="name" name="name" required value="<%= profile.name %>" class="form-control" />
               </div>
-              <div class="form-group form-group-inline">
-                <input type="text" name="socialLinks[<%= i %>][url]" class="form-control" value="<%= link.url %>" placeholder="https://…" required />
+              <div class="form-group">
+                <label for="email">Email Address <span class="text-danger">*</span></label>
+                <input type="email" id="email" name="email" required value="<%= profile.email %>"
+                  class="form-control" />
               </div>
-              <button type="button" class="remove-social-link-btn btn btn-link text-danger">×</button>
+              <div class="form-group">
+                <label for="mobile">Mobile Number <span class="text-danger">*</span></label>
+                <input type="text" id="mobile" name="mobile" required value="<%= profile.mobile %>"
+                  class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="image">Profile Image</label>
+                <% if (profile.image) { %>
+                  <div class="current-image-preview">
+                    <img src="<%= profile.image %>" alt="Current Image" class="profile-image-thumbnail" />
+                    <div class="delete-image-check">
+                      <input type="checkbox" id="deleteImage" name="deleteImage" value="true" />
+                      <label for="deleteImage">Delete current image</label>
+                    </div>
+                  </div>
+                  <% } %>
+                    <input type="file" id="image" name="image" accept="image/*" class="form-control file-input" />
+              </div>
             </div>
-          <% }) %>
-        <% } else { %>
-          <div class="form-row">
-            <div class="form-group">
-              <input type="text" name="socialLinks[0][platform]" class="form-control" placeholder="Platform (e.g. Facebook)" required />
-            </div>
-            <div class="form-group form-group-inline">
-              <input type="text" name="socialLinks[0][url]" class="form-control" placeholder="https://…" required />
-            </div>
-            <button type="button" class="remove-social-link-btn btn btn-link text-danger">×</button>
           </div>
-        <% } %>
+
+          <hr class="divider">
+
+          <div class="form-section">
+            <h3 class="section-title">Professional Details</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="occupation">Occupation</label>
+                <input type="text" id="occupation" name="occupation" value="<%= profile.occupation || '' %>"
+                  class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="experience">Experience (years)</label>
+                <input type="number" id="experience" name="experience" min="0" step="1"
+                  value="<%= profile.experience || 0 %>" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="categorySelect">Category</label>
+                <input type="text" id="categorySearch" placeholder="Search or type category" class="form-control mb-2"
+                  autocomplete="off" />
+                <select id="categorySelect" name="category" class="form-control">
+                  <option value="">-- choose category --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="subcategorySelect">Subcategory</label>
+                <select id="subcategorySelect" name="subcategory" class="form-control" style="margin-top: 3.2rem;">
+                  <option value="">-- choose subcategory --</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="form-section">
+            <h3 class="section-title">Location</h3>
+            <div class="form-group">
+              <label for="addressLine">Street Address</label>
+              <input type="text" id="addressLine" name="addressLine"
+                value="<%= profile.address && profile.address.addressLine %>" class="form-control" />
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" value="<%= profile.address && profile.address.city %>"
+                  class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="state">State</label>
+                <input type="text" id="state" name="state" value="<%= profile.address && profile.address.state %>"
+                  class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" value="<%= profile.address && profile.address.country %>"
+                  class="form-control" />
+              </div>
+              <div class="form-group">
+                <label for="postcode">Postcode</label>
+                <input type="text" id="postcode" name="postcode"
+                  value="<%= profile.address && profile.address.postcode %>" class="form-control" />
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <div class="form-section" id="social-links-section">
+            <div class="section-header-flex">
+              <h3 class="section-title mb-0">Social Links</h3>
+              <button id="add-social-link-btn" type="button" class="btn btn-outline-primary btn-sm">+ Add Link</button>
+            </div>
+            <div id="social-links-list">
+              <% if (profile.socialLinks && profile.socialLinks.length) { %>
+                <% profile.socialLinks.forEach(function(link, i) { %>
+                  <div class="form-row social-row">
+                    <div class="form-group flex-1">
+                      <input type="text" name="socialLinks[<%= i %>][platform]" class="form-control"
+                        value="<%= link.platform %>" placeholder="Platform" required />
+                    </div>
+                    <div class="form-group flex-2">
+                      <input type="text" name="socialLinks[<%= i %>][url]" class="form-control" value="<%= link.url %>"
+                        placeholder="https://…" required />
+                    </div>
+                    <button type="button" class="remove-social-link-btn btn-icon text-danger">×</button>
+                  </div>
+                  <% }) %>
+                    <% } else { %>
+                      <div class="form-row social-row">
+                        <div class="form-group flex-1">
+                          <input type="text" name="socialLinks[0][platform]" class="form-control" placeholder="Platform"
+                            required />
+                        </div>
+                        <div class="form-group flex-2">
+                          <input type="text" name="socialLinks[0][url]" class="form-control" placeholder="https://…"
+                            required />
+                        </div>
+                        <button type="button" class="remove-social-link-btn btn-icon text-danger">×</button>
+                      </div>
+                      <% } %>
+            </div>
+          </div>
+        </form>
+        <div class="form-actions-wrapper">
+          <form action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/delete"
+            method="POST" class="delete-form">
+            <button type="submit" class="btn btn-outline-danger"
+              onclick="return confirm('Are you sure you want to delete this profile? This cannot be undone.');">Delete
+              Profile</button>
+          </form>
+
+          <div class="primary-actions">
+            <a href="/dashboard<%= slugSegment %>/profiles" class="btn btn-secondary">Cancel</a>
+            <button type="submit" form="editProfileForm" class="btn btn-primary">Update Profile</button>
+          </div>
+        </div>
       </div>
-      <button id="add-social-link-btn" type="button" class="btn btn-secondary">+ Add Social Link</button>
-    </div>
-    <button type="submit" class="btn btn-primary">Update Profile</button>
-</form>
-<form action="/dashboard<%= slugSegment %>/profiles/<%= encodeURIComponent(profile.slug) %>/delete" method="POST" style="display:inline;">
-  <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this profile?');">Delete Profile</button>
-</form>
-</div>
-<script>
-// Social Links dynamic add/remove/reindex
-document.addEventListener('DOMContentLoaded', function() {
-  const addBtn = document.getElementById('add-social-link-btn');
-  const linksList = document.getElementById('social-links-list');
 
-  addBtn.addEventListener('click', function() {
-    const index = linksList.querySelectorAll('.form-row').length;
-    const row = document.createElement('div');
-    row.className = 'form-row';
-    row.innerHTML = `
-      <div class="form-group">
-        <input type="text" name="socialLinks[${index}][platform]" class="form-control" placeholder="Platform (e.g. Facebook)" required />
-      </div>
-      <div class="form-group form-group-inline">
-        <input type="text" name="socialLinks[${index}][url]" class="form-control" placeholder="https://…" required />
-      </div>
-      <button type="button" class="remove-social-link-btn btn btn-link text-danger">×</button>
-    `;
-    linksList.appendChild(row);
-  });
+      <script>
+        // Social Links dynamic add/remove/reindex
+        document.addEventListener('DOMContentLoaded', function () {
+          const addBtn = document.getElementById('add-social-link-btn');
+          const linksList = document.getElementById('social-links-list');
 
-  linksList.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-social-link-btn')) {
-      e.target.closest('.form-row').remove();
-      reindexSocialLinks();
-    }
-  });
-});
+          addBtn.addEventListener('click', function () {
+            const index = linksList.querySelectorAll('.social-row').length;
+            const row = document.createElement('div');
+            row.className = 'form-row social-row';
+            row.innerHTML = `
+        <div class="form-group flex-1">
+          <input type="text" name="socialLinks[${index}][platform]" class="form-control" placeholder="Platform" required />
+        </div>
+        <div class="form-group flex-2">
+          <input type="text" name="socialLinks[${index}][url]" class="form-control" placeholder="https://…" required />
+        </div>
+        <button type="button" class="remove-social-link-btn btn-icon text-danger">×</button>
+      `;
+            linksList.appendChild(row);
+          });
 
-function reindexSocialLinks() {
-  const rows = document.querySelectorAll('#social-links-list .form-row');
-  rows.forEach(function(row, i) {
-    const platformInput = row.querySelector('input[name^="socialLinks"][name$="[platform]"]');
-    const urlInput = row.querySelector('input[name^="socialLinks"][name$="[url]"]');
-    if (platformInput) platformInput.name = `socialLinks[${i}][platform]`;
-    if (urlInput) urlInput.name = `socialLinks[${i}][url]`;
-  });
-}
-</script>
-<script>
-  // Reuse the CATEGORY_DATA block from new.ejs — embedded here for edit page
-  const CATEGORY_DATA = (function(){
-    return {
-      "Construction": ["cement shops","bricks & building materials suppliers","construction workers (masons, laborers)","civil contractors","general contractors","demolition services","scaffolding suppliers","heavy equipment rental","concrete mixers","structural engineers","surveyors","site supervisors","plasterers","tilers","roofers","formwork suppliers","insulation installers","waterproofing specialists","paving contractors","flooring specialists","construction estimators"],
-      "Real Estate": ["residential agents","commercial brokers","property managers","leasing agents","real estate developers","brokers for resale","real estate consultants","land surveyors","facilities management","rental/property listings platforms","real estate lawyers","short-term rental managers"],
-      "Architecture & Interior Design": ["architects","interior designers","landscape architects","urban planners","furniture designers","3D visualizers","CAD/BIM modelers","lighting designers","Vastu/ Feng Shui consultants","FF&E suppliers"],
-      "Manufacturing": ["OEM manufacturers","contract manufacturers","metal fabrication","plastics","textiles manufacturing","food processing","packaging manufacturers","electronics assembly","CNC machining","injection molding","sheet metal works","foundries"],
-      "Wholesale & Distribution": ["distributors","importers","exporters","wholesalers (FMCG, electronics, apparel)","drop-shippers","B2B marketplaces","supply chain managers","warehousing & cold storage operators"],
-      "Retail": ["grocery stores","supermarkets","convenience stores","specialty retailers (electronics, apparel, jewelry)","online retailers / e-commerce sellers","mom & pop shops","kiosks","franchise owners","retail managers","visual merchandisers"],
-      "Food & Beverage": ["restaurants","cafes","cloud kitchens","bakeries","food trucks","caterers","confectioners","confectionery suppliers","bar & pubs","microbreweries","beverage distributors","sommeliers","menu designers","food safety consultants"],
-      "Hospitality & Accommodation": ["hotels","resorts","homestays","hostels","boutique hotels","guest houses","hotel management","front-desk","concierge services","housekeeping","event banquet managers"],
-      "Travel & Tourism": ["travel agents","tour operators","guides","OTA platforms","corporate travel managers","visa consultants","adventure tourism operators","travel bloggers/influencers"],
-      "Transportation & Logistics": ["trucking & freight companies","courier & last-mile delivery","freight forwarders","customs brokers","cold chain logistics","rail logistics","intermodal","logistics tech","route planners","fleet managers"],
-      "Automotive": ["car dealerships","motorcycle dealerships","auto repair shops","service centers","spare parts suppliers","car rentals","body shops","detailers","mechanics","vehicle inspectors","EV charging installers"],
-      "Aviation & Aerospace": ["airlines","MRO (maintenance, repair, overhaul)","private jet services","avionics suppliers","pilots","aircraft leasing","aerospace manufacturers","ground handling"],
-      "Marine & Shipping": ["ship owners","shipbuilders","crewing agencies","port operators","ship chandlers","maritime logistics","yacht services","marine surveyors"],
-      "Energy & Utilities": ["power generation (thermal, hydro)","renewable energy developers (solar, wind)","transmission operators","utility companies","energy consultants","smart grid","energy auditors","EV infrastructure","battery suppliers"],
-      "Oil, Gas & Mining": ["upstream exploration","drilling contractors","pipeline operators","mining companies","mineral traders","refinery services","petrochemical suppliers","geologists"],
-      "Agriculture & Agritech": ["farmers","agri-input suppliers (seeds, fertilizers)","equipment dealers","cold storage","agri-tech startups","livestock & dairy","aquaculture","precision farming consultants","agri-commodity traders"],
-      "Healthcare & Medical": ["hospitals","clinics","general practitioners","specialists (cardiology, neurology, orthopedics)","nurses","diagnostic labs","pathology centers","ambulance services","medical equipment suppliers","telemedicine providers"],
-      "Dental & Optical": ["dental clinics","orthodontists","dental labs","optometrists","eyewear retailers","contact lens suppliers","ophthalmologists","optical labs"],
-      "Pharmacy & Pharma": ["retail pharmacies","pharma distribution","pharmaceutical manufacturers","clinical trial CROs","medical reps","pharmacovigilance","compounding pharmacies"],
-      "Biotechnology & Life Sciences": ["biotech startups","research labs","genomics services","biomanufacturing","biotech consultants","lab equipment suppliers"],
-      "Wellness & Personal Care": ["gyms","fitness trainers","yoga studios","physiotherapists","nutritionists","spas","massage therapists","wellness coaches","alternative medicine (Ayurveda, Homeopathy)","beauty salons"],
-      "Education & Training": ["schools","colleges","coaching centers","online course creators","tutors","corporate trainers","edtech startups","exam prep centers","vocational training institutes","language schools"],
-      "Childcare & Eldercare": ["daycare centers","nannies","senior care homes","home caregivers","physiotherapy for elderly","rehabilitation centers"],
-      "Professional Services — Legal": ["corporate lawyers","litigation lawyers","IP attorneys","family law","tax law","notaries","legal consultants","patent agents"],
-      "Professional Services — Accounting & Finance": ["chartered accountants","bookkeepers","tax consultants","payroll services","CFO services","financial planners","auditors","forensic accountants"],
-      "Banking & Financial Services": ["retail bankers","corporate banking","NBFCs","microfinance","investment banking","private banking","wealth managers","loan officers"],
-      "Insurance": ["insurers","brokers","agents","claims adjusters","underwriters","reinsurance","health insurance brokers"],
-      "Fintech & Crypto": ["payments","wallets","neobanks","lending platforms","blockchain developers","crypto exchanges","tokenization platforms","KYC/AML providers"],
-      "Information Technology": ["software development","web development","mobile apps","full-stack developers","DevOps engineers","cloud architects","SaaS companies","product managers","QA/testers","IT support","IT consulting"],
-      "Data & AI": ["data scientists","machine learning engineers","AI researchers","data engineers","analytics consultants","BI developers","NLP specialists","computer vision engineers"],
-      "Hardware & Electronics": ["embedded systems","IoT device manufacturers","PCB designers","semiconductor engineers","electronics repair","contract electronics manufacturers"],
-      "Cybersecurity & Privacy": ["security analysts","penetration testers","SOC operators","identity & access management","privacy consultants","encryption specialists"],
-      "Telecommunications": ["ISPs","mobile operators","fiber providers","network engineers","tower operators","VoIP providers","telecom equipment suppliers"],
-      "Marketing, Advertising & PR": ["digital marketing","SEO/SEM","social media managers","performance marketers","brand strategists","creative agencies","PR firms","content creators","influencer marketing","email marketing","event marketing"],
-      "Sales & Business Development": ["B2B sales reps","account managers","channel partners","inside sales","sales engineers","CRM consultants","lead-gen agencies"],
-      "Human Resources & Recruitment": ["recruiters","staffing agencies","HR consultants","payroll providers","L&D specialists","executive search","HR tech"],
-      "Consulting & Strategy": ["management consultants","IT consultants","strategy consultants","operations consultants","sustainability consultants","supply chain consultants"],
-      "Legal & Compliance Tech": ["regtech providers","contract management","compliance officers","AML/KYC consultants"],
-      "Media, Publishing & Journalism": ["newspapers","magazines","online publishers","editors","reporters","copywriters","content strategists","podcast producers","newsletter writers"],
-      "Film, Video & Photography": ["photographers","videographers","film producers","editors","cinematographers","studios","production houses","stock footage providers","event photographers"],
-      "Music, Arts & Entertainment": ["musicians","bands","artists","galleries","art dealers","stage production","theatre companies","comedians","DJs"],
-      "Gaming & Animation": ["game developers","animators","VFX studios","sound designers","game publishers","indie studios"],
-      "Events & Weddings": ["event planners","wedding planners","decorators","caterers (event)","AV & production","sound & lighting","stage designers","ticketing platforms"],
-      "Sports & Recreation": ["sports clubs","coaches","personal trainers","sports academies","equipment retailers","physiotherapists (sports)","stadium management"],
-      "Beauty, Fashion & Apparel": ["designers","tailors","boutiques","textile suppliers","garment manufacturers","footwear","accessories","fashion stylists","modeling agencies"],
-      "Jewelry & Watches": ["jewelers","watchmakers","repair shops","gemstone dealers","custom jewel design"],
-      "Printing, Signage & Packaging": ["offset printers","digital printers","packaging designers","label printers","signage & hoardings","3D printing services"],
-      "Home Services & Repairs": ["plumbers","electricians","carpenters","handymen","HVAC technicians","pest control","locksmiths","appliance repair"]
-    };
-  })();
+          linksList.addEventListener('click', function (e) {
+            if (e.target.matches('.remove-social-link-btn') || e.target.closest('.remove-social-link-btn')) {
+              e.target.closest('.social-row').remove();
+              reindexSocialLinks();
+            }
+          });
+        });
 
-  (function initCategoryUI(){
-  document.addEventListener('DOMContentLoaded', function () {
-    const CATEGORY_DATA_LOCAL = CATEGORY_DATA; // already defined above
-    const catSelect = document.getElementById('categorySelect');
-    const catSearch = document.getElementById('categorySearch');
-    const subSelect = document.getElementById('subcategorySelect');
-    const existingCategory = `<%= (profile.category || '') %>`;
-    const existingSub = `<%= (profile.subcategory || '') %>`;
+        function reindexSocialLinks() {
+          const rows = document.querySelectorAll('#social-links-list .social-row');
+          rows.forEach(function (row, i) {
+            const platformInput = row.querySelector('input[name^="socialLinks"][name$="[platform]"]');
+            const urlInput = row.querySelector('input[name^="socialLinks"][name$="[url]"]');
+            if (platformInput) platformInput.name = `socialLinks[${i}][platform]`;
+            if (urlInput) urlInput.name = `socialLinks[${i}][url]`;
+          });
+        }
+      </script>
 
-    if (!catSelect || !catSearch || !subSelect) return;
+      <script>
+        // Category UI Logic
+        const CATEGORY_DATA = (function () {
+          return {
+            "Construction": ["cement shops", "bricks & building materials suppliers", "construction workers (masons, laborers)", "civil contractors", "general contractors", "demolition services", "scaffolding suppliers", "heavy equipment rental", "concrete mixers", "structural engineers", "surveyors", "site supervisors", "plasterers", "tilers", "roofers", "formwork suppliers", "insulation installers", "waterproofing specialists", "paving contractors", "flooring specialists", "construction estimators"],
+            "Real Estate": ["residential agents", "commercial brokers", "property managers", "leasing agents", "real estate developers", "brokers for resale", "real estate consultants", "land surveyors", "facilities management", "rental/property listings platforms", "real estate lawyers", "short-term rental managers"],
+            "Architecture & Interior Design": ["architects", "interior designers", "landscape architects", "urban planners", "furniture designers", "3D visualizers", "CAD/BIM modelers", "lighting designers", "Vastu/ Feng Shui consultants", "FF&E suppliers"],
+            "Manufacturing": ["OEM manufacturers", "contract manufacturers", "metal fabrication", "plastics", "textiles manufacturing", "food processing", "packaging manufacturers", "electronics assembly", "CNC machining", "injection molding", "sheet metal works", "foundries"],
+            "Wholesale & Distribution": ["distributors", "importers", "exporters", "wholesalers (FMCG, electronics, apparel)", "drop-shippers", "B2B marketplaces", "supply chain managers", "warehousing & cold storage operators"],
+            "Retail": ["grocery stores", "supermarkets", "convenience stores", "specialty retailers (electronics, apparel, jewelry)", "online retailers / e-commerce sellers", "mom & pop shops", "kiosks", "franchise owners", "retail managers", "visual merchandisers"],
+            "Food & Beverage": ["restaurants", "cafes", "cloud kitchens", "bakeries", "food trucks", "caterers", "confectioners", "confectionery suppliers", "bar & pubs", "microbreweries", "beverage distributors", "sommeliers", "menu designers", "food safety consultants"],
+            "Hospitality & Accommodation": ["hotels", "resorts", "homestays", "hostels", "boutique hotels", "guest houses", "hotel management", "front-desk", "concierge services", "housekeeping", "event banquet managers"],
+            "Travel & Tourism": ["travel agents", "tour operators", "guides", "OTA platforms", "corporate travel managers", "visa consultants", "adventure tourism operators", "travel bloggers/influencers"],
+            "Transportation & Logistics": ["trucking & freight companies", "courier & last-mile delivery", "freight forwarders", "customs brokers", "cold chain logistics", "rail logistics", "intermodal", "logistics tech", "route planners", "fleet managers"],
+            "Automotive": ["car dealerships", "motorcycle dealerships", "auto repair shops", "service centers", "spare parts suppliers", "car rentals", "body shops", "detailers", "mechanics", "vehicle inspectors", "EV charging installers"],
+            "Aviation & Aerospace": ["airlines", "MRO (maintenance, repair, overhaul)", "private jet services", "avionics suppliers", "pilots", "aircraft leasing", "aerospace manufacturers", "ground handling"],
+            "Marine & Shipping": ["ship owners", "shipbuilders", "crewing agencies", "port operators", "ship chandlers", "maritime logistics", "yacht services", "marine surveyors"],
+            "Energy & Utilities": ["power generation (thermal, hydro)", "renewable energy developers (solar, wind)", "transmission operators", "utility companies", "energy consultants", "smart grid", "energy auditors", "EV infrastructure", "battery suppliers"],
+            "Oil, Gas & Mining": ["upstream exploration", "drilling contractors", "pipeline operators", "mining companies", "mineral traders", "refinery services", "petrochemical suppliers", "geologists"],
+            "Agriculture & Agritech": ["farmers", "agri-input suppliers (seeds, fertilizers)", "equipment dealers", "cold storage", "agri-tech startups", "livestock & dairy", "aquaculture", "precision farming consultants", "agri-commodity traders"],
+            "Healthcare & Medical": ["hospitals", "clinics", "general practitioners", "specialists (cardiology, neurology, orthopedics)", "nurses", "diagnostic labs", "pathology centers", "ambulance services", "medical equipment suppliers", "telemedicine providers"],
+            "Dental & Optical": ["dental clinics", "orthodontists", "dental labs", "optometrists", "eyewear retailers", "contact lens suppliers", "ophthalmologists", "optical labs"],
+            "Pharmacy & Pharma": ["retail pharmacies", "pharma distribution", "pharmaceutical manufacturers", "clinical trial CROs", "medical reps", "pharmacovigilance", "compounding pharmacies"],
+            "Biotechnology & Life Sciences": ["biotech startups", "research labs", "genomics services", "biomanufacturing", "biotech consultants", "lab equipment suppliers"],
+            "Wellness & Personal Care": ["gyms", "fitness trainers", "yoga studios", "physiotherapists", "nutritionists", "spas", "massage therapists", "wellness coaches", "alternative medicine (Ayurveda, Homeopathy)", "beauty salons"],
+            "Education & Training": ["schools", "colleges", "coaching centers", "online course creators", "tutors", "corporate trainers", "edtech startups", "exam prep centers", "vocational training institutes", "language schools"],
+            "Childcare & Eldercare": ["daycare centers", "nannies", "senior care homes", "home caregivers", "physiotherapy for elderly", "rehabilitation centers"],
+            "Professional Services — Legal": ["corporate lawyers", "litigation lawyers", "IP attorneys", "family law", "tax law", "notaries", "legal consultants", "patent agents"],
+            "Professional Services — Accounting & Finance": ["chartered accountants", "bookkeepers", "tax consultants", "payroll services", "CFO services", "financial planners", "auditors", "forensic accountants"],
+            "Banking & Financial Services": ["retail bankers", "corporate banking", "NBFCs", "microfinance", "investment banking", "private banking", "wealth managers", "loan officers"],
+            "Insurance": ["insurers", "brokers", "agents", "claims adjusters", "underwriters", "reinsurance", "health insurance brokers"],
+            "Fintech & Crypto": ["payments", "wallets", "neobanks", "lending platforms", "blockchain developers", "crypto exchanges", "tokenization platforms", "KYC/AML providers"],
+            "Information Technology": ["software development", "web development", "mobile apps", "full-stack developers", "DevOps engineers", "cloud architects", "SaaS companies", "product managers", "QA/testers", "IT support", "IT consulting"],
+            "Data & AI": ["data scientists", "machine learning engineers", "AI researchers", "data engineers", "analytics consultants", "BI developers", "NLP specialists", "computer vision engineers"],
+            "Hardware & Electronics": ["embedded systems", "IoT device manufacturers", "PCB designers", "semiconductor engineers", "electronics repair", "contract electronics manufacturers"],
+            "Cybersecurity & Privacy": ["security analysts", "penetration testers", "SOC operators", "identity & access management", "privacy consultants", "encryption specialists"],
+            "Telecommunications": ["ISPs", "mobile operators", "fiber providers", "network engineers", "tower operators", "VoIP providers", "telecom equipment suppliers"],
+            "Marketing, Advertising & PR": ["digital marketing", "SEO/SEM", "social media managers", "performance marketers", "brand strategists", "creative agencies", "PR firms", "content creators", "influencer marketing", "email marketing", "event marketing"],
+            "Sales & Business Development": ["B2B sales reps", "account managers", "channel partners", "inside sales", "sales engineers", "CRM consultants", "lead-gen agencies"],
+            "Human Resources & Recruitment": ["recruiters", "staffing agencies", "HR consultants", "payroll providers", "L&D specialists", "executive search", "HR tech"],
+            "Consulting & Strategy": ["management consultants", "IT consultants", "strategy consultants", "operations consultants", "sustainability consultants", "supply chain consultants"],
+            "Legal & Compliance Tech": ["regtech providers", "contract management", "compliance officers", "AML/KYC consultants"],
+            "Media, Publishing & Journalism": ["newspapers", "magazines", "online publishers", "editors", "reporters", "copywriters", "content strategists", "podcast producers", "newsletter writers"],
+            "Film, Video & Photography": ["photographers", "videographers", "film producers", "editors", "cinematographers", "studios", "production houses", "stock footage providers", "event photographers"],
+            "Music, Arts & Entertainment": ["musicians", "bands", "artists", "galleries", "art dealers", "stage production", "theatre companies", "comedians", "DJs"],
+            "Gaming & Animation": ["game developers", "animators", "VFX studios", "sound designers", "game publishers", "indie studios"],
+            "Events & Weddings": ["event planners", "wedding planners", "decorators", "caterers (event)", "AV & production", "sound & lighting", "stage designers", "ticketing platforms"],
+            "Sports & Recreation": ["sports clubs", "coaches", "personal trainers", "sports academies", "equipment retailers", "physiotherapists (sports)", "stadium management"],
+            "Beauty, Fashion & Apparel": ["designers", "tailors", "boutiques", "textile suppliers", "garment manufacturers", "footwear", "accessories", "fashion stylists", "modeling agencies"],
+            "Jewelry & Watches": ["jewelers", "watchmakers", "repair shops", "gemstone dealers", "custom jewel design"],
+            "Printing, Signage & Packaging": ["offset printers", "digital printers", "packaging designers", "label printers", "signage & hoardings", "3D printing services"],
+            "Home Services & Repairs": ["plumbers", "electricians", "carpenters", "handymen", "HVAC technicians", "pest control", "locksmiths", "appliance repair"],
+            "Others": ["others"]
+          };
+        })();
 
-    // datalist
-    let datalist = document.getElementById('categoryDatalist');
-    if (!datalist) {
-      datalist = document.createElement('datalist');
-      datalist.id = 'categoryDatalist';
-      document.body.appendChild(datalist);
-      catSearch.setAttribute('list', 'categoryDatalist');
-    }
+        (function initCategoryUI() {
+          document.addEventListener('DOMContentLoaded', function () {
+            const CATEGORY_DATA_LOCAL = CATEGORY_DATA;
+            const catSelect = document.getElementById('categorySelect');
+            const catSearch = document.getElementById('categorySearch');
+            const subSelect = document.getElementById('subcategorySelect');
+            const existingCategory = `<%= (profile.category || '') %>`;
+            const existingSub = `<%= (profile.subcategory || '') %>`;
 
-    function populateCategories(filter){
-      const keys = Object.keys(CATEGORY_DATA_LOCAL).filter(k => !filter || k.toLowerCase().includes(filter.toLowerCase()));
-      catSelect.innerHTML = '<option value="">-- choose category --</option>' + keys.map(k => `<option value="${k}">${k}</option>`).join('');
-      datalist.innerHTML = keys.map(k => `<option value="${k}"></option>`).join('');
-      if (existingCategory) catSelect.value = existingCategory;
-    }
+            if (!catSelect || !catSearch || !subSelect) return;
 
-    function populateSubcategories(category){
-      const items = CATEGORY_DATA_LOCAL[category] || [];
-      subSelect.innerHTML = '<option value="">-- choose subcategory --</option>' + items.map(s => `<option value="${s}">${s}</option>`).join('');
-      if (existingSub) subSelect.value = existingSub;
-    }
+            let datalist = document.getElementById('categoryDatalist');
+            if (!datalist) {
+              datalist = document.createElement('datalist');
+              datalist.id = 'categoryDatalist';
+              document.body.appendChild(datalist);
+              catSearch.setAttribute('list', 'categoryDatalist');
+            }
 
-    catSearch.addEventListener('input', (e)=>{ populateCategories(e.target.value); });
-    catSearch.addEventListener('change', (e)=>{
-      const val = e.target.value;
-      if (CATEGORY_DATA_LOCAL[val]) {
-        catSelect.value = val;
-        populateSubcategories(val);
-      }
-    });
-    catSelect.addEventListener('change', (e)=>{ populateSubcategories(e.target.value); catSearch.value = e.target.value; });
+            function populateCategories(filter) {
+              const keys = Object.keys(CATEGORY_DATA_LOCAL).filter(k => !filter || k.toLowerCase().includes(filter.toLowerCase()));
+              catSelect.innerHTML = '<option value="">-- choose category --</option>' + keys.map(k => `<option value="${k}">${k}</option>`).join('');
+              datalist.innerHTML = keys.map(k => `<option value="${k}"></option>`).join('');
+              if (existingCategory && !filter) catSelect.value = existingCategory;
+            }
 
-    populateCategories();
-    if (existingCategory) {
-      catSearch.value = existingCategory;
-      populateSubcategories(existingCategory);
-    }
-  });
-  
-  // end DOMContentLoaded
-  
-  })();
-</script>
+            function populateSubcategories(category) {
+              const items = CATEGORY_DATA_LOCAL[category] || [];
+              subSelect.innerHTML = '<option value="">-- choose subcategory --</option>' + items.map(s => `<option value="${s}">${s}</option>`).join('');
+              if (existingSub && category === existingCategory) subSelect.value = existingSub;
+            }
+
+            catSearch.addEventListener('input', (e) => { populateCategories(e.target.value); });
+            catSearch.addEventListener('change', (e) => {
+              const val = e.target.value;
+              if (CATEGORY_DATA_LOCAL[val]) {
+                catSelect.value = val;
+                populateSubcategories(val);
+              }
+            });
+            catSelect.addEventListener('change', (e) => { populateSubcategories(e.target.value); catSearch.value = e.target.value; });
+
+            populateCategories();
+            if (existingCategory) {
+              catSearch.value = existingCategory;
+              populateSubcategories(existingCategory);
+            }
+          });
+        })();
+        document.addEventListener('DOMContentLoaded', () => {
+          const imageInput = document.getElementById('image');
+
+          if (imageInput) {
+            imageInput.addEventListener('change', async function (e) {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              const maxSizeInBytes = 9 * 1024 * 1024; // 9MB
+
+              if (file.size > maxSizeInBytes) {
+                // Provide visual feedback securely finding the correct label
+                const label = this.closest('.form-group') ? this.closest('.form-group').querySelector('label[for="image"]') : null;
+                const originalLabel = label ? label.innerText : '';
+                if (label) label.innerText = 'Compressing image, please wait... ⏳';
+
+                try {
+                  const compressedFile = await compressImage(file);
+
+                  // Replace the heavy file in the input with the compressed file
+                  const dataTransfer = new DataTransfer();
+                  dataTransfer.items.add(compressedFile);
+                  e.target.files = dataTransfer.files;
+
+                  if (label) label.innerText = 'Image successfully compressed! ✅';
+                  setTimeout(() => {
+                    if (label) label.innerText = originalLabel || 'Profile Image';
+                  }, 3000);
+
+                } catch (err) {
+                  console.error('Client-side compression failed:', err);
+                  alert('The image is too large and failed to compress. Please choose a smaller file.');
+                  e.target.value = ''; // Clear the input
+                  if (label) label.innerText = originalLabel || 'Profile Image';
+                }
+              }
+            });
+          }
+
+          // Canvas-based compression function
+          function compressImage(file) {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+
+                  // Scale down if dimensions are massive (max 1920px)
+                  const MAX_WIDTH = 1920;
+                  const MAX_HEIGHT = 1920;
+                  let width = img.width;
+                  let height = img.height;
+
+                  if (width > height) {
+                    if (width > MAX_WIDTH) {
+                      height *= MAX_WIDTH / width;
+                      width = MAX_WIDTH;
+                    }
+                  } else {
+                    if (height > MAX_HEIGHT) {
+                      width *= MAX_HEIGHT / height;
+                      height = MAX_HEIGHT;
+                    }
+                  }
+
+                  canvas.width = width;
+                  canvas.height = height;
+                  ctx.drawImage(img, 0, 0, width, height);
+
+                  // Output as JPEG at 75% quality
+                  canvas.toBlob((blob) => {
+                    if (!blob) return reject(new Error('Canvas is empty'));
+                    // Create a new File object to pass back to the form
+                    let newFileName = file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg";
+                    const newFile = new File([blob], newFileName, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now()
+                    });
+                    resolve(newFile);
+                  }, 'image/jpeg', 0.75);
+                };
+                img.onerror = error => reject(error);
+              };
+              reader.onerror = error => reject(error);
+            });
+          }
+        });
+      </script>

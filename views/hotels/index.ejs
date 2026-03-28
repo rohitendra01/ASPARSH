@@ -1,63 +1,120 @@
 <% layout('layouts/dashboard-boilerplate') %>
-<% block('styles').append(`<link rel="stylesheet" href="/css/hotel/index.css" />`) %>
+  <% block('styles').append(`<link rel="stylesheet" href="/css/hotel/index.css" />`) %>
 
-  <div class="dashboard-header-row">
-    <form class="search-form" onsubmit="return filterHotels(event)">
-      <input type="text" id="hotelSlugSearch" name="hotelSlug" placeholder="Enter Hotel Slug" required>
-      <button type="submit">Search</button>
-    </form>
-    <a href="/dashboard/<%= user.slug %>/hotels/new" class="create-hotel-btn create-hotel-btn-fixed">+ Create New Hotel</a>
-  </div>
-  <div class="hotel-list-container">
-  <% if (hotels && hotels.length) { %>
-    <div class="hotel-cards-grid">
-      <% hotels.forEach(hotel => { %>
-        <div class="hotel-card" data-hotel-slug="<%= hotel.hotelSlug %>">
-          <img src="<%= hotel.hotelLogo %>" alt="<%= hotel.hotelName %> Logo" class="hotel-card-logo">
-          <div class="hotel-card-body">
-            <div class="hotel-card-heading">
-              <h2 class="hotel-card-title"><%= hotel.hotelName %></h2>
-              <p class="hotel-card-type"><%= hotel.hotelType %></p>
-            </div>
-            <div class="hotel-card-others">
-              <p class="hotel-card-address">
-                <span>
-                  <%= hotel.hotelAddress.street %>, <%= hotel.hotelAddress.city %>
-                </span>
-                <span>
-                 <%= hotel.hotelAddress.state %>
-                </span>
-              </p>
-            </div>
-            <div class="hotel-card-links">
-              <a href="/hotel/<%= hotel.hotelSlug %>" class="hotel-card-link">View Hotel</a>
-              <a href="/dashboard/<%= user.slug %>/hotels/<%= hotel.hotelSlug %>/edit" class="hotel-card-edit">Edit</a>
-            </div>
-          </div>
+  <div class="page-container">
+
+    <div class="page-header-row">
+      <div class="page-header-text">
+        <h1 class="page-title">Hotels</h1>
+        <p class="page-subtitle">Manage your properties, food categories, and promotional banners.</p>
+      </div>
+
+      <div class="page-header-actions">
+        <div class="search-wrapper">
+          <input type="text" id="liveSearchInput" placeholder="Search by hotel name or type..."
+            onkeyup="filterHotels()">
         </div>
-      <% }) %>
+        <a href="/dashboard/<%= user.slug %>/hotels/new" class="btn-primary">+ Create New Hotel</a>
+      </div>
     </div>
+
+    <% if (hotels && hotels.length> 0) { %>
+      <div class="quick-stats-row">
+        <div class="stat-card">
+          <span class="stat-value">
+            <%= hotels.length %>
+          </span>
+          <span class="stat-label">Total Hotels</span>
+        </div>
+      </div>
+      <% } %>
+
+        <div class="entity-list-container">
+          <% if (hotels && hotels.length> 0) { %>
+            <div class="entity-grid compact-grid" id="entityGrid">
+              <% hotels.forEach(hotel=> { %>
+                <div class="entity-card compact-card"
+                  data-search-term="<%= hotel.hotelName.toLowerCase() %> <%= hotel.hotelType.toLowerCase() %> <%= hotel.hotelSlug.toLowerCase() %>">
+
+                  <div class="card-thumbnail">
+                    <% if (hotel.hotelLogo) { %>
+                      <img src="<%= hotel.hotelLogo %>" alt="<%= hotel.hotelName %>" loading="lazy">
+                      <% } else { %>
+                        <div class="thumbnail-placeholder">🏨</div>
+                        <% } %>
+                  </div>
+
+                  <div class="card-info">
+                    <div class="info-header">
+                      <h3 class="card-title text-truncate" title="<%= hotel.hotelName %>">
+                        <%= hotel.hotelName %>
+                      </h3>
+                      <span class="badge">
+                        <%= hotel.hotelType %>
+                      </span>
+                    </div>
+                    <p class="card-meta text-truncate">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      <%= hotel.hotelAddress.city %>, <%= hotel.hotelAddress.state %>
+                    </p>
+                  </div>
+
+                  <div class="card-actions">
+                    <a href="/hotel/<%= hotel.hotelSlug %>" target="_blank" class="action-icon-btn" title="View Live">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                      </svg>
+                    </a>
+                    <a href="/dashboard/<%= user.slug %>/hotels/<%= hotel.hotelSlug %>/edit"
+                      class="action-icon-btn edit-btn" title="Edit Hotel">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </a>
+                  </div>
+
+                </div>
+                <% }) %>
+            </div>
+
+            <% } else { %>
+
+              <div class="empty-state">
+                <div class="empty-icon">
+                  🏨
+                </div>
+                <h2>No hotels created yet</h2>
+                <p>Get started by setting up your first property to manage menus, addresses, and banners.</p>
+                <a href="/dashboard/<%= user.slug %>/hotels/new" class="btn-primary">+ Create Your First Hotel</a>
+              </div>
+
+              <% } %>
+        </div>
   </div>
-    <script>
-      function filterHotels(event) {
-        event.preventDefault();
-        const input = document.getElementById('hotelSlugSearch').value.trim().toLowerCase();
-        const hotelCards = document.querySelectorAll('.hotel-card');
-        if (!input) {
-          hotelCards.forEach(card => card.style.display = '');
-          return false;
+
+  <script>
+    function filterHotels() {
+      const input = document.getElementById('liveSearchInput').value.trim().toLowerCase();
+      const cards = document.querySelectorAll('.entity-card');
+
+      cards.forEach(card => {
+        const searchTerm = card.getAttribute('data-search-term');
+
+        if (searchTerm.includes(input)) {
+          // Restore to flex (or block) so it fits back into the CSS Grid naturally
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
         }
-        hotelCards.forEach(card => {
-          const slug = card.getAttribute('data-hotel-slug');
-          if (slug && slug.toLowerCase().includes(input)) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-        return false;
-      }
-    </script>
-  <% } else { %>
-    <p>No hotels found.</p>
-  <% } %>
+      });
+    }
+  </script>
