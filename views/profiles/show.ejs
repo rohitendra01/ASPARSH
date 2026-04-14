@@ -55,6 +55,9 @@
                 </div>
                 <h2 class="profile-name">
                   <%= profile.name %>
+                  <% if(profile.companyName) { %>
+                    <span style="font-size: 0.7em; color: #6c757d; display: block; margin-top: 5px;"><%= profile.companyName %></span>
+                  <% } %>
                 </h2>
                 <% if (profile.occupation || profile.category) { %>
                   <div class="profile-badges">
@@ -75,6 +78,14 @@
               </div>
 
               <div class="identity-body">
+                <% if (profile.bio) { %>
+                <div class="info-group" style="width: 100%;">
+                  <label>Bio / Description</label>
+                  <p>
+                    <%= profile.bio %>
+                  </p>
+                </div>
+                <% } %>
                 <div class="info-group">
                   <label>Email</label>
                   <p>
@@ -85,6 +96,22 @@
                   <label>Mobile</label>
                   <p>
                     <%= profile.mobile || 'N/A' %>
+                  </p>
+                </div>
+                <div class="info-group">
+                  <label>WhatsApp</label>
+                  <p>
+                    <%= profile.whatsapp || 'N/A' %>
+                  </p>
+                </div>
+                <div class="info-group">
+                  <label>Website</label>
+                  <p>
+                    <% if(profile.website) { %>
+                      <a href="<%= profile.website %>" target="_blank" rel="noopener"><%= profile.website %></a>
+                    <% } else { %>
+                      N/A
+                    <% } %>
                   </p>
                 </div>
                 <div class="info-group">

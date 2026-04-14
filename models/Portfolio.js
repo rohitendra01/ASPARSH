@@ -1,217 +1,123 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { nanoid } = require('nanoid');
 
-const SkillSchema = new Schema({
-  iconClass: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-  name: {
-    type:     String,
-    required: true,
-    unique:   true,
-    trim:     true
-  },
-  description: {
-    type:      String,
-    required:  true,
-    trim:      true,
-    maxlength: 200
-  }
-}, {
-  _id:        true,
-  versionKey: false,
-  timestamps: true
-});
+const portfolioVersionSchema = new mongoose.Schema({
+  modifiedAt: { type: Date, default: Date.now },
+  modifiedByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' },
+  snapshot: { type: mongoose.Schema.Types.Mixed }
+}, { _id: false });
 
-const Skill = mongoose.model('Skill', SkillSchema);
+const portfolioSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  slug: { type: String, unique: true, index: true },
+  profession: { type: String, default: 'Professional' },
+  briefIntro: { type: String, default: '' },
+  aboutDescription: { type: String, default: '' },
 
+  heroImage: { type: String, default: 'https://placehold.co/160x160' },
+  aboutImage: { type: String, default: 'https://placehold.co/600x400' },
+  galleryImages: [{ type: String }],
 
-const PORTFOLIO_CATEGORIES = [
-  'Web Development',
-  'Mobile Development',
-  'Data Science',
-  'Machine Learning',
-  'DevOps',
-  'UI/UX Design',
-  'Digital Marketing',
-  'Content Creation',
-  'Photography',
-  'Videography',
-  'Graphic Design',
-  'Writing & Editing',
-  'Consulting',
-  'Project Management',
-  'Other'
-];
-
-
-
-const WorkExperienceSchema = new Schema({
-  category: {
-    type:     String,
-    required: true,
-    enum:     PORTFOLIO_CATEGORIES,
-    index:    true
-  },
-  title: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-  description: {
-    type:      String,
-    required:  true,
-    trim:      true,
-    maxlength: 200
-  },
-  detailsUrl: {
-    type:     String,
-    required: true,
-    trim:     true
-  }
-}, {
-  _id:        true,
-  versionKey: false
-});
-
-const WorkExperience = mongoose.model('WorkExperience', WorkExperienceSchema);
-
-
-const ExperienceSchema = new Schema({
-  dateRange: {
-    type:      String,
-    required:  true,
-    trim:      true,
-    maxlength: 50
-  },
-  roleTitle: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-  organization: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-  description: {
-    type:      String,
-    required:  true,
-    trim:      true,
-    maxlength: 500
-  }
-}, {
-  _id:        true,
-  versionKey: false
-});
-
-const Experience = mongoose.model('Experience', ExperienceSchema);
-
-
-const PortfolioSchema = new Schema({
-  profileId: { 
-    type:     Schema.Types.ObjectId,
-    ref:      'Profile',
-    required: true,
-  },
-  slug: { 
-    type:     String,
-    required: true,
-    unique:   true,
-    trim:     true
-  },
-  name: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-  profession: {
-    type:     String,
-    required: true,
-    default:  'Nice Person',
-    trim:     true
-  },
-  briefIntro: {
-    type:     String,
-    required: true,
-    default:  'This is a brief introduction about me.',
-    trim:     true,
-    maxlength: 300
-  },
-  heroImage: {
-    type:     String,
-    default:  'https://placehold.co/160x160',
-    trim:     true
-  },
   socialLinks: [{
-    platform: {
-      type:     String,
-      required: true,
-      trim:     true
-    },
-    url: {
-      type:     String,
-      required: true,
-      trim:     true
-    }
+    platform: String,
+    url: String
   }],
-  aboutImage: {
-    type:     String,
-    default:  'https://placehold.co/600x400',
-    trim:     true
-  },
-  aboutDescription: {
-    type:      String,
-    default:   'This is a detailed description about me.',
-    trim:      true,
-    maxlength: 1000
-  },
-  galleryImages: {
-    type:    [String],
-    default: []
-  },
-  skills: [{
-    type:     Schema.Types.ObjectId,
-    ref:      'Skill',
-    required: true
+  workExperience: [{
+    title: String,
+    company: String,
+    duration: String,
+    description: String
   }],
-  workExperience: {
-    type:    [WorkExperienceSchema],
-    default: []
-  },
-  experience: {
-    type:    [ExperienceSchema],
-    default: []
-  },
-  design: {
-    type: Schema.Types.ObjectId,
-    ref: 'Design',
-    required: true
-  },
-  qrCode: {
+  experience: [{
+    year: String,
+    title: String,
+    description: String
+  }],
+
+  skills: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
+  design: { type: mongoose.Schema.Types.ObjectId, ref: 'Design', required: true },
+  qrCode: { type: mongoose.Schema.Types.ObjectId, ref: 'QR' },
+
+  profileId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'QR'
+    ref: 'Profile',
+    required: true,
+    index: true
   },
-  createdBy:{
-    type:     Schema.Types.ObjectId,
-    ref:      'adminUser',
-    required: true
+  tenantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AdminUser',
+    required: true,
+    index: true
+  },
+
+  status: {
+    type: String,
+    enum: ['draft', 'published', 'private', 'archived'],
+    default: 'published',
+    index: true
+  },
+
+  versions: [portfolioVersionSchema],
+
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  deletedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
 });
 
-PortfolioSchema.index({ profileId: 1 });
+portfolioSchema.pre(/^find/, function (next) {
+  if (this.getFilter().isDeleted === undefined) {
+    this.where({ isDeleted: false });
+  }
+  next();
+});
 
-const Portfolio = mongoose.model('Portfolio', PortfolioSchema);
+portfolioSchema.pre('save', async function (next) {
+  if (this.isModified('name') || this.isNew) {
+    let baseSlug = this.name ? this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : 'portfolio';
+    let slug = baseSlug;
+    let count = 0;
 
+    while (await mongoose.models.Portfolio.findOne({ slug, _id: { $ne: this._id } }).select('_id')) {
+      count++;
+      slug = `${baseSlug}-${nanoid(6)}`;
+    }
+    this.slug = slug;
+  }
+  next();
+});
 
-module.exports = {
-  Skill,
-  WorkExperience,
-  Experience,
-  Portfolio,
-  PORTFOLIO_CATEGORIES
+portfolioSchema.pre('save', function (next) {
+  if (!this.isNew && this.isModified()) {
+    const snapshot = this.toObject();
+    delete snapshot.versions;
+
+    this.versions.push({
+      modifiedAt: new Date(),
+      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      snapshot: snapshot
+    });
+
+    if (this.versions.length > 20) {
+      this.versions = this.versions.slice(-20);
+    }
+  }
+  next();
+});
+
+portfolioSchema.methods.softDelete = async function () {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  this.status = 'archived';
+  return this.save();
 };
+
+module.exports = { Portfolio: mongoose.model('Portfolio', portfolioSchema) };

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { isEmail } = require('validator');
 
 const adminUserSchema = new mongoose.Schema({
     username: {
@@ -16,32 +15,57 @@ const adminUserSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        match: [/.+@.+\..+/, 'Please enter a valid email address'] 
+        match: [/.+@.+\..+/, 'Please enter a valid email address']
     },
     password: {
         type: String,
         required: [true, 'Please enter a password'],
-        minlength: [6, 'Password must be at least 6 characters']
+        minlength: [6, 'Password must be at least 6 characters'],
+        select: false
     },
     image: {
-        type: String, 
+        type: String,
         default: ''
+    },
+    role: {
+        type: String,
+        enum: ['superadmin', 'admin', 'manager'],
+        default: 'admin'
     },
     currentSessionId: {
         type: String,
         default: null,
+        select: false
     },
     slug: {
         type: String,
         index: true,
         unique: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    deletedAt: {
+        type: Date,
+        default: null
+    },
+    lastLoginAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true
 });
+adminUserSchema.pre(/^find/, function (next) {
+    if (this.getFilter().isDeleted === undefined) {
+        this.where({ isDeleted: false });
+    }
+    next();
+});
 
-// Slug generation middleware
-adminUserSchema.pre('save', async function(next) {
+adminUserSchema.pre('save', async function (next) {
     if (this.isModified('username')) {
         let baseSlug = this.username
             .toLowerCase()
@@ -49,7 +73,8 @@ adminUserSchema.pre('save', async function(next) {
             .replace(/(^-|-$)+/g, '');
         let slug = baseSlug;
         let count = 0;
-        while (await this.constructor.findOne({ slug, _id: { $ne: this._id } })) {
+
+        while (await mongoose.models.AdminUser.findOne({ slug, _id: { $ne: this._id } }).select('_id')) {
             count++;
             slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
         }
@@ -58,11 +83,11 @@ adminUserSchema.pre('save', async function(next) {
     next();
 });
 
-adminUserSchema.pre('save', async function(next) {
+adminUserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
-    
+
     try {
-        const salt = await bcrypt.genSalt(7);
+        const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (err) {
@@ -70,10 +95,14 @@ adminUserSchema.pre('save', async function(next) {
     }
 });
 
-adminUserSchema.methods.comparePassword = async function(candidatePassword) {
+adminUserSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-const AdminUser = mongoose.model('AdminUser', adminUserSchema);
+adminUserSchema.methods.softDelete = async function () {
+    this.isDeleted = true;
+    this.deletedAt = new Date();
+    return this.save();
+};
 
-module.exports = AdminUser;
+module.exports = mongoose.model('AdminUser', adminUserSchema);

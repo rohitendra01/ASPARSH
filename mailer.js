@@ -1,4 +1,3 @@
-require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -9,8 +8,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// In test environments we skip connection verification to avoid opening network
-// connections that keep the process alive after tests complete.
 if (process.env.NODE_ENV !== 'test') {
     transporter.verify((error, success) => {
         if (error) {

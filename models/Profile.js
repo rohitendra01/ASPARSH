@@ -1,138 +1,115 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
-const crypto = require('crypto');
+const { nanoid } = require('nanoid');
 
-const addressSchema = new Schema({
-  addressLine: { type: String, default: '' },
-  city:        { type: String, default: '' },
-  state:       { type: String, default: '' },
-  country:     { type: String, default: '' },
-  postcode:    { type: String, default: '' }
+const profileVersionSchema = new mongoose.Schema({
+  modifiedAt: { type: Date, default: Date.now },
+  modifiedByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' },
+  snapshot: { type: mongoose.Schema.Types.Mixed }
 }, { _id: false });
 
-const socialLinkSchema = new Schema({
-  platform: { type: String, required: true },
-  url:      { type: String, required: true }
-}, { _id: false });
+const profileSchema = new mongoose.Schema({
+  name: { type: String, required: [true, 'Name is required'], trim: true, index: true },
+  slug: { type: String, unique: true, index: true },
+  email: { type: String, trim: true, lowercase: true },
+  mobile: { type: String, trim: true },
+  image: { type: String, default: '' },
 
-const profileSchema = new Schema({
-  createdBy: {
-    type:     Schema.Types.ObjectId,
-    ref:      'AdminUser',
-    required: true
-  },
-
-  name: {
-    type:     String,
-    required: true,
-    trim:     true
-  },
-
-  slug: {
-    type:     String,
-    unique:   true,
-    required: true
-  },
-
-  email: {
-    type:     String,
-    required: true,
-    unique:   true,
-    lowercase:true
-  },
-
-  mobile: {
-    type:     String,
-    required: true
-  },
-
-  image: {
-    type:    String,
-    default: 'https://placehold.co/160x160'
-  },
-
-  occupation: {
-    type:    String,
-    trim:    true,
-    default: ''
-  },
-
-  category: {
-    type:    String,
-    trim:    true,
-    default: ''
-  },
-
-  subcategory: {
-    type:    String,
-    trim:    true,
-    default: ''
-  },
+  occupation: { type: String, default: '' },
+  companyName: { type: String, default: '', index: true },
+  bio: { type: String, default: '' },
+  website: { type: String, default: '' },
+  whatsapp: { type: String, default: '' },
+  category: { type: String, default: '', index: true },
+  subcategory: { type: String, default: '' },
+  experience: { type: Number, default: 0 },
 
   address: {
-    type: addressSchema,
-    default: () => ({})
+    addressLine: { type: String, default: '' },
+    city: { type: String, default: '', index: true },
+    state: { type: String, default: '' },
+    country: { type: String, default: '' },
+    postcode: { type: String, default: '' }
+  },
+  socialLinks: [{
+    platform: String,
+    url: String
+  }],
+
+  portfolio: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' }],
+
+  tenantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AdminUser',
+    required: true,
+    index: true
   },
 
-  socialLinks: {
-    type: [socialLinkSchema],
-    default: []
+  status: {
+    type: String,
+    enum: ['draft', 'published', 'private', 'archived'],
+    default: 'published',
+    index: true
   },
+  versions: [profileVersionSchema],
 
-  hotels: [{
-    type: Schema.Types.ObjectId,
-    ref:  'Hotel'
-  }],
-
-  visitingCard: [{
-    type: Schema.Types.ObjectId,
-    ref:  'VisitingCard'
-  }],
-
-  portfolio: [{
-    type: Schema.Types.ObjectId,
-    ref:  'Portfolio'
-  }],
-
-  reviewLinks: [{
-    type: Schema.Types.ObjectId,
-    ref:  'ReviewLink'
-  }],
-
-  metadata: {
-    type: Schema.Types.Mixed
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  deletedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
 });
 
-profileSchema.pre('validate', function(next) {
-  if (!this.slug || this.isModified('name')) {
-    const base = this.name
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-')
-      .replace(/^-+/, '')
-      .replace(/-+$/, '');
-
-    let uniqueId;
-    if (this._id) {
-      // For existing documents
-      const idSource = `${this._id.toString()}-${Date.now()}`;
-      uniqueId = crypto.createHash('md5')
-        .update(idSource)
-        .digest('hex')
-        .substring(0, 10);
-    } else {
-      // For new documents
-      uniqueId = crypto.randomBytes(5).toString('hex');
-    }
-
-    this.slug = base ? `${base}-${uniqueId}` : uniqueId;
+profileSchema.pre(/^find/, function (next) {
+  if (this.getFilter().isDeleted === undefined) {
+    this.where({ isDeleted: false });
   }
   next();
 });
+
+profileSchema.pre('save', async function (next) {
+  if (this.isModified('name') || this.isNew) {
+    let baseSlug = this.name ? this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : 'profile';
+    let slug = baseSlug;
+    let count = 0;
+
+    while (await mongoose.models.Profile.findOne({ slug, _id: { $ne: this._id } }).select('_id')) {
+      count++;
+      slug = `${baseSlug}-${nanoid(6)}`;
+    }
+    this.slug = slug;
+  }
+  next();
+});
+
+profileSchema.pre('save', function (next) {
+  if (!this.isNew && this.isModified()) {
+    const snapshot = this.toObject();
+    delete snapshot.versions;
+
+    this.versions.push({
+      modifiedAt: new Date(),
+      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      snapshot: snapshot
+    });
+
+    if (this.versions.length > 15) {
+      this.versions = this.versions.slice(-15);
+    }
+  }
+  next();
+});
+
+profileSchema.methods.softDelete = async function () {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  this.status = 'archived'; // Take offline instantly
+  return this.save();
+};
 
 module.exports = mongoose.model('Profile', profileSchema);

@@ -1,6 +1,5 @@
-// utils/catchAsync.js
 module.exports = function catchAsync(fn) {
-  return function(req, res, next) {
+  return function (req, res, next) {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 };

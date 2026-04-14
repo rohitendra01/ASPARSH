@@ -1,94 +1,97 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
-const reviewLinkSchema = new Schema({
+const generatedReviewSchema = new mongoose.Schema({
+  text: String,
+  category: String,
+  generatedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
+const reviewLinkVersionSchema = new mongoose.Schema({
+  modifiedAt: { type: Date, default: Date.now },
+  modifiedByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser' },
+  targetUrl: { type: String },
+  businessName: { type: String },
+  status: { type: String }
+}, { _id: false });
+
+const reviewLinkSchema = new mongoose.Schema({
+  slug: { type: String, unique: true, index: true },
+  targetUrl: { type: String, required: [true, 'Target URL is required'], trim: true },
+  businessName: { type: String, required: true, trim: true },
+  businessSubheader: { type: String, default: '', trim: true },
+  businessCategory: { type: String, required: true, trim: true },
+  reviewTitle: { type: String, default: 'Share Your Experience' },
+  customPromptTemplate: { type: String, default: '' },
+
   profileId: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Profile',
-    required: true
-  },
-
-  profileSlug: {
-    type: String, 
-    required: true
-  },
-  
-  slug: {
-    type: String,
     required: true,
-    unique: true
+    index: true
+  },
+  profileSlug: { type: String, required: true },
+  tenantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AdminUser',
+    required: true,
+    index: true
   },
 
-  businessName: {
+  status: {
     type: String,
-    required: true
+    enum: ['active', 'inactive', 'archived'],
+    default: 'active',
+    index: true
   },
 
-  businessSubheader: {
-    type: String
-  },
+  viewCount: { type: Number, default: 0 },
+  generationCount: { type: Number, default: 0 },
+  submissionCount: { type: Number, default: 0 },
+  generatedReviews: [generatedReviewSchema],
 
-  businessCategory: {
-    type: String,
-    required: false
-  },
+  versions: [reviewLinkVersionSchema],
 
-  reviewTitle: {
-    type: String,
-    default: 'Share Your Experience'
-  },
-
-  targetUrl: {
-    type: String,
-    required: true
-  },
-
-  createdBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'adminUser',
-    required: true
-  },
-
-  isActive: {
+  isDeleted: {
     type: Boolean,
-    default: true
+    default: false,
+    index: true
   },
-
-  viewCount: {
-    type: Number,
-    default: 0
-  },
-
-  generationCount: {
-    type: Number,
-    default: 0
-  },
-  
-  submissionCount: {
-    type: Number,
-    default: 0
-  },
-  
-  generatedReviews: [{
-    text: {
-      type: String,
-      required: true
-    },
-
-    category: {
-      type: String 
-    },
-
-    generatedAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-
-  customPromptTemplate: {
-    type: String
+  deletedAt: {
+    type: Date,
+    default: null
   }
+}, {
+  timestamps: true
+});
+reviewLinkSchema.pre(/^find/, function (next) {
+  if (this.getFilter().isDeleted === undefined) {
+    this.where({ isDeleted: false });
+  }
+  next();
+});
 
-}, { timestamps: true });
+reviewLinkSchema.pre('save', function (next) {
+  if (!this.isNew && (this.isModified('targetUrl') || this.isModified('businessName') || this.isModified('status'))) {
+    this.versions.push({
+      modifiedAt: new Date(),
+      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      targetUrl: this.targetUrl,
+      businessName: this.businessName,
+      status: this.status
+    });
+
+    if (this.versions.length > 10) {
+      this.versions = this.versions.slice(-10);
+    }
+  }
+  next();
+});
+
+reviewLinkSchema.methods.softDelete = async function () {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  this.status = 'archived';
+  return this.save();
+};
 
 module.exports = mongoose.model('ReviewLink', reviewLinkSchema);

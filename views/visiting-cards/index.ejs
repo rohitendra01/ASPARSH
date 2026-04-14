@@ -1,154 +1,281 @@
-<% layout('layouts/dashboard-boilerplate') -%>
+<%- layout('layouts/dashboard-boilerplate') -%>
   <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css" />') %>
 
-  <% var cardList=[]; if (typeof visitingCards !=='undefined' && visitingCards) { cardList=visitingCards; } else if
-    (typeof cards !=='undefined' && cards) { cardList=cards; } var safeUserSlug='' ; if (typeof user !=='undefined' &&
-    user && user.slug) { safeUserSlug=user.slug; } else if (typeof slug !=='undefined' && slug) { safeUserSlug=slug; }
-    var safeSlugSegment='' ; if (safeUserSlug) { safeSlugSegment='/' + encodeURIComponent(safeUserSlug); } %>
+  <%
+    var cardList = [];
+    if (typeof visitingCards !== 'undefined' && visitingCards) { cardList = visitingCards; }
+    else if (typeof cards !== 'undefined' && cards) { cardList = cards; }
 
-    <div class="page-container">
+    const slugSegment = (typeof slug !== 'undefined' && slug)
+      ? '/' + encodeURIComponent(slug)
+      : ((typeof user !== 'undefined' && user && user.slug) ? '/' + encodeURIComponent(user.slug) : '');
+  %>
 
-      <div class="page-header-row">
-        <div class="page-header-text">
-          <h1 class="page-title">Visiting Cards</h1>
-          <p class="page-subtitle">Manage digital business cards connected to your profiles.</p>
-        </div>
+  <style>
+    /* SaaS List View Optimizations */
+    .saas-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .saas-list-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      content-visibility: auto; /* Optimizes rendering for long lists */
+      contain-intrinsic-size: 80px;
+    }
+    .saas-list-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .saas-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 1.5rem;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .saas-info-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0; /* allows truncation */
+    }
+    .saas-info-main h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .saas-info-main .meta {
+      font-size: 0.85rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .saas-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-inline: 2rem;
+    }
+    .saas-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .saas-stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; font-weight: 700; }
+    .saas-stat-val { font-size: 0.9rem; font-weight: 600; color: #334155; }
+    
+    .saas-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .modern-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .modern-action-btn:hover {
+      background: #f1f5f9;
+      color: #4f46e5;
+      border-color: #cbd5e1;
+    }
+    @media(max-width: 768px) {
+      .saas-list-item { flex-direction: column; align-items: flex-start; gap: 1rem; position: relative; }
+      .saas-stats { margin-inline: 0; margin-top: 0.5rem; }
+      .saas-actions { position: absolute; right: 1rem; top: 1rem; }
+    }
+  </style>
 
-        <div class="page-header-actions">
-          <div class="search-wrapper">
-            <input type="text" id="liveSearchInput" placeholder="Search by title, company, or profile..."
-              onkeyup="filterCards()">
-          </div>
-          <a href="/dashboard<%= safeSlugSegment %>/visiting-cards/new" class="btn-primary">+ Create Visiting Card</a>
-        </div>
+  <div class="page-container">
+    <div class="page-header-row">
+      <div class="page-header-text">
+        <h1 class="page-title">vCard Command Center</h1>
+        <p class="page-subtitle">Manage client visiting cards and your design template repository.</p>
       </div>
 
-      <% if (cardList.length> 0) { %>
-        <div class="quick-stats-row">
-          <div class="stat-card">
-            <span class="stat-value">
-              <%= cardList.length %>
-            </span>
-            <span class="stat-label">Active Cards</span>
-          </div>
+      <div class="page-header-actions">
+        <div class="search-wrapper">
+          <input type="text" id="liveSearchInput" placeholder="Search clients, companies, or templates..."
+            onkeyup="filterCards()">
         </div>
-        <% } %>
-
-          <div class="entity-list-container">
-            <% if (cardList.length> 0) { %>
-              <div class="compact-grid" id="entityGrid">
-
-                <% cardList.forEach(function(card) { var cTitle=card.title || card.profileName || 'Untitled Card' ; var
-                  cCompany=card.company || '' ; var cProfileName=card.profileName || 'Unlinked' ; var
-                  cSearchTerm=(cTitle + ' ' + cCompany + ' ' + cProfileName).toLowerCase(); var cViewSlug=null; if
-                  (card.profileSlug) { cViewSlug=encodeURIComponent(card.profileSlug); } else if (card.slug) {
-                  cViewSlug=encodeURIComponent(card.slug); } var cEditTarget='' ; if (card.profileSlug) {
-                  cEditTarget='/dashboard/' + encodeURIComponent(safeUserSlug) + '/visiting-cards/profile/' +
-                  encodeURIComponent(card.profileSlug) + '/edit' ; } else { cEditTarget='/dashboard/' +
-                  encodeURIComponent(safeUserSlug) + '/visiting-cards/' + card._id + '/edit' ; } %>
-
-                  <div class="compact-card entity-card" data-search-term="<%= cSearchTerm %>">
-
-                    <div class="card-thumbnail">
-                      <% if (card.profileImage) { %>
-                        <img src="<%= card.profileImage %>" alt="<%= cTitle %>" loading="lazy">
-                        <% } else { %>
-                          <div class="thumbnail-placeholder">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                          </div>
-                          <% } %>
-                    </div>
-
-                    <div class="card-info">
-                      <div class="info-header">
-                        <h3 class="card-title text-truncate" title="<%= cTitle %>">
-                          <%= cTitle %>
-                        </h3>
-                        <% if (cCompany) { %>
-                          <span class="badge">
-                            <%= cCompany %>
-                          </span>
-                          <% } %>
-                      </div>
-
-                      <div class="info-meta-grid">
-                        <span class="meta-item text-truncate" title="Profile: <%= cProfileName %>">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                          </svg>
-                          <%= cProfileName %>
-                        </span>
-
-                        <span class="meta-item text-truncate">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                          </svg>
-                          Ready to Share
-                        </span>
-                      </div>
-                    </div>
-
-                    <div class="card-actions">
-                      <% if (cViewSlug) { %>
-                        <a href="/visiting-card/<%= cViewSlug %>" target="_blank" class="action-icon-btn info-btn"
-                          title="View Live Card">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                          </svg>
-                        </a>
-                        <% } %>
-
-                          <a href="<%= cEditTarget %>" class="action-icon-btn edit-btn" title="Edit Visiting Card">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                          </a>
-                    </div>
-
-                  </div>
-                  <% }); %>
-              </div>
-
-              <% } else { %>
-
-                <div class="empty-state">
-                  <div class="empty-icon">🪪</div>
-                  <h2>No visiting cards found</h2>
-                  <p>Create digital business cards connected to your profiles so you can share your contact info
-                    effortlessly.</p>
-                  <a href="/dashboard<%= safeSlugSegment %>/visiting-cards/new" class="btn-primary">+ Create Your First
-                    Card</a>
-                </div>
-
-                <% } %>
-          </div>
+        <a href="/dashboard<%= slugSegment %>/templates/new" class="btn-secondary">+ Add New Design</a>
+        <a href="/dashboard<%= slugSegment %>/visiting-cards/new" class="btn-primary">+ Create Client vCard</a>
+      </div>
     </div>
 
-    <script>
-      function filterCards() {
-        var input = document.getElementById('liveSearchInput').value.trim().toLowerCase();
-        var cards = document.querySelectorAll('.entity-card');
+    <div class="quick-stats-row">
+      <div class="stat-card">
+        <span class="stat-value"><%= typeof totalCards !== 'undefined' ? totalCards : '0' %></span>
+        <span class="stat-label">Active Client Cards</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= typeof totalTemplates !== 'undefined' ? totalTemplates : '0' %></span>
+        <span class="stat-label">Registered Designs</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value"><%= typeof totalViews !== 'undefined' ? totalViews : '0' %></span>
+        <span class="stat-label">Total Global Views</span>
+      </div>
+    </div>
 
-        cards.forEach(function (card) {
-          var searchTerm = card.getAttribute('data-search-term') || '';
-          if (searchTerm.includes(input)) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
-        });
+    <div class="section-tabs">
+      <h3 class="tab-title active" onclick="switchTab('cards')" id="tab-cards" style="cursor: pointer;">Client vCards</h3>
+      <h3 class="tab-title" onclick="switchTab('templates')" id="tab-templates" style="cursor: pointer;">Template Library</h3>
+    </div>
+
+    <!-- ── vCard list ─────────────────────────────────────────────────── -->
+    <div class="entity-list-container" id="cards-container" style="margin-top: 2rem;">
+      <% if (cardList.length > 0) { %>
+        <div class="saas-list-container" id="entityGrid">
+          <% cardList.forEach(function(card) {
+            var cTitle       = (card.profile && card.profile.fullName) || card.slug || 'Untitled';
+            var cCompany     = (card.profile && card.profile.companyName) || '';
+            var cDesignation = (card.profile && card.profile.designation) || '';
+            var cTemplate    = card.templateId || {};
+            var displayImg   = (card.profile && card.profile.profileImage) ? card.profile.profileImage : cTemplate.thumbnailUrl;
+          %>
+            <div class="saas-list-item entity-card" data-search-term="<%= (cTitle + ' ' + cCompany + ' ' + cDesignation).toLowerCase() %>">
+              <% if (displayImg) { %>
+                <img class="saas-thumb" src="<%= displayImg %>" alt="<%= cTitle %>" loading="lazy">
+              <% } else { %>
+                <div class="saas-thumb">👤</div>
+              <% } %>
+
+              <div class="saas-info-main">
+                <h3><%= cTitle %></h3>
+                <div class="meta">
+                  <% if (cDesignation) { %> <%= cDesignation %> <% } %>
+                  <% if (cDesignation && cCompany) { %> &bull; <% } %>
+                  <% if (cCompany) { %> <%= cCompany %> <% } %>
+                </div>
+              </div>
+
+              <div class="saas-stats">
+                <div class="saas-stat-item">
+                  <span class="saas-stat-label">Template</span>
+                  <span class="saas-stat-val">
+                    <span class="badge badge-template" style="margin:0"><%= cTemplate.name || 'No Template' %></span>
+                  </span>
+                </div>
+                <div class="saas-stat-item">
+                  <span class="saas-stat-label">Views</span>
+                  <span class="saas-stat-val"><%= card.viewCount || 0 %></span>
+                </div>
+              </div>
+
+              <div class="saas-actions">
+                <a href="/visiting-card/<%= card.slug %>" target="_blank" class="modern-action-btn" title="View Live Card">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+                </a>
+                <a href="/dashboard<%= slugSegment %>/visiting-cards/<%= card._id %>/edit" class="modern-action-btn" title="Edit Card">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </a>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-icon">🪪</div>
+          <h2>No Client Cards Found</h2>
+          <p>You haven't generated any vCards for your clients yet.</p>
+          <a href="/dashboard<%= slugSegment %>/visiting-cards/new" class="btn-primary">+ Create First Client vCard</a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- ── Template library ────────────────────────────────────────────── -->
+    <div class="entity-list-container" id="templates-container" style="margin-top: 2rem; display: none;">
+      <% if (typeof templates !== 'undefined' && templates && templates.length > 0) { %>
+        <div class="compact-grid" id="templateGrid">
+          <% templates.forEach(function(template) { %>
+            <div class="compact-card entity-card" data-search-term="<%= (template.name + ' ' + template.category).toLowerCase() %>">
+              <div class="card-thumbnail">
+                <% if (template.thumbnailUrl) { %>
+                  <img src="<%= template.thumbnailUrl %>" alt="<%= template.name %> Preview" loading="lazy">
+                <% } else { %>
+                  <div class="thumbnail-placeholder">🎨</div>
+                <% } %>
+              </div>
+              <div class="card-info">
+                <div class="info-header">
+                  <h3 class="card-title text-truncate"><%= template.name %></h3>
+                  <span class="badge badge-template"><%= template.category %></span>
+                </div>
+                <div class="info-meta-grid">
+                  <span class="meta-item text-truncate">File: <%= template.fileName || template.templateKey %>.ejs</span>
+                  <span class="meta-item text-truncate">Status: <%= template.isActive ? 'Active' : 'Inactive' %></span>
+                </div>
+              </div>
+              <div class="card-actions">
+                <a href="/dashboard<%= slugSegment %>/templates/<%= template._id %>/edit" class="action-icon-btn edit-btn" title="Edit Template Schema">⚙️</a>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-icon">🎨</div>
+          <h2>No Templates Found</h2>
+          <p>You haven't registered any design templates yet.</p>
+          <a href="/dashboard<%= slugSegment %>/templates/new" class="btn-primary">+ Add First Template</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    function filterCards() {
+      var input = document.getElementById('liveSearchInput').value.trim().toLowerCase();
+      var activeContainer = document.getElementById('cards-container').style.display !== 'none'
+        ? document.getElementById('cards-container')
+        : document.getElementById('templates-container');
+      var cards = activeContainer.querySelectorAll('.entity-card');
+      cards.forEach(function (card) {
+        var searchTerm = card.getAttribute('data-search-term') || '';
+        card.style.display = searchTerm.includes(input) ? 'flex' : 'none';
+      });
+    }
+
+    function switchTab(tabName) {
+      document.getElementById('liveSearchInput').value = '';
+      if (tabName === 'cards') {
+        document.getElementById('tab-cards').classList.add('active');
+        document.getElementById('tab-templates').classList.remove('active');
+        document.getElementById('cards-container').style.display = 'block';
+        document.getElementById('templates-container').style.display = 'none';
+      } else {
+        document.getElementById('tab-templates').classList.add('active');
+        document.getElementById('tab-cards').classList.remove('active');
+        document.getElementById('templates-container').style.display = 'block';
+        document.getElementById('cards-container').style.display = 'none';
       }
-    </script>
+      filterCards();
+    }
+  </script>

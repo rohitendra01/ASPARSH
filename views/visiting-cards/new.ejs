@@ -1,107 +1,806 @@
 <% layout('layouts/dashboard-boilerplate') %>
-<% block('styles').append('<link rel="stylesheet" href="/css/portfolio/business/visiting-card.css">') %>
-<% // Pre-encode slug for safe URL usage and avoid double slashes
-  const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
+<% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
+<% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
 
-<div class="visiting-card-form-root">
-  <h1>Create Visiting Card</h1>
+<style>
+  .wz { max-width:960px; margin:0 auto; padding:1.5rem; }
+  .wz-header h1 { font-size:1.8rem; font-weight:700; color:#1e293b; margin-bottom:.25rem; }
+  .wz-header p { color:#64748b; font-size:.9rem; }
 
-  <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
-    <input type="hidden" id="_csrf" name="_csrf" value="<%= csrfToken %>">
+  /* ── Progress ── */
+  .progress-bar { display:flex; align-items:center; margin:1.8rem 0 2rem; }
+  .step-node { display:flex; align-items:center; gap:.5rem; }
+  .step-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; background:#e2e8f0; color:#94a3b8; transition:.3s; flex-shrink:0; }
+  .step-lbl { font-size:.78rem; font-weight:600; color:#94a3b8; white-space:nowrap; transition:.3s; }
+  .step-node.active .step-dot { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 4px 12px rgba(99,102,241,.4); }
+  .step-node.active .step-lbl { color:#6366f1; font-weight:700; }
+  .step-node.done .step-dot { background:#10b981; color:#fff; }
+  .step-node.done .step-lbl { color:#10b981; }
+  .step-line { flex:1; height:2px; background:#e2e8f0; margin:0 .5rem; min-width:16px; transition:.3s; }
+  .step-line.done { background:#10b981; }
+
+  /* ── Step 1 dual panel ── */
+  .step1-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start; }
+  .step1-panel { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:1.25rem; }
+  .step1-panel h3 { font-size:.9rem; font-weight:700; color:#1e293b; margin:0 0 1rem; display:flex; align-items:center; gap:.4rem; }
+  .panel-required-badge { font-size:.68rem; background:#fef3c7; color:#92400e; border-radius:20px; padding:.15rem .5rem; font-weight:600; margin-left:auto; }
+  .panel-optional-badge { font-size:.68rem; background:#f0fdf4; color:#166534; border-radius:20px; padding:.15rem .5rem; font-weight:600; margin-left:auto; }
+
+  /* ── Template picker ── */
+  .tmpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; max-height:450px; overflow-y:auto; padding-right:2px; }
+  .tmpl-card { border:2px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fafafa; display:flex; flex-direction:column; position:relative; }
+  .tmpl-card.sel { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.2); background:#fff; }
+  .tmpl-card img { width:100%; height:110px; object-fit:cover; display:block; border-bottom:1px solid #e2e8f0; }
+  .tmpl-ph { width:100%; height:110px; background:linear-gradient(135deg,#667eea,#764ba2); display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+  .tmpl-info { padding:.6rem .7rem; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
+  .tmpl-info-text h4 { font-size:.82rem; font-weight:700; color:#1e293b; margin:0; }
+  .tmpl-info-text p { font-size:.7rem; color:#64748b; margin:.1rem 0 .5rem; }
+  .btn-select { background:#fff; border:1px solid #cbd5e1; color:#475569; padding:.4rem; border-radius:6px; font-size:.72rem; font-weight:600; cursor:pointer; text-align:center; transition:.2s; }
+  .btn-select:hover { background:#f1f5f9; }
+  .tmpl-card.sel .btn-select { background:#6366f1; color:#fff; border-color:#6366f1; }
+  
+  /* ── Profile picker ── */
+  .profile-search-box { position:relative; margin-bottom:.75rem; }
+  .profile-search-box input { width:100%; padding:.58rem .8rem .58rem 2.2rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:.86rem; color:#1e293b; background:#fafafa; }
+  .profile-search-box input:focus { outline:none; border-color:#6366f1; background:#fff; }
+  .profile-search-box .ico { position:absolute; left:.7rem; top:50%; transform:translateY(-50%); font-size:.9rem; color:#94a3b8; pointer-events:none; }
+  .profile-list { max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:.5rem; }
+  .profile-item { display:flex; align-items:center; gap:.7rem; padding:.6rem; border:1.5px solid #e2e8f0; border-radius:10px; background:#fafafa; position:relative; }
+  .profile-item.sel { border-color:#10b981; background:#f0fdf4; }
+  .profile-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.9rem; font-weight:700; flex-shrink:0; overflow:hidden;}
+  .profile-meta { flex:1; min-width:0; }
+  .profile-meta .pname { font-size:.86rem; font-weight:700; color:#1e293b; }
+  .profile-meta .pdetail { font-size:.72rem; color:#64748b; }
+  .btn-select-profile { background:#fff; border:1px solid #cbd5e1; color:#475569; padding:.3rem .6rem; border-radius:6px; font-size:.7rem; font-weight:600; cursor:pointer; text-align:center; transition:.2s; }
+  .btn-select-profile:hover { background:#f1f5f9; }
+  .profile-item.sel .btn-select-profile { background:#10b981; color:#fff; border-color:#10b981; content:"Selected"; }
+  .no-profiles { text-align:center; padding:1.5rem; color:#94a3b8; font-size:.84rem; }
+  .sel-profile-strip { display:none; align-items:center; gap:.6rem; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:.45rem .8rem; margin-top:.5rem; font-size:.8rem; color:#15803d; font-weight:600; }
+  .sel-profile-strip.show { display:flex; }
+  .sel-profile-strip button { background:none; border:none; cursor:pointer; color:#94a3b8; font-size:.9rem; margin-left:auto; }
+
+  /* ── Sections ── */
+  .sec { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:1.4rem 1.5rem; margin-bottom:1.1rem; }
+  .sec h3 { font-size:.95rem; font-weight:700; color:#1e293b; margin:0 0 1rem; display:flex; align-items:center; gap:.45rem; }
+  .sec-purple { background:linear-gradient(135deg,#faf5ff,#ede9fe); border-color:#c4b5fd; }
+  .sec-purple h3 { color:#7c3aed; }
+
+  /* ── Grid ── */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.9rem; }
+  .g1 { display:grid; grid-template-columns:1fr; gap:.9rem; }
+  .span2 { grid-column:span 2; }
+  .span3 { grid-column:span 3; }
+
+  /* ── Fields ── */
+  .f { display:flex; flex-direction:column; gap:.3rem; }
+  .f label { font-size:.78rem; font-weight:600; color:#374151; }
+  .f input,.f textarea,.f select { padding:.58rem .8rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:.88rem; color:#1e293b; background:#fafafa; width:100%; transition:border-color .2s; }
+  .f textarea { resize:vertical; min-height:76px; }
+  .f input:focus,.f textarea:focus,.f select:focus { outline:none; border-color:#6366f1; background:#fff; }
+  .req { color:#ef4444; margin-left:2px; }
+  .hint { font-size:.72rem; color:#94a3b8; margin-top:-.15rem; }
+
+  /* ── Dynamic array rows ── */
+  .array-row { display:grid; gap:.6rem; align-items:end; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:.8rem; margin-bottom:.6rem; position:relative; }
+  .array-row .del-row { position:absolute; top:.4rem; right:.4rem; background:none; border:none; cursor:pointer; font-size:1rem; color:#94a3b8; line-height:1; }
+  .array-row .del-row:hover { color:#ef4444; }
+  .add-row-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem 1rem; background:#f5f3ff; border:1.5px dashed #a78bfa; border-radius:8px; font-size:.82rem; font-weight:600; color:#7c3aed; cursor:pointer; transition:.2s; margin-top:.2rem; }
+  .add-row-btn:hover { background:#ede9fe; border-color:#8b5cf6; }
+
+  /* ── File fields ── */
+  .img-field-wrap label.file-label { display:flex; align-items:center; gap:.7rem; padding:.6rem .8rem; border:1.5px dashed #c4b5fd; border-radius:8px; cursor:pointer; background:#faf5ff; font-size:.82rem; color:#7c3aed; font-weight:600; transition:.2s; }
+  .img-field-wrap label.file-label:hover { border-color:#8b5cf6; background:#ede9fe; }
+  .img-field-wrap input[type=file] { display:none; }
+  .img-thumb { width:56px; height:42px; object-fit:cover; border-radius:6px; display:none; }
+
+  /* ── Selected bar ── */
+  .sel-bar { background:#f5f3ff; border:1px solid #c4b5fd; border-radius:10px; padding:.75rem 1.1rem; display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.3rem; font-size:.84rem; align-items:center; }
+  .sel-bar-item { display:flex; align-items:center; gap:.55rem; }
+  .sel-bar-item img { width:42px; height:32px; object-fit:cover; border-radius:6px; }
+  .sel-bar-item .lbl { font-size:.72rem; color:#94a3b8; }
+  .sel-bar-item .val { font-weight:700; color:#7c3aed; }
+
+  /* ── Actions ── */
+  .wz-actions { display:flex; align-items:center; justify-content:space-between; margin-top:1.5rem; flex-wrap:wrap; gap:.8rem; }
+  .wz-actions .right { display:flex; gap:.7rem; }
+  .btn { padding:.68rem 1.6rem; border-radius:10px; font-size:.88rem; font-weight:600; cursor:pointer; border:none; transition:.2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
+  .btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 4px 12px rgba(99,102,241,.35); }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(99,102,241,.5); }
+  .btn-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+  .btn-secondary { background:#f1f5f9; color:#475569; }
+  .btn-secondary:hover { background:#e2e8f0; }
+  .alert-err { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; border-radius:10px; padding:.85rem 1.1rem; margin-bottom:1.3rem; font-size:.88rem; }
+  .review-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; font-size:.86rem; color:#475569; line-height:1.8; }
+  .review-grid strong { color:#1e293b; display:block; font-size:.78rem; }
+
+  @media(max-width:700px) {
+    .step1-layout { grid-template-columns:1fr; }
+    .g2,.g3 { grid-template-columns:1fr; }
+    .span2,.span3 { grid-column:span 1; }
+    .step-lbl { display:none; }
+    .tmpl-grid { grid-template-columns:1fr 1fr; }
+  }
+</style>
+
+<div class="wz">
+  <div class="wz-header">
+    <h1>🪪 Create Client vCard</h1>
+    <p>Select a design and fill in the card details.</p>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert-err">⚠️ <%= error %></div>
   <% } %>
 
-  <form action="/dashboard/<%= slug || '' %>/visiting-cards" method="POST" enctype="application/x-www-form-urlencoded">
-    <% if (profile && profile._id) { %>
-      <input type="hidden" name="profileSlug" value="<%= profile.slug %>">
-      <input type="hidden" name="slug" value="<%= slug || '' %>">
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="step-node active" id="pn1"><div class="step-dot">1</div><div class="step-lbl">Design</div></div>
+    <div class="step-line" id="pl1"></div>
+    <div class="step-node" id="pn2"><div class="step-dot">2</div><div class="step-lbl">Card Details</div></div>
+    <div class="step-line" id="pl2"></div>
+    <div class="step-node" id="pn3"><div class="step-dot">3</div><div class="step-lbl">Confirm</div></div>
+  </div>
+
+  <!-- ═══ STEP 1 — Design ═══ -->
+  <div id="step-1">
+    <% if (!templates || templates.length === 0) { %>
+      <div style="text-align:center;padding:3rem;background:#fff;border:1px solid #e2e8f0;border-radius:14px;">
+        <div style="font-size:2.5rem;margin-bottom:.8rem">🎨</div>
+        <h3>No Design Templates Yet</h3>
+        <p style="color:#64748b;margin:.5rem 0 1.2rem">Register a design first before creating a vCard.</p>
+        <a href="/dashboard<%= slugSegment %>/templates/new" class="btn btn-primary">+ Add First Template</a>
+      </div>
     <% } else { %>
-      <input type="hidden" name="profileSlug" value="">
-      <input type="hidden" name="slug" value="">
+
+    <div class="step1-layout">
+      <!-- LEFT: Template picker -->
+      <div class="step1-panel">
+        <h3>🎨 Choose a Design <span class="panel-required-badge">Required</span></h3>
+        <div class="tmpl-grid">
+          <% templates.forEach(function(t) { %>
+            <div class="tmpl-card" id="tmpl-card-<%= t._id %>">
+              <% if (t.thumbnailUrl) { %>
+                <img src="<%= t.thumbnailUrl %>" alt="<%= t.name %>" loading="lazy">
+              <% } else { %>
+                <div class="tmpl-ph">🎨</div>
+              <% } %>
+              <div class="tmpl-info">
+                <div class="tmpl-info-text">
+                  <h4><%= t.name %></h4>
+                  <p><%= t.category %></p>
+                </div>
+                <button type="button" class="btn-select" data-id="<%= t._id %>" data-name="<%= t.name %>" data-category="<%= t.category %>" data-thumb="<%= t.thumbnailUrl || '' %>" onclick="handleSelectTemplate(this)">
+                  Select Design
+                </button>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- RIGHT: Profile picker -->
+      <div class="step1-panel">
+        <h3>👤 Link a Customer <span class="panel-optional-badge">Optional</span></h3>
+        <div class="profile-search-box">
+          <span class="ico">🔍</span>
+          <input type="text" id="profileSearch" placeholder="Search profiles to link..." autocomplete="off">
+        </div>
+        <div class="sel-profile-strip" id="selProfileStrip">
+          <span id="selProfileLabel">—</span>
+          <button type="button" onclick="clearProfile()" title="Remove link">✕</button>
+        </div>
+        <div class="profile-list" id="profileList">
+          <% if (profiles && profiles.length > 0) { %>
+            <% profiles.forEach(function(p) { %>
+              <div class="profile-item" id="prof-item-<%= p._id %>">
+                <div class="profile-avatar">
+                  <% if (p.image) { %><img src="<%= p.image %>" alt="<%= p.name %>" style="width:100%;height:100%;object-fit:cover;"><% } else { %><%= (p.name||'?')[0].toUpperCase() %><% } %>
+                </div>
+                <div class="profile-meta">
+                  <div class="pname"><%= p.name %></div>
+                  <div class="pdetail"><%= p.occupation || p.email || p.mobile || p.slug %></div>
+                </div>
+                <button type="button" class="btn-select-profile" data-id="<%= p._id %>" data-slug="<%= p.slug %>" data-name="<%= p.name %>" onclick="handleSelectProfile(this)">Select</button>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="no-profiles" id="noProfMsg">No profiles yet. <a href="/dashboard<%= slugSegment %>/profiles/new" style="color:#6366f1;font-weight:600;">Create one?</a></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
     <% } %>
 
-   
-      <!-- Profile search / attach -->
-      <label>
-        Attach Profile
-        <input id="profile-search" type="search" placeholder="Search profile by name, email or slug..." autocomplete="off">
-      </label>
-      <div id="profile-suggestions" class="suggestions"></div>
-      <div id="selected-profile" class="selected-profile">No profile selected</div>
-
-    <!-- Visiting-card fields: keep only card-specific fields. Contact/name/image come from Profile. -->
-    <label>
-      Title / Designation
-      <input type="text" name="title" id="field-title" value="" required>
-    </label>
-
-    <label>
-      Description
-      <textarea name="description" id="field-description" rows="4" required></textarea>
-    </label>
-
-    <label>
-      Website (optional)
-      <input type="url" name="website" id="field-website" value="">
-    </label>
-
-
-    <div class="form-actions">
-  <button type="submit" class="btn btn-primary">Create Visiting Card</button>
-  <a href="/dashboard<%= slugSegment %>/visiting-cards" class="btn btn-secondary">Cancel</a>
+    <div class="wz-actions" style="margin-top:1.2rem;">
+      <a href="/dashboard<%= slugSegment %>/visiting-cards" class="btn btn-secondary">Cancel</a>
+      <div class="right">
+        <button type="button" class="btn btn-primary" id="step1Next" onclick="goToStep2()" disabled>
+          Next: Fill Details →
+        </button>
+      </div>
     </div>
-  </form>
+  </div>
+
+  <!-- ═══ STEP 2 — Card Data Form ═══ -->
+  <div id="step-2" style="display:none;">
+    <!-- Summary bar -->
+    <div class="sel-bar">
+      <div class="sel-bar-item">
+        <img id="selThumbImg" src="" alt="" style="display:none;">
+        <div><div class="lbl">Design</div><div class="val" id="selTmplName">—</div></div>
+      </div>
+    </div>
+
+    <form id="vcardForm"
+          action="/dashboard<%= slugSegment %>/visiting-cards"
+          method="POST"
+          enctype="multipart/form-data">
+      <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <% } %>
+      <input type="hidden" name="templateId" id="templateIdInput">
+
+      <!-- 1. Profile / Identity -->
+      <div class="sec">
+        <h3>👤 Core Identity</h3>
+        <div class="g2">
+          <div class="f">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="profile[fullName]" required placeholder="Dr. Rohit Verma / ABC Corp" id="inp-fullName">
+          </div>
+          <div class="f">
+            <label>Designation</label>
+            <input type="text" name="profile[designation]" placeholder="Senior Cardiologist / CEO">
+          </div>
+          <div class="f">
+            <label>Company / Firm Name</label>
+            <input type="text" name="profile[companyName]" placeholder="City Heart Hospital">
+          </div>
+
+          <div class="f">
+            <label>Logo / Brand Image <small class="hint">(Upload file)</small></label>
+            <input type="file" name="profile[logo]" accept="image/*">
+          </div>
+          <div class="f">
+             <!-- Cover spacer -->
+          </div>
+          <div class="f span2">
+            <label>Bio / Introduction</label>
+            <textarea name="profile[bio]" placeholder="Short intro about this person or business…"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Contact & Hours -->
+      <div class="sec">
+        <h3>📞 Contact Information & Hours</h3>
+        <div class="g2">
+          <div class="f"><label>Primary Phone</label><input type="tel" name="contact[primaryPhone]" placeholder="+91 98765 43210"></div>
+          <div class="f"><label>Primary Email</label><input type="email" name="contact[primaryEmail]" placeholder="contact@example.com"></div>
+          <div class="f"><label>Website</label><input type="url" name="contact[website]" placeholder="https://example.com"></div>
+          <div class="f"><label>Business Hours</label><input type="text" name="contact[businessHours]" placeholder="Mon-Fri: 9AM - 8PM"></div>
+          <div class="f"><label>Address</label><input type="text" name="contact[location][address]" placeholder="Plot 12, MG Road"></div>
+          <div class="f"><label>Google Maps Embed URL</label><input type="url" name="contact[location][mapEmbedUrl]" placeholder="https://maps.google.com/…"></div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <label style="font-size:.78rem;font-weight:600;color:#374151;display:block;margin-bottom:.4rem;">Additional Contacts <small class="hint">(Fax, Skype, Telegram, etc.)</small></label>
+          <div id="additionalContactsContainer"></div>
+          <button type="button" class="add-row-btn" onclick="addAdditionalContact()">+ Add Contact</button>
+        </div>
+      </div>
+
+      <!-- 3. Social Media -->
+      <div class="sec">
+        <h3>🔗 Social Media Links</h3>
+        <div id="socialsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addSocial()">+ Add Social Link</button>
+      </div>
+
+      <!-- 4. Stats -->
+      <div class="sec">
+        <h3>📊 Highlights & Stats</h3>
+        <div id="statsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addStat()">+ Add Stat</button>
+      </div>
+
+      <!-- 5. Services / Offerings -->
+      <div class="sec">
+        <h3>🛠️ Services / Offerings</h3>
+        <div id="servicesContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addService()">+ Add Service / Item</button>
+      </div>
+
+      <!-- 6. Pricing Plans -->
+      <div class="sec">
+        <h3>💰 Pricing Packages</h3>
+        <div id="pricingContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addPricing()">+ Add Package</button>
+      </div>
+
+      <!-- 7. Portfolio (Links/Videos) -->
+      <div class="sec">
+        <h3>🎬 Portfolio / Media Links</h3>
+        <div id="portfolioContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addPortfolio()">+ Add Video / Link</button>
+      </div>
+
+      <!-- 8. Gallery (Images) -->
+      <div class="sec">
+        <h3>🖼️ Gallery Images</h3>
+        <div id="galleryContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addGallery()">+ Add Gallery Image</button>
+      </div>
+
+      <!-- 9. Experience / Timeline -->
+      <div class="sec">
+        <h3>💼 Experience / Timeline</h3>
+        <div id="experienceContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addExperience()">+ Add Entry</button>
+      </div>
+
+      <!-- 10. Testimonials -->
+      <div class="sec">
+        <h3>⭐ Testimonials / Reviews</h3>
+        <div id="testimonialsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addTestimonial()">+ Add Review</button>
+      </div>
+
+      <!-- 11. Partners -->
+      <div class="sec">
+        <h3>🤝 Partners / Affiliates</h3>
+        <div id="partnersContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addPartner()">+ Add Partner</button>
+      </div>
+
+      <!-- 12. Specializations -->
+      <div class="sec">
+        <h3>🗂️ Specializations (Secondary)</h3>
+        <div id="specializationsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addSpecialization()">+ Add Specialization</button>
+      </div>
+
+      <!-- 13. Qualifications / Simple List -->
+      <div class="sec">
+        <h3>📜 Qualifications / Certifications</h3>
+        <p class="hint">Enter one per line.</p>
+        <div class="f">
+          <textarea name="qualifications" rows="4" placeholder="MD General Medicine&#10;Member of Medical Association"></textarea>
+        </div>
+      </div>
+
+      <!-- 14. Images Uploads -->
+      <div class="sec">
+        <h3>🖼️ Hero Images Upload</h3>
+        <p class="hint" style="margin-bottom:1rem;">Compressed before upload. Max 7MB each.</p>
+        <div class="g2">
+          <div class="f">
+            <label>Profile / Hero Photo</label>
+            <div class="img-field-wrap">
+              <label class="file-label" for="inp-profileImage" id="lbl-profileImage">
+                <span>📷</span> Choose Photo
+                <img class="img-thumb" id="prev-profileImage" alt="">
+              </label>
+              <input type="file" id="inp-profileImage" name="profile[profileImage]" accept="image/*">
+            </div>
+          </div>
+          <div class="f">
+            <label>Cover / Banner Image</label>
+            <div class="img-field-wrap">
+              <label class="file-label" for="inp-coverImage" id="lbl-coverImage">
+                <span>🖼️</span> Choose Banner
+                <img class="img-thumb" id="prev-coverImage" alt="">
+              </label>
+              <input type="file" id="inp-coverImage" name="profile[coverImage]" accept="image/*">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 15. Theme & Aliasing -->
+      <div class="sec sec-purple">
+        <h3>🎨 Theme & Section Titles</h3>
+        <div class="g3">
+          <div class="f"><label>Primary Color</label><input type="color" name="theme[primaryColor]" value="#1e40af"></div>
+          <div class="f"><label>Secondary Color</label><input type="color" name="theme[secondaryColor]" value="#0891b2"></div>
+          <div class="f">
+            <label>Font Style</label>
+            <select name="theme[fontStyle]">
+              <option value="Inter">Inter</option>
+              <option value="Roboto">Roboto</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Merriweather">Merriweather</option>
+              <option value="Lato">Lato</option>
+              <option value="Outfit">Outfit</option>
+            </select>
+          </div>
+        </div>
+        <div class="g2" style="margin-top:1.5rem">
+           <div class="f"><label>"Services" Section Title</label><input type="text" name="theme[sectionTitles][services]" placeholder="Our Services"></div>
+           <div class="f"><label>"Experience" Section Title</label><input type="text" name="theme[sectionTitles][experience]" placeholder="Experience"></div>
+           <div class="f"><label>"Gallery" Section Title</label><input type="text" name="theme[sectionTitles][gallery]" placeholder="Gallery"></div>
+           <div class="f"><label>"Partners" Section Title</label><input type="text" name="theme[sectionTitles][partners]" placeholder="Our Partners"></div>
+        </div>
+      </div>
+
+      <div class="wz-actions">
+        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+        <div class="right">
+          <button type="button" class="btn btn-primary" onclick="goToStep(3)">Review & Confirm →</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ STEP 3 — Confirm ═══ -->
+  <div id="step-3" style="display:none;">
+    <div class="sec">
+      <h3>✅ Ready to Create</h3>
+      <div id="reviewSummary" class="review-grid"></div>
+    </div>
+    <div class="wz-actions">
+      <button type="button" class="btn btn-secondary" onclick="goToStep(2)">← Back to Edit</button>
+      <div class="right">
+        <button type="button" class="btn btn-primary" id="finalBtn" onclick="submitForm()">🚀 Create vCard</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// Profile search helper
-;(function(){
-  const input = document.getElementById('profile-search');
-  const suggestions = document.getElementById('profile-suggestions');
-  const selected = document.getElementById('selected-profile');
-  const profileIdField = document.querySelector('input[name="profileSlug"]');
-  const slugField = document.querySelector('input[name="slug"]');
+// ─── State ───────────────────────────
+let selTemplate = null;
+let currentStep = 1;
 
-  let timeout = null;
-  input && input.addEventListener('input', function(e){
-    const q = (e.target.value || '').trim();
-    suggestions.innerHTML = '';
-    if (timeout) clearTimeout(timeout);
-    if (!q || q.length < 2) return;
-    timeout = setTimeout(async ()=>{
-      try {
-        const res = await fetch('/api/profiles/search?q=' + encodeURIComponent(q));
-        if (!res.ok) return;
-        const profiles = await res.json();
-        suggestions.innerHTML = '';
-        profiles.forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'suggestion-item';
-          div.textContent = (p.name || p.slug || p.email) + ' — ' + (p.email || p.slug || '');
-          div.dataset.id = p._id;
-          div.dataset.slug = p.slug;
-          div.addEventListener('click', ()=>{
-            profileIdField.value = p.slug || '';
-            slugField.value = p.slug || '';
-            selected.textContent = (p.name || p.slug || '') + ' — ' + (p.email || '');
-            suggestions.innerHTML = '';
-            input.value = '';
-          });
-          suggestions.appendChild(div);
-        });
-      } catch (err) {
-        console.error('Profile search error', err);
+// ─── Template selection ──────────────
+function handleSelectTemplate(btn) {
+  selectTemplate(btn.dataset.id, btn.dataset.name, btn.dataset.category, btn.dataset.thumb);
+}
+
+function selectTemplate(id, name, category, thumb) {
+  document.querySelectorAll('.tmpl-card').forEach(c => {
+    c.classList.remove('sel');
+    c.querySelector('.btn-select').textContent = "Select Design";
+  });
+  const el = document.getElementById('tmpl-card-' + id);
+  if(el) {
+    el.classList.add('sel');
+    el.querySelector('.btn-select').textContent = "✅ Selected";
+  }
+  selTemplate = { id, name, category, thumb };
+  document.getElementById('step1Next').disabled = false;
+}
+
+// ─── Profile selection ───────────────
+let selProfile = null;
+function handleSelectProfile(btn) {
+  selectProfile(btn.dataset.id, btn.dataset.slug, btn.dataset.name);
+}
+
+function selectProfile(id, slug, name) {
+  const el = document.getElementById('prof-item-' + id);
+  // Toggle off if already selected
+  if (el && el.classList.contains('sel')) {
+    clearProfile();
+    return;
+  }
+  
+  document.querySelectorAll('.profile-item').forEach(i => {
+    i.classList.remove('sel');
+    i.querySelector('.btn-select-profile').textContent = "Select";
+  });
+  
+  if (el) {
+    el.classList.add('sel');
+    el.querySelector('.btn-select-profile').textContent = "✅ Selected";
+  }
+  
+  selProfile = { id, slug, name };
+  document.getElementById('selProfileLabel').textContent = selProfile.name;
+  document.getElementById('selProfileStrip').classList.add('show');
+  
+  // Auto-fill name
+  const nameFld = document.getElementById('inp-fullName');
+  if (nameFld && !nameFld.value) nameFld.value = selProfile.name;
+}
+
+function clearProfile() {
+  selProfile = null;
+  document.getElementById('selProfileStrip').classList.remove('show');
+  document.querySelectorAll('.profile-item').forEach(i => {
+    i.classList.remove('sel');
+    const btn = i.querySelector('.btn-select-profile');
+    if(btn) btn.textContent = "Select";
+  });
+}
+
+// ─── Profile SEARCH (AJAX) ─────────────
+let profileSearchTimeout = null;
+const origProfilesHtml = document.getElementById('profileList') ? document.getElementById('profileList').innerHTML : '';
+
+const profileSearchInput = document.getElementById('profileSearch');
+if (profileSearchInput) {
+  profileSearchInput.addEventListener('input', function() {
+    clearTimeout(profileSearchTimeout);
+    const q = this.value.trim();
+    if (q.length < 2) {
+      if (q.length === 0) {
+        document.getElementById('profileList').innerHTML = origProfilesHtml;
+        if(selProfile) selectProfile(selProfile.id, selProfile.slug, selProfile.name); // re-highlight
       }
-    }, 250);
+      return;
+    }
+    
+    // Show loading
+    document.getElementById('profileList').innerHTML = '<div class="no-profiles">Searching...</div>';
+    
+    profileSearchTimeout = setTimeout(async () => {
+      try {
+        const resp = await fetch(`/api/profiles/search?q=${encodeURIComponent(q)}`);
+        const json = await resp.json();
+        
+        let html = '';
+        if (json.success && json.data && json.data.length > 0) {
+          json.data.forEach(p => {
+             const isSel = selProfile && selProfile.id === p._id;
+             const safeName = (p.name || '').replace(/'/g, "\\'");
+             const init = p.name ? p.name[0].toUpperCase() : '?';
+             const avatar = p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : init;
+             
+             html += `
+              <div class="profile-item ${isSel ? 'sel' : ''}" id="prof-item-${p._id}">
+                <div class="profile-avatar">${avatar}</div>
+                <div class="profile-meta">
+                  <div class="pname">${p.name}</div>
+                  <div class="pdetail">${p.occupation || p.email || p.mobile || p.slug || ''}</div>
+                </div>
+                <button type="button" class="btn-select-profile" data-id="${p._id}" data-slug="${p.slug}" data-name="${safeName}" onclick="handleSelectProfile(this)">
+                  ${isSel ? '✅ Selected' : 'Select'}
+                </button>
+              </div>`;
+          });
+        } else {
+          html = '<div class="no-profiles">No profiles found for "'+q+'"</div>';
+        }
+        document.getElementById('profileList').innerHTML = html;
+        
+      } catch(err) {
+        document.getElementById('profileList').innerHTML = '<div class="no-profiles" style="color:#ef4444">Search failed.</div>';
+      }
+    }, 400); // debounce 400ms
+  });
+}
+
+// ─── Step navigation ─────────────────
+async function goToStep2() {
+  if (!selTemplate) return;
+  document.getElementById('templateIdInput').value = selTemplate.id;
+  document.getElementById('selTmplName').textContent = selTemplate.name;
+  const img = document.getElementById('selThumbImg');
+  if (selTemplate.thumb) { img.src = selTemplate.thumb; img.style.display = ''; } else img.style.display = 'none';
+  goToStep(2);
+}
+
+function goToStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step-' + i).style.display = (i === n) ? '' : 'none';
+    const nd = document.getElementById('pn' + i);
+    nd.classList.remove('active','done');
+    if (i < n)  nd.classList.add('done');
+    if (i === n) nd.classList.add('active');
+    if (i <= 2) document.getElementById('pl' + i).classList.toggle('done', i < n);
+  });
+  currentStep = n;
+  if (n === 3) buildReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Dynamic array builders ─────────
+
+// Socials
+let socialIdx = 0;
+function addSocial() {
+  const i = socialIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 2fr auto';
+  row.innerHTML = `<div class="f"><label>Platform</label><input type="text" name="socials[${i}][platform]"></div>
+    <div class="f"><label>URL</label><input type="url" name="socials[${i}][url]"></div>
+    <div class="f"><label>Icon Class</label><input type="text" name="socials[${i}][icon]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('socialsContainer').appendChild(row);
+}
+
+// Stats
+let statIdx = 0;
+function addStat() {
+  const i = statIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '2fr 1fr 1fr auto';
+  row.innerHTML = `<div class="f"><label>Label</label><input type="text" name="stats[${i}][label]"></div>
+    <div class="f"><label>Value</label><input type="text" name="stats[${i}][value]"></div>
+    <div class="f"><label>Icon Class</label><input type="text" name="stats[${i}][icon]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('statsContainer').appendChild(row);
+}
+
+// Services
+let serviceIdx = 0;
+function addService() {
+  const i = serviceIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr';
+  row.innerHTML = `
+    <div class="f"><label>Title</label><input type="text" name="services[${i}][title]"></div>
+    <div class="f"><label>Price</label><input type="text" name="services[${i}][price]"></div>
+    <div class="f"><label>Icon Class</label><input type="text" name="services[${i}][icon]"></div>
+    <div class="f"><label>Item Image</label><input type="file" name="services[${i}][image]" accept="image/*"></div>
+    <div class="f"><label>Action Link</label><input type="url" name="services[${i}][actionLink]"></div>
+    <div class="f" style="grid-column:1 / span 3"><label>Description</label><textarea name="services[${i}][description]"></textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('servicesContainer').appendChild(row);
+}
+
+// Experience
+let expIdx = 0;
+function addExperience() {
+  const i = expIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr';
+  row.innerHTML = `
+    <div class="f"><label>Title/Role</label><input type="text" name="experience[${i}][title]"></div>
+    <div class="f"><label>Organization</label><input type="text" name="experience[${i}][organization]"></div>
+    <div class="f"><label>Duration</label><input type="text" name="experience[${i}][duration]"></div>
+    <div class="f" style="grid-column:1 / span 3"><label>Description</label><textarea name="experience[${i}][description]"></textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('experienceContainer').appendChild(row);
+}
+
+// Pricing Plans
+let pricingIdx = 0;
+function addPricing() {
+  const i = pricingIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr';
+  row.innerHTML = `
+    <div class="f"><label>Plan Name</label><input type="text" name="pricingPlans[${i}][planName]"></div>
+    <div class="f"><label>Price</label><input type="text" name="pricingPlans[${i}][price]"></div>
+    <div class="f"><label>Duration</label><input type="text" name="pricingPlans[${i}][duration]" placeholder="per month"></div>
+    <div class="f" style="grid-column:1 / span 2"><label>Features (1 per line)</label><textarea name="pricingPlans[${i}][features]"></textarea></div>
+    <div class="f"><label>Action Link</label><input type="url" name="pricingPlans[${i}][actionLink]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('pricingContainer').appendChild(row);
+}
+
+// Portfolio
+let portIdx = 0;
+function addPortfolio() {
+  const i = portIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr';
+  row.innerHTML = `
+    <div class="f"><label>Title</label><input type="text" name="portfolio[${i}][title]"></div>
+    <div class="f"><label>Media Type</label><select name="portfolio[${i}][mediaType]">
+      <option value="image">Image URL</option>
+      <option value="video">Video URL</option>
+      <option value="youtube-embed">YouTube Embed</option>
+      <option value="link">General Link</option>
+    </select></div>
+    <div class="f"><label>Media URL</label><input type="url" name="portfolio[${i}][mediaUrl]"></div>
+    <div class="f" style="grid-column:1 / span 3"><label>Description</label><textarea name="portfolio[${i}][description]"></textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('portfolioContainer').appendChild(row);
+}
+
+// Testimonials
+let testIdx = 0;
+function addTestimonial() {
+  const i = testIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr auto';
+  row.innerHTML = `
+    <div class="f"><label>Client Name</label><input type="text" name="testimonials[${i}][clientName]"></div>
+    <div class="f"><label>Context</label><input type="text" name="testimonials[${i}][context]" placeholder="e.g. Manali Tour"></div>
+    <div class="f"><label>Rating (1-5)</label><input type="number" name="testimonials[${i}][rating]" min="1" max="5" value="5"></div>
+    <div class="f"><label>Avatar Image</label><input type="file" name="testimonials[${i}][avatar]" accept="image/*"></div>
+    <div class="f" style="grid-column:1 / span 4"><label>Quote</label><textarea name="testimonials[${i}][quote]"></textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('testimonialsContainer').appendChild(row);
+}
+
+// Gallery
+let galleryIdx = 0;
+function addGallery() {
+  const i = galleryIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '2fr 1fr auto';
+  row.innerHTML = `
+    <div class="f"><label>Image File</label><input type="file" name="gallery[${i}][image]" accept="image/*"></div>
+    <div class="f"><label>Title</label><input type="text" name="gallery[${i}][title]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('galleryContainer').appendChild(row);
+}
+
+// Partners
+let partnerIdx = 0;
+function addPartner() {
+  const i = partnerIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr auto';
+  row.innerHTML = `
+    <div class="f"><label>Partner Name</label><input type="text" name="partners[${i}][name]"></div>
+    <div class="f"><label>Logo Image</label><input type="file" name="partners[${i}][logo]" accept="image/*"></div>
+    <div class="f"><label>Website URL</label><input type="url" name="partners[${i}][websiteUrl]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('partnersContainer').appendChild(row);
+}
+
+// Specializations
+let specIdx = 0;
+function addSpecialization() {
+  const i = specIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr';
+  row.innerHTML = `
+    <div class="f"><label>Title</label><input type="text" name="specializations[${i}][title]"></div>
+    <div class="f"><label>Icon Class</label><input type="text" name="specializations[${i}][icon]"></div>
+    <div class="f" style="grid-column:span 2"><label>Description</label><textarea name="specializations[${i}][description]"></textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('specializationsContainer').appendChild(row);
+}
+
+// Additional contacts
+let acIdx = 0;
+function addAdditionalContact() {
+  const i = acIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr 1fr auto';
+  row.innerHTML = `
+    <div class="f"><label>Platform</label><input type="text" name="contact[additionalContacts][${i}][platform]"></div>
+    <div class="f"><label>Value</label><input type="text" name="contact[additionalContacts][${i}][value]"></div>
+    <div class="f"><label>Link</label><input type="url" name="contact[additionalContacts][${i}][link]"></div>
+    <div class="f"><label>Icon Class</label><input type="text" name="contact[additionalContacts][${i}][icon]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('additionalContactsContainer').appendChild(row);
+}
+
+// ─── Review summary ──────────────────
+function buildReview() {
+  const fd = new FormData(document.getElementById('vcardForm'));
+  const v  = k => fd.get(k) || '—';
+  document.getElementById('reviewSummary').innerHTML = `
+    <div><strong>Full Name</strong>${v('profile[fullName]')}</div>
+    <div><strong>Design Template</strong>${selTemplate ? selTemplate.name : '—'}</div>
+    <div><strong>Designation</strong>${v('profile[designation]')}</div>
+    <div><strong>Company</strong>${v('profile[companyName]')}</div>
+    <div><strong>Phone</strong>${v('contact[primaryPhone]')}</div>
+    <div><strong>Email</strong>${v('contact[primaryEmail]')}</div>
+  `;
+}
+
+function submitForm() {
+  const btn = document.getElementById('finalBtn');
+  btn.disabled = true; btn.textContent = '⏳ Creating…';
+  document.getElementById('vcardForm').submit();
+}
+
+// ─── Image compression preview ─────
+(function() {
+  [['inp-profileImage','lbl-profileImage','prev-profileImage'],
+   ['inp-coverImage',  'lbl-coverImage',  'prev-coverImage'  ]
+  ].forEach(([inputId, labelId, prevId]) => {
+    const input = document.getElementById(inputId);
+    const label = document.getElementById(labelId);
+    const prev  = document.getElementById(prevId);
+
+    input.addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r0 = new FileReader();
+      r0.onload = ev => { prev.src = ev.target.result; prev.style.display = 'block'; };
+      r0.readAsDataURL(file);
+    });
   });
 })();
-</script>
-<script>
-  // Toggle override is now limited to card-level fields (none of which conflict with Profile)
-;(function(){
-  const useProfileCheckbox = document.getElementById('use-profile-data');
-  if (!useProfileCheckbox) return;
-  // No inputs to disable in the current design; keep UI for clarity
-})();
-
-// (legacy duplicate profileId script removed) - profileSlug search handler above is used
 </script>

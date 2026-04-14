@@ -1,0 +1,204 @@
+<% layout('layouts/dashboard-boilerplate') %>
+    <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
+        <% block('styles').append('<link rel="stylesheet" href="/css/dashboard/template-form.css">') %>
+
+            <% const slugSegment=(typeof slug !=='undefined' && slug) ? '/' + encodeURIComponent(slug) : '' ; %>
+
+                <div class="page-container template-form-container">
+                    <div class="page-header-row">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Register New Design</h1>
+                            <p class="page-subtitle">Upload the preview image and define the custom fields required for
+                                this EJS file.</p>
+                        </div>
+                    </div>
+
+                    <form id="templateForm" action="/dashboard<%= slugSegment %>/templates" method="POST"
+                        enctype="multipart/form-data" class="wizard-form">
+                        <% if (typeof csrfToken !=='undefined' && csrfToken) { %>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <% } %>
+
+                                <input type="hidden" name="customFields" id="customFieldsJson">
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Template Display Name</label>
+                                        <input type="text" name="name" placeholder="e.g., Premium Dark" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Profession Category</label>
+                                        <input type="text" name="category"
+                                            placeholder="e.g., Corporate, Medical, Creative" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Exact EJS Filename (No extension)</label>
+                                        <input type="text" name="fileName" placeholder="e.g., premium-dark" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Thumbnail Image</label>
+                                        <input type="file" name="thumbnail" accept="image/*" required
+                                            id="thumbnailInput">
+                                    </div>
+                                </div>
+
+                                <div class="schema-builder-section">
+                                    <div class="schema-builder-header">
+                                        <h3>Custom Fields Required for this Design</h3>
+                                        <button type="button" onclick="addField()" class="btn-secondary"
+                                            style="padding: 0.5rem 1rem;">+ Add Field</button>
+                                    </div>
+                                    <p class="form-help-text">Define any extra inputs (colors, logos, booking links)
+                                        that your EJS file expects.</p>
+
+                                    <div id="fields-container" class="field-rows-container">
+                                    </div>
+                                </div>
+
+                                <div class="form-actions-footer">
+                                    <a href="/dashboard<%= slugSegment %>/visiting-cards" class="btn-secondary"
+                                        style="padding: 0.75rem 1.5rem; border: 1px solid #cbd5e1; text-decoration: none;">Cancel</a>
+                                    <button type="submit" class="btn-primary" style="padding: 0.75rem 2rem;">Save &
+                                        Register Design</button>
+                                </div>
+                    </form>
+                </div>
+
+                <script>
+                    const container = document.getElementById('fields-container');
+                    const form = document.getElementById('templateForm');
+                    const jsonInput = document.getElementById('customFieldsJson');
+
+                    function createFieldRow() {
+                        const row = document.createElement('div');
+                        row.className = 'field-row';
+
+                        row.innerHTML = `
+      <input type="text" class="f-name" placeholder="Variable Name (e.g., bgColor)" required>
+      <input type="text" class="f-label" placeholder="Display Label (e.g., Background Color)" required>
+      <select class="f-type">
+        <option value="text">Text (Short)</option>
+        <option value="textarea">Text (Long)</option>
+        <option value="color">Color Picker</option>
+        <option value="url">URL Link</option>
+        <option value="image">Image Upload</option>
+      </select>
+      <label class="checkbox-label">
+        <input type="checkbox" class="f-required"> Required
+      </label>
+      <button type="button" class="btn-delete-row" onclick="this.parentElement.remove()" title="Remove Field">🗑️</button>
+    `;
+                        return row;
+                    }
+
+                    function addField() {
+                        container.appendChild(createFieldRow());
+                    }
+
+                    form.addEventListener('submit', function (e) {
+                        const rows = document.querySelectorAll('.field-row');
+                        const fieldsData = Array.from(rows).map(row => ({
+                            name: row.querySelector('.f-name').value.trim(),
+                            label: row.querySelector('.f-label').value.trim(),
+                            type: row.querySelector('.f-type').value,
+                            required: row.querySelector('.f-required').checked
+                        }));
+                        jsonInput.value = JSON.stringify(fieldsData);
+                    });
+                </script>
+
+                <script>
+                    // --- Client-Side Image Compression ---
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const imageInput = document.getElementById('thumbnailInput');
+
+                        if (imageInput) {
+                            imageInput.addEventListener('change', async function (e) {
+                                const file = e.target.files[0];
+                                if (!file) return;
+
+                                // Compress if larger than 3MB to safely stay under 7MB limit
+                                const maxSizeInBytes = 7 * 1024 * 1024;
+
+                                if (file.size > maxSizeInBytes) {
+                                    const label = this.closest('.form-group') ? this.closest('.form-group').querySelector('label') : null;
+                                    const originalLabel = label ? label.innerText : '';
+                                    if (label) label.innerText = 'Compressing image, please wait... ⏳';
+
+                                    try {
+                                        const compressedFile = await compressImage(file);
+
+                                        const dataTransfer = new DataTransfer();
+                                        dataTransfer.items.add(compressedFile);
+                                        e.target.files = dataTransfer.files;
+
+                                        if (label) label.innerText = 'Image successfully compressed! ✅';
+                                        setTimeout(() => {
+                                            if (label) label.innerText = originalLabel || 'Thumbnail Image';
+                                        }, 3000);
+
+                                    } catch (err) {
+                                        console.error('Client-side compression failed:', err);
+                                        alert('The image is too large and failed to compress. Please choose a smaller file.');
+                                        e.target.value = ''; // Clear the input
+                                        if (label) label.innerText = originalLabel || 'Thumbnail Image';
+                                    }
+                                }
+                            });
+                        }
+
+                        // Canvas-based compression function
+                        function compressImage(file) {
+                            return new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = event => {
+                                    const img = new Image();
+                                    img.src = event.target.result;
+                                    img.onload = () => {
+                                        const canvas = document.createElement('canvas');
+                                        const ctx = canvas.getContext('2d');
+
+                                        // Scale down if dimensions are massive (max 1920px)
+                                        const MAX_WIDTH = 1920;
+                                        const MAX_HEIGHT = 1920;
+                                        let width = img.width;
+                                        let height = img.height;
+
+                                        if (width > height) {
+                                            if (width > MAX_WIDTH) {
+                                                height *= MAX_WIDTH / width;
+                                                width = MAX_WIDTH;
+                                            }
+                                        } else {
+                                            if (height > MAX_HEIGHT) {
+                                                width *= MAX_HEIGHT / height;
+                                                height = MAX_HEIGHT;
+                                            }
+                                        }
+
+                                        canvas.width = width;
+                                        canvas.height = height;
+                                        ctx.drawImage(img, 0, 0, width, height);
+
+                                        // Output as JPEG at 80% quality
+                                        canvas.toBlob((blob) => {
+                                            if (!blob) return reject(new Error('Canvas is empty'));
+                                            let newFileName = file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg";
+                                            const newFile = new File([blob], newFileName, {
+                                                type: 'image/jpeg',
+                                                lastModified: Date.now()
+                                            });
+                                            resolve(newFile);
+                                        }, 'image/jpeg', 0.80);
+                                    };
+                                    img.onerror = error => reject(error);
+                                };
+                                reader.onerror = error => reject(error);
+                            });
+                        }
+                    });
+                </script>

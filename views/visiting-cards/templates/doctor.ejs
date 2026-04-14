@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= card.profile.fullName %> - <%= card.profile.designation || 'Profile' %>
+    </title>
+    <meta name="description" content="<%= card.profile.bio || 'Digital Business Card' %>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=<%= card.theme.fontStyle || 'Inter' %>:wght@300;400;500;600;700;800&family=Merriweather:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Now pulls directly from your schema's theme object */
+            --primary-blue: <%=card.theme.primaryColor || '#1e40af' %>;
+            --secondary-teal: <%=card.theme.secondaryColor || '#0891b2' %>;
+            --primary-light: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --light-blue: #eff6ff;
+            --light-gray: #f8fafc;
+            --neutral-50: #fafafa;
+            --neutral-100: #f5f5f5;
+            --neutral-200: #e5e5e5;
+            --neutral-300: #d4d4d4;
+            --neutral-400: #a3a3a3;
+            --neutral-500: #737373;
+            --neutral-600: #525252;
+            --neutral-700: #404040;
+            --neutral-800: #262626;
+            --neutral-900: #171717;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-teal) 100%);
+            --gradient-light: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #f0f9ff 100%);
+        }
+
+        /* [YOUR EXACT ORIGINAL CSS PRESERVED 100%] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: '<%= card.theme.fontStyle || "Inter" %>', sans-serif;
+            line-height: 1.6;
+            color: var(--neutral-700);
+            background: var(--gradient-light);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(30, 64, 175, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(8, 145, 178, 0.08) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 40%), linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #f0f9ff 100%);
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medical-light" patternUnits="userSpaceOnUse" width="50" height="50"><g opacity="0.05"><circle cx="25" cy="25" r="1.5" fill="%231e40af"/><path d="M20 25h10M25 20v10" stroke="%231e40af" stroke-width="0.5"/><circle cx="10" cy="10" r="0.8" fill="%230891b2"/><circle cx="40" cy="40" r="1" fill="%2310b981"/></g></pattern></defs><rect width="100" height="100" fill="url(%23medical-light)"/></svg>');
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 25%;
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--white);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.2), 0 0 0 8px rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+
+        .hero-title {
+            font-family: 'Merriweather', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--neutral-600);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .hero-description {
+            font-size: 1rem;
+            color: var(--neutral-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+            background: var(--white);
+            padding: 1rem 0.8rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            min-width: 80px;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--neutral-500);
+            margin-top: 0.2rem;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-light);
+            padding: 0.9rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--white);
+            color: var(--primary-blue);
+            border-radius: 50%;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .social-links a:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .contact-details-card {
+            background: var(--white);
+            margin: 1.5rem;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .contact-details-card h3 {
+            text-align: center;
+            color: var(--neutral-800);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            font-family: 'Merriweather', serif;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--neutral-50);
+            border-radius: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .contact-item:hover {
+            background: var(--light-blue);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-label {
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+
+        .contact-value {
+            font-size: 0.9rem;
+            color: var(--neutral-700);
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .section {
+            padding: 2rem 0;
+            margin: 0 1rem;
+        }
+
+        .section-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--neutral-800);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .about-content {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .about-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--neutral-600);
+            margin-bottom: 1rem;
+        }
+
+        .qualifications {
+            background: var(--light-blue);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .qualifications h4 {
+            color: var(--neutral-800);
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .qualifications ul {
+            list-style: none;
+            font-size: 0.8rem;
+        }
+
+        .qualifications li {
+            padding: 0.3rem 0;
+            position: relative;
+            padding-left: 1.2rem;
+            color: var(--neutral-600);
+        }
+
+        .qualifications li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-200);
+            transition: var(--transition);
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .service-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .service-content h3 {
+            color: var(--neutral-800);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .service-content p {
+            color: var(--neutral-600);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-top: 0.5rem;
+        }
+
+        .specializations-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .specialization-card {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 1.5rem 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .specialization-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .specialization-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .specialization-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .specialization-card p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .testimonials-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+        }
+
+        .testimonials-track {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card {
+            min-width: 100%;
+            background: var(--white);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .testimonial-text {
+            font-size: 0.9rem;
+            color: var(--neutral-600);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .testimonial-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .author-info h5 {
+            color: var(--neutral-800);
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            color: var(--neutral-500);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .testimonial-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neutral-300);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dot.active {
+            background: var(--primary-blue);
+        }
+
+        .gallery-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            background: var(--white);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .gallery-track {
+            display: flex;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .gallery-overlay h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-blue);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .gallery-nav:hover {
+            background: var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .gallery-nav.prev {
+            left: 10px;
+        }
+
+        .gallery-nav.next {
+            right: 10px;
+        }
+
+        .gallery-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--white);
+        }
+
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--neutral-300);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .gallery-dot.active {
+            background: var(--primary-blue);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .screenshot-area {
+            background: var(--gradient-light);
+            padding-bottom: 2rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.8rem;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .profile-image {
+                width: 180px;
+                height: 180px;
+            }
+
+            .action-btn {
+                font-size: 0.85rem;
+                padding: 0.8rem 1rem;
+            }
+
+            .stat {
+                min-width: 70px;
+                padding: 0.8rem 0.6rem;
+            }
+
+            .stat-number {
+                font-size: 1.6rem;
+            }
+
+            .contact-details-card {
+                margin: 1rem;
+                padding: 1.2rem;
+            }
+
+            .specializations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screenshot-area">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="profile-image"
+                        style="background-image: url('<%= card.profile.profileImage || `https://via.placeholder.com/200` %>')">
+                    </div>
+
+                    <div class="hero-text">
+                        <h1 class="hero-title">
+                            <%= card.profile.fullName %>
+                        </h1>
+                        <p class="hero-subtitle">
+                            <%= card.profile.designation || '' %>
+                                <%= card.profile.companyName ? `| ${card.profile.companyName}` : '' %>
+                        </p>
+
+                        <% if(card.profile.customFields && card.profile.customFields.get('shortDescription')) { %>
+                            <p class="hero-description">
+                                <%= card.profile.customFields.get('shortDescription') %>
+                            </p>
+                            <% } else if(card.profile.bio) { %>
+                                <p class="hero-description">
+                                    <%= card.profile.bio.substring(0, 100) %>...
+                                </p>
+                                <% } %>
+
+                                    <% if(card.stats && card.stats.length> 0) { %>
+                                        <div class="hero-stats">
+                                            <% card.stats.forEach(stat=> { %>
+                                                <div class="stat">
+                                                    <div class="stat-number">
+                                                        <%= stat.value %>
+                                                    </div>
+                                                    <div class="stat-label">
+                                                        <%= stat.label %>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <% } %>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="saveContact()">
+                            <i class="fas fa-address-card"></i> Save Contact
+                        </button>
+                        <button class="action-btn" onclick="takeScreenshot()">
+                            <i class="fas fa-camera"></i> Screenshot
+                        </button>
+                    </div>
+
+                    <% if(card.socials && card.socials.length> 0) { %>
+                        <div class="social-links">
+                            <% card.socials.forEach(social=> { %>
+                                <a href="<%= social.url %>" target="_blank" title="<%= social.platform %>">
+                                    <i class="<%= social.icon || 'fas fa-link' %>"></i>
+                                </a>
+                                <% }); %>
+                        </div>
+                        <% } %>
+                </div>
+            </div>
+        </section>
+
+        <% if(card.contact) { %>
+            <div class="contact-details-card">
+                <h3>Contact Details</h3>
+
+                <% if(card.contact.primaryPhone) { %>
+                    <a href="tel:<%= card.contact.primaryPhone %>" class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div class="contact-info">
+                            <div class="contact-label">Primary Phone</div>
+                            <div class="contact-value">
+                                <%= card.contact.primaryPhone %>
+                            </div>
+                        </div>
+                    </a>
+                    <% } %>
+
+                        <% if(card.contact.primaryEmail) { %>
+                            <a href="mailto:<%= card.contact.primaryEmail %>" class="contact-item">
+                                <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                                <div class="contact-info">
+                                    <div class="contact-label">Email Address</div>
+                                    <div class="contact-value">
+                                        <%= card.contact.primaryEmail %>
+                                    </div>
+                                </div>
+                            </a>
+                            <% } %>
+
+                                <% if(card.contact.location && card.contact.location.address) { %>
+                                    <a href="<%= card.contact.location.mapEmbedUrl || '#' %>" target="_blank"
+                                        class="contact-item">
+                                        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                        <div class="contact-info">
+                                            <div class="contact-label">Location</div>
+                                            <div class="contact-value">
+                                                <%= card.contact.location.address %>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <% } %>
+
+                                        <% if(card.contact.additionalContacts && card.contact.additionalContacts.length>
+                                            0) { %>
+                                            <% card.contact.additionalContacts.forEach(ac=> { %>
+                                                <a href="<%= ac.link || '#' %>" target="_blank" class="contact-item">
+                                                    <div class="contact-icon"><i
+                                                            class="<%= ac.icon || 'fas fa-link' %>"></i></div>
+                                                    <div class="contact-info">
+                                                        <div class="contact-label">
+                                                            <%= ac.platform %>
+                                                        </div>
+                                                        <div class="contact-value">
+                                                            <%= ac.value %>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <% }); %>
+                                                    <% } %>
+            </div>
+            <% } %>
+
+                <% if(card.profile.bio || (card.qualifications && card.qualifications.length> 0)) { %>
+                    <section class="section">
+                        <h2 class="section-title">About</h2>
+                        <div class="about-content">
+                            <% if(card.profile.bio) { %>
+                                <div class="about-text">
+                                    <%= card.profile.bio %>
+                                </div>
+                                <% } %>
+
+                                    <% if(card.qualifications && card.qualifications.length> 0) { %>
+                                        <div class="qualifications">
+                                            <h4>Key Qualifications</h4>
+                                            <ul>
+                                                <% card.qualifications.forEach(qual=> { %>
+                                                    <li>
+                                                        <%= qual %>
+                                                    </li>
+                                                    <% }); %>
+                                            </ul>
+                                        </div>
+                                        <% } %>
+                        </div>
+                    </section>
+                    <% } %>
+
+                        <% if(card.services && card.services.length> 0) { %>
+                            <section class="section">
+                                <h2 class="section-title">
+                                    <%= card.theme.sectionTitles?.services || 'Our Services' %>
+                                </h2>
+                                <div class="services-grid">
+                                    <% card.services.forEach(service=> { %>
+                                        <div class="service-card">
+                                            <div class="service-header">
+                                                <div class="service-icon"><i
+                                                        class="<%= service.icon || 'fas fa-stethoscope' %>"></i></div>
+                                                <div class="service-content">
+                                                    <h3>
+                                                        <%= service.title %>
+                                                    </h3>
+                                                    <% if(service.description) { %>
+                                                        <p>
+                                                            <%= service.description %>
+                                                        </p>
+                                                        <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                            </section>
+                            <% } %>
+
+                                <% if(card.specializations && card.specializations.length> 0) { %>
+                                    <section class="section">
+                                        <h2 class="section-title">Specializations</h2>
+                                        <div class="specializations-grid">
+                                            <% card.specializations.forEach(spec=> { %>
+                                                <div class="specialization-card">
+                                                    <div class="specialization-icon"><i
+                                                            class="<%= spec.icon || 'fas fa-heartbeat' %>"></i></div>
+                                                    <h3>
+                                                        <%= spec.title %>
+                                                    </h3>
+                                                    <% if(spec.description) { %>
+                                                        <p>
+                                                            <%= spec.description %>
+                                                        </p>
+                                                        <% } %>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                    </section>
+                                    <% } %>
+
+                                        <% if(card.testimonials && card.testimonials.length> 0) { %>
+                                            <section class="section">
+                                                <h2 class="section-title">Patient Reviews</h2>
+                                                <div class="testimonials-container">
+                                                    <div class="testimonials-track" id="testimonialsTrack">
+                                                        <% card.testimonials.forEach(test=> { %>
+                                                            <div class="testimonial-card">
+                                                                <p class="testimonial-text">"<%= test.quote %>"</p>
+                                                                <div class="testimonial-author">
+                                                                    <div class="testimonial-avatar">
+                                                                        <%= test.avatarUrl ? `<img
+                                                                            src="${test.avatarUrl}"
+                                                                            style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                                                                            ` : test.clientName.substring(0,
+                                                                            2).toUpperCase() %>
+                                                                    </div>
+                                                                    <div class="author-info">
+                                                                        <h5>
+                                                                            <%= test.clientName %>
+                                                                        </h5>
+                                                                        <% if(test.context) { %>
+                                                                            <p>
+                                                                                <%= test.context %>
+                                                                            </p>
+                                                                            <% } %>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% }); %>
+                                                    </div>
+                                                    <div class="testimonial-dots">
+                                                        <% card.testimonials.forEach((_, index)=> { %>
+                                                            <span class="dot <%= index === 0 ? 'active' : '' %>"
+                                                                data-index="<%= index + 1 %>"
+                                                                onclick="currentTestimonial(Number(this.dataset.index))"></span>
+                                                            <% }); %>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <% } %>
+
+                                                <% if(card.gallery && card.gallery.length> 0) { %>
+                                                    <section class="section">
+                                                        <h2 class="section-title">
+                                                            <%= card.theme.sectionTitles?.gallery
+                                                                || 'Medical Facilities' %>
+                                                        </h2>
+                                                        <div class="gallery-container">
+                                                            <div class="gallery-track" id="galleryTrack">
+                                                                <% card.gallery.forEach(img=> { %>
+                                                                    <div class="gallery-item">
+                                                                        <img src="<%= img.imageUrl %>"
+                                                                            alt="<%= img.title || 'Gallery Image' %>">
+                                                                        <% if(img.title) { %>
+                                                                            <div class="gallery-overlay">
+                                                                                <h4>
+                                                                                    <%= img.title %>
+                                                                                </h4>
+                                                                            </div>
+                                                                            <% } %>
+                                                                    </div>
+                                                                    <% }); %>
+                                                            </div>
+                                                            <button class="gallery-nav prev"
+                                                                onclick="changeGallery(-1)">‹</button>
+                                                            <button class="gallery-nav next"
+                                                                onclick="changeGallery(1)">›</button>
+                                                            <div class="gallery-indicators">
+                                                                <% card.gallery.forEach((_, index)=> { %>
+                                                                    <span
+                                                                        class="gallery-dot <%= index === 0 ? 'active' : '' %>"
+                                                                        data-index="<%= index + 1 %>"
+                                                                        onclick="currentGallery(Number(this.dataset.index))"></span>
+                                                                    <% }); %>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                    <% } %>
+    </div>
+
+    <button class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
+        // FIXED: Dynamically pulls from Superset Schema
+        function saveContact() {
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:<%= card.profile.fullName %>
+ORG:<%= card.profile.companyName || '' %>
+TITLE:<%= card.profile.designation || '' %>
+EMAIL:<%= card.contact?.primaryEmail || '' %>
+TEL:<%= card.contact?.primaryPhone || '' %>
+ADR:;;<%= card.contact?.location?.address || '' %>
+URL:<%= card.contact?.website || '' %>
+NOTE:<%= card.profile.bio || '' %>
+END:VCARD`;
+
+            const blob = new Blob([vCardData], { type: "text/vcard" });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            // FIXED: Dynamic Filename
+            link.download = "<%= card.profile.fullName.replace(/\\s+/g, '_') %>_Contact.vcf";
+            link.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function takeScreenshot() {
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            button.disabled = true;
+
+            const screenshotArea = document.querySelector('.screenshot-area');
+            html2canvas(screenshotArea, {
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                scale: 2,
+                logging: false,
+                width: screenshotArea.scrollWidth,
+                height: screenshotArea.scrollHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                // FIXED: Dynamic Filename
+                link.download = '<%= card.profile.fullName.replace(/\\s+/g, "_") %>_Profile.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }).catch(error => {
+                console.error('Error:', error);
+                alert("Error taking screenshot.");
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+
+        // Back to top functionality
+        window.addEventListener('scroll', function () {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        document.querySelector('.back-to-top').addEventListener('click', function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // FIXED: Testimonial slider won't crash if array is empty
+        const totalTestimonials = Number("<%= card.testimonials ? card.testimonials.length : 0 %>");
+        if (totalTestimonials > 0) {
+            let testimonialIndex = 1;
+            function currentTestimonial(n) { showTestimonial(testimonialIndex = n); }
+            function showTestimonial(n) {
+                const track = document.getElementById('testimonialsTrack');
+                const dots = document.querySelectorAll('.testimonial-dots .dot');
+                if (n > totalTestimonials) testimonialIndex = 1;
+                if (n < 1) testimonialIndex = totalTestimonials;
+                track.style.transform = `translateX(-${(testimonialIndex - 1) * 100}%)`;
+                dots.forEach(dot => dot.classList.remove('active'));
+                dots[testimonialIndex - 1].classList.add('active');
+            }
+            setInterval(() => {
+                testimonialIndex++;
+                if (testimonialIndex > totalTestimonials) testimonialIndex = 1;
+                showTestimonial(testimonialIndex);
+            }, 5000);
+        }
+
+        // FIXED: Gallery slider won't crash if array is empty
+        const totalGallery = Number("<%= card.gallery ? card.gallery.length : 0 %>");
+        if (totalGallery > 0) {
+            let galleryIndex = 1;
+            function changeGallery(n) { showGallery(galleryIndex += n); }
+            function currentGallery(n) { showGallery(galleryIndex = n); }
+            function showGallery(n) {
+                const track = document.getElementById('galleryTrack');
+                const dots = document.querySelectorAll('.gallery-dot');
+                if (n > totalGallery) galleryIndex = 1;
+                if (n < 1) galleryIndex = totalGallery;
+                track.style.transform = `translateX(-${(galleryIndex - 1) * 100}%)`;
+                dots.forEach(dot => dot.classList.remove('active'));
+                dots[galleryIndex - 1].classList.add('active');
+            }
+
+            // Touch support for gallery
+            let startX = 0, endX = 0;
+            const galleryContainer = document.querySelector('.gallery-container');
+            galleryContainer.addEventListener('touchstart', e => {
+                startX = e.changedTouches[0].screenX;
+            });
+            galleryContainer.addEventListener('touchend', e => {
+                endX = e.changedTouches[0].screenX;
+                if (endX < startX - 50) changeGallery(1);
+                if (endX > startX + 50) changeGallery(-1);
+            });
+        }
+
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const href = this.getAttribute('href');
+                if (href && href !== '#') {
+                    window.open(href, href.startsWith('tel:') || href.startsWith('mailto:') ? '_self' : '_blank');
+                }
+            });
+        });
+
+        // Page load animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+        });
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease';
+    </script>
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 exports.isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated()) return next();
     req.session.returnTo = req.originalUrl;
-    req.flash('error_msg', 'Please log in first');
+    req.flash('error_msg', 'Please log in to access this page.');
     res.redirect('/login');
 };
 
@@ -14,42 +14,40 @@ exports.storeReturnTo = (req, res, next) => {
 
 exports.isGuest = (req, res, next) => {
     if (!req.isAuthenticated()) return next();
-    req.flash('error_msg', 'You are already logged in');
-    res.redirect('/');
+    req.flash('error_msg', 'You are already logged in.');
+    res.redirect('/dashboard');
 };
 
-exports.enforceSingleSession = (req, res, next) => {
+exports.enforceSingleSession = async (req, res, next) => {
     try {
-        if (req.isAuthenticated && req.isAuthenticated() && req.user) {
-            const stored = req.user.currentSessionId || null;
-            const current = req.sessionID || null;
-            if (stored && current && stored !== current) {
-                try {
-                    if (req.sessionStore && typeof req.sessionStore.destroy === 'function') {
-                        req.sessionStore.destroy(current, () => {
-                        });
-                    }
-                } catch (e) {
-                }
-                return req.logout(() => {
-                    try {
-                        if (req.session) {
-                            req.session.destroy(() => {
-                                req.flash('error_msg', 'You were logged out because your account was signed in from another device.');
-                                return res.redirect('/login');
-                            });
-                        } else {
-                            req.flash('error_msg', 'You were logged out because your account was signed in from another device.');
-                            return res.redirect('/login');
-                        }
-                    } catch (e) {
-                        req.flash('error_msg', 'You were logged out because your account was signed in from another device.');
-                        return res.redirect('/login');
-                    }
-                });
+        if (!req.isAuthenticated() || !req.user) return next();
+
+        const storedSessionId = req.user.currentSessionId;
+        const currentSessionId = req.sessionID;
+
+        if (storedSessionId && currentSessionId && storedSessionId !== currentSessionId) {
+
+            if (req.sessionStore && typeof req.sessionStore.destroy === 'function') {
+                await new Promise((resolve) => req.sessionStore.destroy(currentSessionId, resolve));
             }
+
+            req.logout((err) => {
+                if (err) console.error('Error during forced logout:', err);
+
+                if (req.session) {
+                    req.session.destroy(() => {
+                        return res.redirect('/login?reason=multidevice');
+                    });
+                } else {
+                    return res.redirect('/login?reason=multidevice');
+                }
+            });
+            return;
         }
-    } catch (e) {
+
+        next();
+    } catch (error) {
+        console.error('Session enforcement error:', error);
+        next();
     }
-    return next();
 };

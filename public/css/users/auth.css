@@ -1,0 +1,247 @@
+/* public/css/users/auth.css */
+.auth-wrapper {
+    font-family: var(--font-body, 'Poppins', sans-serif);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Use dynamic viewport height to prevent clipping when mobile browser UI expands/collapses */
+    min-height: 100dvh;
+    margin: 0;
+    background-color: var(--bg-app, #f1f5f9);
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.auth-container,
+.reset-modal,
+.otp-modal {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: 1px solid var(--shell-border, #e2e8f0);
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.auth-title {
+    font-family: var(--font-head, 'Montserrat', sans-serif);
+    font-size: 1.75rem;
+    color: var(--text-dark, #0f172a);
+    margin-bottom: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.auth-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.auth-group label,
+.auth-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--shell-text, #475569);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.auth-input,
+.auth-group input[type="text"],
+.auth-group input[type="email"],
+.auth-group input[type="password"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* 16px is STRICTLY required to prevent iOS Safari from zooming in when user taps input */
+    font-size: 16px;
+    color: var(--text-dark, #0f172a);
+    background: #f8fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    appearance: none;
+}
+
+.auth-input::placeholder {
+    color: #94a3b8;
+}
+
+.auth-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    outline: none;
+    background-color: #fff;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+}
+
+.auth-btn {
+    background: var(--pill-bg, linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%));
+    color: #ffffff;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    box-shadow: var(--pill-shadow, 0 4px 12px rgba(99, 102, 241, 0.25));
+    /* Minimum standard touch target size */
+    min-height: 48px;
+}
+
+.auth-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.auth-link-text {
+    margin-top: 1.5rem;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.auth-link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
+/* Modals */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* === MOBILE RESPONSIVE QUERIES === */
+
+/* Small Tablets / Large Phones */
+@media screen and (max-width: 600px) {
+
+    .auth-container,
+    .reset-modal,
+    .otp-modal {
+        padding: 2rem;
+    }
+}
+
+/* Mobile Phones (iPhone, Android) */
+@media screen and (max-width: 480px) {
+    .auth-wrapper {
+        padding: 1rem;
+        background-color: #ffffff;
+        /* Seamless bleed into notch/status bar area */
+    }
+
+    .auth-container,
+    .reset-modal,
+    .otp-modal,
+    .modal-content {
+        padding: 1.5rem 1rem;
+        /* Maximize horizontal screen real estate */
+        border-radius: 0;
+        /* Remove curves to flush against edges */
+        box-shadow: none;
+        /* Remove shadow for cleaner flat mobile look */
+        border: none;
+        /* Remove border */
+        max-width: 100%;
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-group {
+        margin-bottom: 1rem;
+    }
+
+    .auth-group label,
+    .auth-label {
+        font-size: 0.875rem;
+    }
+
+    /* Ensures inputs are touch-friendly without triggering horizontal scroll */
+    .auth-input {
+        padding: 0.85rem 1rem;
+    }
+
+    /* Adjust 'Forgot Password' link spacing for thumbs */
+    p[style*="text-align: right"] {
+        margin-top: -0.25rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .auth-link {
+        padding: 0.5rem 0;
+        /* Increase invisible touch area for the text link */
+        display: inline-block;
+    }
+
+    .auth-btn {
+        font-size: 1.05rem;
+        /* Slightly larger text for mobile button readability */
+    }
+
+    .auth-link-text {
+        margin-top: 1.75rem;
+    }
+
+    /* Modal Specific Mobile Fixes */
+    .modal-overlay {
+        align-items: flex-end;
+        /* Drop modal to bottom of screen on mobile (like bottom-sheets) */
+        padding: 0;
+    }
+
+    .modal-content {
+        border-radius: 24px 24px 0 0;
+        /* Bottom sheet styling */
+        padding-bottom: env(safe-area-inset-bottom, 2rem);
+        /* Respect iOS home indicator */
+    }
+}

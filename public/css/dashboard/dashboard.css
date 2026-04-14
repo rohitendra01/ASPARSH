@@ -76,7 +76,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
     z-index: 90;
     opacity: 0;
     visibility: hidden;
@@ -86,5 +87,9 @@ body {
   .sidebar-overlay.active {
     opacity: 1;
     visibility: visible;
+  }
+
+  .app-content-scroll {
+    padding: 1rem;
   }
 }

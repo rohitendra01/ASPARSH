@@ -1,51 +1,44 @@
-const mongoose = require('mongoose');
-const Profile = require('../models/Profile');
-const Design = require('../models/Design');
-const { QR } = require('../models/QR');
-const { Portfolio } = require('../models/Portfolio');
+const streamlineService = require('../services/streamlineService');
 
 exports.renderDashboard = async (req, res) => {
     try {
-        const profiles = await Profile.find({}).select('name slug image').lean();
-        const designs = await Design.find({ isActive: true }).lean();
-        const unassignedQrs = await QR.find({ status: 'EMPTY' }).select('shortId').lean();
+        const dashboardData = await streamlineService.getStreamlineDashboardData();
 
         res.render('streamline/dashboard', {
             title: 'Streamline Process Dashboard',
-            profiles,
-            designs,
-            unassignedQrs,
+            ...dashboardData,
             user: req.user,
             layout: 'layouts/dashboard-boilerplate'
         });
     } catch (err) {
-        console.error(err);
+        console.error('Error loading streamline dashboard:', err);
         res.status(500).send('Error loading streamline dashboard');
     }
 };
 
 exports.quickCreate = async (req, res) => {
-    // This will be a specialized version or wrapper around createPortfolio
-    // for AJAX-based fast creation
     try {
-        const { profileId, designId, qrSlug } = req.body;
-        
-        // Basic validation
-        if (!profileId || !designId) {
-            return res.status(400).json({ success: false, message: 'Profile and Design are required' });
+        const { portfolio, dynamicLinkDoc } = await streamlineService.processQuickCreate(
+            req.body,
+            req.files,
+            req.user?._id
+        );
+
+        if (dynamicLinkDoc) {
+            dynamicLinkDoc.destinationUrl = `${req.protocol}://${req.get('host')}${dynamicLinkDoc.destinationUrl}`;
+            await dynamicLinkDoc.save();
         }
 
-        // Delegate to portfolioController's logic or implement a simplified version here
-        // For consistency, let's trigger the existing createPortfolio logic but with specific flags
-        req.body.profileId = profileId;
-        req.body.designId = designId;
-        req.body.qrSlug = qrSlug;
-
-        const portfolioController = require('./portfolioController');
-        return portfolioController.createPortfolio(req, res);
+        return res.json({
+            success: true,
+            portfolio,
+            slug: portfolio.slug,
+            message: 'Portfolio created successfully via Streamline'
+        });
 
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: err.message });
+        console.error('Quick Create Error:', err);
+        const statusCode = err.message.includes('required') ? 400 : 500;
+        res.status(statusCode).json({ success: false, message: err.message });
     }
 };

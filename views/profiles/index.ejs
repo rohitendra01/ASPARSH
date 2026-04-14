@@ -37,7 +37,7 @@
 
                 <% profiles.forEach(profile=> { %>
                   <div class="compact-card entity-card"
-                    data-search-term="<%= profile.name.toLowerCase() %> <%= profile.mobile %> <%= (profile.occupation || '').toLowerCase() %> <%= (profile.category || '').toLowerCase() %> <%= profile.slug.toLowerCase() %>">
+                    data-search-term="<%= profile.name.toLowerCase() %> <%= profile.mobile %> <%= (profile.whatsapp || '').toLowerCase() %> <%= (profile.companyName || '').toLowerCase() %> <%= (profile.occupation || '').toLowerCase() %> <%= (profile.category || '').toLowerCase() %> <%= profile.slug.toLowerCase() %>">
 
                     <div class="card-thumbnail profile-thumbnail">
                       <% if (profile.image) { %>
@@ -55,8 +55,8 @@
 
                     <div class="card-info">
                       <div class="info-header">
-                        <h3 class="card-title text-truncate" title="<%= profile.name %>">
-                          <%= profile.name %>
+                        <h3 class="card-title text-truncate" title="<%= profile.companyName ? profile.companyName + ' (' + profile.name + ')' : profile.name %>">
+                          <%= profile.companyName ? profile.companyName + ' (' + profile.name + ')' : profile.name %>
                         </h3>
                         <% if (profile.occupation || profile.category) { %>
                           <span class="badge">

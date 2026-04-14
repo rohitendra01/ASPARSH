@@ -96,34 +96,28 @@ const testimonials = [
 ];
 
 
-// Index route
 router.get("/", (req, res) => {
     res.render("index", { products, testimonials, layout: "layouts/boilerplate" });
 });
 
-// Home route
 router.get("/home", (req, res) => {
     res.render("home", { layout: "layouts/boilerplate" });
 });
 
-// Contact Us page
 router.get("/contact", (req, res) => {
     res.render("contact", { layout: "layouts/boilerplate" });
 });
 
-// Pricing page
 router.get("/pricing", (req, res) => {
     res.render("pricing", { layout: "layouts/boilerplate" });
 });
 
-// About Us page
 router.get("/about", (req, res) => {
     res.render("about", { layout: "layouts/boilerplate" });
 });
 
 
 
-// Legal & accessibility pages
 router.get('/privacy-policy', (req, res) => {
     res.render('privacy', { layout: 'layouts/boilerplate', pageTitle: 'Privacy Policy' });
 });
@@ -142,7 +136,6 @@ router.get('/accessibility', (req, res) => {
 
 
 
-// Dashboard page (protected, dashboard-boilerplate)
 router.get('/dashboard', isLoggedIn, (req, res) => {
     const userSlug = req.user && req.user.slug ? req.user.slug : '';
     if (userSlug) {
@@ -152,13 +145,11 @@ router.get('/dashboard', isLoggedIn, (req, res) => {
     }
 });
 
-// Public hotel show page
 router.get('/hotel/:hotelSlug', hotelController.showHotelPage);
 
-// Visiting card show page
-router.get('/visiting-card/:profileSlug', visitingCardController.showByProfile);
+// Public vCard render — uses the card's unique slug to resolve the right template
+router.get('/visiting-card/:slug', visitingCardController.renderCard);
 
-// Portfolio show page
 router.get('/portfolio/:slug', portfolioController.showPortfolio);
 
 

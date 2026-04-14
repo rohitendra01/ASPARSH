@@ -29,6 +29,14 @@
               <input type="text" id="mobile" name="mobile" required placeholder="+91 0000000000" class="form-control" />
             </div>
             <div class="form-group">
+              <label for="whatsapp">WhatsApp Number</label>
+              <input type="text" id="whatsapp" name="whatsapp" placeholder="+91 0000000000" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="website">Website</label>
+              <input type="url" id="website" name="website" placeholder="https://example.com" class="form-control" />
+            </div>
+            <div class="form-group">
               <label for="image">Profile Image</label>
               <input type="file" id="image" name="image" accept="image/*" class="form-control file-input" />
             </div>
@@ -40,9 +48,17 @@
         <div class="form-section">
           <h3 class="section-title">Professional Details</h3>
           <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="companyName">Company / Business Name</label>
+              <input type="text" id="companyName" name="companyName" placeholder="e.g. Acme Corp" class="form-control" />
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label for="bio">Bio / Short Description</label>
+              <textarea id="bio" name="bio" rows="3" placeholder="Tell us about yourself or your business..." class="form-control"></textarea>
+            </div>
             <div class="form-group">
-              <label for="occupation">Occupation</label>
-              <input type="text" id="occupation" name="occupation" placeholder="e.g. Chef, Designer"
+              <label for="occupation">Designation / Occupation</label>
+              <input type="text" id="occupation" name="occupation" placeholder="e.g. CEO, Developer"
                 class="form-control" />
             </div>
             <div class="form-group">

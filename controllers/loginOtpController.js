@@ -1,12 +1,7 @@
-const adminUser = require('../models/adminUser');
-const transporter = require('../mailer');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const passport = require('passport');
+const otpService = require('../services/otpService');
+const authService = require('../services/authService'); // Reusing from authController step
 
-// In-memory OTP store (use DB in production)
-const otpStore = {};
-
-// Helper to safely obtain CSRF token — works when csurf is applied per-router or not applied
 function getCsrf(req, res) {
   if (typeof req.csrfToken === 'function') return req.csrfToken();
   if (res && res.locals && res.locals.csrfToken) return res.locals.csrfToken;
@@ -22,7 +17,6 @@ exports.getLoginPage = (req, res) => {
 };
 
 exports.loginUser = (req, res, next) => {
-  const passport = require('passport');
   passport.authenticate('local', (err, user, info) => {
     if (err) return next(err);
     if (!user) {
@@ -33,13 +27,7 @@ exports.loginUser = (req, res, next) => {
     req.logIn(user, async (err) => {
       if (err) return next(err);
       try {
-        if (user.currentSessionId && req.sessionStore && typeof req.sessionStore.destroy === 'function') {
-          try {
-            await new Promise((resolve) => req.sessionStore.destroy(user.currentSessionId, () => resolve()));
-          } catch (e) {}
-        }
-        user.currentSessionId = req.sessionID || null;
-        await user.save();
+        await authService.manageLoginSession(user, req.sessionID, req.sessionStore);
 
         req.flash('success_msg', 'Successfully logged in!');
         const redirectUrl = req.session.returnTo || '/';
@@ -63,67 +51,47 @@ exports.logoutUser = (req, res) => {
   });
 };
 
-// OTP Request
 exports.requestOtp = async (req, res) => {
   const { email } = req.body;
-  const user = await adminUser.findOne({ email });
-  if (!user) {
-    return res.render('users/login', { error_msg: 'No account with that email.', csrfToken: getCsrf(req, res) });
+  try {
+    await otpService.generateAndSendOtp(email);
+    res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
+  } catch (err) {
+    res.render('users/login', { error_msg: err.message, csrfToken: getCsrf(req, res) });
   }
-  const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
-  otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
-  await transporter.sendMail({
-    to: email,
-    subject: 'Your OTP for Password Reset',
-    html: `<p>Your OTP is <b>${otp}</b>. It is valid for 10 minutes.</p>`
-  });
-  res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
 };
 
-// OTP Resend
 exports.resendOtp = async (req, res) => {
   const { email } = req.body;
-  if (!otpStore[email]) {
-    return res.render('users/login', { error_msg: 'Session expired. Please request again.', csrfToken: getCsrf(req, res) });
+  try {
+    await otpService.resendOtp(email);
+    res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
+  } catch (err) {
+    res.render('users/login', { error_msg: err.message, csrfToken: getCsrf(req, res) });
   }
-  const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
-  otpStore[email] = { otp, expires: Date.now() + 10 * 60 * 1000 };
-  await transporter.sendMail({
-    to: email,
-    subject: 'Your OTP for Password Reset',
-    html: `<p>Your new OTP is <b>${otp}</b>. It is valid for 10 minutes.</p>`
-  });
-  res.render('users/otp', { email, error_msg: null, csrfToken: getCsrf(req, res) });
 };
 
-// OTP Verify
-exports.verifyOtp = async (req, res) => {
+exports.verifyOtp = (req, res) => {
   const { email, otp } = req.body;
-  const record = otpStore[email];
-  if (!record || record.expires < Date.now()) {
-    return res.render('users/login', { error_msg: 'OTP expired. Please request again.', csrfToken: getCsrf(req, res) });
+  try {
+    otpService.verifyOtp(email, otp);
+    return res.render('users/new-password', { email, csrfToken: getCsrf(req, res) });
+  } catch (err) {
+    if (err.message.includes('expired')) {
+      return res.render('users/login', { error_msg: err.message, csrfToken: getCsrf(req, res) });
+    }
+    return res.render('users/otp', { email, error_msg: err.message, csrfToken: getCsrf(req, res) });
   }
-  if (record.otp !== otp) {
-    return res.render('users/otp', { email, error_msg: 'Invalid OTP. Try again.', csrfToken: getCsrf(req, res) });
-  }
-  return res.render('users/new-password', { email, csrfToken: getCsrf(req, res) });
 };
 
-// Password Reset via OTP
 exports.resetPasswordOtp = async (req, res) => {
   const { email, password } = req.body;
-  const user = await adminUser.findOne({ email });
-  if (!user) {
-    return res.render('users/login', { error_msg: 'User not found.', csrfToken: getCsrf(req, res) });
-  }
   try {
-    user.password = password;
-    await user.save();
-    delete otpStore[email];
+    await otpService.resetPassword(email, password);
     req.flash('success_msg', 'Password reset successful. Please log in.');
     return res.redirect('/login');
   } catch (err) {
     console.error('Error resetting password:', err);
-    res.render('users/login', { error_msg: 'Error resetting password. Please try again.', csrfToken: getCsrf(req, res) });
+    res.render('users/login', { error_msg: err.message || 'Error resetting password. Please try again.', csrfToken: getCsrf(req, res) });
   }
 };

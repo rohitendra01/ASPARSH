@@ -119,10 +119,10 @@
 /* ==========================================================================
    Compact Grid & Profile Cards
    ========================================================================== */
+
 .compact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  /* Slightly wider for profiles */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 1.25rem;
 }
 
@@ -148,10 +148,8 @@
 /* 1. Profile Thumbnail */
 .profile-thumbnail {
   width: 72px;
-  /* Slightly larger for profiles */
   height: 72px;
   border-radius: 50%;
-  /* Make profiles circular to distinguish from hotels */
   background-color: #f8fafc;
   border: 1px solid var(--card-border);
   flex-shrink: 0;
@@ -172,7 +170,6 @@
   display: flex;
 }
 
-/* 2. Center Content & Dense Meta Grid */
 .card-info {
   flex: 1;
   min-width: 0;
@@ -213,7 +210,6 @@
   border: 1px solid #e2e8f0;
 }
 
-/* The 2-column grid for dense contact info */
 .info-meta-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -330,13 +326,17 @@
   max-width: 400px;
 }
 
-/* Responsive adjustments */
+/* --- Mobile Responsive Updates --- */
 @media (max-width: 768px) {
+  .page-container {
+    gap: 1.5rem;
+  }
 
   .page-header-row,
   .page-header-actions {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 
   .search-wrapper {
@@ -345,11 +345,22 @@
 
   .quick-stats-row {
     flex-direction: column;
+    gap: 1rem;
   }
 
   .compact-card {
     flex-direction: column;
     align-items: flex-start;
+    padding: 1.25rem 1rem;
+    gap: 1rem;
+  }
+
+  .card-info {
+    width: 100%;
+  }
+
+  .info-meta-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   }
 
   .card-actions {

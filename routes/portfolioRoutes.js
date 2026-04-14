@@ -1,23 +1,23 @@
+const express = require('express');
+const router = express.Router({ mergeParams: true });
 const { isLoggedIn } = require('../middleware/authMiddleware');
+const portfolioController = require('../controllers/portfolioController');
+const { upload } = require('../middleware/uploadMiddleware');
 const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 
+const portfolioUploads = upload.fields([
+    { name: 'heroImage', maxCount: 1 },
+    { name: 'aboutImage', maxCount: 1 },
+    { name: 'galleryImages', maxCount: 10 }
+]);
 
-const express = require('express');
-const router = express.Router({ mergeParams: true });
-const portfolioController = require('../controllers/portfolioController');
-const { uploadPortfolioImages } = require('../middleware/uploadMiddleware');
-
-// List all portfolios for the dashboard (mounted at /dashboard/:slug/portfolios)
 router.get('/', isLoggedIn, portfolioController.listPortfolios);
 
-// Render form to create new portfolio
 router.get('/new', isLoggedIn, portfolioController.showCreateForm);
 
-// Create portfolio
-router.post('/new', isLoggedIn, uploadPortfolioImages, csrfProtection, portfolioController.createPortfolio);
+router.post('/new', isLoggedIn, portfolioUploads, csrfProtection, portfolioController.createPortfolio);
 
-// Public view of a portfolio by slug
 router.get('/:slug', portfolioController.getPortfolioBySlug);
 
 module.exports = router;

@@ -6,31 +6,18 @@ const csurf = require('csurf');
 const csrfProtection = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
 const { upload } = require('../middleware/uploadMiddleware');
 
-// List profiles
 router.get('/', isLoggedIn, profileController.listProfiles);
 
-// Render new profile form
 router.get('/new', isLoggedIn, profileController.renderNewProfileForm);
 
-// Create new profile (handles form submission from /new)
-router.post('/', 
-  isLoggedIn,
-  upload.single('image'),
-  csrfProtection,
-  profileController.createProfile
-);
+router.post('/', isLoggedIn, upload.single('image'), csrfProtection, profileController.createProfile);
 
-// Show profile (public under dashboard)
 router.get('/:profileSlug', profileController.showProfile);
 
-// Render edit form
 router.get('/:profileSlug/edit', isLoggedIn, profileController.renderEditProfileForm);
 
-// Update profile (POST for form submissions)
 router.post('/:profileSlug', isLoggedIn, csrfProtection, profileController.updateProfile);
 
-// Delete profile
 router.post('/:profileSlug/delete', isLoggedIn, csrfProtection, profileController.deleteProfile);
 
 module.exports = router;
- 

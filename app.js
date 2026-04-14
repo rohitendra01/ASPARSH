@@ -11,7 +11,6 @@ function cacheBypass(req, res, next) {
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const csurf = require('csurf');
-const app = express();
 const bodyParser = require("body-parser");
 const ejsMate = require('ejs-mate');
 const path = require("path");
@@ -19,14 +18,30 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const helmet = require('helmet');
+const morgan = require('morgan');
 const adminUser = require('./models/adminUser');
 
+const app = express();
+
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+}));
+
+if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan('dev', {
+        skip: (req, res) => {
+            return req.originalUrl.startsWith('/assets') ||
+                req.originalUrl.startsWith('/css') ||
+                req.originalUrl.startsWith('/js');
+        }
+    }));
+}
 
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
-
-// Trust first proxy to get real IP addresses
 app.set('trust proxy', true);
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -35,8 +50,8 @@ app.use('/assets', express.static(path.join(__dirname, "assets")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-require('dotenv').config();
 app.use(cookieParser());
+
 const sessionOptions = {
     secret: 'yourSecretKey',
     resave: false,
@@ -93,11 +108,15 @@ try {
 passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
     try {
         const emailLower = email.toLowerCase();
-        const user = await adminUser.findOne({ email: emailLower });
+
+        const user = await adminUser.findOne({ email: emailLower }).select('+password');
+
         if (!user) return done(null, false, { message: 'Incorrect email.' });
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
+
+        adminUser.findByIdAndUpdate(user._id, { lastLoginAt: new Date() }).catch(e => console.error(e));
 
         return done(null, user);
     } catch (err) {
@@ -159,9 +178,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-
-
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const indexRoutes = require('./routes/indexRoutes');
@@ -178,6 +194,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const streamlineRoutes = require('./routes/streamlineRoutes');
 const qrRoutes = require('./routes/qrRoutes');
 const qrController = require('./controllers/qrController');
+const templateRoutes = require('./routes/templateRoutes');
 
 // Use routes
 app.use('/', indexRoutes);
@@ -193,6 +210,7 @@ app.use('/dashboard/:slug/reviews', reviewRoutes);
 app.use('/dashboard/:slug/streamline', streamlineRoutes);
 app.use('/dashboard/:slug/qr-codes', qrRoutes);
 app.use('/dashboard/:slug', dashboardRoutes);
+app.use('/dashboard/:slug/templates', templateRoutes);
 
 app.get('/q/:shortId', qrController.redirect);
 
@@ -201,13 +219,20 @@ app.use('/api', apiRoutes);
 
 app.use((err, req, res, next) => {
     if (!err) return next();
-    if (err.code === 'EBADCSRFTOKEN' || err.message === 'invalid csrf token') {
-        const accept = (req.headers['accept'] || '').toLowerCase();
-        if (req.xhr || accept.includes('application/json') || req.is('json')) return res.status(403).json({ error: 'invalid csrf token' });
-        return res.status(403).send('Invalid CSRF token');
-    }
-    return next(err);
-});
 
+    const isJsonRequest = req.xhr || (req.headers['accept'] || '').toLowerCase().includes('application/json') || req.is('json');
+
+    if (err.code === 'EBADCSRFTOKEN') {
+        if (isJsonRequest) return res.status(403).json({ success: false, message: 'Invalid or expired security token.' });
+        req.flash('error_msg', 'Your session expired. Please try again.');
+        return res.redirect('back');
+    }
+
+    if (isJsonRequest) {
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+
+    res.status(500).send('Internal Server Error');
+});
 
 module.exports = app;

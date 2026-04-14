@@ -380,3 +380,90 @@
 
 
 <script src="/js/portfolio-wizard.js"></script>
+
+<script>
+  // --- Global Portfolio Image Compression ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const fileInputs = ['heroImage', 'aboutImage', 'galleryImages'];
+    
+    fileInputs.forEach(id => {
+      const input = document.getElementById(id);
+      if (!input) return;
+
+      input.addEventListener('change', async function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        const maxSizeInBytes = 3 * 1024 * 1024; // 3MB limit for trigger
+        let needsCompression = files.some(f => f.size > maxSizeInBytes);
+
+        if (needsCompression) {
+          const label = this.closest('.form-group') ? this.closest('.form-group').querySelector('label') : null;
+          const originalText = label ? label.innerHTML : '';
+          if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Compressing images...';
+
+          try {
+            const compressedFiles = await Promise.all(files.map(async (file) => {
+              if (file.size > maxSizeInBytes) {
+                return await compressImage(file);
+              }
+              return file;
+            }));
+
+            const dataTransfer = new DataTransfer();
+            compressedFiles.forEach(f => dataTransfer.items.add(f));
+            e.target.files = dataTransfer.files;
+
+            if (label) label.innerHTML = '<i class="fas fa-check-circle"></i> Images compressed! ✅';
+            setTimeout(() => { if (label) label.innerHTML = originalText; }, 3000);
+
+            // Trigger preview updates if handled by wizard.js
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+
+          } catch (err) {
+            console.error('Compression failed:', err);
+            if (label) label.innerHTML = originalText;
+          }
+        }
+      });
+    });
+
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = event => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const MAX_SIZE = 1600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+            } else {
+              if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (!blob) return reject(new Error('Canvas empty'));
+              resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg", {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              }));
+            }, 'image/jpeg', 0.75);
+          };
+          img.onerror = reject;
+        };
+        reader.onerror = reject;
+      });
+    }
+  });
+</script>
