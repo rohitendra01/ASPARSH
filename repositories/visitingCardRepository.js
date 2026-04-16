@@ -9,7 +9,6 @@ exports.create = (data) => {
 
 /**
  * Find a card by its unique public slug.
- * Populates the template reference.
  */
 exports.findBySlug = (slug) => {
     return VisitingCard.findOne({ slug })
@@ -19,7 +18,6 @@ exports.findBySlug = (slug) => {
 
 /**
  * Find a card by its MongoDB _id.
- * Populates the template reference.
  */
 exports.findById = (id) => {
     return VisitingCard.findById(id)
@@ -28,18 +26,25 @@ exports.findById = (id) => {
 };
 
 /**
- * Fetch ALL visiting cards company-wide (no owner filter).
+ * Fetch ALL visiting cards company-wide.
+ * All admins can see all cards — no owner filter.
  */
 exports.findAll = () => {
     return VisitingCard.find({})
         .populate('templateId')
+        .populate('profileId', 'name slug email mobile')
         .sort({ createdAt: -1 })
         .lean();
 };
 
-// Kept for backward-compat; now returns all cards regardless of userId
-exports.findAllByCreator = () => {
-    return exports.findAll();
+/**
+ * Fetch all visiting cards belonging to a specific profile.
+ */
+exports.findByProfileId = (profileId) => {
+    return VisitingCard.find({ profileId })
+        .populate('templateId')
+        .sort({ createdAt: -1 })
+        .lean();
 };
 
 /**
@@ -56,10 +61,15 @@ exports.updateById = (id, data) => {
 };
 
 /**
- * Delete a card by its _id.
+ * Soft-delete a card by its _id.
  */
-exports.deleteById = (id) => {
-    return VisitingCard.findByIdAndDelete(id);
+exports.softDeleteById = async (id) => {
+    const card = await VisitingCard.findById(id);
+    if (!card) throw new Error('Visiting card not found');
+    card.isDeleted = true;
+    card.deletedAt = new Date();
+    card.isPublished = false;
+    return card.save();
 };
 
 /**

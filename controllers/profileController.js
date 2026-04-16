@@ -69,7 +69,7 @@ exports.createProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    await profileService.processProfileUpdate(req.params.profileSlug, req.body, req.file, req.body.deleteImage);
+    await profileService.processProfileUpdate(req.params.profileSlug, req.body, req.file, req.body.deleteImage, req.user._id);
     req.flash('success_msg', 'Profile updated successfully!');
 
     const redirectSlug = req.params.slug || req.user?.slug || '';

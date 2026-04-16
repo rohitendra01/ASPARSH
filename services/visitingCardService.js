@@ -23,6 +23,11 @@ class VisitingCardService {
     async createVisitingCard({ body, files = {}, user }) {
         if (!body) throw new Error('Request body missing');
         if (!body.templateId) throw new Error('Please select a design template');
+        if (!user || !user._id) throw new Error('Admin user required');
+
+        // profileId is the customer this card belongs to (required)
+        const profileId = body.profileId || body.selectedProfileId;
+        if (!profileId) throw new Error('Please select a customer profile for this visiting card');
 
         const template = await templateRepository.findTemplateById(body.templateId);
         if (!template) throw new Error('Selected template not found');
@@ -36,8 +41,11 @@ class VisitingCardService {
         // Link template
         payload.templateId = template._id;
 
-        // Link user
-        if (user && user._id) payload.userId = user._id;
+        // Data ownership: link to customer profile
+        payload.profileId = profileId;
+
+        // Audit: which admin created this
+        payload.createdByAdmin = user._id;
 
         // Ensure slug uniqueness
         let slug = payload.slug || this.generateSlug(payload.profile && payload.profile.fullName);
@@ -98,7 +106,9 @@ class VisitingCardService {
         // Preserve immutable system fields
         delete updated.slug;
         delete updated.templateId;
-        updated.userId = card.userId;
+        // profileId and createdByAdmin are immutable after creation
+        delete updated.profileId;
+        delete updated.createdByAdmin;
 
         return visitingCardRepository.updateById(id, updated);
     }
@@ -108,7 +118,7 @@ class VisitingCardService {
     // ─────────────────────────────────────────────
 
     async deleteCard(id) {
-        return visitingCardRepository.deleteById(id);
+        return visitingCardRepository.softDeleteById(id);
     }
 
     // ─────────────────────────────────────────────

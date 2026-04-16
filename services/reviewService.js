@@ -13,7 +13,14 @@ const generateUniqueSlug = async (profileSlug) => {
     return uniqueSlug;
 };
 
-exports.processReviewCreation = async (data, userId) => {
+/**
+ * Create a new review link.
+ * - profileId: the customer profile this review link belongs to (required)
+ * - createdByAdmin: the logged-in admin's ID (required, audit only)
+ */
+exports.processReviewCreation = async (data, adminUserId) => {
+    if (!adminUserId) throw new Error('Admin user ID required');
+
     const { profileSlug, targetUrl, reviewTitle, businessName, businessSubheader, businessCategory } = data;
 
     const profile = await profileRepository.findProfileBySlug(profileSlug);
@@ -23,12 +30,15 @@ exports.processReviewCreation = async (data, userId) => {
 
     const reviewLink = await reviewRepository.createReviewLink({
         profileSlug: profile.slug,
-        profileId: profile._id,
-        slug, targetUrl, businessName, businessSubheader, businessCategory,
+        profileId: profile._id,      // data ownership
+        createdByAdmin: adminUserId, // audit only
+        slug,
+        targetUrl,
+        businessName,
+        businessSubheader,
+        businessCategory,
         reviewTitle: reviewTitle || 'Share Your Experience',
-        isActive: true,
-        status: 'active',
-        tenantId: userId
+        status: 'active'
     });
 
     return { reviewLink, slug };

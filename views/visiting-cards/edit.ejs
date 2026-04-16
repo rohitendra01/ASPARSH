@@ -529,4 +529,66 @@ function confirmDelete() {
     document.getElementById('deleteForm').submit();
   }
 }
+
+// ─── Image compression logic (shared from profiles) ─────
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const MAX_WIDTH = 1920, MAX_HEIGHT = 1920;
+        let width = img.width, height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+        }
+        canvas.width = width; canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error('Canvas is empty'));
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg", {
+            type: 'image/jpeg', lastModified: Date.now()
+          });
+          resolve(newFile);
+        }, 'image/jpeg', 0.75);
+      };
+      img.onerror = error => reject(error);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
+
+document.addEventListener('change', async function(e) {
+  if (e.target.type === 'file' && e.target.accept && e.target.accept.includes('image')) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Compression Logic
+    const maxSize = 7 * 1024 * 1024; // 7MB matching server limit
+    if (file.size > maxSize) {
+      // Find label for feedback
+      const label = e.target.id ? document.querySelector(`label[for="${e.target.id}"]`) : e.target.closest('.form-field')?.querySelector('label');
+      const originalHtml = label ? label.innerHTML : '';
+      if (label) label.innerHTML = label.innerText + ' <span>⏳ Compressing...</span>';
+
+      try {
+        const compressed = await compressImage(file);
+        const dt = new DataTransfer();
+        dt.items.add(compressed);
+        e.target.files = dt.files;
+        if (label) label.innerHTML = label.innerText.replace('⏳ Compressing...', '') + ' <span>✅ Compressed</span>';
+        setTimeout(() => { if (label) label.innerHTML = originalHtml; }, 2000);
+      } catch (err) {
+        console.error('Compression failed:', err);
+        if (label) label.innerHTML = label.innerText.replace('⏳ Compressing...', '') + ' <span>❌ Too Large</span>';
+      }
+    }
+  }
+});
 </script>

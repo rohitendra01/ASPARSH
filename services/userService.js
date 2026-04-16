@@ -22,8 +22,8 @@ exports.getUserEcosystemStats = async (slug, currentUser) => {
 
         const [portfolioCount, hotelCount, vcardCount, reviewCount] = await Promise.all([
             Portfolio.countDocuments(query),
-            Hotel.countDocuments({ createdByProfile: profile._id, isDeleted: false }),
-            VisitingCard.countDocuments({ profileSlug: profile.slug, isDeleted: false }),
+            Hotel.countDocuments({ profileId: profile._id, isDeleted: false }),
+            VisitingCard.countDocuments({ profileId: profile._id, isDeleted: false }),
             ReviewLink.countDocuments(query)
         ]);
 

@@ -30,12 +30,8 @@ const reviewLinkSchema = new mongoose.Schema({
     index: true
   },
   profileSlug: { type: String, required: true },
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'AdminUser',
-    required: true,
-    index: true
-  },
+
+  createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
 
   status: {
     type: String,
@@ -74,7 +70,7 @@ reviewLinkSchema.pre('save', function (next) {
   if (!this.isNew && (this.isModified('targetUrl') || this.isModified('businessName') || this.isModified('status'))) {
     this.versions.push({
       modifiedAt: new Date(),
-      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      modifiedByAdmin: this._modifiedByAdminId,
       targetUrl: this.targetUrl,
       businessName: this.businessName,
       status: this.status

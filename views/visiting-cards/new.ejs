@@ -181,7 +181,7 @@
 
       <!-- RIGHT: Profile picker -->
       <div class="step1-panel">
-        <h3>👤 Link a Customer <span class="panel-optional-badge">Optional</span></h3>
+        <h3>👤 Link a Customer <span class="panel-required-badge">Required</span></h3>
         <div class="profile-search-box">
           <span class="ico">🔍</span>
           <input type="text" id="profileSearch" placeholder="Search profiles to link..." autocomplete="off">
@@ -237,10 +237,10 @@
           action="/dashboard<%= slugSegment %>/visiting-cards"
           method="POST"
           enctype="multipart/form-data">
-      <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <% } %>
       <input type="hidden" name="templateId" id="templateIdInput">
+      <input type="hidden" name="profileId" id="profileIdInput">
 
       <!-- 1. Profile / Identity -->
       <div class="sec">
@@ -485,7 +485,7 @@ function selectTemplate(id, name, category, thumb) {
     el.querySelector('.btn-select').textContent = "✅ Selected";
   }
   selTemplate = { id, name, category, thumb };
-  document.getElementById('step1Next').disabled = false;
+  checkStep1Next();
 }
 
 // ─── Profile selection ───────────────
@@ -513,22 +513,34 @@ function selectProfile(id, slug, name) {
   }
   
   selProfile = { id, slug, name };
+  document.getElementById('profileIdInput').value = id;
   document.getElementById('selProfileLabel').textContent = selProfile.name;
   document.getElementById('selProfileStrip').classList.add('show');
   
   // Auto-fill name
   const nameFld = document.getElementById('inp-fullName');
   if (nameFld && !nameFld.value) nameFld.value = selProfile.name;
+
+  checkStep1Next();
 }
 
 function clearProfile() {
   selProfile = null;
+  document.getElementById('profileIdInput').value = '';
   document.getElementById('selProfileStrip').classList.remove('show');
   document.querySelectorAll('.profile-item').forEach(i => {
     i.classList.remove('sel');
     const btn = i.querySelector('.btn-select-profile');
     if(btn) btn.textContent = "Select";
   });
+  checkStep1Next();
+}
+
+function checkStep1Next() {
+  const btn = document.getElementById('step1Next');
+  if (btn) {
+    btn.disabled = !(selTemplate && selProfile);
+  }
 }
 
 // ─── Profile SEARCH (AJAX) ─────────────
@@ -835,22 +847,74 @@ function submitForm() {
   document.getElementById('vcardForm').submit();
 }
 
-// ─── Image compression preview ─────
-(function() {
-  [['inp-profileImage','lbl-profileImage','prev-profileImage'],
-   ['inp-coverImage',  'lbl-coverImage',  'prev-coverImage'  ]
-  ].forEach(([inputId, labelId, prevId]) => {
-    const input = document.getElementById(inputId);
-    const label = document.getElementById(labelId);
-    const prev  = document.getElementById(prevId);
+// ─── Image compression logic (shared from profiles) ─────
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const MAX_WIDTH = 1920, MAX_HEIGHT = 1920;
+        let width = img.width, height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+        }
+        canvas.width = width; canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error('Canvas is empty'));
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + "_compressed.jpg", {
+            type: 'image/jpeg', lastModified: Date.now()
+          });
+          resolve(newFile);
+        }, 'image/jpeg', 0.75);
+      };
+      img.onerror = error => reject(error);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
 
-    input.addEventListener('change', async function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+document.addEventListener('change', async function(e) {
+  if (e.target.type === 'file' && e.target.accept && e.target.accept.includes('image')) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Handle Previews (for known static IDs)
+    const previewIds = { 'inp-profileImage': 'prev-profileImage', 'inp-coverImage': 'prev-coverImage' };
+    const prevId = previewIds[e.target.id];
+    if (prevId) {
+      const prev = document.getElementById(prevId);
       const r0 = new FileReader();
       r0.onload = ev => { prev.src = ev.target.result; prev.style.display = 'block'; };
       r0.readAsDataURL(file);
-    });
-  });
-})();
+    }
+
+    // Compression Logic
+    const maxSize = 7 * 1024 * 1024; // 7MB
+    if (file.size > maxSize) {
+      const label = e.target.id ? document.querySelector(`label[for="${e.target.id}"]`) : null;
+      const originalHtml = label ? label.innerHTML : '';
+      if (label) label.innerHTML = '<span>⏳</span> Compressing...';
+
+      try {
+        const compressed = await compressImage(file);
+        const dt = new DataTransfer();
+        dt.items.add(compressed);
+        e.target.files = dt.files;
+        if (label) label.innerHTML = '<span>✅</span> Compressed';
+        setTimeout(() => { if (label) label.innerHTML = originalHtml; }, 2000);
+      } catch (err) {
+        console.error('Compression failed:', err);
+        if (label) label.innerHTML = '<span>❌</span> Too Large';
+      }
+    }
+  }
+});
 </script>

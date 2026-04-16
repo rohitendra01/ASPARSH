@@ -44,12 +44,8 @@ const portfolioSchema = new mongoose.Schema({
     required: true,
     index: true
   },
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'AdminUser',
-    required: true,
-    index: true
-  },
+
+  createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
 
   status: {
     type: String,
@@ -102,7 +98,7 @@ portfolioSchema.pre('save', function (next) {
 
     this.versions.push({
       modifiedAt: new Date(),
-      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      modifiedByAdmin: this._modifiedByAdminId,
       snapshot: snapshot
     });
 

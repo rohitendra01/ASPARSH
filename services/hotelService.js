@@ -4,126 +4,121 @@ const hotelRepository = require('../repositories/hotelRepository');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 const { deleteCloudinaryImage } = require('../utils/cloudinaryUtils');
 
-exports.processHotelCreation = async (data, files, user) => {
+/**
+ * Create a new hotel.
+ * - profileId: the customer profile this hotel belongs to (required, stored for data ownership)
+ * - createdByAdmin: the logged-in admin ID (stored for audit only)
+ */
+exports.processHotelCreation = async (data, files, adminUser) => {
+    if (!adminUser || !adminUser._id) throw new Error('Admin user required');
+
+    // Resolve the profile this hotel belongs to
     let profile = null;
     if (data.selectedProfileId && mongoose.Types.ObjectId.isValid(data.selectedProfileId)) {
         profile = await Profile.findById(data.selectedProfileId);
     } else if (data.selectedProfileSlug) {
         profile = await Profile.findOne({ slug: data.selectedProfileSlug });
+    } else if (data.profileId && mongoose.Types.ObjectId.isValid(data.profileId)) {
+        profile = await Profile.findById(data.profileId);
     }
     if (!profile) throw new Error('Selected profile not found. Please select a valid profile.');
 
-    const hotelSlug = data.hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    if (await hotelRepository.findHotelBySlug(hotelSlug)) {
-        throw new Error('A hotel with this name already exists.');
-    }
-
-    let hotelLogo, hotelOfferBanner, hotelLogoPublicId, hotelOfferBannerPublicId;
+    let hotelLogo = '', hotelOfferBanner = '';
 
     if (files?.hotelLogo?.[0]) {
         const file = files.hotelLogo[0];
         const upload = await uploadToCloudinary(file.buffer, 'hotelLogo', file.mimetype);
-        hotelLogo = upload.secure_url; hotelLogoPublicId = upload.public_id;
+        hotelLogo = upload.secure_url;
     }
     if (files?.hotelOfferBanner?.[0]) {
         const file = files.hotelOfferBanner[0];
         const upload = await uploadToCloudinary(file.buffer, 'hotelBanner', file.mimetype);
-        hotelOfferBanner = upload.secure_url; hotelOfferBannerPublicId = upload.public_id;
+        hotelOfferBanner = upload.secure_url;
     }
 
-    const hotelAddress = { street: data.street, city: data.city, state: data.state, country: data.country, zipCode: data.zipCode };
-    const hotelData = {
-        ...data, hotelAddress, hotelSlug, hotelLogo, hotelOfferBanner, hotelLogoPublicId, hotelOfferBannerPublicId,
-        foodCategories: Array.isArray(data.foodCategories) ? data.foodCategories : (data.foodCategories ? [data.foodCategories] : []),
-        createdByProfile: profile._id, createdByProfileUsername: profile.slug, createdByProfileName: profile.name,
-        createdByAdmin: user?._id, createdByAdminUsername: user?.username
+    const amenities = Array.isArray(data.amenities)
+        ? data.amenities
+        : (data.amenities ? [data.amenities] : []);
+
+    const address = {
+        street: data.street || '',
+        city: data.city || '',
+        state: data.state || '',
+        country: data.country || '',
+        zipCode: data.zipCode || ''
     };
 
-    const hotel = hotelRepository.createHotel(hotelData);
-    hotel.versions = [{ changedAt: new Date(), changedBy: user?._id, changedByName: user?.username, changes: {}, snapshot: hotel.toObject() }];
+    const hotelData = {
+        name: data.hotelName || data.name,
+        description: data.hotelDescription || data.description || '',
+        address,
+        amenities,
+        hotelLogo,
+        hotelOfferBanner,
+        profileId: profile._id,        // data ownership — links hotel to customer
+        createdByAdmin: adminUser._id  // audit only — who created it
+    };
 
-    await hotel.save();
-    return hotel;
+    return hotelRepository.createHotel(hotelData);
 };
 
-exports.processHotelUpdate = async (slug, data, files, user) => {
-    const hotel = await hotelRepository.findHotelBySlug(slug);
+/**
+ * Update an existing hotel.
+ * All admins can update any hotel. Admin ID is stored in version history.
+ */
+exports.processHotelUpdate = async (id, data, files, adminUser) => {
+    if (!adminUser || !adminUser._id) throw new Error('Admin user required');
+
+    const hotel = await hotelRepository.findHotelById(id);
     if (!hotel) throw new Error('Hotel not found');
-    const original = hotel.toObject();
 
-    if (data.hotelName) hotel.hotelName = data.hotelName;
-    if (data.hotelDescription) hotel.hotelDescription = data.hotelDescription;
-    if (data.hotelType) hotel.hotelType = data.hotelType;
-    if (data.hotelAddress) hotel.hotelAddress = data.hotelAddress;
+    const updates = {};
 
-    if (Array.isArray(data.foodCategories)) {
-        hotel.foodCategories = data.foodCategories.map(category => ({
-            ...category,
-            foodItems: Array.isArray(category.foodItems) ? category.foodItems.map(item => ({
-                ...item, price: item.itemPrice !== undefined ? item.itemPrice : item.price
-            })) : []
-        }));
-    } else if (data.foodCategories) {
-        hotel.foodCategories = [data.foodCategories];
+    if (data.hotelName || data.name) updates.name = data.hotelName || data.name;
+    if (data.hotelDescription || data.description) updates.description = data.hotelDescription || data.description;
+    if (data.status) updates.status = data.status;
+
+    if (data.street || data.city || data.state || data.country || data.zipCode) {
+        updates.address = {
+            street: data.street || hotel.address?.street || '',
+            city: data.city || hotel.address?.city || '',
+            state: data.state || hotel.address?.state || '',
+            country: data.country || hotel.address?.country || '',
+            zipCode: data.zipCode || hotel.address?.zipCode || ''
+        };
     }
 
-    if (data.hotelName && data.hotelName !== original.hotelName) {
-        const newSlug = data.hotelName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        if (newSlug !== hotel.hotelSlug && await hotelRepository.findHotelBySlug(newSlug)) {
-            throw new Error('A hotel with this name already exists.');
-        }
-        hotel.hotelSlug = newSlug;
+    if (data.amenities) {
+        updates.amenities = Array.isArray(data.amenities) ? data.amenities : [data.amenities];
     }
 
     if (files?.hotelLogo?.[0]) {
         const file = files.hotelLogo[0];
         const upload = await uploadToCloudinary(file.buffer, 'hotelLogo', file.mimetype);
-        if (hotel.hotelLogo && hotel.hotelLogo !== upload.secure_url) {
-            await deleteCloudinaryImage(hotel.hotelLogoPublicId || hotel.hotelLogo);
-        }
-        hotel.hotelLogo = upload.secure_url; hotel.hotelLogoPublicId = upload.public_id;
+        if (hotel.hotelLogo) await deleteCloudinaryImage(hotel.hotelLogo).catch(() => {});
+        updates.hotelLogo = upload.secure_url;
     }
 
     if (files?.hotelOfferBanner?.[0]) {
         const file = files.hotelOfferBanner[0];
         const upload = await uploadToCloudinary(file.buffer, 'hotelBanner', file.mimetype);
-        if (hotel.hotelOfferBanner && hotel.hotelOfferBanner !== upload.secure_url) {
-            await deleteCloudinaryImage(hotel.hotelOfferBannerPublicId || hotel.hotelOfferBanner);
-        }
-        hotel.hotelOfferBanner = upload.secure_url; hotel.hotelOfferBannerPublicId = upload.public_id;
+        if (hotel.hotelOfferBanner) await deleteCloudinaryImage(hotel.hotelOfferBanner).catch(() => {});
+        updates.hotelOfferBanner = upload.secure_url;
     }
 
-    const changes = {};
-    ['hotelName', 'hotelDescription', 'hotelType'].forEach(key => {
-        if (original[key] !== hotel[key]) changes[key] = { from: original[key], to: hotel[key] };
-    });
-    if (JSON.stringify(original.hotelAddress) !== JSON.stringify(hotel.hotelAddress)) changes.hotelAddress = { from: original.hotelAddress, to: hotel.hotelAddress };
-    if (JSON.stringify(original.foodCategories || []) !== JSON.stringify(hotel.foodCategories || [])) changes.foodCategories = { from: original.foodCategories || [], to: hotel.foodCategories || [] };
-
-    hotel.updatedBy = user?._id;
-    if (!hotel.versions) hotel.versions = [];
-    hotel.versions.push({ changedAt: new Date(), changedBy: user?._id, changedByName: user?.username, changes, snapshot: hotel.toObject() });
-
-    await hotel.save();
-    return hotel;
+    return hotelRepository.updateHotel(id, updates, adminUser._id);
 };
 
-exports.processHotelDeletion = async (slug) => {
-    const hotel = await hotelRepository.findHotelBySlug(slug);
+/**
+ * Soft-delete a hotel by ID.
+ * All admins can delete any hotel.
+ */
+exports.processHotelDeletion = async (id) => {
+    const hotel = await hotelRepository.findHotelById(id);
     if (!hotel) return;
 
-    await deleteCloudinaryImage(hotel.hotelLogo);
-    await deleteCloudinaryImage(hotel.hotelOfferBanner);
+    if (hotel.hotelLogo) await deleteCloudinaryImage(hotel.hotelLogo).catch(() => {});
+    if (hotel.hotelOfferBanner) await deleteCloudinaryImage(hotel.hotelOfferBanner).catch(() => {});
 
-    if (Array.isArray(hotel.foodCategories)) {
-        for (const cat of hotel.foodCategories) {
-            if (cat?.imagePublicId || cat?.imageUrl) await deleteCloudinaryImage(cat.imagePublicId || cat.imageUrl);
-            if (Array.isArray(cat?.foodItems)) {
-                for (const item of cat.foodItems) {
-                    if (item?.imagePublicId || item?.imageUrl) await deleteCloudinaryImage(item.imagePublicId || item.imageUrl);
-                }
-            }
-        }
-    }
-    await hotelRepository.deleteHotelBySlug(slug);
+    return hotelRepository.softDeleteHotel(id);
 };

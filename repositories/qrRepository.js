@@ -4,25 +4,27 @@ exports.isShortIdExists = async (shortId) => {
     return await QR.exists({ shortId, isDeleted: { $in: [true, false] } });
 };
 
-// tenantId param kept for API compat but no longer used to filter
-exports.findQRsByTenant = (tenantId, filter = {}, sortOpt = { createdAt: -1 }) => {
+/**
+ * List all QR codes, optionally filtered.
+ * All admins can see all QR codes — no tenant isolation.
+ */
+exports.findAllQRs = (filter = {}, sortOpt = { createdAt: -1 }) => {
     return QR.find(filter).sort(sortOpt).lean();
 };
 
-// tenantId param kept for API compat but ownership is no longer checked
-exports.findQRByIdAndTenant = (id, tenantId) => {
+exports.findQRById = (id) => {
     return QR.findOne({ _id: id }).lean();
 };
 
+/**
+ * Bulk insert pre-built QR records.
+ * Records must already have createdByAdmin set by the caller.
+ */
 exports.insertManyQRs = (records) => {
-    records.forEach(r => {
-        if (r.owner && !r.tenantId) r.tenantId = r.owner;
-    });
     return QR.insertMany(records);
 };
 
-exports.updateQRByIdAndTenant = async (id, tenantId, updates, adminId) => {
-    // tenantId ownership check removed — all admins can edit any QR
+exports.updateQRById = async (id, updates, adminId) => {
     const qr = await QR.findOne({ _id: id });
     if (!qr) return null;
 
@@ -31,6 +33,7 @@ exports.updateQRByIdAndTenant = async (id, tenantId, updates, adminId) => {
 
     return qr.save();
 };
+
 exports.findQRByShortId = (shortId) => {
     return QR.findOne({ shortId });
 };
@@ -47,8 +50,7 @@ exports.findRecentScanHistory = (qrId, limit = 50) => {
     return ScanHistory.find({ qr: qrId }).sort({ scannedAt: -1 }).limit(limit).lean();
 };
 
-exports.softDeleteQR = async (id, tenantId) => {
-    // tenantId ownership check removed — all admins can delete any QR
+exports.softDeleteQR = async (id) => {
     const qr = await QR.findOne({ _id: id });
     if (!qr) throw new Error('QR not found');
 

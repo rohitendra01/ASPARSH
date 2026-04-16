@@ -1,7 +1,11 @@
 const { Portfolio } = require('../models/Portfolio');
+const Profile = require('../models/Profile');
 
-// tenantId param kept for API compat but no longer used to filter
-exports.findPortfoliosByTenant = (tenantId, profileId = null) => {
+/**
+ * List all portfolios, optionally filtered by profileId.
+ * All admins can see all portfolios — no tenant isolation.
+ */
+exports.findAllPortfolios = (profileId = null) => {
     const query = {};
     if (profileId) query.profileId = profileId;
 
@@ -20,22 +24,17 @@ exports.findPublicPortfolioBySlug = (slug) => {
         .lean();
 };
 
-// tenantId param kept for API compat but ownership is no longer checked
-exports.findPortfolioByIdAndTenant = (id, tenantId) => {
+exports.findPortfolioById = (id) => {
     return Portfolio.findOne({ _id: id })
         .populate('design')
         .populate('skills');
 };
 
 exports.createPortfolio = (data) => {
-    if (data.createdBy && !data.tenantId) {
-        data.tenantId = data.createdBy;
-    }
     return new Portfolio(data).save();
 };
 
-exports.updatePortfolio = async (id, tenantId, updates, adminId) => {
-    // tenantId ownership check removed — all admins can edit any portfolio
+exports.updatePortfolio = async (id, updates, adminId) => {
     const portfolio = await Portfolio.findOne({ _id: id });
     if (!portfolio) throw new Error('Portfolio not found');
 
@@ -45,8 +44,7 @@ exports.updatePortfolio = async (id, tenantId, updates, adminId) => {
     return portfolio.save();
 };
 
-exports.softDeletePortfolio = async (id, tenantId) => {
-    // tenantId ownership check removed — all admins can delete any portfolio
+exports.softDeletePortfolio = async (id) => {
     const portfolio = await Portfolio.findOne({ _id: id });
     if (!portfolio) throw new Error('Portfolio not found');
 
@@ -55,8 +53,6 @@ exports.softDeletePortfolio = async (id, tenantId) => {
 
 exports.searchProfilesByKeyword = (searchQuery, limit = 10) => {
     return Profile.find({
-        status: 'published',
-        isDeleted: false,
         $or: [
             { name: { $regex: searchQuery, $options: 'i' } },
             { slug: { $regex: searchQuery, $options: 'i' } }

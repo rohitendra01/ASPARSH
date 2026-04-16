@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const visitingCardSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'adminUser', required: true },
+  profileId: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
+  createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
   templateId: { type: mongoose.Schema.Types.ObjectId, ref: 'VisitingCardTemplate', required: true },
 
   profile: {
@@ -127,8 +128,18 @@ const visitingCardSchema = new mongoose.Schema({
 
   slug: { type: String, unique: true, sparse: true },
   viewCount: { type: Number, default: 0 },
+  isDeleted: { type: Boolean, default: false, index: true },
+  deletedAt: { type: Date, default: null },
   isPublished: { type: Boolean, default: true }
 
 }, { timestamps: true });
+
+// Automatically exclude soft-deleted cards from all find queries
+visitingCardSchema.pre(/^find/, function (next) {
+    if (this.getFilter().isDeleted === undefined) {
+        this.where({ isDeleted: false });
+    }
+    next();
+});
 
 module.exports = mongoose.model('VisitingCard', visitingCardSchema);

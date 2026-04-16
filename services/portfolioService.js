@@ -21,7 +21,14 @@ const generateSlug = (baseName) => {
     return `${slugify(baseName)}-${uniqueId}`;
 };
 
-exports.processPortfolioCreation = async (payload, files, userId) => {
+/**
+ * Create a new portfolio.
+ * - profileId: the customer profile this portfolio belongs to (required)
+ * - createdByAdmin: the logged-in admin's ID (required, audit only)
+ */
+exports.processPortfolioCreation = async (payload, files, adminUserId) => {
+    if (!adminUserId) throw new Error('Admin user ID required');
+
     const profileIdentifier = payload.profileId || payload.selectedProfileId || payload.profileSlug;
     if (!profileIdentifier) throw new Error('Profile ID required');
 
@@ -30,6 +37,7 @@ exports.processPortfolioCreation = async (payload, files, userId) => {
         : await Profile.findOne({ slug: profileIdentifier });
 
     if (!profile) throw new Error('Profile not found');
+
     if (!payload.designId || !mongoose.Types.ObjectId.isValid(payload.designId)) {
         throw new Error('Valid Design ID required');
     }
@@ -64,26 +72,34 @@ exports.processPortfolioCreation = async (payload, files, userId) => {
     const socialLinks = parseJsonField(payload.socialLinks);
     const workExperience = parseJsonField(payload.workExperience);
     const experience = parseJsonField(payload.experienceTimeline);
-
     const rawSkills = parseJsonField(payload.skills);
     const skills = rawSkills.map(skill => skill.id || skill._id || skill);
-    const createdById = userId || profile.createdBy || profile._id;
-    if (!createdById) throw new Error('Unable to determine portfolio creator');
 
     let portfolio;
     try {
         portfolio = await portfolioRepository.createPortfolio({
-            profileId: profile._id, slug: finalSlug, name: payload.name || profile.name,
-            profession: payload.profession || 'Professional', briefIntro: payload.briefIntro || 'Brief intro.',
-            heroImage, aboutImage, galleryImages, socialLinks, skills, workExperience, experience,
+            profileId: profile._id,       // data ownership
+            createdByAdmin: adminUserId,  // audit only
+            slug: finalSlug,
+            name: payload.name || profile.name,
+            profession: payload.profession || 'Professional',
+            briefIntro: payload.briefIntro || 'Brief intro.',
+            heroImage,
+            aboutImage,
+            galleryImages,
+            socialLinks,
+            skills,
+            workExperience,
+            experience,
             aboutDescription: payload.aboutDescription || 'Detailed description.',
-            design: design._id, qrCode: dynamicLinkDoc ? dynamicLinkDoc._id : undefined,
-            tenantId: createdById
+            design: design._id,
+            qrCode: dynamicLinkDoc ? dynamicLinkDoc._id : undefined
         });
     } catch (saveErr) {
         if (saveErr.code === 11000) {
+            // Slug collision — retry with a fresh slug
             payload.name = `${baseSlugName}-${crypto.randomBytes(2).toString('hex')}`;
-            return this.processPortfolioCreation(payload, files, userId);
+            return exports.processPortfolioCreation(payload, files, adminUserId);
         }
         throw saveErr;
     }
@@ -91,6 +107,7 @@ exports.processPortfolioCreation = async (payload, files, userId) => {
     if (dynamicLinkDoc) {
         dynamicLinkDoc.status = 'LIVE';
         dynamicLinkDoc.destinationUrl = `/portfolio/${portfolio.slug}`;
+        dynamicLinkDoc._modifiedByAdminId = adminUserId;
         await dynamicLinkDoc.save();
     }
     await Profile.findByIdAndUpdate(profile._id, { $push: { portfolio: portfolio._id } });
@@ -98,8 +115,12 @@ exports.processPortfolioCreation = async (payload, files, userId) => {
     return { portfolio, dynamicLinkDoc };
 };
 
+/**
+ * Soft-delete a portfolio.
+ * All admins can delete any portfolio.
+ */
 exports.processPortfolioDeletion = async (id) => {
-    const portfolio = await portfolioRepository.softDeletePortfolio(id, null);
+    const portfolio = await portfolioRepository.softDeletePortfolio(id);
     if (!portfolio) throw new Error('Portfolio not found');
 
     await Profile.findByIdAndUpdate(portfolio.profileId, { $pull: { portfolio: portfolio._id } });

@@ -37,12 +37,7 @@ const profileSchema = new mongoose.Schema({
 
   portfolio: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' }],
 
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'AdminUser',
-    required: true,
-    index: true
-  },
+  createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
 
   status: {
     type: String,
@@ -94,7 +89,7 @@ profileSchema.pre('save', function (next) {
 
     this.versions.push({
       modifiedAt: new Date(),
-      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      modifiedByAdmin: this._modifiedByAdminId || this.createdByAdmin,
       snapshot: snapshot
     });
 

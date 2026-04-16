@@ -32,13 +32,13 @@ const qrSchema = new mongoose.Schema({
         index: true
     },
 
-    tenantId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'AdminUser',
-        required: true,
-        index: true
-    },
+    createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
 
+    profileId: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile', index: true },
+
+    linkedServiceType: { type: String, enum: ['Portfolio', 'Hotel', 'VisitingCard', 'ReviewLink', 'None'], default: 'None' },
+
+    linkedServiceId: { type: mongoose.Schema.Types.ObjectId },
     status: {
         type: String,
         enum: ['EMPTY', 'LIVE', 'INACTIVE'],
@@ -86,7 +86,7 @@ qrSchema.pre('save', function (next) {
     if (!this.isNew && (this.isModified('destinationUrl') || this.isModified('status'))) {
         this.versions.push({
             modifiedAt: new Date(),
-            modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+            modifiedByAdmin: this._modifiedByAdminId,
             destinationUrl: this.destinationUrl,
             status: this.status
         });

@@ -178,9 +178,11 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
     const slug = req.params?.slug || req.user?.slug || '';
     try {
+        // Use soft-delete to preserve data integrity
         await visitingCardService.deleteCard(req.params.id);
         res.redirect(`/dashboard/${slug}/visiting-cards`);
     } catch (err) {
+        console.error('vCard delete error:', err);
         res.status(500).send(err.message);
     }
 };

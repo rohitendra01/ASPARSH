@@ -35,18 +35,8 @@ const hotelSchema = new mongoose.Schema({
   hotelOfferBanner: { type: String, default: '' },
   galleryImages: [{ type: String }],
 
-  createdByProfile: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Profile',
-    required: true,
-    index: true
-  },
-  tenantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'AdminUser',
-    required: true,
-    index: true
-  },
+  profileId: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile', required: true, index: true },
+  createdByAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'AdminUser', required: true },
 
   status: {
     type: String,
@@ -99,7 +89,7 @@ hotelSchema.pre('save', function (next) {
 
     this.versions.push({
       modifiedAt: new Date(),
-      modifiedByAdmin: this._modifiedByAdminId || this.tenantId,
+      modifiedByAdmin: this._modifiedByAdminId,
       snapshot: snapshot
     });
   }

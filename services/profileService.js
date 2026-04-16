@@ -16,9 +16,9 @@ exports.getProfileEcosystem = async (slug) => {
     if (!profile) throw new Error('Profile not found.');
 
     const [hotels, portfolios, visitingCards, reviewLinks] = await Promise.all([
-        Hotel.find({ createdByProfile: profile._id }).lean(),
+        Hotel.find({ profileId: profile._id }).lean(),
         Portfolio.find({ profileId: profile._id }).populate('design', 'name').lean(),
-        VisitingCard.find({ profileSlug: profile.slug }).lean(),
+        VisitingCard.find({ profileId: profile._id }).lean(),
         ReviewLink.find({ profileId: profile._id }).lean()
     ]);
 
@@ -33,7 +33,8 @@ exports.processProfileCreation = async (data, file, userId) => {
     };
 
     const profileData = {
-        ...data, address, createdBy: userId,
+        ...data, address,
+        createdByAdmin: userId,  // audit only — which admin created this profile
         socialLinks: data.socialLinks || [], occupation: data.occupation || '',
         companyName: data.companyName || '', bio: data.bio || '',
         website: data.website || '', whatsapp: data.whatsapp || '',
@@ -49,7 +50,7 @@ exports.processProfileCreation = async (data, file, userId) => {
     return await profileRepository.createProfile(profileData);
 };
 
-exports.processProfileUpdate = async (slug, data, file, deleteImageFlag) => {
+exports.processProfileUpdate = async (slug, data, file, deleteImageFlag, adminId) => {
     const profile = await profileRepository.findProfileDocumentBySlug(slug);
     if (!profile) throw new Error('Profile not found.');
 
@@ -80,6 +81,9 @@ exports.processProfileUpdate = async (slug, data, file, deleteImageFlag) => {
         const upload = await uploadToCloudinary(file.buffer, 'profile', file.mimetype);
         profile.image = upload.secure_url;
     }
+
+    // Store the admin who made this change in version history
+    if (adminId) profile._modifiedByAdminId = adminId;
 
     return await profile.save();
 };

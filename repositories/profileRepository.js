@@ -17,17 +17,12 @@ exports.findAllProfiles = (searchQuery = null, limit = null) => {
     return dbQuery.lean();
 };
 
-// kept for backward-compat; now delegates to findAllProfiles (tenantId ignored)
-exports.findProfilesByTenant = (tenantId, searchQuery = null, limit = null) => {
-    return exports.findAllProfiles(searchQuery, limit);
-};
-
 /**
- * Keyword search scoped to a tenant — used by the AJAX profile picker.
+ * Keyword search across all profiles — used by AJAX pickers.
+ * All admins can search all profiles.
  */
-exports.searchProfilesByKeyword = (keyword, tenantId, limit = 8) => {
+exports.searchProfilesByKeyword = (keyword, limit = 8) => {
     const regex = { $regex: keyword.trim(), $options: 'i' };
-    // tenantId param kept for API compat but no longer used to filter
     const query = {
         $or: [
             { name: regex },
@@ -45,7 +40,6 @@ exports.searchProfilesByKeyword = (keyword, tenantId, limit = 8) => {
         .lean();
 };
 
-
 exports.findPublicProfileBySlug = (slug) => {
     return Profile.findOne({ slug, status: 'published' }).lean();
 };
@@ -58,6 +52,14 @@ exports.findProfileDocumentBySlug = (slug) => {
     return Profile.findOne({ slug });
 };
 
+exports.findProfileDocumentBySlugAndTenant = (slug) => {
+    return Profile.findOne({ slug });
+};
+
+exports.findProfileById = (id) => {
+    return Profile.findById(id).lean();
+};
+
 exports.deleteProfileBySlug = (slug) => {
     return Profile.findOneAndDelete({ slug });
 };
@@ -66,20 +68,14 @@ exports.findProfilesForStreamline = () => {
     return Profile.find({ status: 'published' }).select('name slug image').lean();
 };
 
-// tenantId param kept for API compat but ownership is no longer checked
-exports.findProfileDocumentBySlugAndTenant = (slug, tenantId) => {
-    return Profile.findOne({ slug });
-};
-
+/**
+ * Create a new profile. createdByAdmin must be set by the caller.
+ */
 exports.createProfile = (data) => {
-    if (data.createdBy && !data.tenantId) {
-        data.tenantId = data.createdBy;
-    }
     return new Profile(data).save();
 };
 
-exports.updateProfile = async (slug, tenantId, updates, adminId) => {
-    // tenantId ownership check removed — all admins can edit any profile
+exports.updateProfile = async (slug, updates, adminId) => {
     const profile = await Profile.findOne({ slug });
     if (!profile) throw new Error('Profile not found');
 
@@ -89,8 +85,7 @@ exports.updateProfile = async (slug, tenantId, updates, adminId) => {
     return profile.save();
 };
 
-exports.softDeleteProfile = async (slug, tenantId) => {
-    // tenantId ownership check removed — all admins can delete any profile
+exports.softDeleteProfile = async (slug) => {
     const profile = await Profile.findOne({ slug });
     if (!profile) throw new Error('Profile not found');
 

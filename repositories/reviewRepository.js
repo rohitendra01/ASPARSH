@@ -1,15 +1,17 @@
 const ReviewLink = require('../models/ReviewLink');
 
-// tenantId param kept for API compat but no longer used to filter
-exports.listReviewsByTenant = (tenantId, profileId = null) => {
+/**
+ * List all review links, optionally filtered by profileId.
+ * All admins can see all review links — no tenant isolation.
+ */
+exports.listAllReviews = (profileId = null) => {
     const query = {};
     if (profileId) query.profileId = profileId;
 
     return ReviewLink.find(query).sort({ createdAt: -1 }).lean();
 };
 
-// tenantId param kept for API compat but ownership is no longer checked
-exports.findReviewByIdAndTenant = (id, tenantId) => {
+exports.findReviewById = (id) => {
     return ReviewLink.findOne({ _id: id }).lean();
 };
 
@@ -22,12 +24,10 @@ exports.checkSlugExists = (slug) => {
 };
 
 exports.createReviewLink = (data) => {
-    if (data.createdBy && !data.tenantId) data.tenantId = data.createdBy;
     return new ReviewLink(data).save();
 };
 
-exports.updateReviewLink = async (id, tenantId, updates, adminId) => {
-    // tenantId ownership check removed — all admins can edit any review link
+exports.updateReviewLink = async (id, updates, adminId) => {
     const reviewLink = await ReviewLink.findOne({ _id: id });
     if (!reviewLink) throw new Error('Review link not found');
 
@@ -62,8 +62,7 @@ exports.saveGeneratedReview = (id, text, category) => {
     });
 };
 
-exports.softDeleteReviewLink = async (id, tenantId) => {
-    // tenantId ownership check removed — all admins can delete any review link
+exports.softDeleteReviewLink = async (id) => {
     const reviewLink = await ReviewLink.findOne({ _id: id });
     if (!reviewLink) throw new Error('Review link not found');
 
