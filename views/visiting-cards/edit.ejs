@@ -4,6 +4,8 @@
   const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : '';
   const tpl = (card.templateId) || {};
   // Pre-load arrays as JSON for JS hydration
+  const _customFields = encodeURIComponent(JSON.stringify((card.profile && card.profile.customFields) || {}));
+  const _heroStats   = encodeURIComponent(JSON.stringify(card.heroStats || []));
   const _socials     = encodeURIComponent(JSON.stringify(card.socials || []));
   const _stats       = encodeURIComponent(JSON.stringify(card.stats || []));
   const _services    = encodeURIComponent(JSON.stringify(card.services || []));
@@ -96,11 +98,11 @@
         </div>
         <div class="form-field">
           <label>Logo / Brand Image</label>
-          <input type="hidden" name="profile[logo]" value="<%= (card.profile && card.profile.logo) || '' %>">
-          <% if (card.profile && card.profile.logo) { %>
-            <img src="<%= card.profile.logo %>" style="width:40px;height:40px;object-fit:contain;border-radius:4px;margin-bottom:.3rem;">
+          <input type="hidden" name="profile[logoUrl]" value="<%= (card.profile && card.profile.logoUrl) || '' %>">
+          <% if (card.profile && card.profile.logoUrl) { %>
+            <img src="<%= card.profile.logoUrl %>" style="width:40px;height:40px;object-fit:contain;border-radius:4px;margin-bottom:.3rem;">
           <% } %>
-          <input type="file" name="profile[logo]" accept="image/*">
+          <input type="file" name="profile[logoUrl]" accept="image/*">
         </div>
         <div class="form-field">
           <label>Cover / Banner Image</label>
@@ -114,6 +116,13 @@
           <label>Bio</label>
           <textarea name="profile[bio]"><%= (card.profile && card.profile.bio) || '' %></textarea>
         </div>
+      </div>
+
+      <!-- Custom Profile Fields -->
+      <div style="margin-top:1.5rem;">
+        <label style="font-size:.8rem;font-weight:600;color:#374151;display:block;margin-bottom:.4rem;">Custom Profile Fields</label>
+        <div id="customFieldsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addCustomField()">+ Add Custom Field</button>
       </div>
     </div>
 
@@ -141,6 +150,13 @@
       <h3>🔗 Social Media Links</h3>
       <div id="socialsContainer"></div>
       <button type="button" class="add-row-btn" onclick="addSocial()">+ Add Social Link</button>
+    </div>
+
+    <!-- 4a. Hero Stats -->
+    <div class="form-section-block">
+      <h3>⭐ Hero Stats (Top Section)</h3>
+      <div id="heroStatsContainer"></div>
+      <button type="button" class="add-row-btn" onclick="addHeroStat()">+ Add Hero Stat</button>
     </div>
 
     <!-- 4. Stats -->
@@ -238,9 +254,11 @@
       </div>
       <div class="field-grid" style="margin-top:1.5rem">
          <div class="form-field"><label>"Services" Section Title</label><input type="text" name="theme[sectionTitles][services]" value="<%= (card.theme && card.theme.sectionTitles && card.theme.sectionTitles.services) || 'Our Services' %>"></div>
+         <div class="form-field"><label>"Services" Section Subtitle</label><input type="text" name="theme[sectionDescriptions][services]" value="<%= (card.theme && card.theme.sectionDescriptions && card.theme.sectionDescriptions.services) || '' %>"></div>
          <div class="form-field"><label>"Experience" Section Title</label><input type="text" name="theme[sectionTitles][experience]" value="<%= (card.theme && card.theme.sectionTitles && card.theme.sectionTitles.experience) || 'Experience' %>"></div>
          <div class="form-field"><label>"Gallery" Section Title</label><input type="text" name="theme[sectionTitles][gallery]" value="<%= (card.theme && card.theme.sectionTitles && card.theme.sectionTitles.gallery) || 'Gallery' %>"></div>
          <div class="form-field"><label>"Partners" Section Title</label><input type="text" name="theme[sectionTitles][partners]" value="<%= (card.theme && card.theme.sectionTitles && card.theme.sectionTitles.partners) || 'Our Partners' %>"></div>
+         <div class="form-field"><label>"Stats" Section Title</label><input type="text" name="theme[sectionTitles][stats]" value="<%= (card.theme && card.theme.sectionTitles && card.theme.sectionTitles.stats) || 'Medical Excellence' %>"></div>
       </div>
     </div>
 
@@ -264,6 +282,8 @@
 
 <script>
 // Pre-loaded data from server
+const _customFields = JSON.parse(decodeURIComponent('<%- _customFields %>'));
+const _heroStats   = JSON.parse(decodeURIComponent('<%- _heroStats %>'));
 const _socials     = JSON.parse(decodeURIComponent('<%- _socials %>'));
 const _stats       = JSON.parse(decodeURIComponent('<%- _stats %>'));
 const _services    = JSON.parse(decodeURIComponent('<%- _services %>'));
@@ -277,12 +297,44 @@ const _specializations = JSON.parse(decodeURIComponent('<%- _specializations %>'
 const _additionals = JSON.parse(decodeURIComponent('<%- _additionals %>'));
 
 // ── Index counters ──
-let socialIdx=0, statIdx=0, serviceIdx=0, pricingIdx=0, portIdx=0;
+let heroStatIdx=0, socialIdx=0, statIdx=0, serviceIdx=0, pricingIdx=0, portIdx=0;
 let galleryIdx=0, expIdx=0, testIdx=0, partnerIdx=0, specIdx=0, acIdx=0;
 
 // ── Hydration Functions ──
 
-function addSocial(platform='', url='') {
+let customFieldIdx = 0;
+function addCustomField(key='', value='') {
+  const i = customFieldIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 2fr auto';
+  row.innerHTML = `
+    <div class="form-field"><label>Field Key Name</label><input type="text" class="cf-key" value="${esc(key)}" oninput="updateCustomFieldName(this)" placeholder="e.g. shortDescription"></div>
+    <div class="form-field"><label>Field Value</label><input type="text" class="cf-value" value="${esc(value)}" name="${key ? 'profile[customFields]['+esc(key)+']' : ''}"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('customFieldsContainer').appendChild(row);
+}
+
+function updateCustomFieldName(input) {
+  const safeName = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '');
+  const valInput = input.closest('.array-row').querySelector('.cf-value');
+  if (safeName) {
+      valInput.name = 'profile[customFields][' + safeName + ']';
+  } else {
+      valInput.name = '';
+  }
+}
+
+function addHeroStat(label='', value='') {
+  const i = heroStatIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '2fr 1fr auto';
+  row.innerHTML = `<div class="form-field"><label>Label</label><input type="text" name="heroStats[${i}][label]" value="${esc(label)}"></div>
+    <div class="form-field"><label>Value</label><input type="text" name="heroStats[${i}][value]" value="${esc(value)}"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('heroStatsContainer').appendChild(row);
+}
+
+function addSocial(platform='', url='', icon='') {
   const i = socialIdx++;
   const row = document.createElement('div');
   row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 2fr auto';
@@ -455,6 +507,10 @@ function esc(s) {
 
 // ── Hydrate existing data ──
 document.addEventListener('DOMContentLoaded', function() {
+  if (_customFields && typeof _customFields === 'object') {
+     Object.keys(_customFields).forEach(k => addCustomField(k, _customFields[k]));
+  }
+  _heroStats.forEach(s => addHeroStat(s.label, s.value));
   _socials.forEach(s => addSocial(s.platform, s.url, s.icon));
   _stats.forEach(s => addStat(s.label, s.value, s.icon));
   _services.forEach(s => addService(s.title, s.description, s.price, s.icon, s.image, s.actionLink));

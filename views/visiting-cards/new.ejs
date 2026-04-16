@@ -261,7 +261,7 @@
 
           <div class="f">
             <label>Logo / Brand Image <small class="hint">(Upload file)</small></label>
-            <input type="file" name="profile[logo]" accept="image/*">
+            <input type="file" name="profile[logoUrl]" accept="image/*">
           </div>
           <div class="f">
              <!-- Cover spacer -->
@@ -270,6 +270,12 @@
             <label>Bio / Introduction</label>
             <textarea name="profile[bio]" placeholder="Short intro about this person or business…"></textarea>
           </div>
+        </div>
+
+        <div style="margin-top:1.5rem">
+          <label style="font-size:.8rem;font-weight:600;color:#374151;display:block;margin-bottom:.4rem;">Custom Profile Fields</label>
+          <div id="customFieldsContainer"></div>
+          <button type="button" class="add-row-btn" onclick="addCustomField()">+ Add Custom Field</button>
         </div>
       </div>
 
@@ -297,6 +303,13 @@
         <h3>🔗 Social Media Links</h3>
         <div id="socialsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addSocial()">+ Add Social Link</button>
+      </div>
+
+      <!-- 4a. Hero Stats -->
+      <div class="sec">
+        <h3>⭐ Hero Stats (Top Section)</h3>
+        <div id="heroStatsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addHeroStat()">+ Add Hero Stat</button>
       </div>
 
       <!-- 4. Stats -->
@@ -419,9 +432,11 @@
         </div>
         <div class="g2" style="margin-top:1.5rem">
            <div class="f"><label>"Services" Section Title</label><input type="text" name="theme[sectionTitles][services]" placeholder="Our Services"></div>
+           <div class="f"><label>"Services" Section Subtitle</label><input type="text" name="theme[sectionDescriptions][services]" placeholder="Describe your services..."></div>
            <div class="f"><label>"Experience" Section Title</label><input type="text" name="theme[sectionTitles][experience]" placeholder="Experience"></div>
            <div class="f"><label>"Gallery" Section Title</label><input type="text" name="theme[sectionTitles][gallery]" placeholder="Gallery"></div>
            <div class="f"><label>"Partners" Section Title</label><input type="text" name="theme[sectionTitles][partners]" placeholder="Our Partners"></div>
+           <div class="f"><label>"Stats" Section Title</label><input type="text" name="theme[sectionTitles][stats]" placeholder="Medical Excellence"></div>
         </div>
       </div>
 
@@ -612,6 +627,18 @@ function addSocial() {
   document.getElementById('socialsContainer').appendChild(row);
 }
 
+// Hero Stats
+let heroStatIdx = 0;
+function addHeroStat() {
+  const i = heroStatIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '2fr 1fr auto';
+  row.innerHTML = `<div class="f"><label>Label</label><input type="text" name="heroStats[${i}][label]"></div>
+    <div class="f"><label>Value</label><input type="text" name="heroStats[${i}][value]"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('heroStatsContainer').appendChild(row);
+}
+
 // Stats
 let statIdx = 0;
 function addStat() {
@@ -748,6 +775,29 @@ function addSpecialization() {
     <div class="f" style="grid-column:span 2"><label>Description</label><textarea name="specializations[${i}][description]"></textarea></div>
     <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
   document.getElementById('specializationsContainer').appendChild(row);
+}
+
+// Custom Fields
+let customFieldIdx = 0;
+function addCustomField() {
+  const i = customFieldIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 2fr auto';
+  row.innerHTML = `
+    <div class="f"><label>Field Key Name</label><input type="text" class="cf-key" placeholder="e.g. shortDescription" oninput="updateCustomFieldName(this)"></div>
+    <div class="f"><label>Field Value</label><input type="text" class="cf-value"></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('customFieldsContainer').appendChild(row);
+}
+
+function updateCustomFieldName(input) {
+  const safeName = input.value.trim().replace(/[^a-zA-Z0-9_]/g, '');
+  const valInput = input.closest('.array-row').querySelector('.cf-value');
+  if (safeName) {
+      valInput.name = 'profile[customFields][' + safeName + ']';
+  } else {
+      valInput.name = '';
+  }
 }
 
 // Additional contacts

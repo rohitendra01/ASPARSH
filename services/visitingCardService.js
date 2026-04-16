@@ -159,8 +159,8 @@ class VisitingCardService {
             companyName:  profileBody.companyName  || body.companyName  || '',
             bio:          profileBody.bio           || body.bio          || '',
             profileImage: profileBody.profileImage || body.profileImage || '',
-            coverImage:   profileBody.coverImage   || body.coverImage || '',
-            logo:         profileBody.logo         || body.logo      || ''
+            coverImage:   profileBody.coverImage   || body.coverImage   || '',
+            logoUrl:      profileBody.logoUrl      || body.logoUrl      || ''
         };
         // Custom fields (Map)
         if (profileBody.customFields && typeof profileBody.customFields === 'object') {
@@ -185,6 +185,9 @@ class VisitingCardService {
 
         // ── Socials (dynamic repeatable rows) ───
         const socials = this.normalizeArrayField(body.socials, []).filter(s => s.platform && s.url);
+
+        // ── Hero Stats ───────────────────────────
+        const heroStats = this.normalizeArrayField(body.heroStats, []).filter(s => s.label && s.value);
 
         // ── Stats ────────────────────────────────
         const stats = this.normalizeArrayField(body.stats, []).filter(s => s.label && s.value);
@@ -237,10 +240,14 @@ class VisitingCardService {
             secondaryColor: themeBody.secondaryColor || body.secondaryColor || '#0891b2',
             fontStyle:      themeBody.fontStyle      || body.fontStyle      || 'Inter',
             sectionTitles: {
-                services: (themeBody.sectionTitles && themeBody.sectionTitles.services) || 'Our Services',
+                services:   (themeBody.sectionTitles && themeBody.sectionTitles.services)   || 'Our Services',
                 experience: (themeBody.sectionTitles && themeBody.sectionTitles.experience) || 'Experience',
-                gallery: (themeBody.sectionTitles && themeBody.sectionTitles.gallery) || 'Gallery',
-                partners: (themeBody.sectionTitles && themeBody.sectionTitles.partners) || 'Our Partners',
+                gallery:    (themeBody.sectionTitles && themeBody.sectionTitles.gallery)    || 'Gallery',
+                partners:   (themeBody.sectionTitles && themeBody.sectionTitles.partners)   || 'Our Partners',
+                stats:      (themeBody.sectionTitles && themeBody.sectionTitles.stats)      || 'Medical Excellence'
+            },
+            sectionDescriptions: {
+                services: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.services) || ''
             }
         };
 
@@ -250,6 +257,7 @@ class VisitingCardService {
             profile,
             contact,
             socials,
+            heroStats,
             stats,
             services,
             pricingPlans,

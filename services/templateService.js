@@ -34,7 +34,8 @@ exports.registerNewTemplate = async (bodyData, file) => {
     // 4. Construct and Save
     const newTemplateData = {
         name: bodyData.name.trim(),
-        category: bodyData.category.trim(),
+        category: bodyData.category ? bodyData.category.trim() : 'General',
+        templateKey: bodyData.fileName.trim(), // Use fileName as the unique templateKey
         fileName: bodyData.fileName.trim(),
         thumbnailUrl,
         customFields,
@@ -78,6 +79,7 @@ exports.updateTemplate = async (id, bodyData, file) => {
         name: bodyData.name ? bodyData.name.trim() : existingTemplate.name,
         category: bodyData.category ? bodyData.category.trim() : existingTemplate.category,
         fileName: bodyData.fileName ? bodyData.fileName.trim() : existingTemplate.fileName,
+        templateKey: bodyData.fileName ? bodyData.fileName.trim() : existingTemplate.templateKey, // Sync templateKey
         thumbnailUrl,
         customFields
     };

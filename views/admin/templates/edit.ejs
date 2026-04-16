@@ -42,7 +42,7 @@
                                     <label>
                                         <span style="display:block; margin-bottom: 0.5rem; font-weight: 600;">Profession
                                             Category</span>
-                                        <input type="text" name="category" value="<%= template.category %>" required
+                                        <input type="text" name="category" value="<%= template.category %>"
                                             style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
                                     </label>
                                 </div>
@@ -121,8 +121,8 @@
                         row.style.cssText = "display: grid; grid-template-columns: 2fr 2fr 1.5fr auto auto; gap: 1rem; align-items: center; background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;";
 
                         row.innerHTML = `
-      <input type="text" class="f-name" value="${data.name || ''}" placeholder="Variable Name" required style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-      <input type="text" class="f-label" value="${data.label || ''}" placeholder="Display Label" required style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+      <input type="text" class="f-name" value="${data.name || ''}" placeholder="Variable Name" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+      <input type="text" class="f-label" value="${data.label || ''}" placeholder="Display Label" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
       <select class="f-type" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
         <option value="text" ${data.type === 'text' ? 'selected' : ''}>Text (Short)</option>
         <option value="textarea" ${data.type === 'textarea' ? 'selected' : ''}>Text (Long)</option>
