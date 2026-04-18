@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= card.profile?.fullName || 'Professional Profile' %> - <%= card.profile?.designation || '' %>
+    </title>
+    <meta name="description" content="<%= card.profile?.bio || 'Professional Digital Visiting Card' %>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=<%= card.theme?.fontStyle?.replace(/ /g, '+') || 'Inter' %>:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/fa-all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            /* Dynamic Theme Variables from Schema */
+            --primary-rose: <%=card.theme?.primaryColor || '#ff6b9d' %>;
+            --primary-blush: <%=card.theme?.secondaryColor || '#ffc2d4' %>;
+
+            --accent-gold: #d4a574;
+            --accent-peach: #ffb4a2;
+            --accent-lavender: #c9a7eb;
+            --soft-cream: #fff8f3;
+            --charcoal: #2d2d2d;
+            --white: #ffffff;
+
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+            --gradient-rose: linear-gradient(135deg, var(--primary-rose) 0%, var(--accent-lavender) 100%);
+            --gradient-peach: linear-gradient(135deg, var(--accent-peach) 0%, var(--primary-blush) 100%);
+            --gradient-sunset: linear-gradient(135deg, var(--primary-rose) 0%, var(--accent-peach) 50%, var(--accent-gold) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: '<%= card.theme?.fontStyle || "Inter" %>', sans-serif;
+            line-height: 1.6;
+            color: var(--charcoal);
+            background: var(--soft-cream);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 15% 20%, var(--primary-rose) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, var(--accent-lavender) 0%, transparent 40%);
+            opacity: 0.08;
+            z-index: -2;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 2rem 0;
+            background: linear-gradient(135deg, rgba(255, 248, 243, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-image {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: var(--gradient-rose);
+            padding: 8px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1), 0 0 0 15px rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            transition: transform 0.4s ease;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .profile-image::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            border-radius: 50%;
+            background: var(--bg-image) center/cover;
+        }
+
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--gradient-sunset);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--primary-rose);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .hero-specialty {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-rose);
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--charcoal);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            max-width: 600px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+            background: var(--white);
+            padding: 1.8rem 1.2rem;
+            border-radius: 25px;
+            box-shadow: var(--shadow-medium);
+            min-width: 110px;
+            border: 2px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-rose);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .action-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            background: var(--gradient-rose);
+            color: var(--white);
+            border: none;
+            padding: 1.2rem 1.8rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: var(--white);
+            color: var(--primary-rose);
+            border-radius: 50%;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            box-shadow: var(--shadow-soft);
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            background: var(--gradient-rose);
+            color: var(--white);
+            transform: translateY(-5px);
+        }
+
+        /* Contact Card */
+        .contact-details-card {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 2rem 1.5rem;
+            padding: 2.5rem 2rem;
+            border-radius: 40px;
+            box-shadow: var(--shadow-strong);
+            backdrop-filter: blur(25px);
+        }
+
+        .contact-details-card h3 {
+            text-align: center;
+            background: var(--gradient-rose);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2.5rem;
+            font-size: 2.2rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 800;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: var(--white);
+            border-radius: 25px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-rose);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .contact-label {
+            font-size: 0.85rem;
+            color: var(--primary-rose);
+            margin-bottom: 0.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .contact-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 0;
+            margin: 0 1rem;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-rose);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0.85;
+        }
+
+        /* Credentials / About */
+        .about-content {
+            background: var(--white);
+            padding: 3rem 2.5rem;
+            border-radius: 35px;
+            box-shadow: var(--shadow-strong);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .credentials {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 2rem;
+            border-radius: 25px;
+            margin-bottom: 2rem;
+        }
+
+        .credentials h4 {
+            color: var(--primary-rose);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .credentials ul {
+            list-style: none;
+        }
+
+        .credentials li {
+            padding: 0.8rem 0;
+            position: relative;
+            padding-left: 2.5rem;
+            font-weight: 500;
+        }
+
+        .credentials li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-rose);
+            font-weight: bold;
+        }
+
+        /* Grids */
+        .services-grid,
+        .pricing-grid,
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .service-card,
+        .pricing-card {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.4s ease;
+        }
+
+        .service-card:hover,
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-rose);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-content h3 {
+            color: var(--primary-rose);
+            font-size: 1.6rem;
+            font-weight: 800;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Pricing Specs */
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-sunset);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-rose);
+        }
+
+        .pricing-btn {
+            background: var(--gradient-rose);
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            border-radius: 50px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Process */
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .process-step {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .step-number {
+            width: 70px;
+            height: 70px;
+            background: var(--gradient-lavender);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Sliders */
+        .portfolio-slider,
+        .testimonials-slider {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 30px;
+            box-shadow: var(--shadow-strong);
+            background: var(--white);
+        }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .slider-slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .portfolio-image {
+            width: 100%;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .slider-slide:hover .portfolio-overlay {
+            opacity: 1;
+        }
+
+        .testimonial-slide {
+            padding: 4rem 3rem;
+            text-align: center;
+        }
+
+        .stars {
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-text {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        .author-image {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+        }
+
+        .author-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--white);
+            color: var(--primary-rose);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-medium);
+            z-index: 10;
+        }
+
+        .slider-nav.prev {
+            left: 15px;
+        }
+
+        .slider-nav.next {
+            right: 15px;
+        }
+
+        .slider-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--primary-rose);
+            transform: scale(1.2);
+        }
+
+        /* Gallery Collage */
+        .gallery-collage {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--primary-rose);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            margin-top: 0;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        /* CTA */
+        .cta-section {
+            background: var(--gradient-rose);
+            margin: 2rem 1.5rem;
+            padding: 4rem 2.5rem;
+            border-radius: 40px;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-btn {
+            background: var(--white);
+            color: var(--primary-rose);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1.5rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .process-step {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="screenshot-area" id="capture-area">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="profile-image"
+                        style="--bg-image: url('<%= card.profile?.profileImage || 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=500&h=500&fit=crop&crop=face' %>');">
+                    </div>
+
+                    <div class="hero-text">
+                        <h1 class="hero-title">
+                            <%= card.profile?.fullName %>
+                        </h1>
+                        <p class="hero-subtitle">
+                            <%= card.profile?.designation %>
+                        </p>
+
+                        <% if(card.profile?.companyName || (card.tags && card.tags.length> 0)) { %>
+                            <div class="hero-specialty">
+                                <i class="fas fa-sparkles"></i>
+                                <%= card.profile?.companyName || card.tags.slice(0, 3).join(' • ') %>
+                        </div>
+                        <% } %>
+                        
+                        <% if(card.profile?.bio) { %>
+                        <p class="hero-description"><%= card.profile.bio %></p>
+                        <% } %>
+                        
+                        <% if(card.heroStats && card.heroStats.length > 0) { %>
+                        <div class="hero-stats">
+                            <% card.heroStats.forEach(stat => { %>
+                            <div class="stat">
+                                <div class="stat-number"><%= stat.value %></div>
+                                <div class="stat-label"><%= stat.label %></div>
+                            </div>
+                            <% }); %>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="saveContact()">
+                            <i class="fas fa-address-card"></i> Save Contact
+                        </button>
+                        <button class="action-btn" onclick="takeScreenshot(this)">
+                            <i class="fas fa-camera"></i> Screenshot
+                        </button>
+                    </div>
+
+                    <% if(card.socials && card.socials.length > 0) { %>
+                    <div class="social-links">
+                        <% card.socials.forEach(social => { %>
+                        <a href="<%= social.url %>" target="_blank" aria-label="<%= social.platform %>">
+                            <i class="<%= social.icon || ' fas fa-link' %>"></i>
+                                    </a>
+                                    <% }); %>
+                            </div>
+                            <% } %>
+                    </div>
+                </div>
+        </section>
+
+        <div class="contact-details-card">
+            <h3>
+                <%= card.theme?.sectionTitles?.contact || 'Get in Touch' %>
+            </h3>
+
+            <% if(card.contact?.primaryPhone) { %>
+                <a href="tel:<%= card.contact.primaryPhone %>" class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <div class="contact-info">
+                        <div class="contact-label">Call / WhatsApp</div>
+                        <div class="contact-value">
+                            <%= card.contact.primaryPhone %>
+                        </div>
+                    </div>
+                </a>
+                <% } %>
+
+                    <% if(card.contact?.primaryEmail) { %>
+                        <a href="mailto:<%= card.contact.primaryEmail %>" class="contact-item">
+                            <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="contact-info">
+                                <div class="contact-label">Email</div>
+                                <div class="contact-value">
+                                    <%= card.contact.primaryEmail %>
+                                </div>
+                            </div>
+                        </a>
+                        <% } %>
+
+                            <% if(card.contact?.location?.address) { %>
+                                <a href="<%= card.contact.location.mapEmbedUrl || '#' %>" target="_blank"
+                                    class="contact-item">
+                                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div class="contact-info">
+                                        <div class="contact-label">Location</div>
+                                        <div class="contact-value">
+                                            <%= card.contact.location.address %>
+                                        </div>
+                                    </div>
+                                </a>
+                                <% } %>
+
+                                    <% if(card.contact?.businessHours) { %>
+                                        <div class="contact-item">
+                                            <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                                            <div class="contact-info">
+                                                <div class="contact-label">Available Hours</div>
+                                                <div class="contact-value">
+                                                    <%= card.contact.businessHours %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+
+                                            <% if(card.contact?.additionalContacts &&
+                                                card.contact.additionalContacts.length> 0) { %>
+                                                <% card.contact.additionalContacts.forEach(ac=> { %>
+                                                    <a href="<%= ac.link || '#' %>" target="_blank"
+                                                        class="contact-item">
+                                                        <div class="contact-icon"><i
+                                                                class="<%= ac.icon || 'fas fa-globe' %>"></i></div>
+                                                        <div class="contact-info">
+                                                            <div class="contact-label">
+                                                                <%= ac.platform %>
+                                                            </div>
+                                                            <div class="contact-value">
+                                                                <%= ac.value %>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    <% }); %>
+                                                        <% } %>
+        </div>
+    </div>
+    <% if((card.qualifications && card.qualifications.length> 0) || (card.experience && card.experience.length > 0)) {
+        %>
+        <section class="section">
+            <h2 class="section-title">
+                <%= card.theme?.sectionTitles?.about || 'About & Credentials' %>
+            </h2>
+            <% if(card.theme?.sectionDescriptions?.about) { %>
+                <p class="section-description">
+                    <%= card.theme.sectionDescriptions.about %>
+                </p>
+                <% } %>
+
+                    <div class="about-content">
+                        <% if(card.qualifications && card.qualifications.length> 0) { %>
+                            <div class="credentials">
+                                <h4>Certifications & Training</h4>
+                                <ul>
+                                    <% card.qualifications.forEach(qual=> { %>
+                                        <li>
+                                            <%= qual %>
+                                        </li>
+                                        <% }); %>
+                                </ul>
+                            </div>
+                            <% } %>
+
+                                <% if(card.experience && card.experience.length> 0) { %>
+                                    <div class="credentials" style="background: rgba(0,0,0,0.01);">
+                                        <h4>Experience</h4>
+                                        <% card.experience.forEach(exp=> { %>
+                                            <div style="margin-bottom: 1rem; padding-left: 2rem;">
+                                                <strong style="color: var(--primary-rose);">
+                                                    <%= exp.title %>
+                                                </strong>
+                                                <% if(exp.organization) { %> at <%= exp.organization %>
+                                                        <% } %>
+                                                            <% if(exp.duration) { %> <br><small style="color: #666;">
+                                                                    <%= exp.duration %>
+                                                                </small>
+                                                                <% } %>
+                                                                    <% if(exp.description) { %>
+                                                                        <p
+                                                                            style="font-size: 0.9rem; margin-top: 0.3rem;">
+                                                                            <%= exp.description %>
+                                                                        </p>
+                                                                        <% } %>
+                                            </div>
+                                            <% }); %>
+                                    </div>
+                                    <% } %>
+                    </div>
+        </section>
+        <% } %>
+
+            <% if(card.services && card.services.length> 0) { %>
+                <section class="section">
+                    <h2 class="section-title">
+                        <%= card.theme?.sectionTitles?.services || 'Services' %>
+                    </h2>
+                    <% if(card.theme?.sectionDescriptions?.services) { %>
+                        <p class="section-description">
+                            <%= card.theme.sectionDescriptions.services %>
+                        </p>
+                        <% } %>
+
+                            <div class="services-grid">
+                                <% card.services.forEach(service=> { %>
+                                    <div class="service-card">
+                                        <div class="service-icon"><i class="<%= service.icon || 'fas fa-star' %>"></i>
+                                        </div>
+                                        <div class="service-content">
+                                            <h3>
+                                                <%= service.title %>
+                                            </h3>
+                                            <% if(service.price) { %><strong style="color: var(--primary-rose);">
+                                                    <%= service.price %>
+                                                </strong>
+                                                <% } %>
+                                                    <p>
+                                                        <%= service.description %>
+                                                    </p>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                            </div>
+                </section>
+                <% } %>
+
+                    <% if(card.portfolio && card.portfolio.length> 0) { %>
+                        <section class="section">
+                            <h2 class="section-title">
+                                <%= card.theme?.sectionTitles?.portfolio || 'Portfolio' %>
+                            </h2>
+                            <div class="portfolio-slider" id="portfolioWrapper">
+                                <div class="slider-track" id="portfolioTrack">
+                                    <% card.portfolio.forEach((item, index)=> { %>
+                                        <div class="slider-slide portfolio-slide">
+                                            <img src="<%= item.mediaUrl %>" alt="<%= item.title %>"
+                                                class="portfolio-image">
+                                            <div class="portfolio-overlay">
+                                                <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem;">
+                                                    <%= item.title %>
+                                                </h3>
+                                                <% if(item.description) { %>
+                                                    <p>
+                                                        <%= item.description %>
+                                                    </p>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                                <% if(card.portfolio.length> 1) { %>
+                                    <button class="slider-nav prev"
+                                        onclick="changeSlide('portfolioTrack', -1, <%= card.portfolio.length %>)">‹</button>
+                                    <button class="slider-nav next"
+                                        onclick="changeSlide('portfolioTrack', 1, <%= card.portfolio.length %>)">›</button>
+                                    <div class="slider-indicators" id="portfolioDots">
+                                        <% card.portfolio.forEach((_, index)=> { %>
+                                            <span class="dot <%= index === 0 ? 'active' : '' %>"
+                                                onclick="currentSlide('portfolioTrack', <%= index %>, <%= card.portfolio.length %>)"></span>
+                                            <% }); %>
+                                    </div>
+                                    <% } %>
+                            </div>
+                        </section>
+                        <% } %>
+
+                            <% if(card.pricingPlans && card.pricingPlans.length> 0) { %>
+                                <section class="section">
+                                    <h2 class="section-title">
+                                        <%= card.theme?.sectionTitles?.pricing || 'Pricing' %>
+                                    </h2>
+                                    <div class="pricing-grid">
+                                        <% card.pricingPlans.forEach((plan, index)=> { %>
+                                            <div class="pricing-card <%= index === 1 ? 'featured' : '' %>">
+                                                <h3
+                                                    style="color: var(--primary-rose); font-size: 1.5rem; margin-bottom: 0.5rem;">
+                                                    <%= plan.planName %>
+                                                </h3>
+                                                <div class="pricing-price">
+                                                    <%= plan.price %>
+                                                </div>
+                                                <p style="color: #666; margin-bottom: 1.5rem;">
+                                                    <%= plan.duration %>
+                                                </p>
+                                                <% if(plan.features && plan.features.length> 0) { %>
+                                                    <ul class="pricing-features">
+                                                        <% plan.features.forEach(feature=> { %>
+                                                            <li>
+                                                                <%= feature %>
+                                                            </li>
+                                                            <% }); %>
+                                                    </ul>
+                                                    <% } %>
+                                                        <% if(plan.actionLink) { %>
+                                                            <a href="<%= plan.actionLink %>" class="pricing-btn"
+                                                                style="display: block; text-align: center; text-decoration: none;">Book
+                                                                Now</a>
+                                                            <% } else { %>
+                                                                <button class="pricing-btn"
+                                                                    onclick="alert('Contact us to book: <%= plan.planName %>')">Book
+                                                                    Now</button>
+                                                                <% } %>
+                                            </div>
+                                            <% }); %>
+                                    </div>
+                                </section>
+                                <% } %>
+
+                                    <% if(card.process && card.process.length> 0) { %>
+                                        <section class="section">
+                                            <h2 class="section-title">
+                                                <%= card.theme?.sectionTitles?.process || 'My Process' %>
+                                            </h2>
+                                            <div class="process-steps">
+                                                <% card.process.forEach((step, index)=> { %>
+                                                    <div class="process-step">
+                                                        <div class="step-number">
+                                                            <%= index + 1 %>
+                                                        </div>
+                                                        <div>
+                                                            <h3
+                                                                style="color: var(--primary-rose); font-size: 1.3rem; margin-bottom: 0.5rem;">
+                                                                <%= step.title %>
+                                                            </h3>
+                                                            <p>
+                                                                <%= step.description %>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <% }); %>
+                                            </div>
+                                        </section>
+                                        <% } %>
+
+                                            <% if(card.testimonials && card.testimonials.length> 0) { %>
+                                                <section class="section">
+                                                    <h2 class="section-title">
+                                                        <%= card.theme?.sectionTitles?.testimonials || 'Client Love' %>
+                                                    </h2>
+                                                    <div class="testimonials-slider" id="testimonialWrapper">
+                                                        <div class="slider-track" id="testimonialTrack">
+                                                            <% card.testimonials.forEach(test=> { %>
+                                                                <div class="slider-slide testimonial-slide">
+                                                                    <div class="stars">
+                                                                        <%= '★' .repeat(test.rating || 5) %>
+                                                                    </div>
+                                                                    <p class="testimonial-text">"<%= test.quote %>"</p>
+                                                                    <% if(test.avatar) { %>
+                                                                        <div class="author-image"><img
+                                                                                src="<%= test.avatar %>"
+                                                                                alt="<%= test.clientName %>"></div>
+                                                                        <% } %>
+                                                                            <h4 style="color: var(--primary-rose);">
+                                                                                <%= test.clientName %>
+                                                                            </h4>
+                                                                            <% if(test.context) { %>
+                                                                                <p
+                                                                                    style="font-size: 0.9rem; color: #666;">
+                                                                                    <%= test.context %>
+                                                                                </p>
+                                                                                <% } %>
+                                                                </div>
+                                                                <% }); %>
+                                                        </div>
+                                                        <% if(card.testimonials.length> 1) { %>
+                                                            <button class="slider-nav prev"
+                                                                onclick="changeSlide('testimonialTrack', -1, <%= card.testimonials.length %>)">‹</button>
+                                                            <button class="slider-nav next"
+                                                                onclick="changeSlide('testimonialTrack', 1, <%= card.testimonials.length %>)">›</button>
+                                                            <div class="slider-indicators" id="testimonialDots">
+                                                                <% card.testimonials.forEach((_, index)=> { %>
+                                                                    <span class="dot <%= index === 0 ? 'active' : '' %>"
+                                                                        onclick="currentSlide('testimonialTrack', <%= index %>, <%= card.testimonials.length %>)"></span>
+                                                                    <% }); %>
+                                                            </div>
+                                                            <% } %>
+                                                    </div>
+                                                </section>
+                                                <% } %>
+
+                                                    <% if(card.faqs && card.faqs.length> 0) { %>
+                                                        <section class="section">
+                                                            <h2 class="section-title">
+                                                                <%= card.theme?.sectionTitles?.faqs
+                                                                    || 'Frequently Asked Questions' %>
+                                                            </h2>
+                                                            <div style="max-width: 800px; margin: 0 auto;">
+                                                                <% card.faqs.forEach(faq=> { %>
+                                                                    <div class="faq-item" onclick="toggleFAQ(this)">
+                                                                        <div class="faq-question">
+                                                                            <span>
+                                                                                <%= faq.question %>
+                                                                            </span>
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </div>
+                                                                        <div class="faq-answer">
+                                                                            <%= faq.answer %>
+                                                                        </div>
+                                                                    </div>
+                                                                    <% }); %>
+                                                            </div>
+                                                        </section>
+                                                        <% } %>
+
+                                                            <% if(card.partners && card.partners.length> 0) { %>
+                                                                <section class="section">
+                                                                    <h2 class="section-title">
+                                                                        <%= card.theme?.sectionTitles?.partners
+                                                                            || 'Our Partners & Brands' %>
+                                                                    </h2>
+                                                                    <div class="partners-grid"
+                                                                        style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
+                                                                        <% card.partners.forEach(partner=> { %>
+                                                                            <div style="text-align: center;">
+                                                                                <% if(partner.logo) { %>
+                                                                                    <img src="<%= partner.logo %>"
+                                                                                        alt="<%= partner.name %>"
+                                                                                        style="max-width: 120px; border-radius: 10px; margin-bottom: 0.5rem;">
+                                                                                    <% } %>
+                                                                                        <div
+                                                                                            style="font-weight: bold; color: var(--primary-rose);">
+                                                                                            <%= partner.name %>
+                                                                                        </div>
+                                                                            </div>
+                                                                            <% }); %>
+                                                                    </div>
+                                                                </section>
+                                                                <% } %>
+
+                                                                    <% if(card.gallery && card.gallery.length> 0) { %>
+                                                                        <section class="section">
+                                                                            <h2 class="section-title">
+                                                                                <%= card.theme?.sectionTitles?.gallery
+                                                                                    || 'Gallery Collage' %>
+                                                                            </h2>
+                                                                            <div class="gallery-collage">
+                                                                                <% card.gallery.forEach(img=> { %>
+                                                                                    <div class="gallery-item">
+                                                                                        <img src="<%= img.image %>"
+                                                                                            alt="<%= img.title || 'Gallery' %>">
+                                                                                    </div>
+                                                                                    <% }); %>
+                                                                            </div>
+                                                                        </section>
+                                                                        <% } %>
+
+                                                                            <% if(card.callToAction &&
+                                                                                card.callToAction.title) { %>
+                                                                                <div class="cta-section">
+                                                                                    <h2>
+                                                                                        <%= card.callToAction.title %>
+                                                                                    </h2>
+                                                                                    <p>
+                                                                                        <%= card.callToAction.description
+                                                                                            %>
+                                                                                    </p>
+                                                                                    <% if(card.callToAction.buttonText)
+                                                                                        { %>
+                                                                                        <a href="<%= card.callToAction.buttonLink || '#' %>"
+                                                                                            class="cta-btn">
+                                                                                            <%= card.callToAction.buttonText
+                                                                                                %>
+                                                                                        </a>
+                                                                                        <% } %>
+                                                                                </div>
+                                                                                <% } %>
+
+                                                                                    <footer class="footer">
+                                                                                        <p>© 2024 <%=
+                                                                                                card.profile?.fullName
+                                                                                                %>. All rights reserved.
+                                                                                        </p>
+                                                                                    </footer>
+
+                                                                                    <script id="vcard-data"
+                                                                                        type="application/json">
+        <%- JSON.stringify({
+            fullName: card.profile?.fullName || 'Contact',
+            companyName: card.profile?.companyName || '',
+            designation: card.profile?.designation || '',
+            email: card.contact?.primaryEmail || '',
+            phone: card.contact?.primaryPhone || '',
+            address: card.contact?.location?.address || '',
+            website: card.contact?.website || '',
+            bio: card.profile?.bio || ''
+        }) %>
+    </script>
+
+                                                                                    <script>
+                                                                                        // Generic Slider State
+                                                                                        const sliders = {
+                                                                                            portfolioTrack: { index: 0 },
+                                                                                            testimonialTrack: { index: 0 }
+                                                                                        };
+
+                                                                                        function changeSlide(trackId, direction, maxSlides) {
+                                                                                            let nextIndex = sliders[trackId].index + direction;
+                                                                                            if (nextIndex >= maxSlides) nextIndex = 0;
+                                                                                            if (nextIndex < 0) nextIndex = maxSlides - 1;
+                                                                                            currentSlide(trackId, nextIndex, maxSlides);
+                                                                                        }
+
+                                                                                        function currentSlide(trackId, index, maxSlides) {
+                                                                                            sliders[trackId].index = index;
+                                                                                            const track = document.getElementById(trackId);
+                                                                                            if (track) {
+                                                                                                track.style.transform = `translateX(-${index * 100}%)`;
+                                                                                            }
+
+                                                                                            // Update dots
+                                                                                            const dotsContainerId = trackId === 'portfolioTrack' ? 'portfolioDots' : 'testimonialDots';
+                                                                                            const dotsContainer = document.getElementById(dotsContainerId);
+                                                                                            if (dotsContainer) {
+                                                                                                const dots = dotsContainer.querySelectorAll('.dot');
+                                                                                                dots.forEach(d => d.classList.remove('active'));
+                                                                                                if (dots[index]) dots[index].classList.add('active');
+                                                                                            }
+                                                                                        }
+
+                                                                                        // Auto-advance
+                                                                                        setInterval(() => {
+                                                                                            const pTrack = document.getElementById('portfolioTrack');
+                                                                                            if (pTrack) {
+                                                                                                const count = pTrack.children.length;
+                                                                                                if (count > 1) changeSlide('portfolioTrack', 1, count);
+                                                                                            }
+                                                                                        }, 5000);
+
+                                                                                        setInterval(() => {
+                                                                                            const tTrack = document.getElementById('testimonialTrack');
+                                                                                            if (tTrack) {
+                                                                                                const count = tTrack.children.length;
+                                                                                                if (count > 1) changeSlide('testimonialTrack', 1, count);
+                                                                                            }
+                                                                                        }, 7000);
+
+                                                                                        // Toggle FAQ
+                                                                                        function toggleFAQ(element) {
+                                                                                            const wasActive = element.classList.contains('active');
+                                                                                            document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('active'));
+                                                                                            if (!wasActive) element.classList.add('active');
+                                                                                        }
+
+                                                                                        // Save Contact
+                                                                                        function saveContact() {
+                                                                                            const vCardPayload = JSON.parse(document.getElementById('vcard-data').textContent);
+                                                                                            const vCardData = `BEGIN:VCARD\nVERSION:3.0\nFN:${vCardPayload.fullName}\nORG:${vCardPayload.companyName}\nTITLE:${vCardPayload.designation}\nEMAIL:${vCardPayload.email}\nTEL:${vCardPayload.phone}\nADR:;;${vCardPayload.address}\nURL:${vCardPayload.website}\nNOTE:${vCardPayload.bio.replace(/\n/g, ' ')}\nEND:VCARD`;
+                                                                                            const blob = new Blob([vCardData], { type: "text/vcard" });
+                                                                                            const url = window.URL.createObjectURL(blob);
+                                                                                            const link = document.createElement("a");
+                                                                                            link.href = url;
+                                                                                            link.download = `${vCardPayload.fullName.replace(/\s+/g, '_')}_Contact.vcf`;
+                                                                                            link.click();
+                                                                                            window.URL.revokeObjectURL(url);
+                                                                                        }
+
+                                                                                        // Screenshot 
+                                                                                        function takeScreenshot(button) {
+                                                                                            const originalText = button.innerHTML;
+                                                                                            button.innerHTML = 'Saving...';
+                                                                                            button.disabled = true;
+
+                                                                                            const screenshotArea = document.getElementById('capture-area');
+                                                                                            const vCardPayload = JSON.parse(document.getElementById('vcard-data').textContent);
+
+                                                                                            html2canvas(screenshotArea, {
+                                                                                                useCORS: true,
+                                                                                                scale: 2,
+                                                                                                backgroundColor: null
+                                                                                            }).then(canvas => {
+                                                                                                const link = document.createElement('a');
+                                                                                                link.download = `${vCardPayload.fullName.replace(/\s+/g, '_')}_Profile.png`;
+                                                                                                link.href = canvas.toDataURL('image/png');
+                                                                                                link.click();
+                                                                                                button.innerHTML = originalText;
+                                                                                                button.disabled = false;
+                                                                                            }).catch(err => {
+                                                                                                console.error(err);
+                                                                                                button.innerHTML = originalText;
+                                                                                                button.disabled = false;
+                                                                                            });
+                                                                                        }
+                                                                                    </script>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 const profileRepository = require('../repositories/profileRepository');
 const userRepository = require('../repositories/userRepository');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
+const { validatePasswordStrength } = require('../utils/securityUtils');
 
 const Hotel = require('../models/Hotel');
 const { Portfolio } = require('../models/Portfolio');
@@ -59,6 +60,11 @@ exports.processUserUpdate = async (slug, data, file, currentUser) => {
     if (data.email) userToUpdate.email = data.email.toLowerCase();
 
     if (data.password && data.password === data.passwordConfirm) {
+        const passwordError = validatePasswordStrength(data.password);
+        if (passwordError) {
+            throw new Error(passwordError);
+        }
+
         userToUpdate.password = data.password;
     } else if (data.password && data.password !== data.passwordConfirm) {
         throw new Error('Passwords do not match');

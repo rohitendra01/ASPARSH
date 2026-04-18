@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const newsletterRepository = require('../repositories/newsletterRepository');
 const emailService = require('./emailService');
+const { getRequiredEnv } = require('../utils/securityConfig');
 
 exports.processSubscription = async (email, ipAddress, userAgent, browserFingerprint) => {
     const existingSubscription = await newsletterRepository.checkExistingSubscription(email, browserFingerprint);
@@ -18,9 +19,9 @@ exports.processSubscription = async (email, ipAddress, userAgent, browserFingerp
     ]).catch(err => console.error('Failed to send background emails:', err));
 
     const token = jwt.sign(
-        { subscribed: true, email, fingerprint: browserFingerprint },
-        process.env.JWT_SECRET,
-        { expiresIn: '365d' }
+        { subscribed: true, email, fingerprint: browserFingerprint, purpose: 'newsletter-status' },
+        getRequiredEnv('JWT_SECRET'),
+        { expiresIn: '30d' }
     );
 
     return { alreadySubscribed: false, token };
@@ -30,8 +31,8 @@ exports.verifySubscriptionStatus = async (token, currentFingerprint) => {
     if (!token) return { subscribed: false, email: null };
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.fingerprint !== currentFingerprint) {
+        const decoded = jwt.verify(token, getRequiredEnv('JWT_SECRET'));
+        if (decoded.purpose !== 'newsletter-status' || decoded.fingerprint !== currentFingerprint) {
             return { subscribed: false, email: null };
         }
 

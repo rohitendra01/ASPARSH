@@ -23,36 +23,34 @@
                     </div>
 
                     <form id="templateEditForm"
-                        action="/dashboard<%= slugSegment %>/templates/<%= template._id %>?_method=PUT" method="POST"
+                        action="/dashboard<%= slugSegment %>/templates/<%= template._id %>" method="POST"
                         enctype="multipart/form-data" class="wizard-form"
-                        style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        enctype="multipart/form-data" class="wizard-form">
                         <% if (typeof csrfToken !=='undefined' && csrfToken) { %>
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <% } %>
                                 <input type="hidden" name="customFields" id="customFieldsJson">
+                                <input type="hidden" id="initialFields" value='<%= JSON.stringify(template.customFields || []) %>'>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                    <label>
-                                        <span style="display:block; margin-bottom: 0.5rem; font-weight: 600;">Template
-                                            Display
-                                            Name</span>
-                                        <input type="text" name="name" value="<%= template.name %>" required
-                                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
-                                    </label>
-                                    <label>
-                                        <span style="display:block; margin-bottom: 0.5rem; font-weight: 600;">Profession
-                                            Category</span>
-                                        <input type="text" name="category" value="<%= template.category %>"
-                                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
-                                    </label>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Template Display Name</label>
+                                        <input type="text" name="name" value="<%= template.name %>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Profession Category</label>
+                                        <input type="text" name="category" value="<%= template.category %>">
+                                    </div>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-                                    <label>
-                                        <span style="display:block; margin-bottom: 0.5rem; font-weight: 600;">Thumbnail
-                                            Image (Optional)</span>
-                                        <input type="file" id="thumbnailInput" name="thumbnail" accept="image/*"
-                                            style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Exact EJS Filename (No extension)</label>
+                                        <input type="text" name="fileName" value="<%= template.fileName || '' %>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Thumbnail Image (Optional)</label>
+                                        <input type="file" id="thumbnailInput" name="thumbnail" accept="image/*">
                                         <% if (template.thumbnailUrl) { %>
                                             <div style="margin-top: 10px;">
                                                 <p style="font-size: 0.85rem; margin-bottom: 5px;">Current Thumbnail:
@@ -61,20 +59,16 @@
                                                     style="max-width: 150px; border-radius: 4px; border: 1px solid #e2e8f0;">
                                             </div>
                                             <% } %>
-                                    </label>
+                                    </div>
                                 </div>
 
-                                <div
-                                    style="margin-top: 1rem; padding: 1.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;">
-                                    <div
-                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                        <h3 style="font-family: var(--font-head); font-size: 1.1rem;">Custom Fields</h3>
+                                <div class="schema-builder-section">
+                                    <div class="schema-builder-header">
+                                        <h3>Custom Fields Required for this Design</h3>
                                         <button type="button" onclick="addField()" class="btn-secondary"
-                                            style="background: #fff; border: 1px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">+
-                                            Add Field</button>
+                                            style="padding: 0.5rem 1rem;">+ Add Field</button>
                                     </div>
-                                    <div id="fields-container"
-                                        style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div id="fields-container" class="field-rows-container">
                                     </div>
                                 </div>
 
@@ -110,7 +104,7 @@
                 </script>
 
                 <script>
-                    const existingFields = <% - JSON.stringify(template.customFields || []) %>;
+                    const existingFields = JSON.parse(document.getElementById('initialFields').value || '[]');
                     const container = document.getElementById('fields-container');
                     const form = document.getElementById('templateEditForm');
                     const jsonInput = document.getElementById('customFieldsJson');
@@ -118,22 +112,22 @@
                     function createFieldRow(data = {}) {
                         const row = document.createElement('div');
                         row.className = 'field-row';
-                        row.style.cssText = "display: grid; grid-template-columns: 2fr 2fr 1.5fr auto auto; gap: 1rem; align-items: center; background: #fff; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;";
+                        row.style.cssText = "";
 
                         row.innerHTML = `
-      <input type="text" class="f-name" value="${data.name || ''}" placeholder="Variable Name" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-      <input type="text" class="f-label" value="${data.label || ''}" placeholder="Display Label" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
-      <select class="f-type" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+      <input type="text" class="f-name" value="${data.name || ''}" placeholder="Variable Name">
+      <input type="text" class="f-label" value="${data.label || ''}" placeholder="Display Label">
+      <select class="f-type">
         <option value="text" ${data.type === 'text' ? 'selected' : ''}>Text (Short)</option>
         <option value="textarea" ${data.type === 'textarea' ? 'selected' : ''}>Text (Long)</option>
         <option value="color" ${data.type === 'color' ? 'selected' : ''}>Color Picker</option>
         <option value="url" ${data.type === 'url' ? 'selected' : ''}>URL Link</option>
         <option value="image" ${data.type === 'image' ? 'selected' : ''}>Image Upload</option>
       </select>
-      <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
+      <label class="checkbox-label">
         <input type="checkbox" class="f-required" ${data.required ? 'checked' : ''}> Required
       </label>
-      <button type="button" onclick="this.parentElement.remove()" style="background: #fee2e2; color: #ef4444; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer;">🗑️</button>
+      <button type="button" class="btn-delete-row" onclick="this.parentElement.remove()">🗑️</button>
     `;
                         return row;
                     }

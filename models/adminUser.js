@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { PASSWORD_MIN_LENGTH } = require('../utils/securityConfig');
+const { isStrongPassword, getPasswordPolicyMessage } = require('../utils/securityUtils');
 
 const adminUserSchema = new mongoose.Schema({
     username: {
@@ -20,7 +22,14 @@ const adminUserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please enter a password'],
-        minlength: [6, 'Password must be at least 6 characters'],
+        minlength: [PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`],
+        validate: {
+            validator(value) {
+                if (!this.isModified('password')) return true;
+                return isStrongPassword(value);
+            },
+            message: getPasswordPolicyMessage()
+        },
         select: false
     },
     image: {
@@ -87,7 +96,7 @@ adminUserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
 
     try {
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(12);
         this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (err) {

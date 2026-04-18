@@ -12,7 +12,7 @@ try {
 
 // Try to load profileRepository — graceful fallback if not present
 let profileRepository = null;
-try { profileRepository = require('../repositories/profileRepository'); } catch (_) {}
+try { profileRepository = require('../repositories/profileRepository'); } catch (_) { }
 
 class VisitingCardService {
 
@@ -76,7 +76,7 @@ class VisitingCardService {
         if (!card.templateId) throw new Error('Template not found for this card');
 
         // Increment view count (fire-and-forget)
-        visitingCardRepository.incrementViewCount(slug).catch(() => {});
+        visitingCardRepository.incrementViewCount(slug).catch(() => { });
 
         // Attach the populated template as `template` for backward compat with EJS
         return { card, template: card.templateId };
@@ -164,13 +164,13 @@ class VisitingCardService {
         // ── Profile ──────────────────────────────
         const profileBody = body.profile || {};
         const profile = {
-            fullName:     profileBody.fullName     || body.fullName     || '',
-            designation:  profileBody.designation  || body.designation  || '',
-            companyName:  profileBody.companyName  || body.companyName  || '',
-            bio:          profileBody.bio           || body.bio          || '',
+            fullName: profileBody.fullName || body.fullName || '',
+            designation: profileBody.designation || body.designation || '',
+            companyName: profileBody.companyName || body.companyName || '',
+            bio: profileBody.bio || body.bio || '',
             profileImage: profileBody.profileImage || body.profileImage || '',
-            coverImage:   profileBody.coverImage   || body.coverImage   || '',
-            logoUrl:      profileBody.logoUrl      || body.logoUrl      || ''
+            coverImage: profileBody.coverImage || body.coverImage || '',
+            logoUrl: profileBody.logoUrl || body.logoUrl || ''
         };
         // Custom fields (Map)
         if (profileBody.customFields && typeof profileBody.customFields === 'object') {
@@ -182,10 +182,10 @@ class VisitingCardService {
         const contact = {
             primaryEmail: contactBody.primaryEmail || body.primaryEmail || '',
             primaryPhone: contactBody.primaryPhone || body.primaryPhone || '',
-            website:      contactBody.website      || body.website      || '',
+            website: contactBody.website || body.website || '',
             businessHours: contactBody.businessHours || body.businessHours || '',
             location: {
-                address:     (contactBody.location && contactBody.location.address)     || body.address  || '',
+                address: (contactBody.location && contactBody.location.address) || body.address || '',
                 mapEmbedUrl: (contactBody.location && contactBody.location.mapEmbedUrl) || body.mapEmbedUrl || ''
             },
             additionalContacts: this.normalizeArrayField(
@@ -243,21 +243,76 @@ class VisitingCardService {
         // ── Specializations ──────────────────────
         const specializations = this.normalizeArrayField(body.specializations, []).filter(s => s.title);
 
+        // ── Process ────────────────────────────────
+        const process = this.normalizeArrayField(body.process, []).filter(p => p.title);
+
+        // ── FAQs ───────────────────────────────────
+        const faqs = this.normalizeArrayField(body.faqs, []).filter(f => f.question);
+
+        // ── Tags ───────────────────────────────────
+        let tags = [];
+        if (body.tags) {
+            if (Array.isArray(body.tags)) {
+                tags = body.tags.filter(Boolean);
+            } else if (typeof body.tags === 'string') {
+                try {
+                    let parsed = JSON.parse(body.tags);
+                    if (Array.isArray(parsed)) {
+                        tags = parsed.map(t => String(t).trim()).filter(Boolean);
+                    } else {
+                        tags = body.tags.split(',').map(t => t.trim()).filter(Boolean);
+                    }
+                } catch (e) {
+                    tags = body.tags.split(',').map(t => t.trim()).filter(Boolean);
+                }
+            }
+        }
+
+        // ── Call To Action ─────────────────────────
+        const ctaBody = body.callToAction || {};
+        const callToAction = {
+            title: ctaBody.title || '',
+            description: ctaBody.description || '',
+            buttonText: ctaBody.buttonText || '',
+            buttonLink: ctaBody.buttonLink || ''
+        };
+
         // ── Theme ────────────────────────────────
+
         const themeBody = body.theme || {};
         const theme = {
-            primaryColor:   themeBody.primaryColor   || body.primaryColor   || '#1e40af',
+            primaryColor: themeBody.primaryColor || body.primaryColor || '#1e40af',
             secondaryColor: themeBody.secondaryColor || body.secondaryColor || '#0891b2',
-            fontStyle:      themeBody.fontStyle      || body.fontStyle      || 'Inter',
+            fontStyle: themeBody.fontStyle || body.fontStyle || 'Inter',
             sectionTitles: {
-                services:   (themeBody.sectionTitles && themeBody.sectionTitles.services)   || 'Our Services',
+                about: (themeBody.sectionTitles && themeBody.sectionTitles.about) || 'About Me',
+                services: (themeBody.sectionTitles && themeBody.sectionTitles.services) || 'Our Services',
+                specializations: (themeBody.sectionTitles && themeBody.sectionTitles.specializations) || 'Specializations',
+                pricing: (themeBody.sectionTitles && themeBody.sectionTitles.pricing) || 'Pricing',
+                process: (themeBody.sectionTitles && themeBody.sectionTitles.process) || 'Process',
+                portfolio: (themeBody.sectionTitles && themeBody.sectionTitles.portfolio) || 'Portfolio',
                 experience: (themeBody.sectionTitles && themeBody.sectionTitles.experience) || 'Experience',
-                gallery:    (themeBody.sectionTitles && themeBody.sectionTitles.gallery)    || 'Gallery',
-                partners:   (themeBody.sectionTitles && themeBody.sectionTitles.partners)   || 'Our Partners',
-                stats:      (themeBody.sectionTitles && themeBody.sectionTitles.stats)      || 'Medical Excellence'
+                testimonials: (themeBody.sectionTitles && themeBody.sectionTitles.testimonials) || 'Testimonials',
+                gallery: (themeBody.sectionTitles && themeBody.sectionTitles.gallery) || 'Gallery',
+                faqs: (themeBody.sectionTitles && themeBody.sectionTitles.faqs) || 'FAQ',
+                partners: (themeBody.sectionTitles && themeBody.sectionTitles.partners) || 'Our Partners',
+                stats: (themeBody.sectionTitles && themeBody.sectionTitles.stats) || 'Highlights',
+                contact: (themeBody.sectionTitles && themeBody.sectionTitles.contact) || 'Contact Us'
             },
             sectionDescriptions: {
-                services: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.services) || ''
+                about: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.about) || '',
+                services: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.services) || '',
+                specializations: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.specializations) || '',
+                pricing: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.pricing) || '',
+                process: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.process) || '',
+                portfolio: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.portfolio) || '',
+                experience: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.experience) || '',
+                testimonials: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.testimonials) || '',
+                gallery: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.gallery) || '',
+                faqs: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.faqs) || '',
+                partners: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.partners) || '',
+                stats: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.stats) || '',
+                contact: (themeBody.sectionDescriptions && themeBody.sectionDescriptions.contact) || ''
             }
         };
 
@@ -278,6 +333,10 @@ class VisitingCardService {
             partners,
             qualifications,
             specializations,
+            process,
+            faqs,
+            tags,
+            callToAction,
             theme,
             isPublished,
             slug: this.generateSlug(profile.fullName)

@@ -1,0 +1,215 @@
+/* vcard-ui.css */
+
+/* Tags Input */
+.tags-input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    min-height: 44px;
+}
+.tags-input-wrapper input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 120px;
+    background: transparent;
+    font-size: 0.9rem;
+}
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 0.2rem 0.6rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.tag-pill button {
+    background: none;
+    border: none;
+    color: #4338ca;
+    margin-left: 4px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0;
+}
+
+.alert-err,
+.vcard-form-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Icon Picker */
+.icon-picker-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.icon-preview-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.2rem;
+    color: #475569;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+.icon-preview-box:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+.icon-preview-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.icon-preview-label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+.icon-preview-class {
+    font-size: 0.74rem;
+    color: #64748b;
+    word-break: break-word;
+}
+
+.icon-picker-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+.icon-picker-modal.show {
+    display: flex;
+}
+.icon-picker-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 640px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+.icon-picker-header {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid #e2e8f0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.icon-picker-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+.icon-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #64748b;
+}
+#iconPickerSearch {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    width: 100%;
+    outline: none;
+}
+.icon-picker-grid {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.8rem;
+    overflow-y: auto;
+}
+.icon-picker-btn {
+    width: 100%;
+    min-height: 84px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.8rem;
+    text-align: left;
+    color: #475569;
+    transition: 0.2s;
+}
+.icon-picker-btn i {
+    font-size: 1.15rem;
+}
+.icon-picker-btn-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+.icon-picker-btn-class {
+    font-size: 0.73rem;
+    color: #64748b;
+    word-break: break-word;
+}
+.icon-picker-btn:hover {
+    background: #e0e7ff;
+    border-color: #c7d2fe;
+    color: #4f46e5;
+    transform: translateY(-1px);
+}
+.icon-picker-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+}
+
+@media (max-width: 640px) {
+    .icon-picker-wrap {
+        align-items: flex-start;
+    }
+
+    .icon-picker-content {
+        max-width: calc(100vw - 1.5rem);
+    }
+
+    .icon-picker-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}

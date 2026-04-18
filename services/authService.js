@@ -1,4 +1,8 @@
 const userRepository = require('../repositories/userRepository');
+const {
+    getPasswordPolicyMessage,
+    validatePasswordStrength
+} = require('../utils/securityUtils');
 
 exports.validateAndRegisterUser = async (data) => {
     const { name, email, password, confirmPassword } = data;
@@ -8,7 +12,10 @@ exports.validateAndRegisterUser = async (data) => {
     if (!email) errors.email = 'Email is required';
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Invalid email address';
     if (!password) errors.password = 'Password is required';
-    if (password && password.length < 6) errors.password = 'Password must be at least 6 characters';
+    if (password) {
+        const passwordError = validatePasswordStrength(password);
+        if (passwordError) errors.password = passwordError;
+    }
     if (password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
 
     if (email && !errors.email) {
@@ -41,3 +48,5 @@ exports.manageLoginSession = async (user, newSessionId, sessionStore) => {
 
     await userRepository.updateUserSession(user._id, newSessionId);
 };
+
+exports.getPasswordPolicyMessage = getPasswordPolicyMessage;

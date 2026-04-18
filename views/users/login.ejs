@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>Authentication</title>
   <link rel="stylesheet" href="/public/css/users/auth.css">
+  <%- include('../partials/csrf-meta') %>
 </head>
 
 <body>
@@ -28,7 +29,7 @@
             </div>
             <div class="auth-group">
               <label for="password">Password</label>
-              <input type="password" id="password" name="password" required placeholder="Enter your password"
+              <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password"
                 class="auth-input <%= error_msg ? 'input-error' : '' %>">
             </div>
             <input type="hidden" name="returnTo" id="returnToInput"
@@ -52,9 +53,10 @@
       <p class="modal-desc">Enter your registered email to receive a password reset link.</p>
 
       <form id="reset-form" method="POST" action="/request-otp" autocomplete="on" style="width:100%;">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="auth-group">
           <label for="reset-email" class="auth-label">Email Address</label>
-          <input type="email" id="reset-email" name="email" required placeholder="your@email.com" class="auth-input">
+          <input type="email" id="reset-email" name="email" value="<%= typeof resetEmail !== 'undefined' ? resetEmail : '' %>" required placeholder="your@email.com" class="auth-input">
         </div>
         <button type="submit" class="auth-btn">Send Reset Link</button>
       </form>
@@ -66,8 +68,15 @@
     window.addEventListener('DOMContentLoaded', function () {
       var returnToInput = document.getElementById('returnToInput');
       var referrer = document.referrer;
-      if (referrer && !referrer.includes('/login')) {
-        returnToInput.value = referrer;
+      if (!referrer) return;
+
+      try {
+        var referrerUrl = new URL(referrer);
+        if (referrerUrl.origin === window.location.origin && referrerUrl.pathname.indexOf('/login') !== 0) {
+          returnToInput.value = referrerUrl.pathname + referrerUrl.search + referrerUrl.hash;
+        }
+      } catch (error) {
+        returnToInput.value = '/';
       }
     });
 
@@ -90,6 +99,7 @@
       return true;
     };
   </script>
+  <%- include('../partials/session-heartbeat') %>
 </body>
 
 </html>

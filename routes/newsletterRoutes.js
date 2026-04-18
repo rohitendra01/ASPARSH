@@ -4,7 +4,7 @@ const newsletterController = require('../controllers/newsletterController');
 
 router.post('/newsletter-signup', newsletterController.newsletterSignup);
 
-router.post('/newsletter-status', newsletterController.checkSubscriptionStatus);
+router.get('/newsletter-status', newsletterController.checkSubscriptionStatus);
 
 router.get('/unsubscribe/:token', newsletterController.unsubscribe);
 

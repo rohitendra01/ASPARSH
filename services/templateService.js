@@ -1,7 +1,7 @@
 const templateRepository = require('../repositories/templateRepository');
 const { uploadToCloudinary } = require('../middleware/uploadMiddleware');
 
-exports.registerNewTemplate = async (bodyData, file) => {
+exports.registerNewTemplate = async (bodyData, file, profileId, adminId) => {
     // 1. Check if the exact EJS filename is already registered
     const existingTemplate = await templateRepository.findTemplateByFileName(bodyData.fileName);
     if (existingTemplate) {
@@ -34,6 +34,8 @@ exports.registerNewTemplate = async (bodyData, file) => {
     // 4. Construct and Save
     const newTemplateData = {
         name: bodyData.name.trim(),
+        profileId,
+        createdByAdmin: adminId,
         category: bodyData.category ? bodyData.category.trim() : 'General',
         templateKey: bodyData.fileName.trim(), // Use fileName as the unique templateKey
         fileName: bodyData.fileName.trim(),

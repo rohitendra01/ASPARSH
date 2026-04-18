@@ -1,14 +1,17 @@
 const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const streamifier = require('streamifier');
+const { getRequiredEnv } = require('../utils/securityConfig');
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: getRequiredEnv('CLOUDINARY_CLOUD_NAME'),
+  api_key: getRequiredEnv('CLOUDINARY_API_KEY'),
+  api_secret: getRequiredEnv('CLOUDINARY_API_SECRET')
 });
 
 const storage = multer.memoryStorage();
+const MAX_FILE_SIZE_MB = 7;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
@@ -20,7 +23,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024, files: 25 },
+  limits: { fileSize: MAX_FILE_SIZE_BYTES, files: 25 },
   fileFilter: fileFilter
 });
 
@@ -56,11 +59,22 @@ const uploadToCloudinary = (fileBuffer, folderName, mimetype) => {
   });
 };
 
+const respondUploadError = (req, res, status, message) => {
+  const accepts = (req.headers.accept || '').toLowerCase();
+  const wantsJson = req.xhr || accepts.includes('application/json') || req.is('json');
+
+  if (wantsJson) {
+    return res.status(status).json({ success: false, message });
+  }
+
+  return res.status(status).send(message);
+};
+
 const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ success: false, message: 'File size exceeds 7MB limit' });
+    return respondUploadError(req, res, 400, `File size exceeds ${MAX_FILE_SIZE_MB}MB limit`);
   } else if (err) {
-    return res.status(400).json({ success: false, message: err.message });
+    return respondUploadError(req, res, 400, err.message);
   }
   next();
 };

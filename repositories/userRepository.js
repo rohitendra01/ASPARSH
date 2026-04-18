@@ -1,7 +1,7 @@
 const AdminUser = require('../models/adminUser');
 
 exports.findUserByEmail = (email) => {
-    return AdminUser.findOne({ email: email.toLowerCase() });
+    return AdminUser.findOne({ email: String(email || '').trim().toLowerCase() });
 };
 
 exports.findUserByUsername = (username) => {
@@ -18,7 +18,7 @@ exports.updateUserSession = (userId, sessionId) => {
 };
 
 exports.updateUserPassword = async (email, newPassword) => {
-    const user = await AdminUser.findOne({ email }).select('+password');
+    const user = await AdminUser.findOne({ email: String(email || '').trim().toLowerCase() }).select('+password');
     if (!user) throw new Error('User not found');
     user.password = newPassword;
     return user.save();

@@ -13,7 +13,7 @@ const visitingCardSchema = new mongoose.Schema({
     profileImage: { type: String },
     coverImage: { type: String },
     logoUrl: { type: String },
-    customFields: { type: Map, of: String }
+    customFields: { type: mongoose.Schema.Types.Mixed }
   },
 
   contact: {
@@ -39,74 +39,57 @@ const visitingCardSchema = new mongoose.Schema({
     icon: { type: String }
   }],
 
-  stats: [{
-    label: { type: String },
-    value: { type: String },
-    icon: { type: String }
-  }],
+  tags: [{ type: String }],
 
-  heroStats: [{
-    label: { type: String },
-    value: { type: String }
-  }],
+  stats: [{ label: { type: String }, value: { type: String }, icon: { type: String } }],
+  heroStats: [{ label: { type: String }, value: { type: String } }],
 
   services: [{
-    title: { type: String },
-    description: { type: String },
-    icon: { type: String },
-    image: { type: String },
-    price: { type: String },
-    actionLink: { type: String }
+    title: { type: String }, description: { type: String },
+    icon: { type: String }, image: { type: String },
+    price: { type: String }, actionLink: { type: String }
   }],
 
+  specializations: [{ title: { type: String }, description: { type: String }, icon: { type: String } }],
+
   pricingPlans: [{
-    planName: { type: String },
-    price: { type: String },
-    duration: { type: String },
-    features: [{ type: String }],
-    actionLink: { type: String }
+    planName: { type: String }, price: { type: String }, duration: { type: String },
+    features: [{ type: String }], actionLink: { type: String }
+  }],
+
+  process: [{
+    title: { type: String }, description: { type: String }, icon: { type: String }
+  }],
+
+  faqs: [{
+    question: { type: String }, answer: { type: String }
   }],
 
   portfolio: [{
-    title: { type: String },
-    mediaType: { type: String, enum: ['image', 'video', 'youtube-embed', 'link'] },
-    mediaUrl: { type: String },
-    description: { type: String }
+    title: { type: String }, mediaUrl: { type: String }, description: { type: String },
+    mediaType: { type: String, enum: ['image', 'video', 'youtube-embed', 'link'] }
   }],
 
   experience: [{
-    title: { type: String },
-    organization: { type: String },
-    duration: { type: String },
-    description: { type: String }
+    title: { type: String }, organization: { type: String },
+    duration: { type: String }, description: { type: String }
   }],
 
   testimonials: [{
-    clientName: { type: String },
-    context: { type: String },
-    quote: { type: String },
-    rating: { type: Number, min: 1, max: 5 },
-    avatar: { type: String }
+    clientName: { type: String }, context: { type: String }, quote: { type: String },
+    rating: { type: Number, min: 1, max: 5 }, avatar: { type: String }
   }],
 
-  gallery: [{
-    image: { type: String },
-    title: { type: String }
-  }],
-
-  partners: [{
-    name: { type: String },
-    logo: { type: String },
-    websiteUrl: { type: String }
-  }],
-
+  gallery: [{ image: { type: String }, title: { type: String } }],
+  partners: [{ name: { type: String }, logo: { type: String }, websiteUrl: { type: String } }],
   qualifications: [{ type: String }],
 
-  specializations: [{
+  callToAction: {
     title: { type: String },
     description: { type: String },
-    icon: { type: String }
-  }],
+    buttonText: { type: String },
+    buttonLink: { type: String }
+  },
 
   theme: {
     primaryColor: { type: String, default: '#1e40af' },
@@ -114,15 +97,35 @@ const visitingCardSchema = new mongoose.Schema({
     fontStyle: { type: String, default: 'Inter' },
 
     sectionTitles: {
+      about: { type: String, default: 'About Me' },
       services: { type: String, default: 'Our Services' },
+      specializations: { type: String, default: 'Specializations' },
+      pricing: { type: String, default: 'Pricing' },
+      process: { type: String, default: 'Process' },
+      portfolio: { type: String, default: 'Portfolio' },
       experience: { type: String, default: 'Experience' },
+      testimonials: { type: String, default: 'Testimonials' },
       gallery: { type: String, default: 'Gallery' },
+      faqs: { type: String, default: 'FAQ' },
       partners: { type: String, default: 'Our Partners' },
-      stats: { type: String, default: 'Medical Excellence' }
+      stats: { type: String, default: 'Highlights' },
+      contact: { type: String, default: 'Contact Us' }
     },
 
     sectionDescriptions: {
-      services: { type: String }
+      about: { type: String },
+      services: { type: String },
+      specializations: { type: String },
+      pricing: { type: String },
+      process: { type: String },
+      portfolio: { type: String },
+      experience: { type: String },
+      testimonials: { type: String },
+      gallery: { type: String },
+      faqs: { type: String },
+      partners: { type: String },
+      stats: { type: String },
+      contact: { type: String }
     }
   },
 
@@ -134,12 +137,11 @@ const visitingCardSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-// Automatically exclude soft-deleted cards from all find queries
 visitingCardSchema.pre(/^find/, function (next) {
-    if (this.getFilter().isDeleted === undefined) {
-        this.where({ isDeleted: false });
-    }
-    next();
+  if (this.getFilter().isDeleted === undefined) {
+    this.where({ isDeleted: false });
+  }
+  next();
 });
 
 module.exports = mongoose.model('VisitingCard', visitingCardSchema);

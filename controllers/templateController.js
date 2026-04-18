@@ -1,8 +1,8 @@
 const templateService = require('../services/templateService');
 const templateRepository = require('../repositories/templateRepository');
+const Profile = require('../models/Profile');
 const { getCsrfToken } = require('../utils/securityUtils');
 
-// Render the UI to register a new design
 exports.renderNewForm = async (req, res) => {
     try {
         const { token: csrfToken } = getCsrfToken(req, res);
@@ -20,13 +20,16 @@ exports.renderNewForm = async (req, res) => {
     }
 };
 
-// Process the new design registration
 exports.create = async (req, res) => {
     const slug = req.params.slug || req.user?.slug || '';
     try {
-        await templateService.registerNewTemplate(req.body, req.file);
+        const profile = await Profile.findOne({ slug });
+        if (!profile) {
+            throw new Error(`Profile not found for slug: ${slug}`);
+        }
 
-        // Redirect back to the Master Visiting Cards list with a success query
+        await templateService.registerNewTemplate(req.body, req.file, profile._id, req.user._id);
+
         res.redirect(`/dashboard/${slug}/visiting-cards?success=Design+Registered`);
     } catch (err) {
         console.error('Template Registration Error:', err);
@@ -42,7 +45,6 @@ exports.create = async (req, res) => {
     }
 };
 
-// Render the UI to edit an existing design schema
 exports.renderEditForm = async (req, res) => {
     try {
         const template = await templateRepository.findTemplateById(req.params.id);
@@ -77,14 +79,10 @@ exports.update = async (req, res) => {
     }
 };
 
-// ─────────────────────────────────────────────
-// DELETE DESIGN TEMPLATE
-// ─────────────────────────────────────────────
 
 exports.delete = async (req, res) => {
     const slug = req.params.slug || req.user?.slug || '';
     try {
-        // Safety check: reject deletion if any vCards still reference this template
         const VisitingCard = require('../models/VisitingCard');
         const usageCount = await VisitingCard.countDocuments({ templateId: req.params.id });
         if (usageCount > 0) {
@@ -101,4 +99,4 @@ exports.delete = async (req, res) => {
         console.error('Template Delete Error:', err);
         res.redirect(`/dashboard/${slug}/visiting-cards?error=${encodeURIComponent(err.message)}`);
     }
-};
+};

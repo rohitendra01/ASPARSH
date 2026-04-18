@@ -12,7 +12,19 @@ const visitingCardTemplateSchema = new mongoose.Schema({
         unique: true
     },
 
-    // The EJS file name under views/visiting-cards/templates/ (without .ejs)
+    profileId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Profile',
+        required: true,
+        index: true
+    },
+
+    createdByAdmin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AdminUser',
+        required: true
+    },
+
     fileName: {
         type: String,
         required: true
@@ -25,6 +37,11 @@ const visitingCardTemplateSchema = new mongoose.Schema({
     category: {
         type: String,
         default: 'General'
+    },
+
+    customFields: {
+        type: mongoose.Schema.Types.Mixed,
+        default: []
     },
 
     defaultColors: {

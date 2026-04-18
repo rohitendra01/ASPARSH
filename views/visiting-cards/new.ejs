@@ -2,126 +2,9 @@
 <% block('styles').append('<link rel="stylesheet" href="/css/visiting-cards/index.css">') %>
 <% const slugSegment = (typeof slug !== 'undefined' && slug) ? '/' + encodeURIComponent(slug) : ''; %>
 
-<style>
-  .wz { max-width:960px; margin:0 auto; padding:1.5rem; }
-  .wz-header h1 { font-size:1.8rem; font-weight:700; color:#1e293b; margin-bottom:.25rem; }
-  .wz-header p { color:#64748b; font-size:.9rem; }
-
-  /* ── Progress ── */
-  .progress-bar { display:flex; align-items:center; margin:1.8rem 0 2rem; }
-  .step-node { display:flex; align-items:center; gap:.5rem; }
-  .step-dot { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; background:#e2e8f0; color:#94a3b8; transition:.3s; flex-shrink:0; }
-  .step-lbl { font-size:.78rem; font-weight:600; color:#94a3b8; white-space:nowrap; transition:.3s; }
-  .step-node.active .step-dot { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 4px 12px rgba(99,102,241,.4); }
-  .step-node.active .step-lbl { color:#6366f1; font-weight:700; }
-  .step-node.done .step-dot { background:#10b981; color:#fff; }
-  .step-node.done .step-lbl { color:#10b981; }
-  .step-line { flex:1; height:2px; background:#e2e8f0; margin:0 .5rem; min-width:16px; transition:.3s; }
-  .step-line.done { background:#10b981; }
-
-  /* ── Step 1 dual panel ── */
-  .step1-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start; }
-  .step1-panel { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:1.25rem; }
-  .step1-panel h3 { font-size:.9rem; font-weight:700; color:#1e293b; margin:0 0 1rem; display:flex; align-items:center; gap:.4rem; }
-  .panel-required-badge { font-size:.68rem; background:#fef3c7; color:#92400e; border-radius:20px; padding:.15rem .5rem; font-weight:600; margin-left:auto; }
-  .panel-optional-badge { font-size:.68rem; background:#f0fdf4; color:#166534; border-radius:20px; padding:.15rem .5rem; font-weight:600; margin-left:auto; }
-
-  /* ── Template picker ── */
-  .tmpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; max-height:450px; overflow-y:auto; padding-right:2px; }
-  .tmpl-card { border:2px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fafafa; display:flex; flex-direction:column; position:relative; }
-  .tmpl-card.sel { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.2); background:#fff; }
-  .tmpl-card img { width:100%; height:110px; object-fit:cover; display:block; border-bottom:1px solid #e2e8f0; }
-  .tmpl-ph { width:100%; height:110px; background:linear-gradient(135deg,#667eea,#764ba2); display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
-  .tmpl-info { padding:.6rem .7rem; flex:1; display:flex; flex-direction:column; justify-content:space-between; }
-  .tmpl-info-text h4 { font-size:.82rem; font-weight:700; color:#1e293b; margin:0; }
-  .tmpl-info-text p { font-size:.7rem; color:#64748b; margin:.1rem 0 .5rem; }
-  .btn-select { background:#fff; border:1px solid #cbd5e1; color:#475569; padding:.4rem; border-radius:6px; font-size:.72rem; font-weight:600; cursor:pointer; text-align:center; transition:.2s; }
-  .btn-select:hover { background:#f1f5f9; }
-  .tmpl-card.sel .btn-select { background:#6366f1; color:#fff; border-color:#6366f1; }
-  
-  /* ── Profile picker ── */
-  .profile-search-box { position:relative; margin-bottom:.75rem; }
-  .profile-search-box input { width:100%; padding:.58rem .8rem .58rem 2.2rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:.86rem; color:#1e293b; background:#fafafa; }
-  .profile-search-box input:focus { outline:none; border-color:#6366f1; background:#fff; }
-  .profile-search-box .ico { position:absolute; left:.7rem; top:50%; transform:translateY(-50%); font-size:.9rem; color:#94a3b8; pointer-events:none; }
-  .profile-list { max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:.5rem; }
-  .profile-item { display:flex; align-items:center; gap:.7rem; padding:.6rem; border:1.5px solid #e2e8f0; border-radius:10px; background:#fafafa; position:relative; }
-  .profile-item.sel { border-color:#10b981; background:#f0fdf4; }
-  .profile-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.9rem; font-weight:700; flex-shrink:0; overflow:hidden;}
-  .profile-meta { flex:1; min-width:0; }
-  .profile-meta .pname { font-size:.86rem; font-weight:700; color:#1e293b; }
-  .profile-meta .pdetail { font-size:.72rem; color:#64748b; }
-  .btn-select-profile { background:#fff; border:1px solid #cbd5e1; color:#475569; padding:.3rem .6rem; border-radius:6px; font-size:.7rem; font-weight:600; cursor:pointer; text-align:center; transition:.2s; }
-  .btn-select-profile:hover { background:#f1f5f9; }
-  .profile-item.sel .btn-select-profile { background:#10b981; color:#fff; border-color:#10b981; content:"Selected"; }
-  .no-profiles { text-align:center; padding:1.5rem; color:#94a3b8; font-size:.84rem; }
-  .sel-profile-strip { display:none; align-items:center; gap:.6rem; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:.45rem .8rem; margin-top:.5rem; font-size:.8rem; color:#15803d; font-weight:600; }
-  .sel-profile-strip.show { display:flex; }
-  .sel-profile-strip button { background:none; border:none; cursor:pointer; color:#94a3b8; font-size:.9rem; margin-left:auto; }
-
-  /* ── Sections ── */
-  .sec { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:1.4rem 1.5rem; margin-bottom:1.1rem; }
-  .sec h3 { font-size:.95rem; font-weight:700; color:#1e293b; margin:0 0 1rem; display:flex; align-items:center; gap:.45rem; }
-  .sec-purple { background:linear-gradient(135deg,#faf5ff,#ede9fe); border-color:#c4b5fd; }
-  .sec-purple h3 { color:#7c3aed; }
-
-  /* ── Grid ── */
-  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
-  .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.9rem; }
-  .g1 { display:grid; grid-template-columns:1fr; gap:.9rem; }
-  .span2 { grid-column:span 2; }
-  .span3 { grid-column:span 3; }
-
-  /* ── Fields ── */
-  .f { display:flex; flex-direction:column; gap:.3rem; }
-  .f label { font-size:.78rem; font-weight:600; color:#374151; }
-  .f input,.f textarea,.f select { padding:.58rem .8rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:.88rem; color:#1e293b; background:#fafafa; width:100%; transition:border-color .2s; }
-  .f textarea { resize:vertical; min-height:76px; }
-  .f input:focus,.f textarea:focus,.f select:focus { outline:none; border-color:#6366f1; background:#fff; }
-  .req { color:#ef4444; margin-left:2px; }
-  .hint { font-size:.72rem; color:#94a3b8; margin-top:-.15rem; }
-
-  /* ── Dynamic array rows ── */
-  .array-row { display:grid; gap:.6rem; align-items:end; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:.8rem; margin-bottom:.6rem; position:relative; }
-  .array-row .del-row { position:absolute; top:.4rem; right:.4rem; background:none; border:none; cursor:pointer; font-size:1rem; color:#94a3b8; line-height:1; }
-  .array-row .del-row:hover { color:#ef4444; }
-  .add-row-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.45rem 1rem; background:#f5f3ff; border:1.5px dashed #a78bfa; border-radius:8px; font-size:.82rem; font-weight:600; color:#7c3aed; cursor:pointer; transition:.2s; margin-top:.2rem; }
-  .add-row-btn:hover { background:#ede9fe; border-color:#8b5cf6; }
-
-  /* ── File fields ── */
-  .img-field-wrap label.file-label { display:flex; align-items:center; gap:.7rem; padding:.6rem .8rem; border:1.5px dashed #c4b5fd; border-radius:8px; cursor:pointer; background:#faf5ff; font-size:.82rem; color:#7c3aed; font-weight:600; transition:.2s; }
-  .img-field-wrap label.file-label:hover { border-color:#8b5cf6; background:#ede9fe; }
-  .img-field-wrap input[type=file] { display:none; }
-  .img-thumb { width:56px; height:42px; object-fit:cover; border-radius:6px; display:none; }
-
-  /* ── Selected bar ── */
-  .sel-bar { background:#f5f3ff; border:1px solid #c4b5fd; border-radius:10px; padding:.75rem 1.1rem; display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.3rem; font-size:.84rem; align-items:center; }
-  .sel-bar-item { display:flex; align-items:center; gap:.55rem; }
-  .sel-bar-item img { width:42px; height:32px; object-fit:cover; border-radius:6px; }
-  .sel-bar-item .lbl { font-size:.72rem; color:#94a3b8; }
-  .sel-bar-item .val { font-weight:700; color:#7c3aed; }
-
-  /* ── Actions ── */
-  .wz-actions { display:flex; align-items:center; justify-content:space-between; margin-top:1.5rem; flex-wrap:wrap; gap:.8rem; }
-  .wz-actions .right { display:flex; gap:.7rem; }
-  .btn { padding:.68rem 1.6rem; border-radius:10px; font-size:.88rem; font-weight:600; cursor:pointer; border:none; transition:.2s; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem; }
-  .btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; box-shadow:0 4px 12px rgba(99,102,241,.35); }
-  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(99,102,241,.5); }
-  .btn-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-  .btn-secondary { background:#f1f5f9; color:#475569; }
-  .btn-secondary:hover { background:#e2e8f0; }
-  .alert-err { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; border-radius:10px; padding:.85rem 1.1rem; margin-bottom:1.3rem; font-size:.88rem; }
-  .review-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; font-size:.86rem; color:#475569; line-height:1.8; }
-  .review-grid strong { color:#1e293b; display:block; font-size:.78rem; }
-
-  @media(max-width:700px) {
-    .step1-layout { grid-template-columns:1fr; }
-    .g2,.g3 { grid-template-columns:1fr; }
-    .span2,.span3 { grid-column:span 1; }
-    .step-lbl { display:none; }
-    .tmpl-grid { grid-template-columns:1fr 1fr; }
-  }
-</style>
+<link rel="stylesheet" href="/css/visiting-cards/new.css">
+<link rel="stylesheet" href="/css/vcard-ui.css">
+<link rel="stylesheet" href="/css/fa-all.min.css">
 
 <div class="wz">
   <div class="wz-header">
@@ -237,14 +120,18 @@
           action="/dashboard<%= slugSegment %>/visiting-cards"
           method="POST"
           enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <% } %>
+        <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <% } %>
       <input type="hidden" name="templateId" id="templateIdInput">
       <input type="hidden" name="profileId" id="profileIdInput">
 
       <!-- 1. Profile / Identity -->
-      <div class="sec">
-        <h3>👤 Core Identity</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">👤 Core Identity</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div class="g2">
           <div class="f">
             <label>Full Name <span class="req">*</span></label>
@@ -261,10 +148,36 @@
 
           <div class="f">
             <label>Logo / Brand Image <small class="hint">(Upload file)</small></label>
-            <input type="file" name="profile[logoUrl]" accept="image/*">
+            <div class="img-field-wrap">
+              <label class="file-label" for="inp-logoUrl" id="lbl-logoUrl">
+                <span>🖼️</span> Choose Logo
+                <img class="img-thumb" id="prev-logoUrl" alt="">
+              </label>
+              <input type="file" id="inp-logoUrl" name="profile[logoUrl]" accept="image/*">
+            </div>
           </div>
           <div class="f">
-             <!-- Cover spacer -->
+            <label>Profile / Hero Photo <small class="hint">(Upload file)</small></label>
+            <div class="img-field-wrap">
+              <label class="file-label" for="inp-profileImage" id="lbl-profileImage">
+                <span>📷</span> Choose Photo
+                <img class="img-thumb" id="prev-profileImage" alt="">
+              </label>
+              <input type="file" id="inp-profileImage" name="profile[profileImage]" accept="image/*">
+            </div>
+          </div>
+          <div class="f">
+            <label>Cover / Banner Image <small class="hint">(Upload file)</small></label>
+            <div class="img-field-wrap">
+              <label class="file-label" for="inp-coverImage" id="lbl-coverImage">
+                <span>🖼️</span> Choose Banner
+                <img class="img-thumb" id="prev-coverImage" alt="">
+              </label>
+              <input type="file" id="inp-coverImage" name="profile[coverImage]" accept="image/*">
+            </div>
+          </div>
+          <div class="f">
+             <!-- Cover spacer to align grid elements depending on columns -->
           </div>
           <div class="f span2">
             <label>Bio / Introduction</label>
@@ -278,10 +191,14 @@
           <button type="button" class="add-row-btn" onclick="addCustomField()">+ Add Custom Field</button>
         </div>
       </div>
+</div>
 
       <!-- 2. Contact & Hours -->
-      <div class="sec">
-        <h3>📞 Contact Information & Hours</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">📞 Contact Information & Hours</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div class="g2">
           <div class="f"><label>Primary Phone</label><input type="tel" name="contact[primaryPhone]" placeholder="+91 98765 43210"></div>
           <div class="f"><label>Primary Email</label><input type="email" name="contact[primaryEmail]" placeholder="contact@example.com"></div>
@@ -297,124 +214,202 @@
           <button type="button" class="add-row-btn" onclick="addAdditionalContact()">+ Add Contact</button>
         </div>
       </div>
+</div>
 
       <!-- 3. Social Media -->
-      <div class="sec">
-        <h3>🔗 Social Media Links</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🔗 Social Media Links</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="socialsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addSocial()">+ Add Social Link</button>
       </div>
+</div>
 
       <!-- 4a. Hero Stats -->
-      <div class="sec">
-        <h3>⭐ Hero Stats (Top Section)</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">⭐ Hero Stats (Top Section)</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="heroStatsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addHeroStat()">+ Add Hero Stat</button>
       </div>
+</div>
 
       <!-- 4. Stats -->
-      <div class="sec">
-        <h3>📊 Highlights & Stats</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">📊 Highlights & Stats</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="statsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addStat()">+ Add Stat</button>
       </div>
+</div>
 
       <!-- 5. Services / Offerings -->
-      <div class="sec">
-        <h3>🛠️ Services / Offerings</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🛠️ Services / Offerings</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="servicesContainer"></div>
         <button type="button" class="add-row-btn" onclick="addService()">+ Add Service / Item</button>
       </div>
+</div>
 
       <!-- 6. Pricing Plans -->
-      <div class="sec">
-        <h3>💰 Pricing Packages</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">💰 Pricing Packages</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="pricingContainer"></div>
         <button type="button" class="add-row-btn" onclick="addPricing()">+ Add Package</button>
       </div>
+</div>
 
       <!-- 7. Portfolio (Links/Videos) -->
-      <div class="sec">
-        <h3>🎬 Portfolio / Media Links</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🎬 Portfolio / Media Links</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="portfolioContainer"></div>
         <button type="button" class="add-row-btn" onclick="addPortfolio()">+ Add Video / Link</button>
       </div>
+</div>
 
       <!-- 8. Gallery (Images) -->
-      <div class="sec">
-        <h3>🖼️ Gallery Images</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🖼️ Gallery Images</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="galleryContainer"></div>
         <button type="button" class="add-row-btn" onclick="addGallery()">+ Add Gallery Image</button>
       </div>
+</div>
 
       <!-- 9. Experience / Timeline -->
-      <div class="sec">
-        <h3>💼 Experience / Timeline</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">💼 Experience / Timeline</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="experienceContainer"></div>
         <button type="button" class="add-row-btn" onclick="addExperience()">+ Add Entry</button>
       </div>
+</div>
 
       <!-- 10. Testimonials -->
-      <div class="sec">
-        <h3>⭐ Testimonials / Reviews</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">⭐ Testimonials / Reviews</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="testimonialsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addTestimonial()">+ Add Review</button>
       </div>
+</div>
 
       <!-- 11. Partners -->
-      <div class="sec">
-        <h3>🤝 Partners / Affiliates</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🤝 Partners / Affiliates</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="partnersContainer"></div>
         <button type="button" class="add-row-btn" onclick="addPartner()">+ Add Partner</button>
       </div>
+</div>
 
       <!-- 12. Specializations -->
-      <div class="sec">
-        <h3>🗂️ Specializations (Secondary)</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🗂️ Specializations (Secondary)</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div id="specializationsContainer"></div>
         <button type="button" class="add-row-btn" onclick="addSpecialization()">+ Add Specialization</button>
       </div>
+</div>
 
       <!-- 13. Qualifications / Simple List -->
-      <div class="sec">
-        <h3>📜 Qualifications / Certifications</h3>
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">📜 Qualifications / Certifications</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <p class="hint">Enter one per line.</p>
         <div class="f">
           <textarea name="qualifications" rows="4" placeholder="MD General Medicine&#10;Member of Medical Association"></textarea>
         </div>
       </div>
+</div>
 
-      <!-- 14. Images Uploads -->
-      <div class="sec">
-        <h3>🖼️ Hero Images Upload</h3>
-        <p class="hint" style="margin-bottom:1rem;">Compressed before upload. Max 7MB each.</p>
-        <div class="g2">
-          <div class="f">
-            <label>Profile / Hero Photo</label>
-            <div class="img-field-wrap">
-              <label class="file-label" for="inp-profileImage" id="lbl-profileImage">
-                <span>📷</span> Choose Photo
-                <img class="img-thumb" id="prev-profileImage" alt="">
-              </label>
-              <input type="file" id="inp-profileImage" name="profile[profileImage]" accept="image/*">
-            </div>
-          </div>
-          <div class="f">
-            <label>Cover / Banner Image</label>
-            <div class="img-field-wrap">
-              <label class="file-label" for="inp-coverImage" id="lbl-coverImage">
-                <span>🖼️</span> Choose Banner
-                <img class="img-thumb" id="prev-coverImage" alt="">
-              </label>
-              <input type="file" id="inp-coverImage" name="profile[coverImage]" accept="image/*">
-            </div>
+            <!-- 14. Process -->
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🔄 Process / Steps</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
+        <div id="processContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addProcess()">+ Add Step</button>
+      </div>
+</div>
+
+      <!-- 15. FAQs -->
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">❓ FAQs (Frequently Asked Questions)</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
+        <div id="faqsContainer"></div>
+        <button type="button" class="add-row-btn" onclick="addFaq()">+ Add FAQ</button>
+      </div>
+</div>
+
+      <!-- 16. Tags -->
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🏷️ Tags / Keywords</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
+        <p class="hint">Type a keyword and press Enter or comma.</p>
+        <div class="form-field f" style="max-width: 500px;">
+          <div id="tagsWrapper" class="tags-input-wrapper">
+            <input type="text" placeholder="Add a tag..." autocomplete="off">
+            <input type="hidden" name="tags" id="tagsHidden" value="<%= (typeof card !== 'undefined' && card.tags ? JSON.stringify(card.tags) : '[]') %>">
           </div>
         </div>
       </div>
+</div>
 
-      <!-- 15. Theme & Aliasing -->
-      <div class="sec sec-purple">
-        <h3>🎨 Theme & Section Titles</h3>
+      <!-- 17. Call to Action -->
+      <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">📣 Call To Action (Bottom Section)</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
+        <div class="g2 field-grid">
+          <div class="f form-field"><label>Title</label><input type="text" name="callToAction[title]" value="<%= (typeof card !== 'undefined' && card.callToAction && card.callToAction.title) ? card.callToAction.title : '' %>"></div>
+          <div class="f form-field"><label>Button Text</label><input type="text" name="callToAction[buttonText]" value="<%= (typeof card !== 'undefined' && card.callToAction && card.callToAction.buttonText) ? card.callToAction.buttonText : '' %>"></div>
+          <div class="f form-field"><label>Button Link</label><input type="url" name="callToAction[buttonLink]" value="<%= (typeof card !== 'undefined' && card.callToAction && card.callToAction.buttonLink) ? card.callToAction.buttonLink : '' %>"></div>
+          <div class="f form-field" style="grid-column:1 / -1;"><label>Description</label><textarea name="callToAction[description]"><%= (typeof card !== 'undefined' && card.callToAction && card.callToAction.description) ? card.callToAction.description : '' %></textarea></div>
+        </div>
+      </div>
+</div>
+
+
+      <!-- (Hero Images moved to Section 1) -->
+      <div class="card-block open sec-purple">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">🎨 Theme & Section Titles</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
         <div class="g3">
           <div class="f"><label>Primary Color</label><input type="color" name="theme[primaryColor]" value="#1e40af"></div>
           <div class="f"><label>Secondary Color</label><input type="color" name="theme[secondaryColor]" value="#0891b2"></div>
@@ -437,6 +432,21 @@
            <div class="f"><label>"Gallery" Section Title</label><input type="text" name="theme[sectionTitles][gallery]" placeholder="Gallery"></div>
            <div class="f"><label>"Partners" Section Title</label><input type="text" name="theme[sectionTitles][partners]" placeholder="Our Partners"></div>
            <div class="f"><label>"Stats" Section Title</label><input type="text" name="theme[sectionTitles][stats]" placeholder="Medical Excellence"></div>
+           <div class="f form-field"><label>"Faqs" Title</label><input type="text" name="theme[sectionTitles][faqs]" placeholder="Faqs"></div>
+           <div class="f form-field"><label>"Faqs" Subtitle</label><input type="text" name="theme[sectionDescriptions][faqs]" placeholder=""></div>
+
+           <div class="f form-field"><label>"Portfolio" Title</label><input type="text" name="theme[sectionTitles][portfolio]" placeholder="Portfolio"></div>
+           <div class="f form-field"><label>"Portfolio" Subtitle</label><input type="text" name="theme[sectionDescriptions][portfolio]" placeholder=""></div>
+
+           <div class="f form-field"><label>"Process" Title</label><input type="text" name="theme[sectionTitles][process]" placeholder="Process"></div>
+           <div class="f form-field"><label>"Process" Subtitle</label><input type="text" name="theme[sectionDescriptions][process]" placeholder=""></div>
+
+           <div class="f form-field"><label>"Pricing" Title</label><input type="text" name="theme[sectionTitles][pricing]" placeholder="Pricing"></div>
+           <div class="f form-field"><label>"Pricing" Subtitle</label><input type="text" name="theme[sectionDescriptions][pricing]" placeholder=""></div>
+
+           <div class="f form-field"><label>"About" Title</label><input type="text" name="theme[sectionTitles][about]" placeholder="About"></div>
+           <div class="f form-field"><label>"About" Subtitle</label><input type="text" name="theme[sectionDescriptions][about]" placeholder=""></div>
+
         </div>
       </div>
 
@@ -448,11 +458,15 @@
       </div>
     </form>
   </div>
+</div>
 
   <!-- ═══ STEP 3 — Confirm ═══ -->
   <div id="step-3" style="display:none;">
-    <div class="sec">
-      <h3>✅ Ready to Create</h3>
+    <div class="card-block open">
+  <div class="card-block-header" onclick="this.parentElement.classList.toggle('open')">
+    <h3 style="margin:0;">✅ Ready to Create</h3><span style="font-size:0.8rem;color:#64748b;">▼ Toggle</span>
+  </div>
+  <div class="card-block-body">
       <div id="reviewSummary" class="review-grid"></div>
     </div>
     <div class="wz-actions">
@@ -464,6 +478,7 @@
   </div>
 </div>
 
+<script src="/js/vcard-ui.js"></script>
 <script>
 // ─── State ───────────────────────────
 let selTemplate = null;
@@ -607,6 +622,45 @@ async function goToStep2() {
   document.getElementById('selTmplName').textContent = selTemplate.name;
   const img = document.getElementById('selThumbImg');
   if (selTemplate.thumb) { img.src = selTemplate.thumb; img.style.display = ''; } else img.style.display = 'none';
+
+  // Fetch Custom Fields Schema for this template
+  try {
+    const slugSegment = '<%= slugSegment %>'; // or use the variable from EJS
+    const res = await fetch(`/dashboard${slugSegment}/visiting-cards/template/${selTemplate.id}/schema`);
+    const data = await res.json();
+    const container = document.getElementById('customFieldsContainer');
+    container.innerHTML = ''; // clear
+
+    if (data.customFields && data.customFields.length > 0) {
+      data.customFields.forEach(field => {
+        const row = document.createElement('div');
+        row.className = 'f';
+        const typeMap = {
+          'text': 'text',
+          'url': 'url',
+          'color': 'color'
+        };
+        const inputType = typeMap[field.type] || 'text';
+        
+        let reqHTML = field.required ? '<span class="req">*</span>' : '';
+        let inputHTML = '';
+        
+        if (field.type === 'textarea') {
+           inputHTML = `<textarea name="profile[customFields][${field.name}]" ${field.required ? 'required' : ''}></textarea>`;
+        } else if (field.type === 'image') {
+           inputHTML = `<input type="file" name="profile[customFields][${field.name}]" accept="image/*" ${field.required ? 'required' : ''}>`;
+        } else {
+           inputHTML = `<input type="${inputType}" name="profile[customFields][${field.name}]" ${field.required ? 'required' : ''}>`;
+        }
+
+        row.innerHTML = `<label>${field.label} ${reqHTML} <small style="color:#94a3b8;font-weight:normal;">(${field.name})</small></label>${inputHTML}`;
+        container.appendChild(row);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load template schema:', err);
+  }
+
   goToStep(2);
 }
 
@@ -634,7 +688,7 @@ function addSocial() {
   row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 2fr auto';
   row.innerHTML = `<div class="f"><label>Platform</label><input type="text" name="socials[${i}][platform]"></div>
     <div class="f"><label>URL</label><input type="url" name="socials[${i}][url]"></div>
-    <div class="f"><label>Icon Class</label><input type="text" name="socials[${i}][icon]"></div>
+    <div class="f"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('socials['+i+'][icon]', '', 'ico_socials_'+Date.now()+'_'+i) : ''}</div>
     <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
   document.getElementById('socialsContainer').appendChild(row);
 }
@@ -659,7 +713,7 @@ function addStat() {
   row.className = 'array-row'; row.style.gridTemplateColumns = '2fr 1fr 1fr auto';
   row.innerHTML = `<div class="f"><label>Label</label><input type="text" name="stats[${i}][label]"></div>
     <div class="f"><label>Value</label><input type="text" name="stats[${i}][value]"></div>
-    <div class="f"><label>Icon Class</label><input type="text" name="stats[${i}][icon]"></div>
+    <div class="f"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('stats['+i+'][icon]', '', 'ico_stats_'+Date.now()+'_'+i) : ''}</div>
     <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
   document.getElementById('statsContainer').appendChild(row);
 }
@@ -673,7 +727,7 @@ function addService() {
   row.innerHTML = `
     <div class="f"><label>Title</label><input type="text" name="services[${i}][title]"></div>
     <div class="f"><label>Price</label><input type="text" name="services[${i}][price]"></div>
-    <div class="f"><label>Icon Class</label><input type="text" name="services[${i}][icon]"></div>
+    <div class="f"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('services['+i+'][icon]', '', 'ico_services_'+Date.now()+'_'+i) : ''}</div>
     <div class="f"><label>Item Image</label><input type="file" name="services[${i}][image]" accept="image/*"></div>
     <div class="f"><label>Action Link</label><input type="url" name="services[${i}][actionLink]"></div>
     <div class="f" style="grid-column:1 / span 3"><label>Description</label><textarea name="services[${i}][description]"></textarea></div>
@@ -783,7 +837,7 @@ function addSpecialization() {
   row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr';
   row.innerHTML = `
     <div class="f"><label>Title</label><input type="text" name="specializations[${i}][title]"></div>
-    <div class="f"><label>Icon Class</label><input type="text" name="specializations[${i}][icon]"></div>
+    <div class="f"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('specializations['+i+'][icon]', '', 'ico_specializations_'+Date.now()+'_'+i) : ''}</div>
     <div class="f" style="grid-column:span 2"><label>Description</label><textarea name="specializations[${i}][description]"></textarea></div>
     <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
   document.getElementById('specializationsContainer').appendChild(row);
@@ -822,7 +876,7 @@ function addAdditionalContact() {
     <div class="f"><label>Platform</label><input type="text" name="contact[additionalContacts][${i}][platform]"></div>
     <div class="f"><label>Value</label><input type="text" name="contact[additionalContacts][${i}][value]"></div>
     <div class="f"><label>Link</label><input type="url" name="contact[additionalContacts][${i}][link]"></div>
-    <div class="f"><label>Icon Class</label><input type="text" name="contact[additionalContacts][${i}][icon]"></div>
+    <div class="f"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('contact[additionalContacts]['+i+'][icon]', '', 'ico_contact_additionalContacts_'+Date.now()+'_'+i) : ''}</div>
     <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
   document.getElementById('additionalContactsContainer').appendChild(row);
 }
@@ -848,6 +902,37 @@ function submitForm() {
 }
 
 // ─── Image compression logic (shared from profiles) ─────
+// ── Added Dynamic Arrays ──
+let processIdx = 0;
+function addProcess(title='', dest='', icon='') {
+  const i = processIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr 1fr';
+  row.innerHTML = `
+    <div class="f form-field"><label>Step Title</label><input type="text" name="process[${i}][title]" value="${esc(title)}"></div>
+    <div class="f form-field"><label>Icon Class</label>${window.createVisualIconInput ? createVisualIconInput('process['+i+'][icon]', icon, 'process-ic-'+Date.now()+i) : '<input type="text" name="process['+i+'][icon]" value="'+esc(icon)+'">'}</div>
+    <div class="f form-field" style="grid-column:span 2"><label>Description</label><textarea name="process[${i}][description]">${esc(dest)}</textarea></div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('processContainer').appendChild(row);
+}
+
+let faqIdx = 0;
+function addFaq(q='', a='') {
+  const i = faqIdx++;
+  const row = document.createElement('div');
+  row.className = 'array-row'; row.style.gridTemplateColumns = '1fr';
+  row.innerHTML = `
+    <div class="f form-field"><label>Question</label><input type="text" name="faqs[${i}][question]" value="${esc(q)}"></div>
+    <div class="f form-field"><label>Answer</label><textarea name="faqs[${i}][answer]">${esc(a)}</textarea></div>
+</div>
+    <button type="button" class="del-row" onclick="this.closest('.array-row').remove()">✕</button>`;
+  document.getElementById('faqsContainer').appendChild(row);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if(window.initTagsInput) initTagsInput('tagsWrapper', 'tagsHidden');
+});
+
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -917,4 +1002,5 @@ document.addEventListener('change', async function(e) {
     }
   }
 });
+function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 </script>

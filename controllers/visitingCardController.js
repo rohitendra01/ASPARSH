@@ -2,6 +2,21 @@ const visitingCardService = require('../services/visitingCardService');
 const templateRepository = require('../repositories/templateRepository');
 const { getCsrfToken } = require('../utils/securityUtils');
 
+let profileRepository = null;
+try {
+    profileRepository = require('../repositories/profileRepository');
+} catch (_) { }
+
+async function loadProfilesForForm(limit = 5) {
+    if (!profileRepository) return [];
+
+    try {
+        return await profileRepository.findAllProfiles(null, limit);
+    } catch (_) {
+        return [];
+    }
+}
+
 // ─────────────────────────────────────────────
 // DASHBOARD LIST
 // ─────────────────────────────────────────────
@@ -34,11 +49,7 @@ exports.list = async (req, res) => {
 
 exports.renderNewForm = async (req, res) => {
     try {
-        let profiles = [];
-        try {
-            profiles = await require('../repositories/profileRepository').findAllProfiles(null, 5);
-        } catch (_) { /* profileRepository is optional */ }
-
+        const profiles = await loadProfilesForForm(5);
         const templates = await templateRepository.findAllActiveTemplates();
         const { token: csrfToken, generationError } = getCsrfToken(req, res);
         const slug = req.params?.slug || req.user?.slug || '';
@@ -90,13 +101,17 @@ exports.createVisitingCard = async (req, res) => {
     } catch (err) {
         console.error('vCard create error:', err);
         try {
-            const templates = await templateRepository.findAllActiveTemplates();
+            const [templates, profiles] = await Promise.all([
+                templateRepository.findAllActiveTemplates(),
+                loadProfilesForForm(5)
+            ]);
             const { token: csrfToken } = getCsrfToken(req, res);
             res.status(400).render('visiting-cards/new', {
                 templates,
-                profiles: [],
+                profiles,
                 slug,
                 csrfToken,
+                card: visitingCardService.normalizePayload({ body: req.body || {} }),
                 user: req.user || null,
                 error: err.message,
                 layout: 'layouts/dashboard-boilerplate'
@@ -167,7 +182,21 @@ exports.update = async (req, res) => {
         res.redirect(`/dashboard/${slug}/visiting-cards`);
     } catch (err) {
         console.error('vCard update error:', err);
-        res.status(400).send(err.message);
+        try {
+            const card = await visitingCardService.getCardForEdit(req.params.id);
+            const { token: csrfToken } = getCsrfToken(req, res);
+
+            res.status(400).render('visiting-cards/edit', {
+                card,
+                slug,
+                csrfToken,
+                user: req.user || null,
+                error: err.message,
+                layout: 'layouts/dashboard-boilerplate'
+            });
+        } catch (_) {
+            res.status(400).send(err.message);
+        }
     }
 };
 

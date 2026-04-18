@@ -134,6 +134,8 @@
   });
 
   const newsletterForm = document.querySelector('.newsletter-form');
+  const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+  const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
   if (newsletterForm) {
     checkSubscriptionStatus();
     
@@ -152,8 +154,10 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': csrfToken
           },
+          credentials: 'same-origin',
           body: JSON.stringify(payload)
         });
         
@@ -163,13 +167,10 @@
           if (result.alreadySubscribed) {
             showNewsletterMessage('You are already subscribed! 🎉', 'info');
           } else {
-            if (result.token) {
-              localStorage.setItem('newsletter_token', result.token);
-            }
             showNewsletterMessage('Thank you for subscribing! 🎉', 'success');
             e.target.reset();
           }
-          updateNewsletterUI(true);
+          updateNewsletterUI(true, emailInput.value);
         } else {
           throw new Error(result.message || 'Subscription failed');
         }
@@ -184,24 +185,20 @@
   }
 
   async function checkSubscriptionStatus() {
-    const token = localStorage.getItem('newsletter_token');
-    if (!token) return;
-    
     try {
       const response = await fetch('/newsletter-status', {
-        method: 'POST',
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({ token })
+        credentials: 'same-origin'
       });
       
       const result = await response.json();
-      if (result.subscribed) {
-        updateNewsletterUI(true, result.email);
+      const status = result && result.data ? result.data : { subscribed: false, email: null };
+      if (status.subscribed) {
+        updateNewsletterUI(true, status.email);
       } else {
-        localStorage.removeItem('newsletter_token');
         updateNewsletterUI(false);
       }
     } catch (error) {

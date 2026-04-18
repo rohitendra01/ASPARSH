@@ -20,7 +20,7 @@ router.post(
 
 router.get('/:id/edit', isLoggedIn, csrfProtection, templateController.renderEditForm);
 
-router.put(
+router.post(
     '/:id',
     isLoggedIn,
     upload.single('thumbnail'),

@@ -1,5 +1,6 @@
 const userService = require('../services/userService');
 const userRepository = require('../repositories/userRepository');
+const { getPasswordPolicyMessage } = require('../utils/securityUtils');
 
 exports.viewUserProfile = async (req, res) => {
   try {
@@ -27,6 +28,7 @@ exports.renderEditUserProfile = async (req, res) => {
     res.render('users/edit', {
       user,
       currentUser: req.user,
+      passwordPolicy: getPasswordPolicyMessage(),
       layout: 'layouts/dashboard-boilerplate'
     });
   } catch (err) {

@@ -1,0 +1,21 @@
+<script>
+  (function () {
+    if (typeof window.fetch !== 'function') return;
+
+    var sessionHeartbeatMs = 1000 * 60 * 15;
+    var formSelector = 'form input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]), form textarea, form select';
+
+    window.setInterval(function () {
+      if (!document.querySelector(formSelector)) return;
+
+      fetch('/ping-session', {
+        method: 'GET',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        keepalive: true
+      }).catch(function () {
+        // Keep the heartbeat silent so it never blocks the user's work.
+      });
+    }, sessionHeartbeatMs);
+  })();
+</script>

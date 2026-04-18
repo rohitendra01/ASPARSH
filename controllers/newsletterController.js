@@ -1,6 +1,14 @@
 const validator = require('validator');
 const newsletterService = require('../services/newsletterService');
 const { generateBrowserFingerprint } = require('../utils/fingerprintUtils');
+const {
+    buildNewsletterCookieOptions,
+    getNewsletterCookieName
+} = require('../utils/securityConfig');
+
+function clearNewsletterCookie(res) {
+    res.clearCookie(getNewsletterCookieName(), buildNewsletterCookieOptions());
+}
 
 exports.newsletterSignup = async (req, res) => {
     try {
@@ -21,7 +29,8 @@ exports.newsletterSignup = async (req, res) => {
             return res.status(200).json({ success: true, message: 'You are already subscribed to our newsletter!', alreadySubscribed: true });
         }
 
-        res.status(201).json({ success: true, message: 'Successfully subscribed to newsletter!', data: { token: result.token } });
+        res.cookie(getNewsletterCookieName(), result.token, buildNewsletterCookieOptions());
+        res.status(201).json({ success: true, message: 'Successfully subscribed to newsletter!' });
 
     } catch (error) {
         console.error('Newsletter signup error:', error);
@@ -35,11 +44,16 @@ exports.newsletterSignup = async (req, res) => {
 exports.checkSubscriptionStatus = async (req, res) => {
     try {
         const browserFingerprint = generateBrowserFingerprint(req);
-        const status = await newsletterService.verifySubscriptionStatus(req.body.token, browserFingerprint);
+        const token = req.cookies ? req.cookies[getNewsletterCookieName()] : null;
+        const status = await newsletterService.verifySubscriptionStatus(token, browserFingerprint);
+        if (!status.subscribed) {
+            clearNewsletterCookie(res);
+        }
 
         res.status(200).json({ success: true, data: status });
     } catch (error) {
         console.error('Check subscription error:', error);
+        clearNewsletterCookie(res);
         res.status(200).json({ success: true, data: { subscribed: false, email: null } });
     }
 };
@@ -47,6 +61,7 @@ exports.checkSubscriptionStatus = async (req, res) => {
 exports.unsubscribe = async (req, res) => {
     try {
         await newsletterService.processUnsubscribe(req.params.token);
+        clearNewsletterCookie(res);
         res.status(200).json({ success: true, message: 'Successfully unsubscribed from newsletter' });
     } catch (error) {
         console.error('Unsubscribe error:', error);

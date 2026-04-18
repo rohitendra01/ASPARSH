@@ -21,11 +21,21 @@ const LocalStrategy = require('passport-local').Strategy;
 const helmet = require('helmet');
 const morgan = require('morgan');
 const adminUser = require('./models/adminUser');
+const {
+    buildSessionCookieOptions,
+    getCspDirectives,
+    getRequiredEnv,
+    getSessionCookieName,
+    getTrustProxySetting
+} = require('./utils/securityConfig');
+const { sanitizeReturnTo } = require('./utils/securityUtils');
 
 const app = express();
 
 app.use(helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+        directives: getCspDirectives()
+    },
     crossOriginEmbedderPolicy: false
 }));
 
@@ -42,7 +52,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
-app.set('trust proxy', true);
+app.set('trust proxy', getTrustProxySetting());
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/assets', express.static(path.join(__dirname, "public", "assets")));
@@ -53,15 +63,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const sessionOptions = {
-    secret: 'yourSecretKey',
+    name: getSessionCookieName(),
+    secret: getRequiredEnv('SESSION_SECRET'),
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 10),
-        sameSite: 'lax',
-        maxAge: 1000 * 60 * 30
-    }
+    rolling: true,
+    proxy: Boolean(getTrustProxySetting()),
+    cookie: buildSessionCookieOptions()
 };
 
 let MongoStore;
@@ -76,7 +84,7 @@ if (MongoStore && process.env.NODE_ENV !== 'test') {
         const mongoose = require('mongoose');
         sessionOptions.store = MongoStore.create({
             mongoUrl: process.env.MONGO_URI || (mongoose.connection && mongoose.connection.client && mongoose.connection.client.s.url) || undefined,
-            ttl: 10 * 60
+            ttl: 30 * 60
         });
     } catch (e) {
         console.warn('connect-mongo could not be initialized, falling back to default session store');
@@ -134,7 +142,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
     try {
-        const user = await adminUser.findById(id);
+        const user = await adminUser.findById(id).select('+currentSessionId');
         done(null, user);
     } catch (err) {
         done(err);
@@ -151,20 +159,18 @@ app.use((req, res, next) => {
     res.locals.errors = req.flash('errors');
     res.locals.fieldErrors = req.flash('fieldErrors')[0] || {};
     res.locals.fieldWarnings = req.flash('fieldWarnings')[0] || {};
-    res.locals.returnTo = req.session.returnTo || '/';
+    res.locals.returnTo = sanitizeReturnTo(req.session.returnTo, '/');
     res.locals.name = req.flash('name')[0];
     res.locals.email = req.flash('email')[0];
     next();
 });
 
 try {
-    const safeCsrf = csurf({ cookie: { httpOnly: true, sameSite: 'lax' } });
-    app.use((req, res, next) => {
-        if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
-            return safeCsrf(req, res, next);
-        }
-        return next();
+    const safeCsrf = csurf({
+        cookie: { httpOnly: true, sameSite: 'lax' },
+        ignoreMethods: ['GET', 'HEAD', 'OPTIONS']
     });
+    app.use(safeCsrf);
 } catch (e) {
     console.warn('Could not initialize safe CSRF middleware:', e && e.message);
 }
@@ -176,6 +182,10 @@ app.use((req, res, next) => {
         res.locals.csrfToken = null;
     }
     next();
+});
+
+app.get('/ping-session', (req, res) => {
+    res.sendStatus(200);
 });
 
 // Import routes

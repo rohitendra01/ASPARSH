@@ -2,6 +2,9 @@ require('dotenv').config();
 const http = require('http');
 const app = require('./app');
 const mongoose = require("mongoose");
+const { validateEssentialEnv } = require('./utils/securityConfig');
+
+validateEssentialEnv();
 
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
