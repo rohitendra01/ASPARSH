@@ -170,7 +170,13 @@ try {
         cookie: { httpOnly: true, sameSite: 'lax' },
         ignoreMethods: ['GET', 'HEAD', 'OPTIONS']
     });
-    app.use(safeCsrf);
+    // Skip global CSRF for multipart/form-data to allow multer to parse the body first in per-route CSRF
+    app.use((req, res, next) => {
+        if (req.headers['content-type'] && req.headers['content-type'].includes('multipart/form-data')) {
+            return next();
+        }
+        safeCsrf(req, res, next);
+    });
 } catch (e) {
     console.warn('Could not initialize safe CSRF middleware:', e && e.message);
 }
@@ -234,8 +240,9 @@ app.use((err, req, res, next) => {
 
     if (err.code === 'EBADCSRFTOKEN') {
         if (isJsonRequest) return res.status(403).json({ success: false, message: 'Invalid or expired security token.' });
-        req.flash('error_msg', 'Your session expired. Please try again.');
-        return res.redirect('back');
+        req.flash('error_msg', 'Your session expired or the form is invalid. Please try again.');
+        const fallback = (req.user && req.user.slug) ? `/dashboard/${req.user.slug}` : '/';
+        return res.redirect(req.get('Referrer') || fallback);
     }
 
     if (isJsonRequest) {

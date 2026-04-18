@@ -51,6 +51,7 @@ exports.updateUserProfile = async (req, res) => {
   } catch (err) {
     console.error('Error updating user profile:', err);
     req.flash('error_msg', err.message || 'Error updating profile');
-    res.redirect('back');
+    const fallback = (req.user && req.user.slug) ? `/dashboard/${req.user.slug}` : '/';
+    res.redirect(req.get('Referrer') || fallback);
   }
 };
